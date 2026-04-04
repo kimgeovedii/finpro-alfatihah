@@ -1,0 +1,20 @@
+node_modules/
+dist/
+uploads/
+
+# Environment
+.env
+.env.local
+
+# Prisma generated
+/src/generated/prisma
+
+# Logs
+*.log
+err.txt
+validate.log
+prisma_migrate.log
+
+# IDE
+.vscode/
+.idea/
