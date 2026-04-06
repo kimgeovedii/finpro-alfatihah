@@ -6,6 +6,7 @@ import CartFactory from './factories/carts.factory';
 import CartItemsFactory from './factories/cart_items.factory';
 import OrderFactory from './factories/orders.factory';
 import OrderItemsFactory from './factories/order_items.factory';
+import PaymentFactory from './factories/payments.factory';
 
 const connectionString = process.env.DATABASE_URL;
 const pool = new Pool({ connectionString });
@@ -303,7 +304,6 @@ async function main() {
   console.log(`  Branch Schedules: ${5 + 2 + 5 + 1 + 7}`);
   console.log(`  Employees:        4`);
   console.log(`  Addresses:        3`);
-  console.log(`\n🔑 Default password: password123`);
 
   // Cleanup
   await prisma.order_items.deleteMany()
@@ -334,6 +334,14 @@ async function main() {
   const orderItemsFactory = new OrderItemsFactory()
   await orderItemsFactory.createMany(totalOrderItems)
   console.log(`  Order Items:    ${totalOrderItems}`)
+
+  // Cart Payments Seeders
+  const totalPayments = 10
+  const paymentFactory = new PaymentFactory()
+  await paymentFactory.createMany(totalPayments)
+  console.log(`  Payments:    ${totalPayments}`)
+
+  console.log(`\n🔑 Default password: password123`);
 }
 
 main()

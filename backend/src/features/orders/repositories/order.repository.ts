@@ -9,7 +9,7 @@ export class OrderRepository {
 
     return prisma.orders.findFirst({ 
       skip, 
-      select: { id: true }
+      select: { id: true, status: true }
     })
   }
 }
