@@ -4,7 +4,7 @@ export class AuthRepository {
   async findByEmail(email: string) {
     return prisma.user.findUnique({
       where: { email },
-      include: { role: true },
+
     });
   }
 
@@ -13,7 +13,7 @@ export class AuthRepository {
       data: {
         userId,
         token,
-        expiresAt,
+        expiredAt: expiresAt,
         device,
         ip,
       },

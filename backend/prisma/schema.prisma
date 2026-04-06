@@ -10,17 +10,36 @@ datasource db {
   // connection URL is configured in prisma.config.ts for Prisma v7+
 }
 
+enum UserRole {
+  CUSTOMER
+  ADMIN
+}
+
+enum EmployeeRole {
+  STORE_ADMIN
+  SUPER_ADMIN
+}
+
+enum DayName {
+  SUN
+  MON
+  TUE
+  WED
+  THU
+  FRI
+  SAT
+}
+
 model User {
   id        String   @id @default(uuid())
+  username  String?  @unique
   email     String   @unique
   password  String
-  name      String
-
-  role      Role?    @relation(fields: [roleId], references: [id])
-  roleId    String?
-
-  tokens    Token[]
-
+  avatar    String?
+  role      UserRole @default(CUSTOMER)
+  
+  referalCode String? @map("referal_code")
+  
   emailVerifiedAt     DateTime?
   verificationToken   String?
   verificationExpires DateTime?
@@ -28,12 +47,10 @@ model User {
   lastLogin DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}
 
-model Role {
-  id    String @id @default(uuid())
-  name  String @unique
-  users User[]
+  tokens    Token[]
+  employee  Employee?
+  addresses Address[]
 }
 
 model Token {
@@ -42,9 +59,62 @@ model Token {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  device    String?  // Untuk menyimpan User-Agent / info perangkat
-  ip        String?  // Untuk menyimpan alamat IP
+  device    String?
+  ip        String?
   
-  createdAt DateTime @default(now()) // Waktu login (sesi dimulai)
-  expiresAt DateTime
+  createdAt DateTime @default(now())
+  expiredAt DateTime @map("expires_at")
+}
+
+model Branch {
+  id                  String   @id @default(uuid())
+  storeName           String   @map("store_name")
+  address             String
+  latitude            Float
+  longitude           Float
+  maxDeliveryDistance Float    @map("max_delivery_distance")
+  isActive            Boolean  @default(true) @map("is_active")
+  city                String
+  province            String
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  schedules BranchSchedule[]
+  employees Employee[]
+}
+
+model BranchSchedule {
+  id        String   @id @default(uuid())
+  branchId  String   @map("branch_id")
+  branch    Branch   @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  startTime String   @map("start_time") // Format HH:mm
+  endTime   String   @map("end_time")   // Format HH:mm
+  dayName   DayName  @map("day_name")
+}
+
+model Employee {
+  id        String       @id @default(uuid())
+  fullName  String       @map("full_name")
+  role      EmployeeRole
+  branchId  String       @map("branch_id")
+  branch    Branch       @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  userId    String?      @unique @map("user_id")
+  user      User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model Address {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label       String
+  type        String
+  receiptName String   @map("receipt_name")
+  notes       String?
+  phone       String
+  address     String
+  lat         Float
+  long        Float
+  isPrimary   Boolean  @default(false) @map("is_primary")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 }
