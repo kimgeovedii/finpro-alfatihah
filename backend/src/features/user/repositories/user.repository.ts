@@ -6,7 +6,7 @@ export class UserRepository {
       select: {
         id: true,
         email: true,
-        name: true,
+        username: true,
         role: true,
         createdAt: true,
       },
@@ -19,7 +19,7 @@ export class UserRepository {
       select: {
         id: true,
         email: true,
-        name: true,
+        username: true,
         role: true,
         createdAt: true,
       },
