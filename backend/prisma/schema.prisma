@@ -30,6 +30,17 @@ enum DayName {
   SAT
 }
 
+enum PaymentMethod {
+  MANUAL
+  GATEWAY
+}
+
+enum PaymentStatus {
+  SUCCESS
+  PENDING
+  REJECTED
+}
+
 model User {
   id        String   @id @default(uuid())
   username  String?  @unique
@@ -51,6 +62,8 @@ model User {
   tokens    Token[]
   employee  Employee?
   addresses Address[]
+  orders    orders[]
+  carts     carts[]
 }
 
 model Token {
@@ -81,6 +94,8 @@ model Branch {
 
   schedules BranchSchedule[]
   employees Employee[]
+  orders    orders[]
+  carts     carts[]
 }
 
 model BranchSchedule {
@@ -117,4 +132,90 @@ model Address {
   isPrimary   Boolean  @default(false) @map("is_primary")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
+
+  order     orders[]
+}
+
+model carts {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  branchId  String   @map("branch_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  branch    Branch   @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  
+  items     cart_items[]
+
+  @@map("carts")
+}
+
+model cart_items {
+  id         String   @id @default(uuid())
+  cartId     String   @map("cart_id")
+  // productId  String   @map("product_id")
+  // discountId String?  @map("discount_id")
+  quantity   Int
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  cart carts @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+  @@map("cart_items")
+}
+
+model orders {
+  id              String   @id @default(uuid())
+  orderNumber     String   @map("order_number")
+  userId          String   @map("user_id")
+  branchId        String   @map("branch_id")
+  // discountId      String?  @map("discount_id")
+  addressId       String   @map("address_id")
+  status          String
+  totalPrice      Float    @map("total_price")
+  finalPrice      Float    @map("final_price")
+  shippingCost    Float    @map("shipping_cost")
+  paymentDeadline DateTime @map("payment_deadline")
+  shippedAt       DateTime? @map("shipped_at")
+  confirmedAt     DateTime? @map("confirmed_at")
+  rejectedAt      DateTime? @map("rejected_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  branch  Branch  @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  address Address @relation(fields: [addressId], references: [id], onDelete: Cascade)
+
+  items    order_items[]
+  payments payments[]
+
+  @@map("orders")
+}
+
+model order_items {
+  id         String  @id @default(uuid())
+  orderId    String  @map("order_id")
+  // productId  String  @map("product_id")
+  // discountId String? @map("discount_id")
+  price      Float
+  quantity   Int
+
+  order orders @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("order_items")
+}
+
+model payments {
+  id         String   @id @default(uuid())
+  orderId    String   @map("order_id")
+  method     PaymentMethod
+  status     PaymentStatus
+  evidence   String?
+  approvedBy String?  @map("approved_by")
+  approvedAt DateTime? @map("approved_at")
+  rejectedAt DateTime? @map("rejected_at")
+  gatewayRef String?  @map("gateway_ref")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  order orders @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
 }
