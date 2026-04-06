@@ -41,6 +41,15 @@ enum PaymentStatus {
   REJECTED
 }
 
+enum OrderStatus {
+  WAITING_PAYMENT 
+  WAITING_PAYMENT_CONFIRMATION 
+  PROCESSING                 
+  SHIPPED                   
+  CONFIRMED                  
+  CANCELLED               
+}
+
 model User {
   id        String   @id @default(uuid())
   username  String?  @unique
@@ -170,7 +179,7 @@ model orders {
   branchId        String   @map("branch_id")
   // discountId      String?  @map("discount_id")
   addressId       String   @map("address_id")
-  status          String
+  status          OrderStatus
   totalPrice      Float    @map("total_price")
   finalPrice      Float    @map("final_price")
   shippingCost    Float    @map("shipping_cost")
