@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs';
 import CartFactory from './factories/carts.factory';
 import CartItemsFactory from './factories/cart_items.factory';
 import OrderFactory from './factories/orders.factory';
+import OrderItemsFactory from './factories/order_items.factory';
 
 const connectionString = process.env.DATABASE_URL;
 const pool = new Pool({ connectionString });
@@ -305,6 +306,7 @@ async function main() {
   console.log(`\n🔑 Default password: password123`);
 
   // Cleanup
+  await prisma.order_items.deleteMany()
   await prisma.orders.deleteMany()
   await prisma.cart_items.deleteMany()
   await prisma.carts.deleteMany()
@@ -322,10 +324,16 @@ async function main() {
   console.log(`  Cart Item:    ${totalCartItems}`)
 
   // Cart Orders Seeders
-  const totalOrderItems = 10
+  const totalOrder = 10
   const orderFactory = new OrderFactory()
-  await orderFactory.createMany(totalOrderItems)
-  console.log(`  Order:    ${totalOrderItems}`)
+  await orderFactory.createMany(totalOrder)
+  console.log(`  Order:    ${totalOrder}`)
+
+  // Cart Orders Seeders
+  const totalOrderItems = 10
+  const orderItemsFactory = new OrderItemsFactory()
+  await orderItemsFactory.createMany(totalOrderItems)
+  console.log(`  Order Items:    ${totalOrderItems}`)
 }
 
 main()
