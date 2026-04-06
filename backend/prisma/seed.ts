@@ -3,6 +3,7 @@ import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 import bcrypt from 'bcryptjs';
 import CartFactory from './factories/carts.factory';
+import CartItemsFactory from './factories/cart_items.factory';
 
 const connectionString = process.env.DATABASE_URL;
 const pool = new Pool({ connectionString });
@@ -302,12 +303,21 @@ async function main() {
   console.log(`  Addresses:        3`);
   console.log(`\n🔑 Default password: password123`);
 
+  // Cleanup
+  await prisma.cart_items.deleteMany()
+  await prisma.carts.deleteMany()
+
   // Cart Seeders
   const totalCart = 5
-  await prisma.carts.deleteMany()
   const cartFactory = new CartFactory()
   await cartFactory.createMany(totalCart, UserRole.CUSTOMER)
   console.log(`  Carts:        ${totalCart}`);
+
+  // Cart Items Seeders
+  const totalCartItems = 20
+  const cartItemsFactory = new CartItemsFactory()
+  await cartItemsFactory.createMany(totalCartItems)
+  console.log(`  Cart Item:    ${totalCartItems}`);
 }
 
 main()
