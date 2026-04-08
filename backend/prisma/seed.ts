@@ -7,6 +7,7 @@ import CartItemsFactory from './factories/cart_items.factory';
 import OrderFactory from './factories/orders.factory';
 import OrderItemsFactory from './factories/order_items.factory';
 import PaymentFactory from './factories/payments.factory';
+import ProductCategoriesFactory from './factories/product_categories.factory';
 
 const connectionString = process.env.DATABASE_URL;
 const pool = new Pool({ connectionString });
@@ -18,6 +19,18 @@ async function main() {
 
   // --- Hash password ---
   const defaultPassword = await bcrypt.hash('password123', 10);
+
+  // Cleanup existing data
+  console.log('🧹 Cleaning up existing data...');
+  await prisma.order_items.deleteMany()
+  await prisma.orders.deleteMany()
+  await prisma.cart_items.deleteMany()
+  await prisma.carts.deleteMany()
+  await prisma.product_categories.deleteMany()
+  await prisma.employee.deleteMany()
+  await prisma.address.deleteMany()
+  await prisma.branchSchedule.deleteMany()
+  console.log('  ✅ Cleanup completed.\n');
 
   // ============================================================
   // 1. USERS
@@ -293,6 +306,17 @@ async function main() {
   console.log('  ✅ Addresses seeded.\n');
 
   // ============================================================
+  // 6. PRODUCT CATEGORIES
+  // ============================================================
+  console.log('📦 Seeding Product Categories...');
+
+  const totalProductCategories = 13;
+  const productCategoriesFactory = new ProductCategoriesFactory();
+  await productCategoriesFactory.createMany(totalProductCategories);
+
+  console.log(`  ✅ Product Categories seeded: ${totalProductCategories}\n`);
+
+  // ============================================================
   // DONE
   // ============================================================
   console.log('========================================');
@@ -304,14 +328,9 @@ async function main() {
   console.log(`  Branch Schedules: ${5 + 2 + 5 + 1 + 7}`);
   console.log(`  Employees:        4`);
   console.log(`  Addresses:        3`);
+  console.log(`  Product Categories: ${totalProductCategories}`);
 
-  // Cleanup
-  await prisma.order_items.deleteMany()
-  await prisma.orders.deleteMany()
-  await prisma.cart_items.deleteMany()
-  await prisma.carts.deleteMany()
-
-  // Cart Seeders
+  console.log(`\n🔑 Default password: password123`);
   const totalCart = 5
   const cartFactory = new CartFactory()
   await cartFactory.createMany(totalCart, UserRole.CUSTOMER)
