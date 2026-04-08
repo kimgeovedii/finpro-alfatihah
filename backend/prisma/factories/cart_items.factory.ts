@@ -1,15 +1,15 @@
 import { faker } from "@faker-js/faker"
 import { prisma } from "../../src/config/prisma"
-import { ProductRepository } from "../../src/features/products/repositories/product.repository"
+import { BranchInventoryRepository } from "../../src/features/branch/repositories/branch_inventory.repository"
 import { CartRepository } from "../../src/features/carts/repositories/cart.repository"
 
 class CartItemsFactory {
     private cartRepository: CartRepository
-    private productRepository: ProductRepository
+    private branchInventoryRepository: BranchInventoryRepository
 
     constructor(){
         this.cartRepository = new CartRepository()
-        this.productRepository = new ProductRepository()
+        this.branchInventoryRepository = new BranchInventoryRepository()
     }
 
     public create = async () => {
@@ -17,16 +17,16 @@ class CartItemsFactory {
         const cart = await this.cartRepository.findRandomCart()
         if (!cart) throw new Error('Cannot create cart items without cart')
 
-        // Get random product from repo
-        const product = await this.productRepository.findRandomProduct(cart.branchId)
-        if (!product) throw new Error('Cannot create cart items without products')
+        // Get random product (branch inventory) from repo
+        const branchInventory = await this.branchInventoryRepository.findRandomBranchInventory(cart.branchId)
+        if (!branchInventory) throw new Error('Cannot create cart items without branch inventory')
 
         return prisma.cart_items.create({
             data: {
                 id: faker.string.uuid(),
                 cartId: cart.id,
-                productId: product.id,
-                quantity: faker.number.int({ min: 1, max: 5 }),
+                productId: branchInventory.id,
+                quantity: faker.number.int({ min: 1, max: branchInventory.currentStock }),
                 createdAt: faker.date.past({ years: 1 }),
             },
         })

@@ -202,9 +202,9 @@ model cart_items {
   quantity  Int
   createdAt DateTime @default(now()) @map("created_at")
 
-  cart      carts       @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  product   products    @relation(fields: [productId], references: [id], onDelete: Cascade)
-  discount  discounts?  @relation(fields: [discountId], references: [id], onDelete: Cascade)
+  cart      carts                 @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product   branch_inventories    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  discount  discounts?            @relation(fields: [discountId], references: [id], onDelete: Cascade)
 
   @@map("cart_items")
 }
@@ -214,7 +214,6 @@ model orders {
   orderNumber     String      @map("order_number")
   userId          String      @map("user_id")
   branchId        String      @map("branch_id")
-  discountId      String?     @map("discount_id")
   addressId       String      @map("address_id")
   status          OrderStatus
   totalPrice      Float       @map("total_price")
@@ -229,26 +228,26 @@ model orders {
   user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   branch    Branch      @relation(fields: [branchId], references: [id], onDelete: Cascade)
   address   Address     @relation(fields: [addressId], references: [id], onDelete: Cascade)
-  discount  discounts?  @relation(fields: [discountId], references: [id], onDelete: Cascade)
 
   items         order_items[]
   payments      payments[]
   stockJournals stock_journals[]
+  voucher_useds voucher_useds[]
 
   @@map("orders")
 }
 
 model order_items {
-  id       String @id @default(uuid())
-  orderId  String @map("order_id")
+  id         String @id @default(uuid())
+  orderId    String @map("order_id")
   productId  String  @map("product_id")
   discountId String? @map("discount_id")
-  price    Float
-  quantity Int
+  price      Float
+  quantity   Int
 
-  order     orders      @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product   products    @relation(fields: [productId], references: [id], onDelete: Cascade)
-  discount  discounts?  @relation(fields: [discountId], references: [id], onDelete: Cascade)
+  order     orders                @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   branch_inventories    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  discount  discounts?            @relation(fields: [discountId], references: [id], onDelete: Cascade)
 
   @@map("order_items")
 }
@@ -271,6 +270,17 @@ model payments {
   @@map("payments")
 }
 
+model voucher_useds {
+  id          String @id @default(uuid())
+  voucherId   String @map("voucher_id")
+  orderId     String @map("order_id")
+
+  order     orders      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  voucher   vouchers    @relation(fields: [voucherId], references: [id], onDelete: Cascade)
+
+  @@map("voucher_useds")
+}
+
 model product_categories {
   id          String     @id @default(uuid())
   name        String
@@ -286,7 +296,7 @@ model products {
   productName       String               @map("product_name")
   slugName          String               @map("slug_name")
   description       String
-  basePrice         String               @map("base_price")
+  basePrice         Float                @map("base_price")
   createdAt         DateTime             @default(now()) @map("created_at")
   updatedAt         DateTime?            @updatedAt @map("updated_at")
   category          product_categories   @relation(fields: [productCategoryId], references: [id], onDelete: Cascade)
@@ -296,8 +306,6 @@ model products {
   stockJournals     stock_journals[]
   mutationJournals  mutation_journals[]
   discounts         discounts[]
-  cartItems         cart_items[]
-  orderItems        order_items[]
 }
 
 model product_images {
@@ -319,6 +327,8 @@ model branch_inventories {
   productId        String              @map("product_id")
   stockJournals    stock_journals[]
   mutationJournals mutation_journals[]
+  cartItems        cart_items[]
+  orderItems       order_items[]
 }
 
 model stock_journals {
@@ -379,7 +389,6 @@ model discounts {
 
   cartItems         cart_items[]
   orderItems        order_items[]
-  order             orders[]
 }
 
 model vouchers {
@@ -395,6 +404,7 @@ model vouchers {
   expiredDate          DateTime
   createdAt            DateTime                @default(now()) @map("created_at")
   discountVoucherUseds discount_voucher_used[]
+  voucher_useds        voucher_useds[]
 }
 
 model discount_voucher_used {

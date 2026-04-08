@@ -1,16 +1,15 @@
 import { faker } from "@faker-js/faker"
 import { prisma } from "../../src/config/prisma"
-
 import { OrderRepository } from "../../src/features/orders/repositories/order.repository"
-import { ProductRepository } from "../../src/features/products/repositories/product.repository"
+import { BranchInventoryRepository } from "../../src/features/branch/repositories/branch_inventory.repository"
 
 class OrderItemsFactory {
     private orderRepository: OrderRepository
-    private productRepository: ProductRepository
+    private branchInventoryRepository: BranchInventoryRepository
 
     constructor(){
         this.orderRepository = new OrderRepository()
-        this.productRepository = new ProductRepository()
+        this.branchInventoryRepository = new BranchInventoryRepository()
     }
 
     public create = async () => {
@@ -18,17 +17,19 @@ class OrderItemsFactory {
         const order = await this.orderRepository.findRandomOrder()
         if (!order) throw new Error('Cannot create order items without order')
 
-        // Get random product from repo
-        const product = await this.productRepository.findRandomProduct(order.branchId)
-        if (!product) throw new Error('Cannot create cart items without products')
+        // Get random product (branch inventory) from repo
+        const branchInventory = await this.branchInventoryRepository.findRandomBranchInventory(order.branchId)
+        if (!branchInventory) throw new Error('Cannot create cart items without branch inventory')
+
+        const quantity = faker.number.int({ min: 1, max: branchInventory.currentStock })
 
         return prisma.order_items.create({
             data: {
                 id: faker.string.uuid(),
                 orderId: order.id,
-                productId: product.id,
-                price: faker.number.int({ min: 50000, max: 400000 }), // for now
-                quantity: faker.number.int({ min: 1, max: 5 })
+                productId: branchInventory.id,
+                price: quantity * branchInventory.product.basePrice, 
+                quantity
             },
         })
     }
