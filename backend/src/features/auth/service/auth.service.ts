@@ -20,7 +20,7 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
     const user = await this.authRepository.createUser({
-      name: dto.name,
+      username: dto.username,
       email: dto.email,
       password: hashedPassword,
     });
@@ -32,7 +32,7 @@ export class AuthService {
     await this.authRepository.updateVerificationToken(user.id, verificationToken, expiresAt);
 
     // Kirim email verifikasi
-    const emailHtml = getRegistrationEmailHtml(user.name, verificationToken);
+    const emailHtml = getRegistrationEmailHtml(user.username || user.email, verificationToken);
     
     await Mailer.client.sendMail({
       from: `"Alfatihah Online Grocery" <${process.env.SMTP_USER}>`,
@@ -60,7 +60,7 @@ export class AuthService {
 
     await this.authRepository.updateVerificationToken(user.id, verificationToken, expiresAt);
 
-    const emailHtml = getResendVerificationEmailHtml(user.name, verificationToken);
+    const emailHtml = getResendVerificationEmailHtml(user.username || user.email, verificationToken);
 
     await Mailer.client.sendMail({
       from: `"Alfatihah Online Grocery" <${process.env.SMTP_USER}>`,

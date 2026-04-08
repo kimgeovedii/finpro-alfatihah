@@ -10,41 +10,408 @@ datasource db {
   // connection URL is configured in prisma.config.ts for Prisma v7+
 }
 
+enum UserRole {
+  CUSTOMER
+  ADMIN
+}
+
+enum EmployeeRole {
+  STORE_ADMIN
+  SUPER_ADMIN
+}
+
+enum DayName {
+  SUN
+  MON
+  TUE
+  WED
+  THU
+  FRI
+  SAT
+}
+
+enum PaymentMethod {
+  MANUAL
+  GATEWAY
+}
+
+enum PaymentStatus {
+  SUCCESS
+  PENDING
+  REJECTED
+}
+
+enum OrderStatus {
+  WAITING_PAYMENT
+  WAITING_PAYMENT_CONFIRMATION
+  PROCESSING
+  SHIPPED
+  CONFIRMED
+  CANCELLED
+}
+
+enum TransactionType {
+  IN
+  OUT
+}
+
+enum ReferenceType {
+  ORDER
+  MANUAL
+}
+
+enum DiscountType {
+  PRODUCT_DISCOUNT
+  BUY_ONE_GET_ONE_FREE
+  MINIMUM_PURCHASE
+}
+
+enum DiscountValueType {
+  PERCENTAGE
+  NOMINAL
+}
+
+enum VoucherType {
+  PRODUCT
+  ORDER
+  SHIPPING
+  USER
+}
+
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  name      String
+  id       String   @id @default(uuid())
+  username String?  @unique
+  email    String   @unique
+  password String
+  avatar   String?
+  role     UserRole @default(CUSTOMER)
 
-  role      Role?    @relation(fields: [roleId], references: [id])
-  roleId    String?
-
-  tokens    Token[]
+  referalCode String? @map("referal_code")
 
   emailVerifiedAt     DateTime?
   verificationToken   String?
   verificationExpires DateTime?
 
   lastLogin DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
-model Role {
-  id    String @id @default(uuid())
-  name  String @unique
-  users User[]
+  tokens    Token[]
+  employee  Employee?
+  addresses Address[]
+  orders    orders[]
+  carts     carts[]
 }
 
 model Token {
+  id     String @id @default(uuid())
+  token  String @unique
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  device String?
+  ip     String?
+
+  createdAt DateTime @default(now())
+  expiredAt DateTime @map("expires_at")
+}
+
+model Branch {
+  id                  String   @id @default(uuid())
+  storeName           String   @map("store_name")
+  address             String
+  latitude            Float
+  longitude           Float
+  maxDeliveryDistance Float    @map("max_delivery_distance")
+  isActive            Boolean  @default(true) @map("is_active")
+  city                String
+  province            String
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  schedules            BranchSchedule[]
+  employees            Employee[]
+  orders               orders[]
+  carts                carts[]
+  branchInventories    branch_inventories[]
+  sourceMutations      mutation_journals[]  @relation("sourceBranch")
+  destinationMutations mutation_journals[]  @relation("destinationBranch")
+  discounts            discounts[]
+}
+
+model BranchSchedule {
+  id        String  @id @default(uuid())
+  branchId  String  @map("branch_id")
+  branch    Branch  @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  startTime String  @map("start_time") // Format HH:mm
+  endTime   String  @map("end_time") // Format HH:mm
+  dayName   DayName @map("day_name")
+}
+
+model Employee {
+  id               String              @id @default(uuid())
+  fullName         String              @map("full_name")
+  role             EmployeeRole
+  branchId         String              @map("branch_id")
+  branch           Branch              @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  userId           String?             @unique @map("user_id")
+  user             User?               @relation(fields: [userId], references: [id], onDelete: SetNull)
+  stockJournals    stock_journals[]
+  mutationJournals mutation_journals[]
+  payment          payments[]
+}
+
+model Address {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label       String
+  type        String
+  receiptName String   @map("receipt_name")
+  notes       String?
+  phone       String
+  address     String
+  lat         Float
+  long        Float
+  isPrimary   Boolean  @default(false) @map("is_primary")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  order orders[]
+}
+
+model carts {
   id        String   @id @default(uuid())
-  token     String   @unique
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  device    String?  // Untuk menyimpan User-Agent / info perangkat
-  ip        String?  // Untuk menyimpan alamat IP
-  
-  createdAt DateTime @default(now()) // Waktu login (sesi dimulai)
-  expiresAt DateTime
+  userId    String   @map("user_id")
+  branchId  String   @map("branch_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  branch Branch @relation(fields: [branchId], references: [id], onDelete: Cascade)
+
+  items cart_items[]
+
+  @@map("carts")
+}
+
+model cart_items {
+  id         String    @id @default(uuid())
+  cartId     String    @map("cart_id")
+  productId  String   @map("product_id")
+  discountId String?  @map("discount_id")
+  quantity  Int
+  createdAt DateTime @default(now()) @map("created_at")
+
+  cart      carts                 @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product   branch_inventories    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  discount  discounts?            @relation(fields: [discountId], references: [id], onDelete: Cascade)
+
+  @@map("cart_items")
+}
+
+model orders {
+  id              String      @id @default(uuid())
+  orderNumber     String      @map("order_number")
+  userId          String      @map("user_id")
+  branchId        String      @map("branch_id")
+  addressId       String      @map("address_id")
+  status          OrderStatus
+  totalPrice      Float       @map("total_price")
+  finalPrice      Float       @map("final_price")
+  shippingCost    Float       @map("shipping_cost")
+  paymentDeadline DateTime    @map("payment_deadline")
+  shippedAt       DateTime?   @map("shipped_at")
+  confirmedAt     DateTime?   @map("confirmed_at")
+  rejectedAt      DateTime?   @map("rejected_at")
+  createdAt       DateTime    @default(now()) @map("created_at")
+
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  branch    Branch      @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  address   Address     @relation(fields: [addressId], references: [id], onDelete: Cascade)
+
+  items         order_items[]
+  payments      payments[]
+  stockJournals stock_journals[]
+  voucher_useds voucher_useds[]
+
+  @@map("orders")
+}
+
+model order_items {
+  id         String @id @default(uuid())
+  orderId    String @map("order_id")
+  productId  String  @map("product_id")
+  discountId String? @map("discount_id")
+  price      Float
+  quantity   Int
+
+  order     orders                @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   branch_inventories    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  discount  discounts?            @relation(fields: [discountId], references: [id], onDelete: Cascade)
+
+  @@map("order_items")
+}
+
+model payments {
+  id         String        @id @default(uuid())
+  orderId    String        @map("order_id")
+  method     PaymentMethod
+  status     PaymentStatus
+  evidence   String?
+  approvedBy String?       @map("approved_by")
+  approvedAt DateTime?     @map("approved_at")
+  rejectedAt DateTime?     @map("rejected_at")
+  gatewayRef String?       @map("gateway_ref")
+  createdAt  DateTime      @default(now()) @map("created_at")
+
+  order     orders      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  employee  Employee?   @relation(fields: [approvedBy], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
+
+model voucher_useds {
+  id          String @id @default(uuid())
+  voucherId   String @map("voucher_id")
+  orderId     String @map("order_id")
+
+  order     orders      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  voucher   vouchers    @relation(fields: [voucherId], references: [id], onDelete: Cascade)
+
+  @@map("voucher_useds")
+}
+
+model product_categories {
+  id          String     @id @default(uuid())
+  name        String
+  slugName    String     @map("slug_name")
+  description String
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime?  @updatedAt @map("updated_at")
+  products    products[]
+}
+
+model products {
+  id                String               @id @default(uuid())
+  productName       String               @map("product_name")
+  slugName          String               @map("slug_name")
+  description       String
+  basePrice         Float                @map("base_price")
+  createdAt         DateTime             @default(now()) @map("created_at")
+  updatedAt         DateTime?            @updatedAt @map("updated_at")
+  category          product_categories   @relation(fields: [productCategoryId], references: [id], onDelete: Cascade)
+  productCategoryId String               @map("product_category_id")
+  productImages     product_images[]
+  branchInventories branch_inventories[]
+  stockJournals     stock_journals[]
+  mutationJournals  mutation_journals[]
+  discounts         discounts[]
+}
+
+model product_images {
+  id        String   @id @default(uuid())
+  imageUrl  String   @map("image_url")
+  isPrimary Boolean  @map("is_primary")
+  createdAt DateTime @default(now()) @map("created_at")
+  product   products @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String   @map("product_id")
+}
+
+model branch_inventories {
+  id               String              @id @default(uuid())
+  currentStock     Int                 @map("current_stock")
+  updatedAt        DateTime?           @updatedAt @map("updated_at")
+  branch           Branch              @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  branchId         String              @map("branch_id")
+  product          products            @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId        String              @map("product_id")
+  stockJournals    stock_journals[]
+  mutationJournals mutation_journals[]
+  cartItems        cart_items[]
+  orderItems       order_items[]
+}
+
+model stock_journals {
+  id                String             @id @default(uuid())
+  transactionType   TransactionType    @map("transaction_type")
+  quantityChange    Int                @map("quantity_change")
+  stockBefore       Int                @map("stock_before")
+  stockAfter        Int                @map("stock_after")
+  referenceType     ReferenceType      @map("reference_type")
+  notes             String?
+  createdAt         DateTime           @default(now()) @map("created_at")
+  branchInventory   branch_inventories @relation(fields: [branchInventoryId], references: [id], onDelete: Cascade)
+  branchInventoryId String             @map("branch_inventory_id")
+  product           products           @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId         String             @map("product_id")
+  order             orders?            @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId           String?            @map("order_id")
+  employee          Employee           @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  createdBy         String             @map("created_by")
+}
+
+model mutation_journals {
+  id                  String             @id @default(uuid())
+  quantityChange      Int                @map("quantity_change")
+  stockBefore         Int                @map("stock_before")
+  stockAfter          Int                @map("stock_after")
+  notes               String?
+  createdAt           DateTime           @default(now()) @map("created_at")
+  branchInventory     branch_inventories @relation(fields: [branchInventoryId], references: [id], onDelete: Cascade)
+  branchInventoryId   String             @map("branch_inventory_id")
+  product             products           @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId           String             @map("product_id")
+  employee            Employee           @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  createdBy           String             @map("created_by")
+  sourceBranch        Branch             @relation("sourceBranch", fields: [sourceBranchId], references: [id], onDelete: Cascade)
+  sourceBranchId      String             @map("source_branch_id")
+  destionationBranch  Branch             @relation("destinationBranch", fields: [destinationBranchId], references: [id], onDelete: Cascade)
+  destinationBranchId String             @map("destination_branch_id")
+}
+
+model discounts {
+  id                String            @id @default(uuid())
+  name              String
+  discountType      DiscountType      @map("discount_type")
+  discountValueType DiscountValueType @map("discount_value_type")
+  discountValue     Int               @map("discount_value")
+  minPurchaseAmount Int?              @map("min_purchase_amount")
+  maxDiscountAmount Int               @map("max_discount_amount")
+  startDate         DateTime          @map("start_date")
+  endDate           DateTime          @map("end_date")
+  quota             Int
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime?         @updatedAt @map("updated_at")
+  branch            Branch            @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  branchId          String            @map("branch_id")
+  product           products          @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId         String            @map("product_id")
+
+  cartItems         cart_items[]
+  orderItems        order_items[]
+}
+
+model vouchers {
+  id                   String                  @id @default(uuid())
+  name                 String
+  voucherCode          String                  @map("voucher_code")
+  type                 VoucherType
+  discountValueType    DiscountValueType       @map("discount_value_type")
+  discountValue        Int                     @map("discount_value")
+  minPurchaseAmount    Int?                    @map("min_purchase_amount")
+  maxDiscountAmount    Int                     @map("max_discount_amount")
+  quota                Int
+  expiredDate          DateTime
+  createdAt            DateTime                @default(now()) @map("created_at")
+  discountVoucherUseds discount_voucher_used[]
+  voucher_useds        voucher_useds[]
+}
+
+model discount_voucher_used {
+  id             String      @id @default(uuid())
+  referenceType  VoucherType @map("reference_type")
+  usedAt         DateTime    @map("used_at")
+  discountAmount Int         @map("discount_amount")
+  reference      vouchers    @relation(fields: [referenceId], references: [id])
+  referenceId    String      @map("reference_id")
 }

@@ -1,3 +1,4 @@
+import { UserRole } from "@prisma/client";
 import { prisma } from "../../../config/prisma";
 
 export class UserRepository {
@@ -6,7 +7,7 @@ export class UserRepository {
       select: {
         id: true,
         email: true,
-        name: true,
+        username: true,
         role: true,
         createdAt: true,
       },
@@ -19,10 +20,25 @@ export class UserRepository {
       select: {
         id: true,
         email: true,
-        name: true,
+        username: true,
         role: true,
         createdAt: true,
       },
     });
+  }
+
+  async findRandomUser(role?: UserRole) {
+    const where = role ? { role } : {}
+  
+    const count = await prisma.user.count({ where })
+    if (count === 0) return null
+  
+    const skip = Math.floor(Math.random() * count)
+  
+    return prisma.user.findFirst({
+      where,
+      skip,
+      select: { id: true, email: true },
+    })
   }
 }
