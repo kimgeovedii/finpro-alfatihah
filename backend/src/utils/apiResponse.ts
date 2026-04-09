@@ -8,7 +8,7 @@ interface ApiSuccessResponse<T> {
 
 interface ApiErrorResponse {
   success: false;
-  message: string;
+  message: any;
   errors?: any;
 }
 
@@ -18,7 +18,9 @@ export function sendSuccess<T>(res: Response, data?: T, message = "Success", sta
   return res.status(statusCode).json(response);
 }
 
-export function sendError(res: Response, message = "Internal server error", statusCode = 500, errors?: any) {
+export function sendError(res: Response, message: any, statusCode = 500, errors?: any) {
+  if (message === null) message = "Internal server error"
+
   const response: ApiErrorResponse = { success: false, message };
   if (errors !== undefined) response.errors = errors;
   return res.status(statusCode).json(response);
