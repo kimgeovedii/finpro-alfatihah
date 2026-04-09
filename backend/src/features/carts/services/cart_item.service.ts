@@ -37,4 +37,16 @@ export class CartItemService {
 
         return { cartId: cartItem.cartId, cartItem: updatedItem }
     }
+
+    async deleteCartItemById(userId: string, cartItemId: string) {
+        // Repo : find cart item by id
+        const cartItem = await this.cartItemRepo.findById(cartItemId)
+        if (!cartItem) throw { code: 404, message: 'Cart item not found' }
+
+        // Check if this cart belongs to user
+        if (cartItem.cart.userId !== userId) throw { code: 403, message: 'Forbidden access to this cart item' }
+
+        // Repo : delete cart item by id
+        await this.cartItemRepo.deleteCartItem(cartItemId)
+    }
 }

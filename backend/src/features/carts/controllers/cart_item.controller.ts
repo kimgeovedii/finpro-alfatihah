@@ -11,7 +11,7 @@ export class CartItemController {
         try {
             const userId = req.user?.userId 
 
-            // Param
+            // Route param
             const cartItemId = req.params.cartItemId as string
 
             // Validation
@@ -21,6 +21,22 @@ export class CartItemController {
             const data = await this.cartItemService.updateCartItemQty(userId, cartItemId, payload)
 
             return sendSuccess(res, data, "Product item updated!")
+        } catch (error: any) {
+            next(error)
+        }
+    }
+
+    deleteCartItemById = async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user?.userId 
+
+            // Route param
+            const cartItemId = req.params.cartItemId as string
+
+            // Service
+            await this.cartItemService.deleteCartItemById(userId, cartItemId)
+
+            return sendSuccess(res, "Product item deleted!")
         } catch (error: any) {
             next(error)
         }
