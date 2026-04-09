@@ -4,6 +4,8 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import { ZodError } from "zod"
+import swaggerUi from "swagger-ui-express"
+import { swaggerSpec } from "./config/swagger"
 
 // global router aggregates all feature routers
 import globalRouter from "./router";
@@ -31,6 +33,9 @@ class App {
   private configureRoutes() {
     this.app.use("/api", globalRouter);
 
+    // Swagger
+    this.app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec))
+    
     this.app.get("/", (req: Request, res: Response) => {
       res.send({ status: "ok" });
     });

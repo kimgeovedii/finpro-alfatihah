@@ -1,5 +1,6 @@
 import { Router } from "express"
 import { CartController } from "../controllers/cart.controller"
+import { authMiddleware } from "../../../middleware/auth.middleware"
 
 class CartRouter {
     public router: Router
@@ -13,7 +14,7 @@ class CartRouter {
     }
 
     private initializeRoutes() {
-        this.router.post("/add-to-cart", this.cartController.postAddBranchInventoryToCart)
+        this.router.post("/add-to-cart", authMiddleware, this.cartController.postAddBranchInventoryToCart)
     }
 }
 
