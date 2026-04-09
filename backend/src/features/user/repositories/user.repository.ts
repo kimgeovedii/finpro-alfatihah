@@ -35,7 +35,7 @@ export class UserRepository {
   
     const skip = Math.floor(Math.random() * count)
   
-    return prisma.user.findFirst({
+    return await prisma.user.findFirst({
       where,
       skip,
       select: { id: true, email: true },

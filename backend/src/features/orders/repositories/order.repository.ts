@@ -7,7 +7,7 @@ export class OrderRepository {
 
     const skip = Math.floor(Math.random() * count)
 
-    return prisma.orders.findFirst({ 
+    return await prisma.orders.findFirst({ 
       skip, 
       select: { id: true, status: true, branchId: true }
     })

@@ -11,23 +11,23 @@ export class CartService {
         let { productId, branchId, qty } = payload
         const finalQty = qty ?? 1
 
-        // Service : check if product exist at specific branch
+        // Repo : check if product exist at specific branch
         const branchInventory = await this.branchInventoryRepo.findByProductAndBranch(productId, branchId)
         if (!branchInventory) throw { code: 404, message: 'Product not found in this branch' }
 
         // Make sure requested qty is less than current stock
         if (branchInventory.currentStock < finalQty) throw { code: 422, message: 'Invalid stock' }
 
-        // Service : check if cart already exist
+        // Repo : check if cart already exist
         let cart = await this.cartRepo.findByUserAndBranch(userId, branchId)
 
-        // Service : create cart
+        // Repo : create cart
         if (!cart) cart = await this.cartRepo.createCart(userId, branchId)
 
-        // Service : check existing item in a cart
+        // Repo : check existing item in a cart
         const existingItem = await this.cartItemRepo.findByCartAndProduct(cart.id, branchInventory.id)
 
-        // Service : create cart item if this is the first item in the cart. If already exist, just update the cart
+        // Repo : create cart item if this is the first item in the cart. If already exist, just update the cart
         let cartItem = existingItem ? 
             await this.cartItemRepo.updateCartItemQuantity(existingItem.id, existingItem.quantity + finalQty)
         : 
