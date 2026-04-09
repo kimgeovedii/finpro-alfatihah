@@ -9,7 +9,7 @@ export class AddressRepository {
     
         const skip = Math.floor(Math.random() * count)
     
-        return prisma.address.findFirst({
+        return await prisma.address.findFirst({
             where,
             skip,
             select: { id: true },

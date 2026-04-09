@@ -12,7 +12,7 @@ export class BranchInventoryRepository {
 
         const skip = Math.floor(Math.random() * count)
 
-        return prisma.branch_inventories.findFirst({
+        return await prisma.branch_inventories.findFirst({
             where,
             skip,
             select: { 

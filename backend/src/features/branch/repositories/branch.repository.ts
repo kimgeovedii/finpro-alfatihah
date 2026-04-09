@@ -7,7 +7,7 @@ export class BranchRepository {
 
     const skip = Math.floor(Math.random() * count)
 
-    return prisma.branch.findFirst({ 
+    return await prisma.branch.findFirst({ 
       skip, 
       select: { id: true }
     })
