@@ -9,7 +9,7 @@ export class CartRepository {
 
     return prisma.carts.findFirst({ 
       skip, 
-      select: { id: true }
+      select: { id: true, branchId: true }
     })
   }
 }
