@@ -12,4 +12,16 @@ export class CartRepository {
       select: { id: true, branchId: true }
     })
   }
+
+  async findByUserAndBranch(userId: string, branchId: string) {
+    return prisma.carts.findFirst({
+      where: { userId, branchId }
+    })
+  }
+
+  async createCart(userId: string, branchId: string) {
+    return prisma.carts.create({
+      data: { userId, branchId }
+    })
+  }
 }
