@@ -1,7 +1,11 @@
 import { prisma } from "../../../config/prisma";
 
-export class productCategoriesRepository {
-  public findAll = async (filters: any, skip?: number, take?: number) => {
+export class productCategoryRepository {
+  public findAllCategories = async (
+    filters: any,
+    skip?: number,
+    take?: number,
+  ) => {
     const [data, total] = await prisma.$transaction([
       prisma.product_categories.findMany({
         where: filters,
@@ -18,13 +22,13 @@ export class productCategoriesRepository {
     return { data, total };
   };
 
-  public create = async (data: any) => {
+  public createCategory = async (data: any) => {
     return await prisma.product_categories.create({
       data,
     });
   };
 
-  public update = async (id: string, data: any) => {
+  public updateCategory = async (id: string, data: any) => {
     return await prisma.product_categories.update({
       where: {
         id,
@@ -33,7 +37,7 @@ export class productCategoriesRepository {
     });
   };
 
-  public delete = async (id: string) => {
+  public deleteCategory = async (id: string) => {
     return await prisma.product_categories.delete({
       where: {
         id,
