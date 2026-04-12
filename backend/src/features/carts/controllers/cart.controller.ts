@@ -8,11 +8,30 @@ import { paginationDefault, uuidRegex } from "../../../constants/features.const"
 export class CartController {
     private cartService = new CartService()
 
+    getCartSummary = async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user?.userId
+    
+            // Query param
+            const branchId = typeof req.query.branchId === 'string' ? req.query.branchId.trim() : null
+    
+            // Validate the UUID format
+            if (branchId && !uuidRegex.test(branchId)) throw { code: 400, message: 'branchId is not valid UUID' }
+    
+            // Service
+            const data = await this.cartService.getCartSummary(userId, branchId)
+    
+            return sendSuccess(res, data, "Cart summary fetched")
+        } catch (error: any) {
+            next(error)
+        }
+    }
+
     getAllCarts = async (req: AuthRequest, res: Response, next: NextFunction) => {
         try {
             const userId = req.user?.userId 
 
-            // Query
+            // Query param
             const page = Number(req.query.page) || 1
             const limit = Number(req.query.limit) || paginationDefault
             const branchId = typeof req.query.branchId === 'string' ? req.query.branchId.trim() : null

@@ -10,7 +10,11 @@ export class CartService {
     async getAllCarts(page: number, limit: number, userId: string, branchId: string | null) {
         return await this.cartRepo.findAllCarts(page, limit, userId, branchId)
     }
-        
+
+    async getCartSummary(userId: string, branchId: string | null) {
+        return await this.cartRepo.getCartSummary(userId, branchId)
+    }
+
     async addToCart(userId: string, payload: { productId: string, branchId: string, qty: number | null }) {
         let { productId, branchId, qty } = payload
         const finalQty = qty ?? 1

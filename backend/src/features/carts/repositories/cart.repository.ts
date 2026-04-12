@@ -2,6 +2,29 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "../../../config/prisma";
 
 export class CartRepository {
+  async getCartSummary(userId: string, branchId: string | null) {
+    const carts = await prisma.carts.findMany({
+      where: {
+        userId,
+        ...(branchId && { branchId })
+      },
+      select: {
+        items: {
+          select: {
+            quantity: true
+          }
+        }
+      }
+    })
+
+    // Sum qty from all cart items
+    const allItems = carts.flatMap(cart => cart.items)
+    const totalItems = allItems.length
+    const totalQty = allItems.reduce((sum, item) => sum + item.quantity, 0)
+
+    return { totalItems, totalQty }
+  }
+
   async findAllCarts(page: number, limit: number, userId: string, branchId: string | null) {
     const skip = (page - 1) * limit
 
