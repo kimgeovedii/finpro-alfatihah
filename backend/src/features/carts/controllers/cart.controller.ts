@@ -3,7 +3,7 @@ import { CartService } from "../services/cart.service"
 import { sendSuccess } from "../../../utils/apiResponse"
 import { AddToCartSchema } from "../validation/cart.dto"
 import { AuthRequest } from "../../../middleware/auth.middleware"
-import { paginationDefault } from "../../../constants/features.const"
+import { paginationDefault, uuidRegex } from "../../../constants/features.const"
 
 export class CartController {
     private cartService = new CartService()
@@ -16,6 +16,9 @@ export class CartController {
             const page = Number(req.query.page) || 1
             const limit = Number(req.query.limit) || paginationDefault
             const branchId = typeof req.query.branchId === 'string' ? req.query.branchId.trim() : null
+
+            // Validate the UUID format
+            if (branchId && !uuidRegex.test(branchId)) throw { code: 400, message: 'branchId is not valid UUID' }
             
             // Service
             const result = await this.cartService.getAllCarts(page, limit, userId, branchId)
