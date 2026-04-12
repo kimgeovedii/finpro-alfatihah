@@ -1,0 +1,1 @@
+export const paginationDefault: number = 14
