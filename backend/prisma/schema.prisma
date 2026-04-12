@@ -351,12 +351,12 @@ model stock_journals {
   orderId           String?            @map("order_id")
   mutationId        String?            @map("mutation_id")
   notes             String?
-  createdBy         String             @map("created_by")
+  createdBy         String?            @map("created_by")
   createdAt         DateTime           @default(now()) @map("created_at")
   branchInventory   branch_inventories @relation(fields: [branchInventoryId], references: [id], onDelete: Cascade)
   product           products           @relation(fields: [productId], references: [id], onDelete: Cascade)
   order             orders?            @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  employee          Employee           @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  employee          Employee?          @relation(fields: [createdBy], references: [id], onDelete: Cascade)
   mutation          mutation_journals? @relation(fields: [mutationId], references: [id], onDelete: Cascade)
 }
 
