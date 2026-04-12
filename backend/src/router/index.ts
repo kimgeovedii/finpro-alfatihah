@@ -6,6 +6,7 @@ import userRouter from "../features/user/routers/user.router";
 import { ProductRouter } from "../features/products/routers/product.router";
 import { ProductCategoryRouter } from "../features/products/routers/productCategory.router";
 import { DiscountRouter } from "../features/discounts/routers/discount.router";
+import { VoucherRouter } from "../features/vouchers/routers/voucher.router";
 
 class GlobalRouter {
   public router: Router;
@@ -24,6 +25,7 @@ class GlobalRouter {
     );
     this.router.use("/products", new ProductRouter().getRouter());
     this.router.use("/discounts", new DiscountRouter().getRouter());
+    this.router.use("/vouchers", new VoucherRouter().getRouter());
   }
 }
 
