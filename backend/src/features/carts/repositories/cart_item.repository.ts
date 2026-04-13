@@ -1,0 +1,37 @@
+import { prisma } from "../../../config/prisma"
+
+export class CartItemRepository {
+    async findByCartAndProduct(cartId: string, productId: string) {
+        return await prisma.cart_items.findFirst({
+            where: { cartId, productId }
+        })
+    }
+
+    async createCartItem(cartId: string, productId: string, quantity: number) {
+        return await prisma.cart_items.create({
+            data: { cartId, productId, quantity }
+        })
+    }
+
+    async updateCartItemQuantity(id: string, quantity: number) {
+        return await prisma.cart_items.update({
+            where: { id },
+            data: { quantity }
+        })
+    }
+
+    async findById(cartItemId: string) {
+        return await prisma.cart_items.findUnique({
+            where: { id: cartItemId },
+            include: {
+                cart: true, product: {
+                    select: {
+                        id: true, currentStock: true, branchId: true
+                    }
+                }
+            }
+        })
+    }
+
+    deleteCartItem = async (id: string) => prisma.cart_items.delete({ where: { id } })
+}
