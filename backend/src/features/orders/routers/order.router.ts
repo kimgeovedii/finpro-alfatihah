@@ -15,6 +15,7 @@ class OrderRouter {
 
     private initializeRoutes() {
         this.router.post("/checkout", authMiddleware, this.orderController.postAddCheckoutOrder)
+        this.router.delete("/:orderId", authMiddleware, this.orderController.deleteOrderById)
     }
 }
 

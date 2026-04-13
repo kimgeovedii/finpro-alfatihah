@@ -63,14 +63,31 @@ export class OrderService {
 
         // Repo : update stock for each item in branch inventories
         await Promise.all(
-            cart.items.map(item =>
-                this.branchInventoryRepo.decrementStock(item.product.id, item.quantity)
-            )
+            cart.items.map(item => this.branchInventoryRepo.decrementStock(item.product.id, item.quantity))
         )
 
         // Repo : delete cart and its items
         await this.cartRepo.deleteCart(cartId)
 
+        // Repo : create stock journal Soon LOL ....
+
         return { orderId: order.id, paymentId: payment.id }
+    }
+
+    async deleteOrderById(userId: string, orderId: string) {
+        // Repo : find order by id
+        const order = await this.orderRepo.findOrderById(orderId)
+        if (!order) throw { code: 404, message: 'Order not found' }
+    
+        // Check if this order belongs to user
+        if (order.userId !== userId) throw { code: 403, message: 'Forbidden access to this order' }
+    
+        // Repo : restore stock for each order item in branch inventories
+        await Promise.all(
+            order.items.map(item => this.branchInventoryRepo.incrementStock(item.productId, item.quantity))
+        )
+    
+        // Repo : delete order 
+        await this.orderRepo.deleteOrder(orderId)
     }
 }

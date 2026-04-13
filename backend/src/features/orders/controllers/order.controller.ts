@@ -22,4 +22,20 @@ export class OrderController {
             next(error)
         }
     }
+
+    deleteOrderById = async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user?.userId
+
+            // Route param
+            const orderId = req.params.orderId as string
+    
+            // Service
+            await this.orderService.deleteOrderById(userId, orderId)
+            
+            return sendSuccess(res, "Order deleted!")
+        } catch (error: any) {
+            next(error)
+        }
+    }
 }

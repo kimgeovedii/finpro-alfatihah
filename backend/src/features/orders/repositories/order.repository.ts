@@ -14,6 +14,20 @@ export class OrderRepository {
     })
   }
 
+  async findOrderById(orderId: string) {
+    return await prisma.orders.findFirst({
+      where: { id: orderId },
+      select: {
+        id: true, userId: true,
+        items: {
+          select: {
+            productId: true, quantity: true,
+          }
+        }
+      }
+    })
+  }
+
   async createOrder(userId: string, branchId: string, addressId: string, totalPrice: number, finalPrice: number, shippingCost: number,
     items: Array<{ product: { id: string; product: { basePrice: number } }; quantity: number; discountId?: string | null }>) {
     
@@ -43,4 +57,6 @@ export class OrderRepository {
       select: { id: true, orderNumber: true }
     })
   } 
+
+  deleteOrder = async (id: string) => prisma.orders.delete({ where: { id } })
 }
