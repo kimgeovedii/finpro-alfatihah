@@ -44,8 +44,7 @@ export class OrderRepository {
         take: limit,
         orderBy: { createdAt: 'desc' },
         select: {
-          id: true, createdAt: true, status: true, totalPrice: true, finalPrice: true, shippingCost: true, paymentDeadline: true,
-          items: {
+          id: true, createdAt: true, status: true, totalPrice: true, finalPrice: true, shippingCost: true, paymentDeadline: true, items: {
             select: {
               quantity: true, product: {                 
                 select: {

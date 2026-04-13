@@ -198,3 +198,118 @@
  *                 success: { type: boolean, example: false }
  *                 message: { type: string, example: Internal server error }
  */
+
+/**
+ * @openapi
+ * /api/orders/transaction:
+ *   get:
+ *     summary: Get all orders
+ *     description: Retrieve all orders for the authenticated user with pagination. Optionally filter by branchId to scope the results to a specific branch.
+ *     tags: [Order]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           example: 14
+ *       - in: query
+ *         name: branchId
+ *         required: false
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *           example: fb6359b6-7841-4145-b7fc-eb08c660a3b3
+ *     responses:
+ *       200:
+ *         description: Orders fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 message: { type: string, example: Order fetched }
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     data:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: string
+ *                             format: uuid
+ *                             example: 8bab6859-0372-4a5f-8d53-c39023288ba3
+ *                           createdAt:
+ *                             type: string
+ *                             format: date-time
+ *                             example: 2026-04-13T01:54:05.249Z
+ *                           status:
+ *                             type: string
+ *                             enum: [WAITING_PAYMENT, WAITING_PAYMENT_CONFIRMATION, PROCESSING, SHIPPED, CONFIRMED, CANCELLED]
+ *                             example: WAITING_PAYMENT
+ *                           totalPrice:
+ *                             type: number
+ *                             example: 20000
+ *                           finalPrice:
+ *                             type: number
+ *                             example: 20000
+ *                           shippingCost:
+ *                             type: number
+ *                             example: 6000
+ *                           paymentDeadline:
+ *                             type: string
+ *                             format: date-time
+ *                             example: 2026-04-13T02:54:05.229Z
+ *                           totalItems:
+ *                             type: integer
+ *                             example: 2
+ *                           productList:
+ *                             type: string
+ *                             example: Coca Cola
+ *                     meta:
+ *                       type: object
+ *                       properties:
+ *                         page: { type: integer, example: 1 }
+ *                         limit: { type: integer, example: 14 }
+ *                         total: { type: integer, example: 1 }
+ *                         total_page: { type: integer, example: 1 }
+ *
+ *       400:
+ *         description: Validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: false }
+ *                 message: { type: string, example: branchId is not valid UUID }
+ *
+ *       401:
+ *         description: Unauthorized - No token provided
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: false }
+ *                 message: { type: string, example: No token provided }
+ *
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: false }
+ *                 message: { type: string, example: Internal server error }
+ */
