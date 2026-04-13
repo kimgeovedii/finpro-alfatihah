@@ -3,15 +3,17 @@
 import { useUser } from "@/features/auth/hooks/useUser"
 import { useCart } from "@/features/cart/hooks/useCart"
 import { CartSummary } from "@/features/cart/components/CartSummary"
+import { BranchHeader } from "@/features/cart/components/BranchHeader";
+import { CartItemCard } from "@/features/cart/components/CartItemCard";
 
 export default function CartPage() {
   const { user } = useUser()
   const { summary, isLoading } = useCart()
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto">
       <div className="flex items-center justify-between">
-        <div>
+        <div className="w-full">
           <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">
             Your Basket
           </h1>
@@ -22,6 +24,47 @@ export default function CartPage() {
                 totalQty={summary?.totalQty ?? 0}
               />
           }
+          <hr className="my-5"/>
+          <div>
+            <BranchHeader id="1" storeName="Toko Pusat Jakarta" />
+            <CartItemCard
+              slugName="1"
+              branchId="2"
+              productName="Coca Cola"
+              variant="350ml Can"
+              basePrice={10000}
+              mainImage="/mainImages/coke.png"
+              qty={3}
+              onIncrease={() => console.log("increase")}
+              onDecrease={() => console.log("decrease")}
+              onRemove={() => console.log("remove")}
+            />
+            <CartItemCard
+              slugName="1"
+              branchId="2"
+              productName="Coca Cola"
+              variant="350ml Can"
+              basePrice={10000}
+              mainImage="/mainImages/coke.png"
+              qty={3}
+              onIncrease={() => console.log("increase")}
+              onDecrease={() => console.log("decrease")}
+              onRemove={() => console.log("remove")}
+            />
+            <BranchHeader id="2" storeName="Toko Pusat Jakarta" />
+            <CartItemCard
+              slugName="1"
+              branchId="2"
+              productName="Coca Cola"
+              variant="350ml Can"
+              basePrice={10000}
+              mainImage="/mainImages/coke.png"
+              qty={3}
+              onIncrease={() => console.log("increase")}
+              onDecrease={() => console.log("decrease")}
+              onRemove={() => console.log("remove")}
+            />
+          </div>
         </div>
       </div>
     </div>
