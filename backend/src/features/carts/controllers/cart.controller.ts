@@ -3,7 +3,7 @@ import { CartService } from "../services/cart.service"
 import { sendSuccess } from "../../../utils/apiResponse"
 import { AddToCartSchema } from "../validation/cart.dto"
 import { AuthRequest } from "../../../middleware/auth.middleware"
-import { paginationDefault, uuidRegex } from "../../../constants/features.const"
+import { paginationDefault, uuidRegex } from "../../../constants/feature.const"
 
 export class CartController {
     private cartService = new CartService()

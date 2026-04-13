@@ -5,6 +5,7 @@ import { UserRepository } from "../../src/features/user/repositories/user.reposi
 import { BranchRepository } from "../../src/features/branch/repositories/branch.repository"
 import { AddressRepository } from "../../src/features/user/repositories/address.repository"
 import { OrderStatus, UserRole } from "@prisma/client"
+import { orderCode } from "../../src/constants/business.const"
 
 class OrderFactory {
     private userRepository: UserRepository
@@ -52,7 +53,7 @@ class OrderFactory {
         return prisma.orders.create({
             data: {
                 id: faker.string.uuid(),
-                orderNumber: `ORD-${Date.now()}-${faker.number.int({ min: 100, max: 999 })}`,
+                orderNumber: `${orderCode}-${Date.now()}-${faker.number.int({ min: 100, max: 999 })}`,
                 userId: user.id,
                 branchId: branch.id,
                 addressId: address.id,
