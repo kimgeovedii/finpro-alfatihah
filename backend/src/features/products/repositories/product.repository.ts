@@ -85,7 +85,7 @@ export class ProductRepository {
 
     const skip = Math.floor(Math.random() * count);
 
-    return prisma.products.findFirst({
+    return await prisma.products.findFirst({
       where,
       skip,
       select: { id: true },
