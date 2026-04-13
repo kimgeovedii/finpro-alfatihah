@@ -7,6 +7,17 @@ import CartItemsFactory from './factories/cart_items.factory';
 import OrderFactory from './factories/orders.factory';
 import OrderItemsFactory from './factories/order_items.factory';
 import PaymentFactory from './factories/payments.factory';
+import ProductCategoriesFactory from './factories/product_categories.factory';
+import ProductsFactory from './factories/products.factory';
+import ProductImagesFactory from './factories/product_images.factory';
+import BranchInventoriesFactory from './factories/branch_inventories.factory';
+import DiscountsFactory from './factories/discounts.factory';
+import ProductDiscountsFactory from './factories/product_discounts.factory';
+import VouchersFactory from './factories/vouchers.factory';
+import VoucherUsedFactory from './factories/voucher_used.factory';
+import VoucherReferralFactory from './factories/voucher_referral.factory';
+import StockJournalsFactory from './factories/stock_journals.factory';
+import MutationJournalsFactory from './factories/mutation_journals.factory';
 
 const connectionString = process.env.DATABASE_URL;
 const pool = new Pool({ connectionString });
@@ -19,9 +30,29 @@ async function main() {
   // --- Hash password ---
   const defaultPassword = await bcrypt.hash('password123', 10);
 
-  // ============================================================
-  // 1. USERS
-  // ============================================================
+  // Cleanup existing data
+  console.log('🧹 Cleaning up existing data...');
+  await prisma.stock_journals.deleteMany()
+  await prisma.mutation_journals.deleteMany()
+  await prisma.order_items.deleteMany()
+  await prisma.orders.deleteMany()
+  await prisma.voucher_useds.deleteMany()
+  await prisma.voucher_referral.deleteMany()
+  await prisma.vouchers.deleteMany()
+  await prisma.cart_items.deleteMany()
+  await prisma.carts.deleteMany()
+  await prisma.product_discounts.deleteMany()
+  await prisma.discounts.deleteMany()
+  await prisma.branch_inventories.deleteMany()
+  await prisma.product_categories.deleteMany()
+  await prisma.product_images.deleteMany()
+  await prisma.products.deleteMany()
+  await prisma.employee.deleteMany()
+  await prisma.address.deleteMany()
+  await prisma.branchSchedule.deleteMany()
+  console.log('  ✅ Cleanup completed.\n');
+
+  // Users Seeders
   console.log('👤 Seeding Users...');
 
   const adminUser = await prisma.user.upsert({
@@ -86,9 +117,7 @@ async function main() {
 
   console.log('  ✅ Users seeded.\n');
 
-  // ============================================================
-  // 2. BRANCHES
-  // ============================================================
+  // Branches seeders
   console.log('🏪 Seeding Branches...');
 
   const branchJakarta = await prisma.branch.create({
@@ -132,9 +161,7 @@ async function main() {
 
   console.log('  ✅ Branches seeded.\n');
 
-  // ============================================================
-  // 3. BRANCH SCHEDULES
-  // ============================================================
+  // Branch Schedules Seeders
   console.log('📅 Seeding Branch Schedules...');
 
   const weekdays: DayName[] = [DayName.MON, DayName.TUE, DayName.WED, DayName.THU, DayName.FRI];
@@ -197,9 +224,7 @@ async function main() {
 
   console.log('  ✅ Branch Schedules seeded.\n');
 
-  // ============================================================
-  // 4. EMPLOYEES
-  // ============================================================
+  // Employees Seeders
   console.log('👷 Seeding Employees...');
 
   await prisma.employee.create({
@@ -240,9 +265,7 @@ async function main() {
 
   console.log('  ✅ Employees seeded.\n');
 
-  // ============================================================
-  // 5. ADDRESSES
-  // ============================================================
+  // Addresses Seeders
   console.log('📍 Seeding Addresses...');
 
   await prisma.address.create({
@@ -292,9 +315,106 @@ async function main() {
 
   console.log('  ✅ Addresses seeded.\n');
 
-  // ============================================================
+  // Product Categories Seeders
+  console.log('📦 Seeding Product Categories...');
+
+  const totalProductCategories = 13;
+  const productCategoriesFactory = new ProductCategoriesFactory();
+  await productCategoriesFactory.createMany(totalProductCategories);
+
+  console.log(`  ✅ Product Categories seeded: ${totalProductCategories}\n`);
+
+  // Products Seeders
+  console.log('🛒 Seeding Products...');
+
+  const totalProducts = 50;
+  const productsFactory = new ProductsFactory();
+  await productsFactory.createMany(totalProducts);
+
+  console.log(`  ✅ Products seeded: ${totalProducts}\n`);
+
+  // Product Images Seeders
+  console.log('🖼️ Seeding Product Images...');
+
+  const productImagesFactory = new ProductImagesFactory();
+  const productImages = await productImagesFactory.createForAllProducts();
+  const totalProductImages = productImages.length;
+
+  console.log(`  ✅ Product Images seeded: ${totalProductImages}\n`);
+
+  // Branch Inventories Seeders
+  console.log('📦 Seeding Branch Inventories...');
+
+  const branchInventoriesFactory = new BranchInventoriesFactory();
+  const branchInventories = await branchInventoriesFactory.createForAllBranchProducts();
+  const totalBranchInventories = branchInventories.length;
+
+  console.log(`  ✅ Branch Inventories seeded: ${totalBranchInventories}\n`);
+
+  // Discounts Seeders
+  console.log('💰 Seeding Discounts...');
+
+  const totalDiscounts = 15;
+  const discountsFactory = new DiscountsFactory();
+  await discountsFactory.createMany(totalDiscounts);
+
+  console.log(`  ✅ Discounts seeded: ${totalDiscounts}\n`);
+
+  // Product Discounts Seeders
+  console.log('🏷️ Seeding Product Discounts...');
+
+  const productDiscountsFactory = new ProductDiscountsFactory();
+  const productDiscounts = await productDiscountsFactory.createForAllDiscounts();
+  const totalProductDiscounts = productDiscounts.length;
+
+  console.log(`  ✅ Product Discounts seeded: ${totalProductDiscounts}\n`);
+
+  // Vouchers Seeders
+  console.log('🎟️ Seeding Vouchers...');
+
+  const totalVouchers = 20;
+  const vouchersFactory = new VouchersFactory();
+  await vouchersFactory.createMany(totalVouchers);
+
+  console.log(`  ✅ Vouchers seeded: ${totalVouchers}\n`);
+
+  // Voucher Useds Seeders
+  console.log('📌 Seeding Voucher Useds...');
+
+  const voucherUsedFactory = new VoucherUsedFactory();
+  const voucherUseds = await voucherUsedFactory.linkVouchersToOrders();
+  const totalVoucherUseds = voucherUseds.length;
+
+  console.log(`  ✅ Voucher Useds seeded: ${totalVoucherUseds}\n`);
+
+  // Voucher Referrals Seeders
+  console.log('👥 Seeding Voucher Referrals...');
+
+  const voucherReferralFactory = new VoucherReferralFactory();
+  const voucherReferrals = await voucherReferralFactory.createForAllCustomers();
+  const totalVoucherReferrals = voucherReferrals.length;
+
+  console.log(`  ✅ Voucher Referrals seeded: ${totalVoucherReferrals}\n`);
+
+  // Mutation Journals Seeders
+  console.log('🚀 Seeding Mutation Journals...');
+
+  const totalMutations = 25;
+  const mutationJournalsFactory = new MutationJournalsFactory();
+  await mutationJournalsFactory.createMany(totalMutations);
+
+  console.log(`  ✅ Mutation Journals seeded: ${totalMutations}\n`);
+
+  // Stock Journals Seeders
+  console.log('📄 Seeding Stock Journals...');
+
+  const totalStockJournals = 100;
+  const stockJournalsFactory = new StockJournalsFactory();
+  await stockJournalsFactory.createMany(totalStockJournals);
+
+  console.log(`  ✅ Stock Journals seeded: ${totalStockJournals}\n`);
+
   // DONE
-  // ============================================================
   console.log('========================================');
   console.log('🎉 Seeding finished successfully!');
   console.log('========================================');
@@ -304,14 +424,19 @@ async function main() {
   console.log(`  Branch Schedules: ${5 + 2 + 5 + 1 + 7}`);
   console.log(`  Employees:        4`);
   console.log(`  Addresses:        3`);
+  console.log(`  Product Categories: ${totalProductCategories}`);
+  console.log(`  Products:         ${totalProducts}`);
+  console.log(`  Product Images:   ${totalProductImages}`);
+  console.log(`  Branch Inventories: ${totalBranchInventories}`);
+  console.log(`  Discounts:        ${totalDiscounts}`);
+  console.log(`  Product Discounts: ${totalProductDiscounts}`);
+  console.log(`  Vouchers:         ${totalVouchers}`);
+  console.log(`  Voucher Useds:    ${totalVoucherUseds}`);
+  console.log(`  Voucher Referrals: ${totalVoucherReferrals}`);
+  console.log(`  Mutation Journals: ${totalMutations}`);
+  console.log(`  Stock Journals:   ${totalStockJournals}`);
 
-  // Cleanup
-  await prisma.order_items.deleteMany()
-  await prisma.orders.deleteMany()
-  await prisma.cart_items.deleteMany()
-  await prisma.carts.deleteMany()
-
-  // Cart Seeders
+  console.log(`\n🔑 Default password: password123`);
   const totalCart = 5
   const cartFactory = new CartFactory()
   await cartFactory.createMany(totalCart, UserRole.CUSTOMER)
