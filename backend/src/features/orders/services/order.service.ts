@@ -14,6 +14,10 @@ export class OrderService {
     private branchInventoryRepo = new BranchInventoryRepository()
     private paymentRepo = new PaymentRepository()
 
+    async getAllOrders(page: number, limit: number, userId: string, branchId: string | null) {
+        return await this.orderRepo.findAllOrders(page, limit, userId, branchId)
+    }
+
     async addCartToOrder(userId: string, payload: { cartId: string, voucherId?: string, addressId: string }) {
         const { cartId, addressId } = payload
 

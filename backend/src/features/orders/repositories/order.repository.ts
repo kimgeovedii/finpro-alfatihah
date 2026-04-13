@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "../../../config/prisma";
 import { orderCode, paymentDeadline } from "../../../constants/business.const";
 
@@ -28,6 +29,52 @@ export class OrderRepository {
     })
   }
 
+  async findAllOrders(page: number, limit: number, userId: string, branchId: string | null) {
+    const skip = (page - 1) * limit
+
+    const where: Prisma.ordersWhereInput = {
+      userId,
+      ...(branchId && { branchId })
+    }
+
+    const [rawData, total] = await Promise.all([
+      prisma.orders.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true, createdAt: true, status: true, totalPrice: true, finalPrice: true, shippingCost: true, paymentDeadline: true,
+          items: {
+            select: {
+              quantity: true, product: {                 
+                select: {
+                  product: {          
+                    select: { productName: true }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }),
+      prisma.orders.count({ where })
+    ])
+
+    // Sum quantity & combine product name
+    const mapped = rawData.map(order => {
+      const totalItems = order.items.reduce((sum, item) => sum + item.quantity, 0)
+      const productList = order.items.map(item => item.product.product.productName).join(', ')
+      const { items, ...rest } = order
+
+      return { ...rest, totalItems, productList }
+    })
+
+    const data = branchId ? (mapped[0] ?? null) : mapped
+
+    return { data, total }
+  }
+
   async createOrder(userId: string, branchId: string, addressId: string, totalPrice: number, finalPrice: number, shippingCost: number,
     items: Array<{ product: { id: string; product: { basePrice: number } }; quantity: number; discountId?: string | null }>) {
     
@@ -36,15 +83,8 @@ export class OrderRepository {
 
     return await prisma.orders.create({
       data: {
-        orderNumber,
-        userId: userId,
-        branchId: branchId,
-        addressId: addressId,
-        status: 'WAITING_PAYMENT',
-        totalPrice: totalPrice,
-        finalPrice: finalPrice,
-        shippingCost: shippingCost,
-        paymentDeadline: paymentDeadlineTime,
+        orderNumber, userId, branchId, addressId, totalPrice, finalPrice, shippingCost,
+        status: 'WAITING_PAYMENT', paymentDeadline: paymentDeadlineTime,
         items: {
           create: items.map(item => ({
             productId: item.product.id,

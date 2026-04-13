@@ -3,9 +3,36 @@ import { sendSuccess } from "../../../utils/apiResponse"
 import { AddToOrderSchema } from "../validation/order.dto"
 import { AuthRequest } from "../../../middleware/auth.middleware"
 import { OrderService } from "../services/order.service"
+import { paginationDefault, uuidRegex } from "../../../constants/feature.const"
 
 export class OrderController {
     private orderService = new OrderService()
+
+    getAllTransaction = async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user?.userId 
+
+            // Query param
+            const page = Number(req.query.page) || 1
+            const limit = Number(req.query.limit) || paginationDefault
+            const branchId = typeof req.query.branchId === 'string' ? req.query.branchId.trim() : null
+
+            // Validate the UUID format
+            if (branchId && !uuidRegex.test(branchId)) throw { code: 400, message: 'branchId is not valid UUID' }
+            
+            // Service
+            const result = await this.orderService.getAllOrders(page, limit, userId, branchId)
+
+            return sendSuccess(res, {
+                data: result.data,
+                meta: {
+                    page, limit, total: result.total, total_page: Math.ceil(result.total / limit),
+                },
+            }, "Order fetched")
+        } catch (error: any) {
+            next(error)
+        }
+    }
 
     postAddCheckoutOrder = async (req: AuthRequest, res: Response, next: NextFunction) => {
         try {
@@ -32,7 +59,7 @@ export class OrderController {
     
             // Service
             await this.orderService.deleteOrderById(userId, orderId)
-            
+
             return sendSuccess(res, "Order deleted!")
         } catch (error: any) {
             next(error)
