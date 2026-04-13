@@ -175,9 +175,7 @@
  *               properties:
  *                 success: { type: boolean, example: true }
  *                 message: { type: string, example: Success }
- *                 data:
- *                   type: string
- *                   example: Product item deleted!
+ *                 data: { type: string, example: Product item deleted! }
  *
  *       401:
  *         description: Unauthorized - No token provided

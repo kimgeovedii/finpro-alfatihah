@@ -1,0 +1,1 @@
+export const earthRadiusKM = 6371
