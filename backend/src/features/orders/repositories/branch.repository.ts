@@ -5,7 +5,7 @@ export class BranchRepository {
         return await prisma.branch.findFirst({
             where: { id: branchId },
             select: {
-                address: true, latitude: true, longitude: true, maxDeliveryDistance: true,
+                address: true, latitude: true, longitude: true, maxDeliveryDistance: true, city: true
             }
         })
     }

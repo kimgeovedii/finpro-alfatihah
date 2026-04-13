@@ -1,4 +1,5 @@
 import { calculateShippingCost, isWithinDeliveryRange } from "../../../utils/location"
+import { getCityIdFromCoords, getShippingCost } from "../../../utils/shipping"
 import { AddressRepository } from "../repositories/address.repository"
 import { BranchRepository } from "../repositories/branch.repository"
 import { BranchInventoryRepository } from "../repositories/branch_inventory.repository"
@@ -48,7 +49,13 @@ export class OrderService {
         if (!rangeValidate.isInsideRange) throw { code: 422, message: `Delivery address is outside the branch delivery range. Your distance to our branch is ${range} Km` }
 
         // Helper : calculate shipping cost based on distance
-        const shippingCost = calculateShippingCost(address.lat, address.long, branch.latitude, branch.longitude)
+        const [originId, destinationId] = await Promise.all([
+            getCityIdFromCoords(branch.latitude, branch.longitude),
+            getCityIdFromCoords(address.lat, address.long)
+        ])
+    
+        // Helper : get shipping cost from Raja Ongkir + Opencage
+        const shippingCost = await getShippingCost(originId, destinationId)
 
         // Calculate total price from cart items
         const totalPrice = cart.items.reduce((sum, item) => {
