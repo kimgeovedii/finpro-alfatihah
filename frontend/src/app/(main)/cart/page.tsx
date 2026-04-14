@@ -31,7 +31,7 @@ export default function CartPage() {
               slugName="1"
               branchId="2"
               productName="Coca Cola"
-              variant="350ml Can"
+              description="350ml Can"
               basePrice={10000}
               mainImage="/mainImages/coke.png"
               qty={3}
@@ -43,7 +43,7 @@ export default function CartPage() {
               slugName="1"
               branchId="2"
               productName="Coca Cola"
-              variant="350ml Can"
+              description="350ml Can"
               basePrice={10000}
               mainImage="/mainImages/coke.png"
               qty={3}
@@ -56,7 +56,7 @@ export default function CartPage() {
               slugName="1"
               branchId="2"
               productName="Coca Cola"
-              variant="350ml Can"
+              description="350ml Can"
               basePrice={10000}
               mainImage="/mainImages/coke.png"
               qty={3}

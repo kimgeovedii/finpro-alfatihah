@@ -218,6 +218,9 @@
  *                                         productName:
  *                                           type: string
  *                                           example: Coca Cola
+ *                                         description:
+ *                                           type: string
+ *                                           example: Soft drink that make u diabetes
  *                                         basePrice:
  *                                           type: number
  *                                           example: 10000

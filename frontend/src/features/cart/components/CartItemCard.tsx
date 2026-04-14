@@ -5,7 +5,7 @@ import React from "react"
 type Props = {
     slugName: string
     productName: string
-    variant: string
+    description: string
     basePrice: number
     mainImage: string
     qty: number
@@ -16,7 +16,7 @@ type Props = {
     onRemove: () => void
 }
 
-export const CartItemCard: React.FC<Props> = ({ slugName, branchId, productName, variant, basePrice, mainImage, qty, onIncrease, onDecrease, onRemove }) => {
+export const CartItemCard: React.FC<Props> = ({ slugName, branchId, productName, description, basePrice, mainImage, qty, onIncrease, onDecrease, onRemove }) => {
     return (
         <div className="flex items-center justify-between bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 mb-4">
             <div className="flex items-center gap-5">
@@ -25,7 +25,7 @@ export const CartItemCard: React.FC<Props> = ({ slugName, branchId, productName,
                     <Link href={`/branch/${branchId}/product/${slugName}`}>
                         <h3 className="text-lg font-semibold text-slate-800">{productName}</h3>
                     </Link>
-                    <p className="text-slate-500 text-sm">{variant}</p>
+                    <p className="text-slate-500 text-sm">{description}</p>
                     <p className="text-emerald-700 font-bold text-lg mt-2">Rp {basePrice.toLocaleString("id-ID")}</p>
                 </div>
             </div>
