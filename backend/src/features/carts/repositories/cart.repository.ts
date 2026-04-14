@@ -49,7 +49,7 @@ export class CartRepository {
                 select: {
                   id: true, currentStock: true, product: {                 
                     select: {
-                      productName: true, basePrice: true, category: {
+                      productName: true, basePrice: true, description: true, category: {
                         select: {
                           name: true, slugName: true,
                         }
