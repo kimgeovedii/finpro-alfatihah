@@ -29,13 +29,23 @@ export type CartBranch = {
     items: CartItem[]
 }
 
+export type CartMeta = {
+    page: number
+    limit: number
+    total: number
+    total_page: number
+}
+
+export type CartResponse = {
+    data: CartBranch[]
+    meta: CartMeta
+}
+
 export const cartRepository = {
     async getCartSummary(): Promise<CartSummaryData> {
         return await apiFetch<CartSummaryData>("/carts/summary","get")
     },
-    async getAllCarts(): Promise<CartBranch[]> {
-        const res = await apiFetch<any>("/carts", "get")
-        
-        return res.data.filter((cart: CartBranch) => cart.items.length > 0)
+    async getAllCarts(page: number = 1): Promise<CartResponse> {
+        return await apiFetch<any>(`/carts?page=${page}`, "get")
     }
 }

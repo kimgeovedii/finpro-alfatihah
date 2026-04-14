@@ -59,11 +59,11 @@ export const OrderItemCard: React.FC<Props> = ({ orderNumber, status, totalPrice
                         {
                             status !== 'CANCELLED' && 
                                 <div className="flex gap-x-4 items-end">
-                                        <div>
-                                            <p className="text-emerald-600 font-semibold text-sm">shipping cost</p>
-                                            <p className="text-emerald-600 font-semibold text-sm">Rp. {shippingCost.toLocaleString("id-ID")}</p>
-                                        </div>
-                                        <div>
+                                    <div>
+                                        <p className="text-emerald-600 font-semibold text-sm">shipping cost</p>
+                                        <p className="text-emerald-600 font-semibold text-sm">Rp. {shippingCost.toLocaleString("id-ID")}</p>
+                                    </div>
+                                    <div>
                                         <p className="text-gray-500 font-semibold text-sm mb-0">Total Spend</p>
                                         <p className="text-emerald-800 font-bold text-xl">Rp {finalPrice.toLocaleString("id-ID")}</p>
                                     </div>

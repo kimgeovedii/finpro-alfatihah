@@ -7,8 +7,8 @@ import { CartItemCard } from "@/features/cart/components/CartItemCard";
 
 export default function CartPage() {
   const { summary, isLoading } = useCartSummary()
-  const { carts, isLoading: cartLoading } = useAllCartData()
-
+  const { carts, meta, isLoadingAllCart, fetchAllCarts } = useAllCartData()
+  
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto">
       <div className="flex items-center justify-between">
@@ -26,7 +26,7 @@ export default function CartPage() {
           <hr className="my-5"/>
           <div>
             {
-              cartLoading ? (
+              isLoadingAllCart ? (
               <p className="text-slate-400">Loading carts...</p>
             ) : carts.length === 0 ? (
               <p className="text-slate-500">No items in cart</p>
@@ -48,6 +48,7 @@ export default function CartPage() {
                 </div>
               ))
             )}
+            { meta && meta.page < meta.total_page && <button className="mt-4 px-4 py-2 bg-slate-800 text-white rounded-lg" onClick={() => fetchAllCarts(meta.page + 1)}>See More</button> }
           </div>
         </div>
       </div>

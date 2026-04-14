@@ -248,6 +248,9 @@
  *                             type: string
  *                             format: uuid
  *                             example: 8bab6859-0372-4a5f-8d53-c39023288ba3
+ *                           orderNumber:
+ *                             type: string
+ *                             example: ORD-1776058988781
  *                           createdAt:
  *                             type: string
  *                             format: date-time
