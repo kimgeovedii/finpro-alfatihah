@@ -1,14 +1,13 @@
 "use client";
 
-import { useUser } from "@/features/auth/hooks/useUser"
-import { useCart } from "@/features/cart/hooks/useCart"
+import { useAllCartData, useCartSummary } from "@/features/cart/hooks/useCart"
 import { CartSummary } from "@/features/cart/components/CartSummary"
 import { BranchHeader } from "@/features/cart/components/BranchHeader";
 import { CartItemCard } from "@/features/cart/components/CartItemCard";
 
 export default function CartPage() {
-  const { user } = useUser()
-  const { summary, isLoading } = useCart()
+  const { summary, isLoading } = useCartSummary()
+  const { carts, isLoading: cartLoading } = useAllCartData()
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto">
@@ -26,44 +25,29 @@ export default function CartPage() {
           }
           <hr className="my-5"/>
           <div>
-            <BranchHeader id="1" storeName="Toko Pusat Jakarta" />
-            <CartItemCard
-              slugName="1"
-              branchId="2"
-              productName="Coca Cola"
-              description="350ml Can"
-              basePrice={10000}
-              mainImage="/mainImages/coke.png"
-              qty={3}
-              onIncrease={() => console.log("increase")}
-              onDecrease={() => console.log("decrease")}
-              onRemove={() => console.log("remove")}
-            />
-            <CartItemCard
-              slugName="1"
-              branchId="2"
-              productName="Coca Cola"
-              description="350ml Can"
-              basePrice={10000}
-              mainImage="/mainImages/coke.png"
-              qty={3}
-              onIncrease={() => console.log("increase")}
-              onDecrease={() => console.log("decrease")}
-              onRemove={() => console.log("remove")}
-            />
-            <BranchHeader id="2" storeName="Toko Pusat Jakarta" />
-            <CartItemCard
-              slugName="1"
-              branchId="2"
-              productName="Coca Cola"
-              description="350ml Can"
-              basePrice={10000}
-              mainImage="/mainImages/coke.png"
-              qty={3}
-              onIncrease={() => console.log("increase")}
-              onDecrease={() => console.log("decrease")}
-              onRemove={() => console.log("remove")}
-            />
+            {
+              cartLoading ? (
+              <p className="text-slate-400">Loading carts...</p>
+            ) : carts.length === 0 ? (
+              <p className="text-slate-500">No items in cart</p>
+            ) : (
+              carts.map((cart: any) => (
+                <div key={cart.id} className="mb-6">
+                  <BranchHeader id={cart.branch.id} storeName={cart.branch.storeName}/>
+                  {
+                    cart.items.map((item: any) => (
+                      <CartItemCard key={item.id}
+                        slugName={item.product.id} branchId={cart.branchId} productName={item.product.product.productName} description={item.product.product.description} 
+                        basePrice={item.product.product.basePrice} mainImage="/mainImages/coke.png" qty={item.quantity}
+                        onIncrease={() => console.log("increase")}
+                        onDecrease={() => console.log("decrease")}
+                        onRemove={() => console.log("remove")}
+                      />
+                    ))
+                  }
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>

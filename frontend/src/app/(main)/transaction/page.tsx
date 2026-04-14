@@ -2,11 +2,9 @@
 
 import { useUser } from "@/features/auth/hooks/useUser"
 import { OrderItemCard } from "@/features/cart/components/OrderItemCard";
-import { useCart } from "@/features/cart/hooks/useCart"
 
 export default function TransactionPage() {
   const { user } = useUser()
-  const { summary, isLoading } = useCart()
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto">

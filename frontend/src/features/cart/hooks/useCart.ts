@@ -1,12 +1,22 @@
 import { useEffect } from "react"
 import { useCartService } from "../services/cart.service"
 
-export const useCart = () => {
-    const { summary, fetchSummary, isLoading, error } = useCartService()
+export const useCartSummary = () => {
+    const { summary, fetchCartSummary, isLoading, error } = useCartService()
 
     useEffect(() => {
-        fetchSummary()
+        fetchCartSummary()
     }, [])
 
     return { summary, isLoading, error }
+}
+
+export const useAllCartData = () => {
+    const { carts, fetchAllCarts, isLoading } = useCartService()
+  
+    useEffect(() => {
+        fetchAllCarts()
+    }, [])
+  
+    return { carts, isLoading }
 }
