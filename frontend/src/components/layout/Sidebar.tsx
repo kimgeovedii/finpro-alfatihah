@@ -9,7 +9,9 @@ import {
   ClipboardDocumentCheckIcon, 
   ServerStackIcon, 
   Cog6ToothIcon,
-  GlobeAmericasIcon 
+  GlobeAmericasIcon,
+  ShoppingCartIcon,
+  ArrowsRightLeftIcon
 } from '@heroicons/react/24/outline'
 
 const NAV_ITEMS = [
@@ -17,6 +19,16 @@ const NAV_ITEMS = [
     title: 'Dashboard',
     href: '/dashboard',
     icon: <HomeIcon className="w-5 h-5" />
+  },
+  {
+    title: 'Cart',
+    href: '/cart',
+    icon: <ShoppingCartIcon className="w-5 h-5" />
+  },
+  {
+    title: 'My Transaction',
+    href: '/transaction',
+    icon: <ArrowsRightLeftIcon className="w-5 h-5" />
   },
   {
     title: 'Manage Project',
