@@ -5,5 +5,5 @@ export const paymentDeadline = 60 * 60 * 1000 // 1 hour
 export const orderCode = 'ORD'
 
 // Third service
-export const weightGramsShippingDefault = 1000
+export const weightGramsShippingDefault = 1000 // 1 kg
 export const courierShippingDefault = 'jne' 

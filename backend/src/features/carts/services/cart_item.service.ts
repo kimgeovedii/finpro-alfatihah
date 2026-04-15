@@ -26,7 +26,7 @@ export class CartItemService {
         // If qty become 0, then delete item else just update
         if (newQty === 0) {
             // Repo : delete cart item by id
-            await this.cartItemRepo.deleteCartItem(cartItemId)
+            await this.cartItemRepo.deleteCartItemById(cartItemId)
         } else {
             // Make sure requested qty is less or equal stock
             if (newQty > stock) throw { code: 422, message: 'Exceeds available stock' }
@@ -47,6 +47,6 @@ export class CartItemService {
         if (cartItem.cart.userId !== userId) throw { code: 403, message: 'Forbidden access to this cart item' }
 
         // Repo : delete cart item by id
-        await this.cartItemRepo.deleteCartItem(cartItemId)
+        await this.cartItemRepo.deleteCartItemById(cartItemId)
     }
 }
