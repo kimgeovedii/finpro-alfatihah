@@ -17,7 +17,7 @@ export default function TransactionPage() {
             My History
           </h1>
           <br/>
-          <OrderSummaryCard totalPrice={1750000} totalFinalPrice={1620000}/>
+          <OrderSummaryCard totalPrice={1750000} totalFinalPrice={1620000} totalConfirmedOrder={2} totalProcessingOrder={1} totalWaitingOrder={1} totalCancelledOrder={3}/>
           <hr className="my-5"/>
           <div>
             { isLoading && <p>Loading...</p> }
