@@ -18,11 +18,12 @@ const refreshRateLimiter = rateLimit({
 });
 
 const verificationRateLimiter = rateLimit({
-  windowMs: 60 * 1000, 
-  max: 1, 
+  windowMs: 60 * 1000,
+  max: 1,
   message: {
     success: false,
-    message: "Please wait 60 seconds before sending another verification email.",
+    message:
+      "Please wait 60 seconds before sending another verification email.",
   },
   standardHeaders: true,
   legacyHeaders: false,
@@ -45,12 +46,20 @@ class AuthRouter {
   private registerRoutes() {
     this.router.post("/register", this.authController.register);
     this.router.get("/verify-email", this.authController.verifyEmail);
-    this.router.post("/resend-verification", verificationRateLimiter, this.authController.resendVerification);
-    this.router.post("/login", this.authController.login);
+    this.router.post(
+      "/resend-verification",
+      verificationRateLimiter,
+      this.authController.resendVerification,
+    );
+    this.router.post("/login", loginRateLimiter, this.authController.login);
     this.router.post("/refresh", this.authController.refreshToken);
     this.router.post("/logout", authMiddleware, this.authController.logout);
     this.router.get("/me", authMiddleware, this.authController.me);
-    this.router.post("/revoke-all", authMiddleware, this.authController.revokeAllSessions);
+    this.router.post(
+      "/revoke-all",
+      authMiddleware,
+      this.authController.revokeAllSessions,
+    );
   }
 }
 
