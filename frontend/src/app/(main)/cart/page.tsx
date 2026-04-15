@@ -1,6 +1,6 @@
 "use client";
 
-import { useAllCartData, useCartSummary, useDeleteCart } from "@/features/cart/hooks/useCart"
+import { useAllCartData, useCartSummary, useDeleteCart, useUpdateCartItem } from "@/features/cart/hooks/useCart"
 import { CartSummary } from "@/features/cart/components/CartSummary"
 import { BranchHeader } from "@/features/cart/components/BranchHeader";
 import { CartItemCard } from "@/features/cart/components/CartItemCard";
@@ -10,6 +10,7 @@ export default function CartPage() {
   const { summary, isLoading, fetchCartSummary } = useCartSummary()
   const { carts, meta, isLoadingAllCart, fetchAllCarts } = useAllCartData()
   const { deleteCart, isDeleting } = useDeleteCart()
+  const { updateCartItem, isUpdatingItem } = useUpdateCartItem()
 
   const handleRemoveCart = async (cartId: string) => {
     const confirm = await Swal.fire({
@@ -62,6 +63,44 @@ export default function CartPage() {
       fetchAllCarts(1)
     }
   }
+
+  const handleIncrease = async (itemId: string, qty: number, stock: number) => {
+    if (qty >= stock) {
+      Swal.fire({
+        icon: "info",
+        title: "Stock limit reached",
+        text: "You already selected all available items.",
+        confirmButtonColor: "#10b981",
+      })
+      return
+    }
+  
+    await updateCartItem(itemId, qty + 1)
+    fetchCartSummary()
+    fetchAllCarts(1)
+  }
+  
+  const handleDecrease = async (itemId: string, qty: number, productName: string) => {
+    if (qty <= 1) {
+      const confirm = await Swal.fire({
+        title: "Remove item?",
+        html: `<b>${productName}</b> will be removed from cart.`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, remove",
+        confirmButtonColor: "#ef4444",
+      })
+  
+      if (!confirm.isConfirmed) return
+  
+      await deleteCartItem(itemId)
+    } else {
+      await updateCartItem(itemId, qty - 1)
+    }
+  
+    fetchCartSummary()
+    fetchAllCarts(1)
+  }
   
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto">
@@ -92,9 +131,9 @@ export default function CartPage() {
                     cart.items.map((dt: any) => (
                       <CartItemCard key={dt.id}
                         slugName={dt.product.id} branchId={cart.branchId} productName={dt.product.product.productName} description={dt.product.product.description} 
-                        basePrice={dt.product.product.basePrice} mainImage="/mainImages/coke.png" qty={dt.quantity}
-                        onIncrease={() => console.log("increase")}
-                        onDecrease={() => console.log("decrease")}
+                        basePrice={dt.product.product.basePrice} mainImage="/mainImages/coke.png" qty={dt.quantity} currentStock={dt.product.currentStock}
+                        onDecrease={() => handleDecrease(dt.id, dt.quantity,dt.product.product.productName)}
+                        onIncrease={() => handleIncrease(dt.id, dt.quantity, dt.product.currentStock)}                        
                         onRemove={() => handleRemoveCartItem(cart.id, `(${dt.quantity}) ${dt.product.product.productName}`)}
                       />
                     ))

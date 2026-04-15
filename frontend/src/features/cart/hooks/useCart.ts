@@ -64,6 +64,28 @@ export const useDeleteCart = () => {
     return { deleteCart, isDeleting, error }
 }
 
+export const useUpdateCartItem = () => {
+    const [isUpdatingItem, setIsUpdating] = useState(false)
+    const [errorUpdateItem, setError] = useState<string | null>(null)
+
+    const updateCartItem = async (cartItemId: string, qty: number): Promise<boolean> => {
+        setIsUpdating(true)
+        setError(null)
+
+        try {
+            await cartRepository.updateCartItem(cartItemId, qty)
+            return true
+        } catch (err: any) {
+            setError(err.message || "Failed to update cart item")
+            return false
+        } finally {
+            setIsUpdating(false)
+        }
+    }
+
+    return { updateCartItem, isUpdatingItem, errorUpdateItem }
+}
+
 export const useDeleteCartItem = () => {
     const [isDeletingItem, setIsDeletingItem] = useState(false)
     const [errorItem, setError] = useState<string | null>(null)
