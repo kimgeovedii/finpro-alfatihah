@@ -316,3 +316,60 @@
  *                 success: { type: boolean, example: false }
  *                 message: { type: string, example: Internal server error }
  */
+
+/**
+ * @openapi
+ * /api/orders/summary:
+ *   get:
+ *     summary: Get order summary
+ *     description: Returns total order count grouped by status, and total finalPrice and totalPrice for confirmed orders only.
+ *     tags: [Order]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Order summary fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 message: { type: string, example: Order fetched }
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     ordersByStatus:
+ *                       type: object
+ *                       additionalProperties:
+ *                         type: integer
+ *                       example:
+ *                         WAITING_PAYMENT: 2
+ *                         CONFIRMED: 1
+ *                     totalFinalPrice:
+ *                       type: number
+ *                       example: 30000
+ *                     totalPrice:
+ *                       type: number
+ *                       example: 30000
+ *
+ *       401:
+ *         description: Unauthorized - No token provided
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: false }
+ *                 message: { type: string, example: No token provided }
+ *
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: false }
+ *                 message: { type: string, example: Internal server error }
+ */
