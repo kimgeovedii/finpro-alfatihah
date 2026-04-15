@@ -9,7 +9,7 @@ export const useCartSummary = () => {
         fetchCartSummary()
     }, [])
 
-    return { summary, isLoading, error }
+    return { summary, isLoading, fetchCartSummary }
 }
 
 export const useAllCartData = () => {
@@ -40,4 +40,26 @@ export const useAllCartData = () => {
     }, [])
 
     return { carts, meta, isLoadingAllCart, error, fetchAllCarts }
+}
+
+export const useDeleteCart = () => {
+    const [isDeleting, setIsDeleting] = useState(false)
+    const [error, setError] = useState<string | null>(null)
+
+    const deleteCart = async (cartId: string): Promise<boolean> => {
+        setIsDeleting(true)
+        setError(null)
+
+        try {
+            await cartRepository.deleteCart(cartId)
+            return true
+        } catch (err: any) {
+            setError(err.message || "Failed to delete cart")
+            return false
+        } finally {
+            setIsDeleting(false)
+        }
+    }
+
+    return { deleteCart, isDeleting, error }
 }

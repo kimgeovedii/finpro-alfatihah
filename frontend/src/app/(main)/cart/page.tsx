@@ -1,13 +1,43 @@
 "use client";
 
-import { useAllCartData, useCartSummary } from "@/features/cart/hooks/useCart"
+import { useAllCartData, useCartSummary, useDeleteCart } from "@/features/cart/hooks/useCart"
 import { CartSummary } from "@/features/cart/components/CartSummary"
 import { BranchHeader } from "@/features/cart/components/BranchHeader";
 import { CartItemCard } from "@/features/cart/components/CartItemCard";
+import Swal from "sweetalert2";
 
 export default function CartPage() {
-  const { summary, isLoading } = useCartSummary()
+  const { summary, isLoading, fetchCartSummary } = useCartSummary()
   const { carts, meta, isLoadingAllCart, fetchAllCarts } = useAllCartData()
+  const { deleteCart, isDeleting } = useDeleteCart()
+
+  const handleRemoveCart = async (cartId: string) => {
+    const confirm = await Swal.fire({
+      title: "Remove cart?",
+      text: "All items in this cart will be deleted.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, remove it",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#ef4444",
+    })
+
+    if (!confirm.isConfirmed) return
+
+    const success = await deleteCart(cartId)
+
+    if (success) {
+      await Swal.fire({
+        title: "Cart deleted",
+        text: "Your cart has been removed.",
+        icon: "success",
+        confirmButtonColor: "#10b981",
+      })
+
+      fetchCartSummary()
+      fetchAllCarts(1)
+    }
+  }
   
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto">
@@ -33,7 +63,7 @@ export default function CartPage() {
             ) : (
               carts.map((cart: any) => (
                 <div key={cart.id} className="mb-6">
-                  <BranchHeader id={cart.branch.id} storeName={cart.branch.storeName}/>
+                  <BranchHeader id={cart.branch.id} storeName={cart.branch.storeName} onRemove={() => handleRemoveCart(cart.id)}/>
                   {
                     cart.items.map((item: any) => (
                       <CartItemCard key={item.id}
