@@ -50,5 +50,8 @@ export const cartRepository = {
     },
     async deleteCart(cartId: string): Promise<{ cartId: string }> {
         return await apiFetch<{ cartId: string }>(`/carts/delete/${cartId}`, "delete")
+    },
+    async deleteCartItem(cartItemId: string): Promise<{ cartItemId: string }> {
+        return await apiFetch<{ cartItemId: string }>(`/carts/items/delete/${cartItemId}`, "delete")
     }
 }

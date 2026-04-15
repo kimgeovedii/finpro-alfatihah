@@ -21,15 +21,39 @@ export default function CartPage() {
       cancelButtonText: "Cancel",
       confirmButtonColor: "#ef4444",
     })
-
     if (!confirm.isConfirmed) return
 
     const success = await deleteCart(cartId)
-
     if (success) {
       await Swal.fire({
         title: "Cart deleted",
         text: "Your cart has been removed.",
+        icon: "success",
+        confirmButtonColor: "#10b981",
+      })
+
+      fetchCartSummary()
+      fetchAllCarts(1)
+    }
+  }
+
+  const handleRemoveCartItem = async (cartId: string, productName: string) => {
+    const confirm = await Swal.fire({
+      title: "Remove cart item?",
+      html: `<b>${productName}</b> items in this cart will be deleted.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, remove it",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#ef4444",
+    })
+    if (!confirm.isConfirmed) return
+
+    const success = await deleteCart(cartId)
+    if (success) {
+      await Swal.fire({
+        title: "Item deleted",
+        html: `<b>${productName}</b> has been removed.`,
         icon: "success",
         confirmButtonColor: "#10b981",
       })
@@ -65,13 +89,13 @@ export default function CartPage() {
                 <div key={cart.id} className="mb-6">
                   <BranchHeader id={cart.branch.id} storeName={cart.branch.storeName} onRemove={() => handleRemoveCart(cart.id)}/>
                   {
-                    cart.items.map((item: any) => (
-                      <CartItemCard key={item.id}
-                        slugName={item.product.id} branchId={cart.branchId} productName={item.product.product.productName} description={item.product.product.description} 
-                        basePrice={item.product.product.basePrice} mainImage="/mainImages/coke.png" qty={item.quantity}
+                    cart.items.map((dt: any) => (
+                      <CartItemCard key={dt.id}
+                        slugName={dt.product.id} branchId={cart.branchId} productName={dt.product.product.productName} description={dt.product.product.description} 
+                        basePrice={dt.product.product.basePrice} mainImage="/mainImages/coke.png" qty={dt.quantity}
                         onIncrease={() => console.log("increase")}
                         onDecrease={() => console.log("decrease")}
-                        onRemove={() => console.log("remove")}
+                        onRemove={() => handleRemoveCartItem(cart.id, `(${dt.quantity}) ${dt.product.product.productName}`)}
                       />
                     ))
                   }
