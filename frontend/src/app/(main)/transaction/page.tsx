@@ -2,6 +2,7 @@
 
 import { useUser } from "@/features/auth/hooks/useUser"
 import { OrderItemCard } from "@/features/order/components/OrderItemCard";
+import { OrderSummaryCard } from "@/features/order/components/OrderSummaryCard";
 import { useAllOrderData } from "@/features/order/hooks/useOrder";
 
 export default function TransactionPage() {
@@ -15,7 +16,8 @@ export default function TransactionPage() {
           <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">
             My History
           </h1>
-          ...
+          <br/>
+          <OrderSummaryCard totalPrice={1750000} totalFinalPrice={1620000}/>
           <hr className="my-5"/>
           <div>
             { isLoading && <p>Loading...</p> }
