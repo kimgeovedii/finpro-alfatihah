@@ -8,6 +8,19 @@ import { paginationDefault, uuidRegex } from "../../../constants/feature.const"
 export class OrderController {
     private orderService = new OrderService()
 
+    getTransactionSummary = async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user?.userId 
+            
+            // Service
+            const result = await this.orderService.getOrderSummary(userId)
+
+            return sendSuccess(res, result, "Order fetched")
+        } catch (error: any) {
+            next(error)
+        }
+    }
+
     getAllTransaction = async (req: AuthRequest, res: Response, next: NextFunction) => {
         try {
             const userId = req.user?.userId 
