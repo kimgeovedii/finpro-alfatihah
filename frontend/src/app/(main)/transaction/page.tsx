@@ -1,12 +1,11 @@
 "use client";
 
-import { useUser } from "@/features/auth/hooks/useUser"
 import { OrderItemCard } from "@/features/order/components/OrderItemCard";
 import { OrderSummaryCard } from "@/features/order/components/OrderSummaryCard";
-import { useAllOrderData } from "@/features/order/hooks/useOrder";
+import { useAllOrderData, useOrderSummary } from "@/features/order/hooks/useOrder";
 
 export default function TransactionPage() {
-  const { user } = useUser()
+  const { summary, isLoadingSummary } = useOrderSummary()
   const { orders, meta, isLoading, fetchAllOrders } = useAllOrderData()
 
   return (
@@ -17,7 +16,24 @@ export default function TransactionPage() {
             My History
           </h1>
           <br/>
-          <OrderSummaryCard totalPrice={1750000} totalFinalPrice={1620000} totalConfirmedOrder={2} totalProcessingOrder={1} totalWaitingOrder={1} totalCancelledOrder={3}/>
+          {
+            !isLoadingSummary && summary ? 
+              <OrderSummaryCard 
+                totalPrice={summary?.totalPrice ?? 0}
+                totalFinalPrice={summary?.totalFinalPrice ?? 0}
+                totalConfirmedOrder={summary?.ordersByStatus?.CONFIRMED ?? 0}
+                totalProcessingOrder={
+                  (summary?.ordersByStatus?.PROCESSING ?? 0) +
+                  (summary?.ordersByStatus?.SHIPPED ?? 0)
+                }
+                totalWaitingOrder={
+                  (summary?.ordersByStatus?.WAITING_PAYMENT ?? 0) +
+                  (summary?.ordersByStatus?.WAITING_PAYMENT_CONFIRMATION ?? 0)
+                }
+                totalCancelledOrder={summary?.ordersByStatus?.CANCELLED ?? 0}
+              />   
+            : <p className="text-slate-400 mt-1">Loading...</p>
+          }    
           <hr className="my-5"/>
           <div>
             { isLoading && <p>Loading...</p> }
