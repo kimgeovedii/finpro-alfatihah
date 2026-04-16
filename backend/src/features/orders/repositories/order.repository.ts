@@ -134,4 +134,48 @@ export class OrderRepository {
   } 
 
   deleteOrder = async (id: string) => prisma.orders.delete({ where: { id } })
+
+  async cancelExpiredUnpaidOrders() {
+    const now = new Date()
+
+    return await prisma.$transaction(async (tx) => {
+      const orders = await tx.orders.findMany({
+        where: {
+          status: 'WAITING_PAYMENT', paymentDeadline: { lt: now },
+          payments: {
+            some: {
+              method: 'MANUAL', evidence: null
+            }
+          }
+        },
+        select: { id: true }
+      })
+
+      if (!orders.length) return 0
+
+      const orderIds = orders.map(o => o.id)
+
+      await tx.payments.updateMany({
+        where: {
+          orderId: { in: orderIds },
+          method: 'MANUAL',
+          evidence: null
+        },
+        data: {
+          status: 'REJECTED', rejectedAt: now
+        }
+      })
+
+      await tx.orders.updateMany({
+        where: {
+          id: { in: orderIds }
+        },
+        data: {
+          status: 'CANCELLED', rejectedAt: now
+        }
+      })
+
+      return orderIds.length
+    })
+  }
 }

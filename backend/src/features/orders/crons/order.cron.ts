@@ -19,5 +19,19 @@ export class OrderCron {
                 console.error("Cron error:", error)
             }
         }, { timezone: cronTimezone })
+
+        // Every hour
+        cron.schedule("0 * * * *", async () => {
+        // cron.schedule("* * * * *", async () => {
+            console.log("Running order reminder cron...")
+
+            try {
+                // Service : check order's payment deadline
+                await this.orderService.getExpiredOrder()
+                console.log("Order expired has been updated")
+            } catch (error) {
+                console.error("Cron error:", error)
+            }
+        }, { timezone: cronTimezone })
     }
 }

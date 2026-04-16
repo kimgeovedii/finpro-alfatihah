@@ -172,4 +172,9 @@ export class OrderService {
             }
         }
     }
+
+    async getExpiredOrder() {
+        // Repo : get expired order
+        await this.orderRepo.cancelExpiredUnpaidOrders()
+    }
 }
