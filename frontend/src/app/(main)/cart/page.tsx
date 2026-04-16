@@ -38,7 +38,7 @@ export default function CartPage() {
     }
   }
 
-  const handleRemoveCartItem = async (cartId: string, productName: string) => {
+  const handleRemoveCartItem = async (cartItemId: string, productName: string) => {
     const confirm = await Swal.fire({
       title: "Remove cart item?",
       html: `<b>${productName}</b> items in this cart will be deleted.`,
@@ -50,7 +50,7 @@ export default function CartPage() {
     })
     if (!confirm.isConfirmed) return
 
-    const success = await deleteCart(cartId)
+    const success = await deleteCart(cartItemId)
     if (success) {
       await Swal.fire({
         title: "Item deleted",
@@ -80,7 +80,7 @@ export default function CartPage() {
     fetchAllCarts(1)
   }
   
-  const handleDecrease = async (itemId: string, qty: number, productName: string) => {
+  const handleDecrease = async (cartItemId: string, qty: number, productName: string) => {
     if (qty <= 1) {
       const confirm = await Swal.fire({
         title: "Remove item?",
@@ -93,9 +93,20 @@ export default function CartPage() {
   
       if (!confirm.isConfirmed) return
   
-      await deleteCartItem(itemId)
+      const success = await deleteCart(cartItemId)
+      if (success) {
+        await Swal.fire({
+          title: "Item deleted",
+          html: `<b>${productName}</b> has been removed.`,
+          icon: "success",
+          confirmButtonColor: "#10b981",
+        })
+
+        fetchCartSummary()
+        fetchAllCarts(1)
+      }
     } else {
-      await updateCartItem(itemId, qty - 1)
+      await updateCartItem(cartItemId, qty - 1)
     }
   
     fetchCartSummary()

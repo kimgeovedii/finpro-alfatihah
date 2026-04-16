@@ -1,4 +1,4 @@
-import { calculateShippingCost, isWithinDeliveryRange } from "../../../utils/location"
+import { isWithinDeliveryRange } from "../../../utils/location"
 import { getCityIdFromCoords, getShippingCost } from "../../../utils/shipping"
 import { AddressRepository } from "../repositories/address.repository"
 import { BranchRepository } from "../repositories/branch.repository"
@@ -6,14 +6,18 @@ import { BranchInventoryRepository } from "../repositories/branch_inventory.repo
 import { CartRepository } from "../repositories/cart.repository"
 import { OrderRepository } from "../repositories/order.repository"
 import { PaymentRepository } from "../repositories/payment.repository"
+import { StockJournalRepository } from "../repositories/stok_journal.repository"
+import { UserRepository } from "../repositories/user.repository"
 
 export class OrderService {
     private orderRepo = new OrderRepository()
     private cartRepo = new CartRepository()
+    private stockJournalRepo = new StockJournalRepository()
     private addressRepo = new AddressRepository()
     private branchRepo = new BranchRepository()
     private branchInventoryRepo = new BranchInventoryRepository()
     private paymentRepo = new PaymentRepository()
+    private userRepo = new UserRepository()
 
     async getAllOrders(page: number, limit: number, userId: string, branchId: string | null) {
         return await this.orderRepo.findAllOrders(page, limit, userId, branchId)
@@ -76,15 +80,32 @@ export class OrderService {
         // Repo : create payment based on order id
         const payment = await this.paymentRepo.createPayment(order.id)
 
-        // Repo : update stock for each item in branch inventories
+        // Repo : get user profile
+        const user = await this.userRepo.findById(cart.userId)
+        const orderMessageToBranch = `You got an order ${order.orderNumber} from ${user?.username}`
+
         await Promise.all(
-            cart.items.map(item => this.branchInventoryRepo.decrementStock(item.product.id, item.quantity))
+            cart.items.map(async (item) => {
+                // Repo : get branch inventory by id
+                const branchInventory = await this.branchInventoryRepo.findById(item.product.id)
+                if (!branchInventory) throw { code: 404, message: `Inventory not found` }
+        
+                const stockBefore: number = branchInventory.currentStock
+                const stockAfter: number = stockBefore - item.quantity
+                const quantityChange: number = item.quantity
+        
+                // Repo : update product qty
+                await this.branchInventoryRepo.decrementStock(item.product.id, item.quantity)
+        
+                // Repo : create stock journal 
+                await this.stockJournalRepo.createStockJournal(
+                    branchInventory.productId, item.product.id, 'OUT', quantityChange, stockBefore, stockAfter, 'ORDER', order.id, orderMessageToBranch
+                )
+            })
         )
 
         // Repo : delete cart and its items
         await this.cartRepo.deleteCart(cartId)
-
-        // Repo : create stock journal Soon LOL ....
 
         return { orderId: order.id, paymentId: payment.id }
     }
