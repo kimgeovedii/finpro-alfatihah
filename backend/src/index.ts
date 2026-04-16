@@ -13,6 +13,7 @@ import { success } from "zod";
 import { sendError } from "./utils/apiResponse";
 import { Prisma } from "@prisma/client";
 import { CartCron } from "./features/carts/crons/cart.cron";
+import { OrderCron } from "./features/orders/crons/order.cron";
 
 class App {
   public app: Application;
@@ -46,7 +47,10 @@ class App {
 
   private configureCron() {
     const cartCron = new CartCron()
+    const orderCron = new OrderCron()
+    
     cartCron.start()
+    orderCron.start()
   }
 
   // Error handling

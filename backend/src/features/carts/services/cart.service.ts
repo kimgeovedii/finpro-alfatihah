@@ -18,32 +18,6 @@ export class CartService {
         return await this.cartRepo.getCartSummary(userId, branchId)
     }
 
-    async getAllCartsToRemind() {
-        // Repo : get all cart with max days
-        const carts = await this.cartRepo.findAllCartsCron(cronCartReminderMaxDays)
-
-        // View : mailer template for cart reminder broadcast
-        for (const cart of carts) {
-            const cartGroups: CartGroup[] = [{
-                storeName: cart.branch.storeName,
-                items: cart.items.map(item => ({
-                    productName: item.product.product.productName,
-                    quantity: item.quantity,
-                    price: item.product.product.basePrice,
-                }))
-            }]
-    
-            const emailHtml = getCartReminderEmailTemplate(cart.user.username ?? "Customer", cartGroups)
-    
-            await Mailer.client.sendMail({
-                from: `"Alfatihah Online Grocery" <${process.env.SMTP_USER}>`,
-                to: cart.user.email,
-                subject: "My Cart - Alfatihah Apps",
-                html: emailHtml,
-            })
-        }
-    }
-
     async addToCart(userId: string, payload: { productId: string, branchId: string, qty: number | null }) {
         let { productId, branchId, qty } = payload
         const finalQty = qty ?? 1
@@ -85,5 +59,32 @@ export class CartService {
         await this.cartRepo.deleteCartById(cartId)
     
         return { cartId }
+    }
+
+    // For Task Scheduling / Cron
+    async getAllCartsToRemind() {
+        // Repo : get all cart with max days
+        const carts = await this.cartRepo.findAllCartsCron(cronCartReminderMaxDays)
+
+        // View : mailer template for cart reminder broadcast
+        for (const cart of carts) {
+            const cartGroups: CartGroup[] = [{
+                storeName: cart.branch.storeName,
+                items: cart.items.map(item => ({
+                    productName: item.product.product.productName,
+                    quantity: item.quantity,
+                    price: item.product.product.basePrice,
+                }))
+            }]
+    
+            const emailHtml = getCartReminderEmailTemplate(cart.user.username ?? "Customer", cartGroups)
+    
+            await Mailer.client.sendMail({
+                from: `"Alfatihah Online Grocery" <${process.env.SMTP_USER}>`,
+                to: cart.user.email,
+                subject: "My Cart - Alfatihah Apps",
+                html: emailHtml,
+            })
+        }
     }
 }

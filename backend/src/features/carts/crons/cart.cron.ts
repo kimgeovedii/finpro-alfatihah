@@ -1,5 +1,6 @@
 import cron from "node-cron"
 import { CartService } from "../services/cart.service"
+import { cronTimezone } from "../../../constants/feature.const"
 
 export class CartCron {
     private cartService = new CartService()
@@ -17,6 +18,6 @@ export class CartCron {
             } catch (error) {
                 console.error("Cron error:", error)
             }
-        }, { timezone: "Asia/Jakarta" })
+        }, { timezone: cronTimezone })
     }
 }
