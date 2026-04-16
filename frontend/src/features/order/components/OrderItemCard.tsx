@@ -113,7 +113,7 @@ export const OrderItemCard: React.FC<Props> = ({ orderId, orderNumber, status, t
                     <Badge className={`capitalize font-semibold ${statusClass}`}>{finalStatus}</Badge>
                 </div>
                 <CopyField label="Order number" value={orderNumber} />
-                <p className="text-slate-500 text-sm mb-0"><span>({totalItems})</span> Purchased Item</p>
+                <p className="text-slate-500 text-sm mb-1"><span>({totalItems})</span> Purchased Item</p>
                 <p className="text-slate-500 text-sm font-semibold mb-0">{productList}</p>
                 {
                     status === 'WAITING_PAYMENT' && paymentEvidence === null && 

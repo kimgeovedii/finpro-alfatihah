@@ -75,6 +75,43 @@ export class CartRepository {
     return { data, total }
   }
 
+  async findAllCartsCron(maxDays: number) {
+    const maxDate = new Date()
+    maxDate.setDate(maxDate.getDate() - maxDays)
+  
+    return await prisma.carts.findMany({
+      where: {
+        createdAt: { lte: maxDate },
+        items: { some: {} }
+      },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        createdAt: true, items: {
+          orderBy: { createdAt: 'desc' },
+          select: {
+            quantity: true, product: {
+              select: {
+                product: {
+                  select: {
+                    productName: true, basePrice: true,
+                  }
+                }
+              }
+            }
+          }
+        },
+        branch: {
+          select: { storeName: true }
+        },
+        user: {
+          select: {
+            username: true, email: true
+          }
+        }
+      }
+    })
+  }
+
   async findRandomCart() {
     const count = await prisma.carts.count()
     if (count === 0) return null
