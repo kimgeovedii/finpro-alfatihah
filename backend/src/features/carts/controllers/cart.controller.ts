@@ -68,4 +68,21 @@ export class CartController {
             next(error)
         }
     }
+
+    deleteCartById = async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user?.userId
+            const cartId = req.params?.cartId as string
+    
+            // Validate the UUID format
+            if (!uuidRegex.test(cartId)) throw { code: 400, message: 'cartId is not valid UUID' }
+    
+            // Service
+            const data = await this.cartService.deleteCartById(userId, cartId)
+    
+            return sendSuccess(res, data, "Cart deleted")
+        } catch (error: any) {
+            next(error)
+        }
+    }
 }

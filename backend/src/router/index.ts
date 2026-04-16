@@ -13,6 +13,7 @@ import { VoucherRouter } from "../features/vouchers/routers/voucher.router";
 import { BranchInventoryRouter } from "../features/inventories/routers/branchInventory.router";
 import { StockJournalRouter } from "../features/inventories/routers/stockJournal.router";
 import { MutationJournalRouter } from "../features/inventories/routers/mutationJournal.router";
+import paymentRouter from "../features/payments/routers/payment.router";
 
 class GlobalRouter {
   public router: Router;
@@ -27,6 +28,7 @@ class GlobalRouter {
     this.router.use("/users", userRouter); // Basic user endpoints
     this.router.use("/carts", cartRouter)
     this.router.use("/orders", orderRouter)
+    this.router.use("/payments", paymentRouter)
     this.router.use("/carts/items", cartItemRouter)
     this.router.use(
       "/product-categories",

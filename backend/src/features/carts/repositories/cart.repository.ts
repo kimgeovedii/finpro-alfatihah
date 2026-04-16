@@ -98,4 +98,12 @@ export class CartRepository {
       data: { userId, branchId }
     })
   }
+
+  async findByIdAndUser(cartId: string, userId: string) {
+    return await prisma.carts.findFirst({
+      where: { id: cartId, userId }
+    })
+  }
+
+  deleteCartById = async (id: string) => prisma.carts.delete({ where: { id } })
 }

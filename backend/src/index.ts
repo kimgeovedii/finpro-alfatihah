@@ -11,6 +11,7 @@ import { swaggerSpec } from "./config/swagger"
 import globalRouter from "./router";
 import { success } from "zod";
 import { sendError } from "./utils/apiResponse";
+import { Prisma } from "@prisma/client";
 
 class App {
   public app: Application;
@@ -60,6 +61,20 @@ class App {
       
       // Multer file upload limit size
       if (err.code === "LIMIT_FILE_SIZE") return sendError(res, "File size exceeds 2MB limit", 400)
+
+      // Prisma error handler
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        switch (err.code) {
+          case 'P2002': 
+            return sendError(res, "Duplicate entry", 409)
+          case 'P2003': 
+            return sendError(res, "Related record not found", 409)
+          case 'P2025': 
+            return sendError(res, "Record not found", 404)
+          default:      
+            return sendError(res, "Database error", 500)
+        }
+      }
 
       const statusCode = err.status || err.code || 500
       // Audit server error

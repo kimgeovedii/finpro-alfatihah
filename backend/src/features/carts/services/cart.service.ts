@@ -43,4 +43,18 @@ export class CartService {
 
         return { cartId: cart.id, cartItem }
     }
+
+    async deleteCartById(userId: string, cartId: string) {
+        // Repo : find cart and validate ownership
+        const cart = await this.cartRepo.findByIdAndUser(cartId, userId)
+        if (!cart) throw { code: 404, message: 'Cart not found' }
+    
+        // Repo : delete cart items
+        await this.cartItemRepo.deleteByCartId(cartId)
+    
+        // Repo : delete cart
+        await this.cartRepo.deleteCartById(cartId)
+    
+        return { cartId }
+    }
 }
