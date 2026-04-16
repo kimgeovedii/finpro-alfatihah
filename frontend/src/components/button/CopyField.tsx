@@ -30,7 +30,7 @@ export const CopyField: React.FC<Props> = ({ label, value }) => {
     }
 
     return (
-        <div className="flex items-center gap-1 my-1">
+        <div className="flex items-center gap-1 my-3">
             <button onClick={handleCopy} className="text-xs px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition cursor-pointer" title={`Copy ${label}`}>
                 <DocumentDuplicateIcon className="w-4 h-4"/>
             </button>
