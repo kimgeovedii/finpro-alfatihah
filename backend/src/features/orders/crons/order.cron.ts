@@ -7,8 +7,8 @@ export class OrderCron {
 
     public start() {
         // Every day at 7 AM and 8 PM
-        // cron.schedule("0 7,20 * * *", async () => {
-        cron.schedule("* * * * *", async () => {
+        cron.schedule("0 7,20 * * *", async () => {
+        // cron.schedule("* * * * *", async () => {
             console.log("Running order reminder cron...")
 
             try {

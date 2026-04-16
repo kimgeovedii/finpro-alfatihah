@@ -73,6 +73,10 @@ export const getBranchOrderBroadcastTemplate = (data: Payload) => {
                     <p style="margin-top:20px;">
                         Please review and process these orders.
                     </p>
+                    <p>
+                        Best regards,<br/>
+                        <strong>Alfatihah</strong>
+                    </p>
                 </div>
                 <div class="footer">
                     © ${new Date().getFullYear()} Alfatihah. All rights reserved.

@@ -140,7 +140,6 @@ export class OrderService {
             // Remind every employee
             for (const emp of dt.employees) {
                 if (!emp.user?.username) continue
-                console.log(emp.user.email)
     
                 const emailHtml = getBranchOrderBroadcastTemplate({
                     username: emp.user.username,
