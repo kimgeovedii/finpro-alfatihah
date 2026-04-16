@@ -20,6 +20,9 @@ export class PaymentService {
         const paymentUpdated = await this.paymentRepo.updatePaymentEvidenceByOrderId(orderId, filePath)
         if (paymentUpdated.count !== 1) throw { code: 404, message: 'Payment not found' }
 
+        // Repo : update order by order id
+        await this.orderRepo.updateOrderStatusById(orderId, 'WAITING_PAYMENT_CONFIRMATION')
+
         // Repo : get payment detail
         const payment = await this.paymentRepo.findByOrderId(orderId)
 

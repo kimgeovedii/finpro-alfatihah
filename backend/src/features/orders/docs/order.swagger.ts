@@ -272,6 +272,23 @@
  *                             type: string
  *                             format: date-time
  *                             example: 2026-04-13T02:54:05.229Z
+ *                           payments:
+ *                             type: array
+ *                             items:
+ *                               type: object
+ *                               properties:
+ *                                 evidence:
+ *                                   type: string
+ *                                   format: uri
+ *                                   example: https://res.cloudinary.com/dcpasygag/image/upload/v1776123123/123123123.png
+ *                                 method:
+ *                                   type: string
+ *                                   enum: [MANUAL, AUTOMATIC]
+ *                                   example: MANUAL
+ *                                 status:
+ *                                   type: string
+ *                                   enum: [PENDING, CONFIRMED, REJECTED]
+ *                                   example: PENDING
  *                           totalItems:
  *                             type: integer
  *                             example: 2

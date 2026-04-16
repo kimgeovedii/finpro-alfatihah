@@ -41,8 +41,9 @@ export default function TransactionPage() {
               !isLoading && orders.map((dt, idx) => (
                 <OrderItemCard
                   key={idx}
-                  orderNumber={dt.orderNumber} status={dt.status} totalPrice={dt.totalPrice} finalPrice={dt.finalPrice} shippingCost={dt.shippingCost}
-                  paymentDeadline={dt.paymentDeadline} totalItems={dt.totalItems} productList={dt.productList} createdAt={dt.createdAt}
+                  orderId={dt.id} orderNumber={dt.orderNumber} status={dt.status} totalPrice={dt.totalPrice} finalPrice={dt.finalPrice} shippingCost={dt.shippingCost}
+                  paymentDeadline={dt.paymentDeadline} totalItems={dt.totalItems} productList={dt.productList} createdAt={dt.createdAt} paymentMethod={dt.payments[0]?.method}
+                  paymentStatus={dt.payments[0]?.status} paymentEvidence={dt.payments[0]?.evidence}
                   onComplete={() => console.log("complete")}
                   onDetail={() => console.log("detail")}
                 />

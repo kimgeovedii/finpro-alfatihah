@@ -1,5 +1,11 @@
 import { apiFetch } from "@/utils/api"
 
+export type PaymentData = {
+    evidence?: string
+    method: string
+    status: string
+}
+
 export type OrderData = {
     id: string
     orderNumber: string
@@ -11,6 +17,7 @@ export type OrderData = {
     paymentDeadline: string
     totalItems: number
     productList: string
+    payments: PaymentData[]
 }
 
 export type OrderMeta = {
