@@ -1,11 +1,11 @@
 "use client";
 
-import { useUser } from "@/features/auth/hooks/useUser"
 import { OrderItemCard } from "@/features/order/components/OrderItemCard";
-import { useAllOrderData } from "@/features/order/hooks/useOrder";
+import { OrderSummaryCard } from "@/features/order/components/OrderSummaryCard";
+import { useAllOrderData, useOrderSummary } from "@/features/order/hooks/useOrder";
 
 export default function TransactionPage() {
-  const { user } = useUser()
+  const { summary, isLoadingSummary } = useOrderSummary()
   const { orders, meta, isLoading, fetchAllOrders } = useAllOrderData()
 
   return (
@@ -15,7 +15,25 @@ export default function TransactionPage() {
           <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">
             My History
           </h1>
-          ...
+          <br/>
+          {
+            !isLoadingSummary && summary ? 
+              <OrderSummaryCard 
+                totalPrice={summary?.totalPrice ?? 0}
+                totalFinalPrice={summary?.totalFinalPrice ?? 0}
+                totalConfirmedOrder={summary?.ordersByStatus?.CONFIRMED ?? 0}
+                totalProcessingOrder={
+                  (summary?.ordersByStatus?.PROCESSING ?? 0) +
+                  (summary?.ordersByStatus?.SHIPPED ?? 0)
+                }
+                totalWaitingOrder={
+                  (summary?.ordersByStatus?.WAITING_PAYMENT ?? 0) +
+                  (summary?.ordersByStatus?.WAITING_PAYMENT_CONFIRMATION ?? 0)
+                }
+                totalCancelledOrder={summary?.ordersByStatus?.CANCELLED ?? 0}
+              />   
+            : <p className="text-slate-400 mt-1">Loading...</p>
+          }    
           <hr className="my-5"/>
           <div>
             { isLoading && <p>Loading...</p> }
@@ -23,8 +41,9 @@ export default function TransactionPage() {
               !isLoading && orders.map((dt, idx) => (
                 <OrderItemCard
                   key={idx}
-                  orderNumber={dt.orderNumber} status={dt.status} totalPrice={dt.totalPrice} finalPrice={dt.finalPrice} shippingCost={dt.shippingCost}
-                  paymentDeadline={dt.paymentDeadline} totalItems={dt.totalItems} productList={dt.productList} createdAt={dt.createdAt}
+                  orderId={dt.id} orderNumber={dt.orderNumber} status={dt.status} totalPrice={dt.totalPrice} finalPrice={dt.finalPrice} shippingCost={dt.shippingCost}
+                  paymentDeadline={dt.paymentDeadline} totalItems={dt.totalItems} productList={dt.productList} createdAt={dt.createdAt} paymentMethod={dt.payments[0]?.method}
+                  paymentStatus={dt.payments[0]?.status} paymentEvidence={dt.payments[0]?.evidence}
                   onComplete={() => console.log("complete")}
                   onDetail={() => console.log("detail")}
                 />

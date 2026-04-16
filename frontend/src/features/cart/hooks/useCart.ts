@@ -9,7 +9,7 @@ export const useCartSummary = () => {
         fetchCartSummary()
     }, [])
 
-    return { summary, isLoading, error }
+    return { summary, isLoading, fetchCartSummary }
 }
 
 export const useAllCartData = () => {
@@ -40,4 +40,70 @@ export const useAllCartData = () => {
     }, [])
 
     return { carts, meta, isLoadingAllCart, error, fetchAllCarts }
+}
+
+export const useDeleteCart = () => {
+    const [isDeleting, setIsDeleting] = useState(false)
+    const [error, setError] = useState<string | null>(null)
+
+    const deleteCart = async (cartId: string): Promise<boolean> => {
+        setIsDeleting(true)
+        setError(null)
+
+        try {
+            await cartRepository.deleteCart(cartId)
+            return true
+        } catch (err: any) {
+            setError(err.message || "Failed to delete cart")
+            return false
+        } finally {
+            setIsDeleting(false)
+        }
+    }
+
+    return { deleteCart, isDeleting, error }
+}
+
+export const useUpdateCartItem = () => {
+    const [isUpdatingItem, setIsUpdating] = useState(false)
+    const [errorUpdateItem, setError] = useState<string | null>(null)
+
+    const updateCartItem = async (cartItemId: string, qty: number): Promise<boolean> => {
+        setIsUpdating(true)
+        setError(null)
+
+        try {
+            await cartRepository.updateCartItem(cartItemId, qty)
+            return true
+        } catch (err: any) {
+            setError(err.message || "Failed to update cart item")
+            return false
+        } finally {
+            setIsUpdating(false)
+        }
+    }
+
+    return { updateCartItem, isUpdatingItem, errorUpdateItem }
+}
+
+export const useDeleteCartItem = () => {
+    const [isDeletingItem, setIsDeletingItem] = useState(false)
+    const [errorItem, setError] = useState<string | null>(null)
+
+    const deleteCartItem = async (cartItemId: string): Promise<boolean> => {
+        setIsDeletingItem(true)
+        setError(null)
+
+        try {
+            await cartRepository.deleteCartItem(cartItemId)
+            return true
+        } catch (err: any) {
+            setError(err.message || "Failed to delete cart item")
+            return false
+        } finally {
+            setIsDeletingItem(false)
+        }
+    }
+
+    return { deleteCartItem, isDeletingItem, errorItem }
 }

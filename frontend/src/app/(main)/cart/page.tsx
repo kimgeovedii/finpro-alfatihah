@@ -1,13 +1,117 @@
 "use client";
 
-import { useAllCartData, useCartSummary } from "@/features/cart/hooks/useCart"
+import { useAllCartData, useCartSummary, useDeleteCart, useUpdateCartItem } from "@/features/cart/hooks/useCart"
 import { CartSummary } from "@/features/cart/components/CartSummary"
 import { BranchHeader } from "@/features/cart/components/BranchHeader";
 import { CartItemCard } from "@/features/cart/components/CartItemCard";
+import Swal from "sweetalert2";
 
 export default function CartPage() {
-  const { summary, isLoading } = useCartSummary()
+  const { summary, isLoading, fetchCartSummary } = useCartSummary()
   const { carts, meta, isLoadingAllCart, fetchAllCarts } = useAllCartData()
+  const { deleteCart, isDeleting } = useDeleteCart()
+  const { updateCartItem, isUpdatingItem } = useUpdateCartItem()
+
+  const handleRemoveCart = async (cartId: string) => {
+    const confirm = await Swal.fire({
+      title: "Remove cart?",
+      text: "All items in this cart will be deleted.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, remove it",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#ef4444",
+    })
+    if (!confirm.isConfirmed) return
+
+    const success = await deleteCart(cartId)
+    if (success) {
+      await Swal.fire({
+        title: "Cart deleted",
+        text: "Your cart has been removed.",
+        icon: "success",
+        confirmButtonColor: "#10b981",
+      })
+
+      fetchCartSummary()
+      fetchAllCarts(1)
+    }
+  }
+
+  const handleRemoveCartItem = async (cartItemId: string, productName: string) => {
+    const confirm = await Swal.fire({
+      title: "Remove cart item?",
+      html: `<b>${productName}</b> items in this cart will be deleted.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, remove it",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#ef4444",
+    })
+    if (!confirm.isConfirmed) return
+
+    const success = await deleteCart(cartItemId)
+    if (success) {
+      await Swal.fire({
+        title: "Item deleted",
+        html: `<b>${productName}</b> has been removed.`,
+        icon: "success",
+        confirmButtonColor: "#10b981",
+      })
+
+      fetchCartSummary()
+      fetchAllCarts(1)
+    }
+  }
+
+  const handleIncrease = async (itemId: string, qty: number, stock: number) => {
+    if (qty >= stock) {
+      Swal.fire({
+        icon: "info",
+        title: "Stock limit reached",
+        text: "You already selected all available items.",
+        confirmButtonColor: "#10b981",
+      })
+      return
+    }
+  
+    await updateCartItem(itemId, qty + 1)
+    fetchCartSummary()
+    fetchAllCarts(1)
+  }
+  
+  const handleDecrease = async (cartItemId: string, qty: number, productName: string) => {
+    if (qty <= 1) {
+      const confirm = await Swal.fire({
+        title: "Remove item?",
+        html: `<b>${productName}</b> will be removed from cart.`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, remove",
+        confirmButtonColor: "#ef4444",
+      })
+  
+      if (!confirm.isConfirmed) return
+  
+      const success = await deleteCart(cartItemId)
+      if (success) {
+        await Swal.fire({
+          title: "Item deleted",
+          html: `<b>${productName}</b> has been removed.`,
+          icon: "success",
+          confirmButtonColor: "#10b981",
+        })
+
+        fetchCartSummary()
+        fetchAllCarts(1)
+      }
+    } else {
+      await updateCartItem(cartItemId, qty - 1)
+    }
+  
+    fetchCartSummary()
+    fetchAllCarts(1)
+  }
   
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto">
@@ -33,15 +137,15 @@ export default function CartPage() {
             ) : (
               carts.map((cart: any) => (
                 <div key={cart.id} className="mb-6">
-                  <BranchHeader id={cart.branch.id} storeName={cart.branch.storeName}/>
+                  <BranchHeader id={cart.branch.id} storeName={cart.branch.storeName} onRemove={() => handleRemoveCart(cart.id)}/>
                   {
-                    cart.items.map((item: any) => (
-                      <CartItemCard key={item.id}
-                        slugName={item.product.id} branchId={cart.branchId} productName={item.product.product.productName} description={item.product.product.description} 
-                        basePrice={item.product.product.basePrice} mainImage="/mainImages/coke.png" qty={item.quantity}
-                        onIncrease={() => console.log("increase")}
-                        onDecrease={() => console.log("decrease")}
-                        onRemove={() => console.log("remove")}
+                    cart.items.map((dt: any) => (
+                      <CartItemCard key={dt.id}
+                        slugName={dt.product.id} branchId={cart.branchId} productName={dt.product.product.productName} description={dt.product.product.description} 
+                        basePrice={dt.product.product.basePrice} mainImage="/mainImages/coke.png" qty={dt.quantity} currentStock={dt.product.currentStock}
+                        onDecrease={() => handleDecrease(dt.id, dt.quantity,dt.product.product.productName)}
+                        onIncrease={() => handleIncrease(dt.id, dt.quantity, dt.product.currentStock)}                        
+                        onRemove={() => handleRemoveCartItem(cart.id, `(${dt.quantity}) ${dt.product.product.productName}`)}
                       />
                     ))
                   }

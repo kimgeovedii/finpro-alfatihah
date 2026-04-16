@@ -1,5 +1,16 @@
 import { useEffect, useState } from "react"
 import { orderRepository, OrderData, OrderMeta } from "../repositories/order.repository"
+import { useOrderService } from "../services/order.service"
+
+export const useOrderSummary = () => {
+    const { summary, fetchOrderSummary, isLoadingSummary, error } = useOrderService()
+
+    useEffect(() => {
+        fetchOrderSummary()
+    }, [])
+
+    return { summary, isLoadingSummary, error }
+}
 
 export const useAllOrderData = () => {
     const [orders, setOrders] = useState<OrderData[]>([])

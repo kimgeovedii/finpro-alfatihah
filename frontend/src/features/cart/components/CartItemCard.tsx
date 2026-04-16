@@ -9,6 +9,7 @@ type Props = {
     basePrice: number
     mainImage: string
     qty: number
+    currentStock: number
     branchId: string
 
     onIncrease: () => void

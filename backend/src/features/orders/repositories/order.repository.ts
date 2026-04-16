@@ -15,6 +15,36 @@ export class OrderRepository {
     })
   }
 
+  async getOrderSummary(userId: string) {
+    // Group orders by status
+    const groupedOrders = await prisma.orders.groupBy({
+      by: ['status'],
+      where: { userId },
+      _count: { id: true }
+    })
+
+    // Sum all final price and total price 
+    const priceAggregate = await prisma.orders.aggregate({
+      where: { userId, status: 'CONFIRMED' },
+      _sum: {
+        finalPrice: true,
+        totalPrice: true
+      }
+    })
+
+    // Count total order per status
+    const ordersByStatus = groupedOrders.reduce((acc, curr) => {
+      acc[curr.status] = curr._count.id
+      return acc
+    }, {} as Record<string, number>)
+
+    return {
+      ordersByStatus,
+      totalFinalPrice: priceAggregate._sum.finalPrice ?? 0,
+      totalPrice: priceAggregate._sum.totalPrice ?? 0,
+    }
+  }
+
   async findOrderById(orderId: string) {
     return await prisma.orders.findFirst({
       where: { id: orderId },
@@ -44,7 +74,8 @@ export class OrderRepository {
         take: limit,
         orderBy: { createdAt: 'desc' },
         select: {
-          id: true, orderNumber: true, createdAt: true, status: true, totalPrice: true, finalPrice: true, shippingCost: true, paymentDeadline: true, items: {
+          id: true, orderNumber: true, createdAt: true, status: true, totalPrice: true, finalPrice: true, shippingCost: true, paymentDeadline: true, 
+          items: {
             select: {
               quantity: true, product: {                 
                 select: {
@@ -53,6 +84,11 @@ export class OrderRepository {
                   }
                 }
               }
+            }
+          }, 
+          payments: {
+            select: { 
+              evidence: true, method: true, status: true 
             }
           }
         }

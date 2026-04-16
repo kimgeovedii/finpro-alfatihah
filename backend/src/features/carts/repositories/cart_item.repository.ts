@@ -33,5 +33,11 @@ export class CartItemRepository {
         })
     }
 
-    deleteCartItem = async (id: string) => prisma.cart_items.delete({ where: { id } })
+    async deleteByCartId(cartId: string) {
+        return await prisma.cart_items.deleteMany({
+            where: { cartId }
+        })
+    }
+
+    deleteCartItemById = async (id: string) => prisma.cart_items.delete({ where: { id } })
 }

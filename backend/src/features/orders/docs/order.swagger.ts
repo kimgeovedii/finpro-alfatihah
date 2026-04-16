@@ -272,6 +272,23 @@
  *                             type: string
  *                             format: date-time
  *                             example: 2026-04-13T02:54:05.229Z
+ *                           payments:
+ *                             type: array
+ *                             items:
+ *                               type: object
+ *                               properties:
+ *                                 evidence:
+ *                                   type: string
+ *                                   format: uri
+ *                                   example: https://res.cloudinary.com/dcpasygag/image/upload/v1776123123/123123123.png
+ *                                 method:
+ *                                   type: string
+ *                                   enum: [MANUAL, AUTOMATIC]
+ *                                   example: MANUAL
+ *                                 status:
+ *                                   type: string
+ *                                   enum: [PENDING, CONFIRMED, REJECTED]
+ *                                   example: PENDING
  *                           totalItems:
  *                             type: integer
  *                             example: 2
@@ -295,6 +312,63 @@
  *               properties:
  *                 success: { type: boolean, example: false }
  *                 message: { type: string, example: branchId is not valid UUID }
+ *
+ *       401:
+ *         description: Unauthorized - No token provided
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: false }
+ *                 message: { type: string, example: No token provided }
+ *
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: false }
+ *                 message: { type: string, example: Internal server error }
+ */
+
+/**
+ * @openapi
+ * /api/orders/summary:
+ *   get:
+ *     summary: Get order summary
+ *     description: Returns total order count grouped by status, and total finalPrice and totalPrice for confirmed orders only.
+ *     tags: [Order]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Order summary fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 message: { type: string, example: Order fetched }
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     ordersByStatus:
+ *                       type: object
+ *                       additionalProperties:
+ *                         type: integer
+ *                       example:
+ *                         WAITING_PAYMENT: 2
+ *                         CONFIRMED: 1
+ *                     totalFinalPrice:
+ *                       type: number
+ *                       example: 30000
+ *                     totalPrice:
+ *                       type: number
+ *                       example: 30000
  *
  *       401:
  *         description: Unauthorized - No token provided
