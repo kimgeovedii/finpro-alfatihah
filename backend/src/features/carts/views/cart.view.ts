@@ -45,9 +45,7 @@ export const getCartReminderEmailTemplate = (username: string, carts: CartGroup[
                     </tbody>
                 </table>
                 <div style="margin-top:10px; padding-top:10px; border-top:1px dashed #ddd;">
-                    <p style="margin:0; font-weight:600;">
-                        Total Items: ${totalQty}
-                    </p>
+                    <p style="margin:0; font-weight:600;">Total Items: ${totalQty}</p>
                     <p style="margin:0; font-weight:700; color:#059669;">
                         Total Price: Rp ${totalPrice.toLocaleString("id-ID")}
                     </p>

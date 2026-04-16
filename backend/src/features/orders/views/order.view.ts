@@ -86,3 +86,54 @@ export const getBranchOrderBroadcastTemplate = (data: Payload) => {
         </html>
     `
 }
+
+
+type OrderCreated = {
+    username: string
+    orderNumber: string
+    amount: number
+    paymentDeadline: Date
+}
+
+export const getOrderCreatedPaymentTemplate = (data: OrderCreated, isManual: boolean) => {
+    return `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            ${mailTemplateStyle()}
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>Complete Your Payment</h1>
+                </div>
+                <div class="content">
+                    <p>Hello <strong>${data.username}</strong>,</p>
+                    <p>Your order has been successfully created. Please complete your payment before the deadline to avoid cancellation.</p>
+                    <div class="context-box" style="margin-top:16px;">
+                        <p style="margin:0 0 6px 0;"><strong>Order ID:</strong> ${data.orderNumber}</p>
+                        <p style="margin:0 0 6px 0; color:#059669; font-weight:600;">Payment Amount: Rp ${data.amount.toLocaleString("id-ID")}</p>
+                        <p style="margin:0;">
+                            Payment Deadline: <strong>${new Date(data.paymentDeadline).toLocaleString("id-ID")}</strong>
+                        </p>
+                    </div>
+                    ${
+                        isManual ? `
+                        <p style="margin-top:16px;">
+                            After completing the payment, please upload your payment evidence from the <strong>Order Menu</strong> in the application.
+                            Make sure to upload the evidence before the deadline so your order can be processed.
+                        </p>` : ''
+                    }
+                    <p>
+                        Best regards,<br/>
+                        <strong>Alfatihah</strong>
+                    </p>
+                </div>
+                <div class="footer">
+                    © ${new Date().getFullYear()} Alfatihah. All rights reserved.
+                </div>
+            </div>
+        </body>
+        </html>
+    `
+}

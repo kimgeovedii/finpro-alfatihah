@@ -129,7 +129,7 @@ export class OrderRepository {
           }))
         }
       },
-      select: { id: true, orderNumber: true }
+      select: { id: true, orderNumber: true, paymentDeadline: true }
     })
   } 
 

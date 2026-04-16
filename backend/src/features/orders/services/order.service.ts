@@ -9,7 +9,7 @@ import { PaymentRepository } from "../repositories/payment.repository"
 import { StockJournalRepository } from "../repositories/stok_journal.repository"
 import { UserRepository } from "../repositories/user.repository"
 import { Mailer } from "../../../config/mailer";
-import { getBranchOrderBroadcastTemplate } from "../views/order.view"
+import { getBranchOrderBroadcastTemplate, getOrderCreatedPaymentTemplate } from "../views/order.view"
 
 export class OrderService {
     private orderRepo = new OrderRepository()
@@ -108,6 +108,21 @@ export class OrderService {
 
         // Repo : delete cart and its items
         await this.cartRepo.deleteCart(cartId)
+
+        // Mailer : inform user that an order has been made
+        const emailHtml = getOrderCreatedPaymentTemplate({
+            username: user?.username ?? "",
+            orderNumber: order.orderNumber,
+            amount: finalPrice,
+            paymentDeadline: order.paymentDeadline
+        }, true) // for now
+
+        await Mailer.client.sendMail({
+            from: `"Alfatihah Online Grocery" <${process.env.SMTP_USER}>`,
+            to: user?.email,
+            subject: "Order Checkout",
+            html: emailHtml,
+        })
 
         return { orderId: order.id, paymentId: payment.id }
     }
