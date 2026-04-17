@@ -6,6 +6,50 @@ export type PaymentData = {
     status: string
 }
 
+export type BranchSchedule = {
+    startTime: string
+    endTime: string
+    dayName: string
+}
+
+export type BranchData = {
+    id: string
+    storeName: string
+    address: string
+    city: string
+    schedules: BranchSchedule[]
+}
+
+export type AddressData = {
+    label: string
+    type: string
+    receiptName: string
+    notes: string
+    phone: string
+    address: string
+}
+
+export type ProductImage = {
+    imageUrl: string
+}
+
+export type ProductDetail = {
+    productName: string
+    description: string
+    basePrice: number
+    productImages: ProductImage[]
+}
+
+export type OrderItemProduct = {
+    product: ProductDetail
+}
+
+export type OrderItem = {
+    id: string
+    quantity: number
+    product: OrderItemProduct
+}
+
 export type OrderData = {
     id: string
     orderNumber: string
@@ -18,6 +62,12 @@ export type OrderData = {
     totalItems: number
     productList: string
     payments: PaymentData[]
+    shippedAt: string | null
+    confirmedAt: string | null
+    rejectedAt: string | null
+    branch: BranchData
+    address: AddressData
+    items: OrderItem[]
 }
 
 export type OrderMeta = {
@@ -45,6 +95,9 @@ export const orderRepository = {
         return await apiFetch<OrderSummaryData>("/orders/summary","get")
     },
     async getAllOrders(page: number = 1): Promise<OrderResponse> {
-        return await apiFetch<any>(`/orders/transaction?page=${page}`, "get")
+        return await apiFetch<OrderResponse>(`/orders/transaction?page=${page}`, "get")
+    },
+    async getOrderDetailByOrderNumber(orderNumber: string): Promise<OrderData> {
+        return await apiFetch<OrderData>(`/orders/transaction/${orderNumber}`, "get")
     }
 }

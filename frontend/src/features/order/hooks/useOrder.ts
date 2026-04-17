@@ -39,3 +39,28 @@ export const useAllOrderData = () => {
 
     return { orders, meta, isLoading, fetchAllOrders }
 }
+
+export const useOrderDetailData = (orderNumber: string) => {
+    const [order, setOrder] = useState<OrderData>()
+    const [isLoading, setIsLoading] = useState(false)
+
+    const fetchOrderDetail = async (orderNumber: string) => {
+        setIsLoading(true)
+
+        try {
+            const res = await orderRepository.getOrderDetailByOrderNumber(orderNumber)
+
+            setOrder(res)
+        } catch (err) {
+            console.error("Failed to fetch order", err)
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    useEffect(() => {
+        fetchOrderDetail(orderNumber)
+    }, [])
+
+    return { order, isLoading, fetchOrderDetail }
+}

@@ -1,5 +1,5 @@
 import { CopyField } from "@/components/button/CopyField"
-import { Badge } from "@/components/ui/badge"
+import { formatDate } from "@/utils/converter.util"
 import { BuildingOfficeIcon } from "@heroicons/react/24/outline"
 import { CalendarDays, Clock, MapPin } from "lucide-react"
 import React from "react"
@@ -26,6 +26,36 @@ type Props = {
 }
 
 export const OrderDetailBranchCard: React.FC<Props> = ({ branch, orderInfo }) => {
+    const getOrderStatusStyle = (status: string) => {
+        switch (status) {
+            case "WAITING_PAYMENT":
+            case "WAITING_PAYMENT_CONFIRMATION":
+                return "text-orange-600 bg-orange-100"
+            case "PROCESSING":
+            case "SHIPPED":
+                return "text-blue-600 bg-blue-100"
+            case "CONFIRMED":
+                return "text-emerald-600 bg-emerald-100"
+            case "CANCELLED":
+                return "text-red-600 bg-red-100"
+            default:
+                return "text-slate-600 bg-slate-100"
+        }
+    }
+    
+    const getPaymentStatusStyle = (status: string) => {
+        switch (status) {
+            case "PENDING":
+                return "text-orange-600 bg-orange-100"
+            case "SUCCESS":
+                return "text-emerald-600 bg-emerald-100"
+            case "REJECTED":
+                return "text-red-600 bg-red-100"
+            default:
+                return "text-slate-600 bg-slate-100"
+        }
+    }
+
     return (
         <div className="bg-white rounded-3xl">
             <div className="p-5 pb-0">
@@ -34,15 +64,15 @@ export const OrderDetailBranchCard: React.FC<Props> = ({ branch, orderInfo }) =>
                 <div className="flex flex-col space-y-2">
                     <div className="flex justify-between items-center">
                         <label className="font-semibold text-sm mb-0">Order Status</label>
-                        <span className="inline-block text-sm font-semibold text-red-500 bg-red-100 px-2 py-0.5 rounded-md">{orderInfo.orderStatus}</span>
+                        <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-md ${getOrderStatusStyle(orderInfo.orderStatus)}`}>{orderInfo.orderStatus.replaceAll("_"," ")}</span>
                     </div>
                     <div className="flex justify-between items-center">
                         <label className="font-semibold text-sm">Payment Method</label>
-                        <span className="inline-block text-sm font-semibold text-red-500 bg-red-100 px-2 py-0.5 rounded-md">{orderInfo.paymentMethod}</span>
+                        <span className="inline-block text-xs font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">{orderInfo.paymentMethod}</span>
                     </div>
                     <div className="flex justify-between items-center">
                         <label className="font-semibold text-sm">Payment Status</label>
-                        <span className="inline-block text-sm font-semibold text-red-500 bg-red-100 px-2 py-0.5 rounded-md">{orderInfo.paymentStatus}</span>
+                        <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-md ${getPaymentStatusStyle(orderInfo.paymentStatus)}`}>{orderInfo.paymentStatus}</span>
                     </div>
                 </div>
                 <hr className="mt-4"/>
@@ -54,13 +84,13 @@ export const OrderDetailBranchCard: React.FC<Props> = ({ branch, orderInfo }) =>
                     </div>
                     <div>
                         <p className="text-[11px] text-slate-400 uppercase tracking-wider">Created at</p>
-                        <p className="text-sm font-semibold text-slate-700">{orderInfo.createdAt}</p>
+                        <p className="text-sm font-semibold text-slate-700">{formatDate(orderInfo.createdAt, true)}</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-3 flex-1 justify-end text-end">
                     <div>
                         <p className="text-[11px] text-slate-400 uppercase tracking-wider">Payment Deadline</p>
-                        <p className="text-sm font-semibold text-slate-700">{orderInfo.paymentDeadlineAt}</p>
+                        <p className="text-sm font-semibold text-slate-700">{formatDate(orderInfo.paymentDeadlineAt, true)}</p>
                     </div>
                     <div className="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center text-red-400">
                         <Clock className="w-4 h-4" />
@@ -82,7 +112,7 @@ export const OrderDetailBranchCard: React.FC<Props> = ({ branch, orderInfo }) =>
                         </div>
                         <span>{branch.address}</span>
                     </div>
-                    <div className="flex items-center gap-3 text-white/80 text-sm">
+                    <div className="flex items-center gap-3 text-white/80 text-xs">
                         <div className="w-7 h-7 rounded-lg bg-white/15 flex items-center justify-center flex-shrink-0">
                             <CalendarDays className="w-3.5 h-3.5 text-white" />
                         </div>
