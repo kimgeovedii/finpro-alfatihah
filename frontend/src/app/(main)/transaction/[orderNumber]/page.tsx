@@ -1,5 +1,6 @@
 "use client";
 import { Button } from '@/components/ui/button';
+import { OrderDetailBranchCard } from '@/features/order/components/OrderDetailBranchCard';
 import { OrderDetailItemListCard } from '@/features/order/components/OrderDetailItemListCard';
 import { PaymentSummaryCard } from '@/features/order/components/PaymentSummary';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
@@ -23,7 +24,17 @@ export default function TransactionDetailPage() {
       </div>
       <div className='flex w-full gap-5'>
         <div className='flex-1'>
-
+          <OrderDetailBranchCard branch={{
+            name: "Jakarta Selatan Branch",
+            address: "Jl. Sudirman No. 123, Jakarta Selatan",
+            schedule: "Mon - Sun, 08:00 - 22:00",
+            imageUrl: "/images/branch.jpg", 
+          }} orderInfo={{
+            orderStatus: "Shipping",
+            paymentStatus: "Accepted",
+            createdAt: "20 Apr 2026",
+            paymentDeadlineAt: "20 Apr 2024"
+          }}/>
         </div>
         <div className='flex-1'>
           <OrderDetailItemListCard items={[

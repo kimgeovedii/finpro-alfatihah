@@ -1,0 +1,83 @@
+import { Badge } from "@/components/ui/badge"
+import { BuildingOfficeIcon } from "@heroicons/react/24/outline"
+import { CalendarDays, Clock, MapPin } from "lucide-react"
+import React from "react"
+
+type BranchInfo = {
+    name: string
+    address: string
+    schedule: string
+    imageUrl?: string
+}
+
+type OrderInfo = {
+    orderStatus: string 
+    paymentStatus: string
+    createdAt: string
+    paymentDeadlineAt: string
+}
+
+type Props = {
+    branch: BranchInfo
+    orderInfo: OrderInfo
+}
+
+export const OrderDetailBranchCard: React.FC<Props> = ({ branch, orderInfo }) => {
+    return (
+        <div className="bg-white rounded-3xl">
+            <div className="p-5">
+                <div className="flex justify-between items-center mb-2">
+                    <label className="font-semibold text-sm mb-0">Order Status</label>
+                    <span className="inline-block mt-1 text-sm font-semibold text-red-500 bg-red-100 px-2 py-0.5 rounded-md">{orderInfo.orderStatus}</span>
+                </div>
+                <div className="flex justify-between items-center mb-0">
+                    <label className="font-semibold text-sm">Payment Status</label>
+                    <span className="inline-block mt-1 text-sm font-semibold text-red-500 bg-red-100 px-2 py-0.5 rounded-md">{orderInfo.paymentStatus}</span>
+                </div>
+            </div>
+            <div className="flex flex-wrap gap-5 w-full p-4">
+                <div className="flex items-center gap-3 flex-1">
+                    <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500">
+                        <CalendarDays className="w-4 h-4" />
+                    </div>
+                    <div>
+                        <p className="text-[11px] text-slate-400 uppercase tracking-wider">Created at</p>
+                        <p className="text-sm font-semibold text-slate-700">{orderInfo.createdAt}</p>
+                    </div>
+                </div>
+                <div className="flex items-center gap-3 flex-1 justify-end text-end">
+                    <div>
+                        <p className="text-[11px] text-slate-400 uppercase tracking-wider">Payment Deadline</p>
+                        <p className="text-sm font-semibold text-slate-700">{orderInfo.paymentDeadlineAt}</p>
+                    </div>
+                    <div className="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center text-red-400">
+                        <Clock className="w-4 h-4" />
+                    </div>
+                </div>
+            </div>
+            <div className="relative rounded-b-3xl overflow-hidden p-6 flex flex-col gap-4" style={{ background: "linear-gradient(135deg, #0f6e56 0%, #085041 100%)" }}>
+                <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: "repeating-linear-gradient(45deg, #fff 0, #fff 1px, transparent 0, transparent 50%)", backgroundSize: "12px 12px" }}/>
+                    <div className="relative flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white">
+                            <BuildingOfficeIcon className="w-5 h-5"/>
+                        </div>
+                        <p className="text-white text-lg font-bold">{branch.name}</p>
+                    </div>
+                    <div className="relative flex flex-col gap-3">
+                    <div className="flex items-center gap-3 text-white/80 text-sm">
+                        <div className="w-7 h-7 rounded-lg bg-white/15 flex items-center justify-center flex-shrink-0">
+                            <MapPin className="w-3.5 h-3.5 text-white" />
+                        </div>
+                        <span>{branch.address}</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-white/80 text-sm">
+                        <div className="w-7 h-7 rounded-lg bg-white/15 flex items-center justify-center flex-shrink-0">
+                            <CalendarDays className="w-3.5 h-3.5 text-white" />
+                        </div>
+                        <span>{branch.schedule}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+}

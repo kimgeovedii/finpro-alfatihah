@@ -29,7 +29,7 @@ export const OrderDetailItemListCard: React.FC<Props> = ({ items }) => {
                     items.map((dt, idx) => (
                         <div key={idx} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
                             <div className="w-14 h-14 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                            { dt.imageUrl ? <img src={dt.imageUrl} alt={dt.productName} className="w-full h-full object-cover"/> : <span className="text-2xl">🛒</span> }
+                                { dt.imageUrl ? <img src={dt.imageUrl} alt={dt.productName} className="w-full h-full object-cover"/> : <span className="text-2xl">🛒</span> }
                             </div>
                             <div className="flex-1 min-w-0">
                                 <p className="text-[10px] font-semibold text-emerald-600 uppercase tracking-wider">{dt.category}</p>
