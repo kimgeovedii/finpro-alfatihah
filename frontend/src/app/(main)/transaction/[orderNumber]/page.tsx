@@ -6,11 +6,42 @@ import { PaymentSummaryCard } from '@/features/order/components/PaymentSummary';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { Check, Package, Truck, Home } from "lucide-react"
+import { OrderStatusStepsCard } from '@/features/order/components/OrderStatusStepsCard';
 
 export default function TransactionDetailPage() {
   // For repo fetching
   const params = useParams()
   const orderNumber = params?.orderNumber as string
+
+  const statusSteps = [
+    {
+      key: "pending",
+      label: "Order Placed",
+      sub: "Waiting for confirmation",
+      icon: <Check className="w-4 h-4" />
+    },
+    {
+      key: "processed",
+      label: "Processed",
+      sub: "Preparing your order",
+      icon: <Package className="w-4 h-4" />
+    },
+    {
+      key: "shipped",
+      label: "Shipped",
+      sub: "On the way",
+      icon: <Truck className="w-4 h-4" />
+    },
+    {
+      key: "delivered",
+      label: "Delivered",
+      sub: "Order completed",
+      icon: <Home className="w-4 h-4" />
+    }
+  ]
+
+  const currentStatus = "shipped"
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto w-full">
@@ -18,25 +49,25 @@ export default function TransactionDetailPage() {
         <Link href={'/transaction'}>
           <Button variant='destructive' className='text-md px-3 py-5'><ArrowLeftIcon className="w-4 h-4"/> Back</Button>
         </Link>
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">
-          Order <span>{orderNumber}</span>
-        </h1>
       </div>
       <div className='flex w-full gap-5'>
-        <div className='flex-1'>
+        <div className='flex-1 flex flex-col space-y-5'>
+          <OrderStatusStepsCard statusSteps={statusSteps} currentStatus={currentStatus}/>
           <OrderDetailBranchCard branch={{
             name: "Jakarta Selatan Branch",
             address: "Jl. Sudirman No. 123, Jakarta Selatan",
             schedule: "Mon - Sun, 08:00 - 22:00",
             imageUrl: "/images/branch.jpg", 
           }} orderInfo={{
+            orderNumber,
             orderStatus: "Shipping",
             paymentStatus: "Accepted",
+            paymentMethod: "Manual",
             createdAt: "20 Apr 2026",
             paymentDeadlineAt: "20 Apr 2024"
           }}/>
         </div>
-        <div className='flex-1'>
+        <div className='flex-1 flex flex-col space-y-5'>
           <OrderDetailItemListCard items={[
             {
               branchInventoriesId: "inv-1",
@@ -57,10 +88,10 @@ export default function TransactionDetailPage() {
               basePrice: 5000,
               totalPrice: 5000,
             }
-          ]} />
+          ]}/>
+          <PaymentSummaryCard totalItem={2} shippingCost={10000} totalPrice={15000} totalSaving={2000} finalPrice={22000}/>
         </div>
       </div>
-      <PaymentSummaryCard totalItem={2} shippingCost={10000} totalPrice={15000} totalSaving={2000} finalPrice={22000}/>
     </div>
   )
 }

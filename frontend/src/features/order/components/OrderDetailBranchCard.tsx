@@ -1,3 +1,4 @@
+import { CopyField } from "@/components/button/CopyField"
 import { Badge } from "@/components/ui/badge"
 import { BuildingOfficeIcon } from "@heroicons/react/24/outline"
 import { CalendarDays, Clock, MapPin } from "lucide-react"
@@ -11,8 +12,10 @@ type BranchInfo = {
 }
 
 type OrderInfo = {
+    orderNumber: string
     orderStatus: string 
     paymentStatus: string
+    paymentMethod: string
     createdAt: string
     paymentDeadlineAt: string
 }
@@ -25,15 +28,24 @@ type Props = {
 export const OrderDetailBranchCard: React.FC<Props> = ({ branch, orderInfo }) => {
     return (
         <div className="bg-white rounded-3xl">
-            <div className="p-5">
-                <div className="flex justify-between items-center mb-2">
-                    <label className="font-semibold text-sm mb-0">Order Status</label>
-                    <span className="inline-block mt-1 text-sm font-semibold text-red-500 bg-red-100 px-2 py-0.5 rounded-md">{orderInfo.orderStatus}</span>
+            <div className="p-5 pb-0">
+                <CopyField label="Order number" value={orderInfo.orderNumber} customClass="text-lg font-semibold"/>
+                <hr className="my-4"/>
+                <div className="flex flex-col space-y-2">
+                    <div className="flex justify-between items-center">
+                        <label className="font-semibold text-sm mb-0">Order Status</label>
+                        <span className="inline-block text-sm font-semibold text-red-500 bg-red-100 px-2 py-0.5 rounded-md">{orderInfo.orderStatus}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                        <label className="font-semibold text-sm">Payment Method</label>
+                        <span className="inline-block text-sm font-semibold text-red-500 bg-red-100 px-2 py-0.5 rounded-md">{orderInfo.paymentMethod}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                        <label className="font-semibold text-sm">Payment Status</label>
+                        <span className="inline-block text-sm font-semibold text-red-500 bg-red-100 px-2 py-0.5 rounded-md">{orderInfo.paymentStatus}</span>
+                    </div>
                 </div>
-                <div className="flex justify-between items-center mb-0">
-                    <label className="font-semibold text-sm">Payment Status</label>
-                    <span className="inline-block mt-1 text-sm font-semibold text-red-500 bg-red-100 px-2 py-0.5 rounded-md">{orderInfo.paymentStatus}</span>
-                </div>
+                <hr className="mt-4"/>
             </div>
             <div className="flex flex-wrap gap-5 w-full p-4">
                 <div className="flex items-center gap-3 flex-1">

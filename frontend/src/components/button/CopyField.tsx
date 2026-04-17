@@ -6,9 +6,10 @@ import Swal from "sweetalert2"
 type Props = {
     label: string
     value: string
+    customClass?: string
 }
 
-export const CopyField: React.FC<Props> = ({ label, value }) => {
+export const CopyField: React.FC<Props> = ({ label, value, customClass = "text-md font-semibold" }) => {
     const handleCopy = async () => {
         try {
             await navigator.clipboard.writeText(value)
@@ -34,7 +35,7 @@ export const CopyField: React.FC<Props> = ({ label, value }) => {
             <button onClick={handleCopy} className="text-xs px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition cursor-pointer" title={`Copy ${label}`}>
                 <DocumentDuplicateIcon className="w-4 h-4"/>
             </button>
-            <h5 className="text-md font-semibold text-slate-800 break-all">{value}</h5>
+            <h5 className={`${customClass} text-slate-800 break-all`}>{value}</h5>
         </div>
     )
 }
