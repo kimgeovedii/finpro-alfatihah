@@ -1,5 +1,6 @@
 "use client";
 import { Button } from '@/components/ui/button';
+import { OrderDetailItemListCard } from '@/features/order/components/OrderDetailItemListCard';
 import { PaymentSummaryCard } from '@/features/order/components/PaymentSummary';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
@@ -19,6 +20,34 @@ export default function TransactionDetailPage() {
         <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">
           Order <span>{orderNumber}</span>
         </h1>
+      </div>
+      <div className='flex w-full gap-5'>
+        <div className='flex-1'>
+
+        </div>
+        <div className='flex-1'>
+          <OrderDetailItemListCard items={[
+            {
+              branchInventoriesId: "inv-1",
+              productName: "Ayam Geprek",
+              description: "Spicy fried chicken",
+              category: "Food",
+              imageUrl: "/images/ayam.jpg",
+              quantity: 2,
+              basePrice: 25000,
+              totalPrice: 50000,
+            },
+            {
+              branchInventoriesId: "inv-2",
+              productName: "Es Teh",
+              description: "Cold tea",
+              category: "Drink",
+              quantity: 1,
+              basePrice: 5000,
+              totalPrice: 5000,
+            }
+          ]} />
+        </div>
       </div>
       <PaymentSummaryCard totalItem={2} shippingCost={10000} totalPrice={15000} totalSaving={2000} finalPrice={22000}/>
     </div>
