@@ -12,6 +12,8 @@ import globalRouter from "./router";
 import { success } from "zod";
 import { sendError } from "./utils/apiResponse";
 import { Prisma } from "@prisma/client";
+import { CartCron } from "./features/carts/crons/cart.cron";
+import { OrderCron } from "./features/orders/crons/order.cron";
 
 class App {
   public app: Application;
@@ -20,6 +22,7 @@ class App {
     this.app = express();
     this.configureMiddlewares();
     this.configureRoutes();
+    this.configureCron()
     this.errorHandler()
   }
 
@@ -40,6 +43,14 @@ class App {
     this.app.get("/", (req: Request, res: Response) => {
       res.send({ status: "ok" });
     });
+  }
+
+  private configureCron() {
+    const cartCron = new CartCron()
+    const orderCron = new OrderCron()
+    
+    cartCron.start()
+    orderCron.start()
   }
 
   // Error handling

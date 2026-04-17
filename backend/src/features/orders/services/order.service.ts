@@ -8,6 +8,8 @@ import { OrderRepository } from "../repositories/order.repository"
 import { PaymentRepository } from "../repositories/payment.repository"
 import { StockJournalRepository } from "../repositories/stok_journal.repository"
 import { UserRepository } from "../repositories/user.repository"
+import { Mailer } from "../../../config/mailer";
+import { getBranchOrderBroadcastTemplate, getOrderCreatedPaymentTemplate } from "../views/order.view"
 
 export class OrderService {
     private orderRepo = new OrderRepository()
@@ -21,6 +23,10 @@ export class OrderService {
 
     async getAllOrders(page: number, limit: number, userId: string, branchId: string | null) {
         return await this.orderRepo.findAllOrders(page, limit, userId, branchId)
+    }
+
+    async getOrderDetailByOrderNumber(userId: string, orderNumber: string) {
+        return await this.orderRepo.findOrderDetailByOrderNumber(userId, orderNumber)
     }
 
     async getOrderSummary(userId: string) {
@@ -107,6 +113,21 @@ export class OrderService {
         // Repo : delete cart and its items
         await this.cartRepo.deleteCart(cartId)
 
+        // Mailer : inform user that an order has been made
+        const emailHtml = getOrderCreatedPaymentTemplate({
+            username: user?.username ?? "",
+            orderNumber: order.orderNumber,
+            amount: finalPrice,
+            paymentDeadline: order.paymentDeadline
+        }, true) // for now
+
+        await Mailer.client.sendMail({
+            from: `"Alfatihah Online Grocery" <${process.env.SMTP_USER}>`,
+            to: user?.email,
+            subject: "Order Checkout",
+            html: emailHtml,
+        })
+
         return { orderId: order.id, paymentId: payment.id }
     }
 
@@ -125,5 +146,39 @@ export class OrderService {
     
         // Repo : delete order 
         await this.orderRepo.deleteOrder(orderId)
+    }
+
+    // For Task Scheduling / Cron
+    async getUnprocessedOrdersToRemind() {
+        // Repo : get processing branch order
+        const branchs = await this.branchRepo.findBranchsOrders()
+    
+        for (const dt of branchs) {
+            if (!dt.orders.length) continue
+    
+            // Remind every employee
+            for (const emp of dt.employees) {
+                if (!emp.user?.username) continue
+    
+                const emailHtml = getBranchOrderBroadcastTemplate({
+                    username: emp.user.username,
+                    storeName: dt.storeName,
+                    schedules: dt.schedules,
+                    orders: dt.orders
+                })
+    
+                await Mailer.client.sendMail({
+                    from: `"Alfatihah Online Grocery" <${process.env.SMTP_USER}>`,
+                    to: emp.user.email,
+                    subject: `Branch Orders - ${dt.storeName}`,
+                    html: emailHtml,
+                })
+            }
+        }
+    }
+
+    async getExpiredOrder() {
+        // Repo : get expired order
+        await this.orderRepo.cancelExpiredUnpaidOrders()
     }
 }

@@ -12,7 +12,7 @@ export class OrderRepository {
         } 
       },
       select: {
-        paymentDeadline: true, branchId: true
+        paymentDeadline: true, branchId: true, finalPrice: true
       }
     })
   }

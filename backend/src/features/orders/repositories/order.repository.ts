@@ -59,6 +59,50 @@ export class OrderRepository {
     })
   }
 
+  async findOrderDetailByOrderNumber(userId: string, orderNumber: string) {
+    return await prisma.orders.findFirst({
+      where: { orderNumber, userId },
+      select: {
+        orderNumber: true, status: true, totalPrice: true, finalPrice: true, shippingCost: true, paymentDeadline: true, shippedAt: true, confirmedAt: true, rejectedAt: true, createdAt: true,
+        branch: {
+          select: {
+            id: true, storeName: true, address: true, city: true, schedules: {
+              select: {
+                startTime: true, endTime: true, dayName: true
+              }
+            }
+          }
+        },
+        address: {
+          select: {
+            label: true, type: true, receiptName: true, notes: true, phone: true, address: true
+          }
+        },
+        items: {
+          select: {
+            id: true, quantity: true, product: {
+              select: {
+                product: {
+                  select: {
+                    productName: true, description: true, basePrice: true, productImages: {
+                      select: { imageUrl: true },
+                      where: { isPrimary: true }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        payments: {
+          select: {
+            method: true, status: true, approvedAt: true, evidence: true, rejectedAt: true
+          }
+        }
+      }
+    })
+  }
+
   async findAllOrders(page: number, limit: number, userId: string, branchId: string | null) {
     const skip = (page - 1) * limit
 
@@ -129,9 +173,53 @@ export class OrderRepository {
           }))
         }
       },
-      select: { id: true, orderNumber: true }
+      select: { id: true, orderNumber: true, paymentDeadline: true }
     })
   } 
 
   deleteOrder = async (id: string) => prisma.orders.delete({ where: { id } })
+
+  async cancelExpiredUnpaidOrders() {
+    const now = new Date()
+
+    return await prisma.$transaction(async (tx) => {
+      const orders = await tx.orders.findMany({
+        where: {
+          status: 'WAITING_PAYMENT', paymentDeadline: { lt: now },
+          payments: {
+            some: {
+              method: 'MANUAL', evidence: null
+            }
+          }
+        },
+        select: { id: true }
+      })
+
+      if (!orders.length) return 0
+
+      const orderIds = orders.map(o => o.id)
+
+      await tx.payments.updateMany({
+        where: {
+          orderId: { in: orderIds },
+          method: 'MANUAL',
+          evidence: null
+        },
+        data: {
+          status: 'REJECTED', rejectedAt: now
+        }
+      })
+
+      await tx.orders.updateMany({
+        where: {
+          id: { in: orderIds }
+        },
+        data: {
+          status: 'CANCELLED', rejectedAt: now
+        }
+      })
+
+      return orderIds.length
+    })
+  }
 }
