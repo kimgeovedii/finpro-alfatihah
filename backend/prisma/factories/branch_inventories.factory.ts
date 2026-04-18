@@ -1,15 +1,15 @@
 import { faker } from "@faker-js/faker"
 import { prisma } from "../../src/config/prisma"
 import { BranchRepository } from "../../src/features/branch/repositories/branch.repository"
-import { ProductRepository } from "../../src/features/products/repositories/product.repository"
+import { ProductService } from "../../src/features/products/services/product.service"
 
 class BranchInventoriesFactory {
     private branchRepository: BranchRepository
-    private productRepository: ProductRepository
+    private productService: ProductService
 
     constructor(){
         this.branchRepository = new BranchRepository()
-        this.productRepository = new ProductRepository()
+        this.productService = new ProductService()
     }
 
     public create = async (branchId?: string, productId?: string) => {
@@ -25,14 +25,13 @@ class BranchInventoriesFactory {
 
         if (!targetProductId) {
             // Get random product
-            const count = await prisma.products.count()
-            if (count === 0) throw new Error('Cannot create branch inventory without products')
+            const { meta } = await this.productService.findAllProducts({}, 1, 1);
+            if (meta.total === 0) throw new Error('Cannot create branch inventory without products');
+
+            const skip = Math.floor(Math.random() * meta.total);
+            const { data } = await this.productService.findAllProducts({}, skip + 1, 1);
             
-            const skip = Math.floor(Math.random() * count)
-            const product = await prisma.products.findFirst({
-                skip,
-                select: { id: true }
-            })
+            const product = data[0];
             if (!product) throw new Error('Cannot create branch inventory without product')
             targetProductId = product.id
         }
@@ -75,15 +74,21 @@ class BranchInventoriesFactory {
         return createdInventories
     }
 
-    // Create inventory for all branch-product combinations
     public createForAllBranchProducts = async () => {
         const branches = await prisma.branch.findMany({
             select: { id: true, storeName: true }
         })
 
-        const products = await prisma.products.findMany({
-            select: { id: true, productName: true }
-        })
+        let products: any[] = [];
+        let page = 1;
+        let hasMore = true;
+
+        while(hasMore) {
+           const { data, meta } = await this.productService.findAllProducts({}, page, 50);
+           products.push(...data);
+           if (page >= meta.totalPages || data.length === 0) hasMore = false;
+           page++;
+        }
 
         if (branches.length === 0 || products.length === 0) {
             throw new Error('Cannot create inventory without branches or products')

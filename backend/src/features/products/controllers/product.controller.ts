@@ -44,6 +44,21 @@ export class ProductController {
     }
   };
 
+  public getProductBySlug = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const data = await this.productService.getProductBySlug(
+        req.params.slugName as string,
+      );
+      res.status(200).send({ message: "Get product successfully", data });
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public createProduct = async (
     req: Request,
     res: Response,

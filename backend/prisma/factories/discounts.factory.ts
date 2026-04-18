@@ -1,18 +1,20 @@
 import { faker } from "@faker-js/faker"
 import { prisma } from "../../src/config/prisma"
 import { DiscountType, DiscountValueType } from "@prisma/client"
+import { BranchRepository } from "../../src/features/branch/repositories/branch.repository"
+import { DiscountService } from "../../src/features/discounts/services/discount.service"
 
 class DiscountsFactory {
+    private branchRepository: BranchRepository;
+    private discountService: DiscountService;
+
+    constructor() {
+        this.branchRepository = new BranchRepository();
+        this.discountService = new DiscountService();
+    }
+
     private async findRandomBranch() {
-        const count = await prisma.branch.count()
-        if (count === 0) return null
-
-        const skip = Math.floor(Math.random() * count)
-
-        return prisma.branch.findFirst({
-            skip,
-            select: { id: true }
-        })
+        return this.branchRepository.findRandomBranch()
     }
 
     private async findRandomEmployee() {
@@ -87,23 +89,21 @@ class DiscountsFactory {
 
         const name = faker.helpers.arrayElement(discountNames)
 
-        return prisma.discounts.create({
-            data: {
-                id: faker.string.uuid(),
-                name,
-                discountType,
-                discountValueType,
-                discountValue,
-                minPurchaseAmount,
-                maxDiscountAmount,
-                startDate,
-                endDate,
-                quota,
-                branchId: branch.id,
-                createdBy: employee.id,
-                createdAt: faker.date.past({ years: 1 }),
-            },
-        })
+        return this.discountService.createDiscount({
+            id: faker.string.uuid(),
+            name,
+            discountType,
+            discountValueType,
+            discountValue,
+            minPurchaseAmount,
+            maxDiscountAmount,
+            startDate,
+            endDate,
+            quota,
+            branchId: branch.id,
+            createdBy: employee.id,
+            createdAt: faker.date.past({ years: 1 }),
+        });
     }
 
     public createMany = async (count: number) => {

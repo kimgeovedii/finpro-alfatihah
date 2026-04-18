@@ -1,7 +1,16 @@
 import { faker } from "@faker-js/faker"
-import { prisma } from "../../src/config/prisma"
+import { ProductService } from "../../src/features/products/services/product.service"
+import { ProductCategoryService } from "../../src/features/products/services/productCategory.service"
 
 class ProductsFactory {
+    private productService: ProductService;
+    private productCategoryService: ProductCategoryService;
+
+    constructor() {
+        this.productService = new ProductService();
+        this.productCategoryService = new ProductCategoryService();
+    }
+
     private productsByCategory = {
         'Fruits': [
             { name: 'Fresh Apples', description: 'Crisp and juicy red apples, perfect for snacking' },
@@ -136,15 +145,13 @@ class ProductsFactory {
     }
 
     private async findRandomCategory() {
-        const count = await prisma.product_categories.count()
-        if (count === 0) return null
+        const { meta } = await this.productCategoryService.findAllCategories({}, 1, 1);
+        if (meta.total === 0) return null;
 
-        const skip = Math.floor(Math.random() * count)
-
-        return prisma.product_categories.findFirst({
-            skip,
-            select: { id: true, name: true }
-        })
+        const skip = Math.floor(Math.random() * meta.total);
+        const { data } = await this.productCategoryService.findAllCategories({}, skip + 1, 1);
+        
+        return data[0];
     }
 
     public create = async () => {
@@ -160,21 +167,26 @@ class ProductsFactory {
         const productData = faker.helpers.arrayElement(categoryProducts)
 
         // Generate slug
-        const slugName = productData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+        let slugName = productData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+
+        // Ensure slug uniqueness
+        const existingProduct = await this.productService.getProductBySlug(slugName)
+
+        if (existingProduct) {
+            slugName = `${slugName}-${faker.string.alphanumeric(5).toLowerCase()}`
+        }
 
         // Generate random price between 5,000 and 150,000 IDR
         const basePrice = faker.number.float({ min: 5000, max: 150000, fractionDigits: 0 })
 
-        return prisma.products.create({
-            data: {
-                id: faker.string.uuid(),
-                productName: productData.name,
-                slugName,
-                description: productData.description,
-                categoryId: category.id,
-                basePrice,
-                createdAt: faker.date.past({ years: 1 }),
-            },
+        return this.productService.createProduct({
+            id: faker.string.uuid(),
+            productName: productData.name,
+            slugName,
+            description: productData.description,
+            categoryId: category.id,
+            basePrice,
+            createdAt: faker.date.past({ years: 1 }),
         })
     }
 
