@@ -1,46 +1,50 @@
 import { faker } from "@faker-js/faker"
-import { prisma } from "../../src/config/prisma"
+import { ProductService } from "../../src/features/products/services/product.service"
+import { ProductImageService } from "../../src/features/products/services/productImage.service"
 
 class ProductImagesFactory {
+    private productService: ProductService;
+    private productImageService: ProductImageService;
+
+    constructor() {
+        this.productService = new ProductService();
+        this.productImageService = new ProductImageService();
+    }
     private async findRandomProduct() {
-        const count = await prisma.products.count()
-        if (count === 0) return null
+        const { meta } = await this.productService.findAllProducts({}, 1, 1);
+        if (meta.total === 0) return null;
 
-        const skip = Math.floor(Math.random() * count)
-
-        return prisma.products.findFirst({
-            skip,
-            select: { id: true, productName: true }
-        })
+        const skip = Math.floor(Math.random() * meta.total);
+        const { data } = await this.productService.findAllProducts({}, skip + 1, 1);
+        
+        return data[0];
     }
 
     public create = async (productId?: string) => {
         // Use provided productId or get random product
-        let targetProductId = productId
-        if (!targetProductId) {
-            const product = await this.findRandomProduct()
-            if (!product) throw new Error('Cannot create product image without product')
-            targetProductId = product.id
+        let targetProduct: any;
+        if (productId) {
+            targetProduct = await this.productService.getProductById(productId);
+        } else {
+            targetProduct = await this.findRandomProduct();
         }
+        
+        if (!targetProduct) throw new Error('Cannot create product image without product or valid productId')
 
-        // Generate realistic image URL using faker
-        const imageUrl = faker.image.url({
-            width: 800,
-            height: 600
-        })
+        // Generate realistic image URL using faker, related to the product name
+        const keyword = encodeURIComponent(targetProduct.productName.split(' ').pop() || 'grocery');
+        const imageUrl = `https://loremflickr.com/800/600/${keyword}?lock=${faker.number.int({ min: 1000, max: 9999 })}`;
 
         // For simplicity, set first image as primary, others as secondary
         // In a real scenario, you'd check existing images for the product
         const isPrimary = Math.random() < 0.3 // 30% chance of being primary
 
-        return prisma.product_images.create({
-            data: {
-                id: faker.string.uuid(),
-                productId: targetProductId,
-                imageUrl,
-                isPrimary,
-                createdAt: faker.date.past({ years: 1 }),
-            },
+        return this.productImageService.createImage({
+            id: faker.string.uuid(),
+            productId: targetProduct.id,
+            imageUrl,
+            isPrimary,
+            createdAt: faker.date.past({ years: 1 }),
         })
     }
 
@@ -58,6 +62,9 @@ class ProductImagesFactory {
         const createdImages = []
         let hasPrimary = false
 
+        const targetProduct = await this.productService.getProductById(productId);
+        if (!targetProduct) throw new Error(`Product not found for id ${productId}`);
+
         for (let i = 0; i < count; i++) {
             // Ensure at least one primary image per product
             const forcePrimary = !hasPrimary && i === count - 1
@@ -65,19 +72,15 @@ class ProductImagesFactory {
 
             if (isPrimary) hasPrimary = true
 
-            const imageUrl = faker.image.url({
-                width: 800,
-                height: 600
-            })
+            const keyword = encodeURIComponent(targetProduct.productName.split(' ').pop() || 'grocery');
+            const imageUrl = `https://loremflickr.com/800/600/${keyword}?lock=${faker.number.int({ min: 1000, max: 9999 })}`;
 
-            const image = await prisma.product_images.create({
-                data: {
-                    id: faker.string.uuid(),
-                    productId,
-                    imageUrl,
-                    isPrimary,
-                    createdAt: faker.date.past({ years: 1 }),
-                },
+            const image = await this.productImageService.createImage({
+                id: faker.string.uuid(),
+                productId,
+                imageUrl,
+                isPrimary,
+                createdAt: faker.date.past({ years: 1 }),
             })
             createdImages.push(image)
         }
@@ -86,9 +89,16 @@ class ProductImagesFactory {
 
     // Create images for all products (1-4 images per product)
     public createForAllProducts = async () => {
-        const products = await prisma.products.findMany({
-            select: { id: true, productName: true }
-        })
+        let products: any[] = [];
+        let page = 1;
+        let hasMore = true;
+
+        while(hasMore) {
+           const { data, meta } = await this.productService.findAllProducts({}, page, 50);
+           products.push(...data);
+           if (page >= meta.totalPages || data.length === 0) hasMore = false;
+           page++;
+        }
 
         const allImages = []
         for (const product of products) {

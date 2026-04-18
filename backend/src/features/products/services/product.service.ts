@@ -36,6 +36,10 @@ export class ProductService {
     return await this.productRepository.getProductById(id);
   };
 
+  public getProductBySlug = async (slugName: string) => {
+    return await this.productRepository.getProductBySlug(slugName);
+  };
+
   public createProduct = async (data: any) => {
     return await this.productRepository.createProduct(data);
   };
