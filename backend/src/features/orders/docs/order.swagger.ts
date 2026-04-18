@@ -272,6 +272,23 @@
  *                             type: string
  *                             format: date-time
  *                             example: 2026-04-13T02:54:05.229Z
+ *                           payments:
+ *                             type: array
+ *                             items:
+ *                               type: object
+ *                               properties:
+ *                                 evidence:
+ *                                   type: string
+ *                                   format: uri
+ *                                   example: https://res.cloudinary.com/dcpasygag/image/upload/v1776123123/123123123.png
+ *                                 method:
+ *                                   type: string
+ *                                   enum: [MANUAL, AUTOMATIC]
+ *                                   example: MANUAL
+ *                                 status:
+ *                                   type: string
+ *                                   enum: [PENDING, CONFIRMED, REJECTED]
+ *                                   example: PENDING
  *                           totalItems:
  *                             type: integer
  *                             example: 2
@@ -305,6 +322,277 @@
  *               properties:
  *                 success: { type: boolean, example: false }
  *                 message: { type: string, example: No token provided }
+ *
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: false }
+ *                 message: { type: string, example: Internal server error }
+ */
+
+/**
+ * @openapi
+ * /api/orders/summary:
+ *   get:
+ *     summary: Get order summary
+ *     description: Returns total order count grouped by status, and total finalPrice and totalPrice for confirmed orders only.
+ *     tags: [Order]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Order summary fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 message: { type: string, example: Order fetched }
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     ordersByStatus:
+ *                       type: object
+ *                       additionalProperties:
+ *                         type: integer
+ *                       example:
+ *                         WAITING_PAYMENT: 2
+ *                         CONFIRMED: 1
+ *                     totalFinalPrice:
+ *                       type: number
+ *                       example: 30000
+ *                     totalPrice:
+ *                       type: number
+ *                       example: 30000
+ *
+ *       401:
+ *         description: Unauthorized - No token provided
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: false }
+ *                 message: { type: string, example: No token provided }
+ *
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: false }
+ *                 message: { type: string, example: Internal server error }
+ */
+
+/**
+ * @openapi
+ * /api/orders/transaction/{orderNumber}:
+ *   get:
+ *     summary: Get order detail by order number
+ *     description: Retrieve detailed information of a specific order using its orderNumber for the authenticated user.
+ *     tags: [Order]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: orderNumber
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: ORD-1776295220552-150
+ *     responses:
+ *       200:
+ *         description: Order fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 message: { type: string, example: Order fetched }
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     orderNumber:
+ *                       type: string
+ *                       example: ORD-1776295220552-150
+ *                     status:
+ *                       type: string
+ *                       enum: [WAITING_PAYMENT, WAITING_PAYMENT_CONFIRMATION, PROCESSING, SHIPPED, CONFIRMED, CANCELLED]
+ *                       example: WAITING_PAYMENT_CONFIRMATION
+ *                     totalPrice:
+ *                       type: number
+ *                       example: 224322
+ *                     finalPrice:
+ *                       type: number
+ *                       example: 248580
+ *                     shippingCost:
+ *                       type: number
+ *                       example: 24258
+ *                     paymentDeadline:
+ *                       type: string
+ *                       format: date-time
+ *                       example: 2026-04-16T10:18:42.420Z
+ *                     shippedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       nullable: true
+ *                       example: null
+ *                     confirmedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       nullable: true
+ *                       example: null
+ *                     rejectedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       nullable: true
+ *                       example: null
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: 2025-07-25T15:29:08.364Z
+ *                     branch:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           type: string
+ *                           format: uuid
+ *                           example: 61904921-d090-4196-87b5-27aac626154c
+ *                         storeName:
+ *                           type: string
+ *                           example: Toko Cabang Surabaya
+ *                         address:
+ *                           type: string
+ *                           example: Jl. Tunjungan No. 88, Genteng
+ *                         city:
+ *                           type: string
+ *                           example: Surabaya
+ *                         schedules:
+ *                           type: array
+ *                           items:
+ *                             type: object
+ *                             properties:
+ *                               startTime:
+ *                                 type: string
+ *                                 example: "08:30"
+ *                               endTime:
+ *                                 type: string
+ *                                 example: "21:30"
+ *                               dayName:
+ *                                 type: string
+ *                                 example: MON
+ *                     address:
+ *                       type: object
+ *                       properties:
+ *                         label:
+ *                           type: string
+ *                           example: Rumah
+ *                         type:
+ *                           type: string
+ *                           example: Rumah
+ *                         receiptName:
+ *                           type: string
+ *                           example: Akim Mustofa
+ *                         notes:
+ *                           type: string
+ *                           example: Pagar warna hitam
+ *                         phone:
+ *                           type: string
+ *                           example: 081234567890
+ *                         address:
+ *                           type: string
+ *                           example: Jl. Merdeka No. 10, Bandung
+ *                     items:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: string
+ *                             format: uuid
+ *                             example: 2f7002fc-216b-4cee-9efc-8c252bb8b5fb
+ *                           quantity:
+ *                             type: integer
+ *                             example: 243
+ *                           product:
+ *                             type: object
+ *                             properties:
+ *                               product:
+ *                                 type: object
+ *                                 properties:
+ *                                   productName:
+ *                                     type: string
+ *                                     example: Carrots
+ *                                   description:
+ *                                     type: string
+ *                                     example: Fresh crunchy carrots, perfect for salads or cooking
+ *                                   basePrice:
+ *                                     type: number
+ *                                     example: 14328
+ *                                   productImages:
+ *                                     type: array
+ *                                     items:
+ *                                       type: object
+ *                                       properties:
+ *                                         imageUrl:
+ *                                           type: string
+ *                                           format: uri
+ *                                           example: https://picsum.photos/seed/UYwqDr3/800/600
+ *                     payments:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           evidence:
+ *                             type: string
+ *                             format: uri
+ *                             example: https://res.cloudinary.com/dcpasygag/image/upload/v1776123123/123123123.png
+ *                           method:
+ *                             type: string
+ *                             enum: [MANUAL, AUTOMATIC]
+ *                             example: MANUAL
+ *                           status:
+ *                             type: string
+ *                             enum: [PENDING, CONFIRMED, REJECTED]
+ *                             example: PENDING
+ *
+ *       400:
+ *         description: Validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: false }
+ *                 message: { type: string, example: Invalid order number format }
+ *
+ *       401:
+ *         description: Unauthorized - No token provided
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: false }
+ *                 message: { type: string, example: No token provided }
+ *
+ *       404:
+ *         description: Order not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: false }
+ *                 message: { type: string, example: Order not found }
  *
  *       500:
  *         description: Internal server error

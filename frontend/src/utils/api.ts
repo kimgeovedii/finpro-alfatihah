@@ -77,15 +77,24 @@ export async function apiFetch<T>(
   method: "get" | "post" | "put" | "patch" | "delete" = "get",
   body?: any,
 ): Promise<T> {
-  const response = await api.request({ url: endpoint, method, data: body });
+  const isFormData = body instanceof FormData
+  const response = await api.request({ 
+    url: endpoint, 
+    method, 
+    data: body,
+    ...(isFormData && {
+      headers: { "Content-Type": "multipart/form-data" },
+      transformRequest: (data: any) => data,  
+    })
+  });  
   const data = response.data;
-  // unwrap if wrapped
+
   if (data && data.hasOwnProperty("data")) {
-    if (data.success === false) {
-      throw new Error(data.message || "Request failed");
-    }
+    if (data.success === false) throw new Error(data.message || "Request failed");
+
     return data.data as T;
   }
+
   return data as T;
 }
 

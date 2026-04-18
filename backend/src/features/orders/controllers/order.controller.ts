@@ -4,9 +4,23 @@ import { AddToOrderSchema } from "../validation/order.dto"
 import { AuthRequest } from "../../../middleware/auth.middleware"
 import { OrderService } from "../services/order.service"
 import { paginationDefault, uuidRegex } from "../../../constants/feature.const"
+import { orderCode } from "../../../constants/business.const"
 
 export class OrderController {
     private orderService = new OrderService()
+
+    getTransactionSummary = async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user?.userId 
+            
+            // Service
+            const result = await this.orderService.getOrderSummary(userId)
+
+            return sendSuccess(res, result, "Order fetched")
+        } catch (error: any) {
+            next(error)
+        }
+    }
 
     getAllTransaction = async (req: AuthRequest, res: Response, next: NextFunction) => {
         try {
@@ -29,6 +43,25 @@ export class OrderController {
                     page, limit, total: result.total, total_page: Math.ceil(result.total / limit),
                 },
             }, "Order fetched")
+        } catch (error: any) {
+            next(error)
+        }
+    }
+
+    getOrderDetailByOrderNumber = async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user?.userId 
+
+            // Route param
+            const orderNumber = req.params.orderNumber as string
+
+            // Validator order number
+            if (!orderNumber.startsWith(`${orderCode}-`)) throw { code: 400, message: "Invalid order number format. Must start with 'ORD-'" }    
+
+            // Service
+            const result = await this.orderService.getOrderDetailByOrderNumber(userId, orderNumber)
+
+            return sendSuccess(res, result, "Order fetched")
         } catch (error: any) {
             next(error)
         }

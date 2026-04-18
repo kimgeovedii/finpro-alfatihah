@@ -15,6 +15,36 @@ export class OrderRepository {
     })
   }
 
+  async getOrderSummary(userId: string) {
+    // Group orders by status
+    const groupedOrders = await prisma.orders.groupBy({
+      by: ['status'],
+      where: { userId },
+      _count: { id: true }
+    })
+
+    // Sum all final price and total price 
+    const priceAggregate = await prisma.orders.aggregate({
+      where: { userId, status: 'CONFIRMED' },
+      _sum: {
+        finalPrice: true,
+        totalPrice: true
+      }
+    })
+
+    // Count total order per status
+    const ordersByStatus = groupedOrders.reduce((acc, curr) => {
+      acc[curr.status] = curr._count.id
+      return acc
+    }, {} as Record<string, number>)
+
+    return {
+      ordersByStatus,
+      totalFinalPrice: priceAggregate._sum.finalPrice ?? 0,
+      totalPrice: priceAggregate._sum.totalPrice ?? 0,
+    }
+  }
+
   async findOrderById(orderId: string) {
     return await prisma.orders.findFirst({
       where: { id: orderId },
@@ -23,6 +53,50 @@ export class OrderRepository {
         items: {
           select: {
             productId: true, quantity: true,
+          }
+        }
+      }
+    })
+  }
+
+  async findOrderDetailByOrderNumber(userId: string, orderNumber: string) {
+    return await prisma.orders.findFirst({
+      where: { orderNumber, userId },
+      select: {
+        orderNumber: true, status: true, totalPrice: true, finalPrice: true, shippingCost: true, paymentDeadline: true, shippedAt: true, confirmedAt: true, rejectedAt: true, createdAt: true,
+        branch: {
+          select: {
+            id: true, storeName: true, address: true, city: true, schedules: {
+              select: {
+                startTime: true, endTime: true, dayName: true
+              }
+            }
+          }
+        },
+        address: {
+          select: {
+            label: true, type: true, receiptName: true, notes: true, phone: true, address: true
+          }
+        },
+        items: {
+          select: {
+            id: true, quantity: true, product: {
+              select: {
+                product: {
+                  select: {
+                    productName: true, description: true, basePrice: true, productImages: {
+                      select: { imageUrl: true },
+                      where: { isPrimary: true }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        payments: {
+          select: {
+            method: true, status: true, approvedAt: true, evidence: true, rejectedAt: true
           }
         }
       }
@@ -44,7 +118,8 @@ export class OrderRepository {
         take: limit,
         orderBy: { createdAt: 'desc' },
         select: {
-          id: true, orderNumber: true, createdAt: true, status: true, totalPrice: true, finalPrice: true, shippingCost: true, paymentDeadline: true, items: {
+          id: true, orderNumber: true, createdAt: true, status: true, totalPrice: true, finalPrice: true, shippingCost: true, paymentDeadline: true, 
+          items: {
             select: {
               quantity: true, product: {                 
                 select: {
@@ -53,6 +128,11 @@ export class OrderRepository {
                   }
                 }
               }
+            }
+          }, 
+          payments: {
+            select: { 
+              evidence: true, method: true, status: true 
             }
           }
         }
@@ -93,9 +173,53 @@ export class OrderRepository {
           }))
         }
       },
-      select: { id: true, orderNumber: true }
+      select: { id: true, orderNumber: true, paymentDeadline: true }
     })
   } 
 
   deleteOrder = async (id: string) => prisma.orders.delete({ where: { id } })
+
+  async cancelExpiredUnpaidOrders() {
+    const now = new Date()
+
+    return await prisma.$transaction(async (tx) => {
+      const orders = await tx.orders.findMany({
+        where: {
+          status: 'WAITING_PAYMENT', paymentDeadline: { lt: now },
+          payments: {
+            some: {
+              method: 'MANUAL', evidence: null
+            }
+          }
+        },
+        select: { id: true }
+      })
+
+      if (!orders.length) return 0
+
+      const orderIds = orders.map(o => o.id)
+
+      await tx.payments.updateMany({
+        where: {
+          orderId: { in: orderIds },
+          method: 'MANUAL',
+          evidence: null
+        },
+        data: {
+          status: 'REJECTED', rejectedAt: now
+        }
+      })
+
+      await tx.orders.updateMany({
+        where: {
+          id: { in: orderIds }
+        },
+        data: {
+          status: 'CANCELLED', rejectedAt: now
+        }
+      })
+
+      return orderIds.length
+    })
+  }
 }

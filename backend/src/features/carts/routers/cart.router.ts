@@ -15,6 +15,7 @@ class CartRouter {
 
     private initializeRoutes() {
         this.router.post("/add-to-cart", authMiddleware, this.cartController.postAddBranchInventoryToCart)
+        this.router.delete("/delete/:cartId", authMiddleware, this.cartController.deleteCartById)
         this.router.get("/summary", authMiddleware, this.cartController.getCartSummary)
         this.router.get("/", authMiddleware, this.cartController.getAllCarts)
     }

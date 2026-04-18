@@ -1,4 +1,4 @@
-import { calculateShippingCost, isWithinDeliveryRange } from "../../../utils/location"
+import { isWithinDeliveryRange } from "../../../utils/location"
 import { getCityIdFromCoords, getShippingCost } from "../../../utils/shipping"
 import { AddressRepository } from "../repositories/address.repository"
 import { BranchRepository } from "../repositories/branch.repository"
@@ -6,17 +6,31 @@ import { BranchInventoryRepository } from "../repositories/branch_inventory.repo
 import { CartRepository } from "../repositories/cart.repository"
 import { OrderRepository } from "../repositories/order.repository"
 import { PaymentRepository } from "../repositories/payment.repository"
+import { StockJournalRepository } from "../repositories/stok_journal.repository"
+import { UserRepository } from "../repositories/user.repository"
+import { Mailer } from "../../../config/mailer";
+import { getBranchOrderBroadcastTemplate, getOrderCreatedPaymentTemplate } from "../views/order.view"
 
 export class OrderService {
     private orderRepo = new OrderRepository()
     private cartRepo = new CartRepository()
+    private stockJournalRepo = new StockJournalRepository()
     private addressRepo = new AddressRepository()
     private branchRepo = new BranchRepository()
     private branchInventoryRepo = new BranchInventoryRepository()
     private paymentRepo = new PaymentRepository()
+    private userRepo = new UserRepository()
 
     async getAllOrders(page: number, limit: number, userId: string, branchId: string | null) {
         return await this.orderRepo.findAllOrders(page, limit, userId, branchId)
+    }
+
+    async getOrderDetailByOrderNumber(userId: string, orderNumber: string) {
+        return await this.orderRepo.findOrderDetailByOrderNumber(userId, orderNumber)
+    }
+
+    async getOrderSummary(userId: string) {
+        return await this.orderRepo.getOrderSummary(userId)
     }
 
     async addCartToOrder(userId: string, payload: { cartId: string, voucherId?: string, addressId: string }) {
@@ -72,15 +86,47 @@ export class OrderService {
         // Repo : create payment based on order id
         const payment = await this.paymentRepo.createPayment(order.id)
 
-        // Repo : update stock for each item in branch inventories
+        // Repo : get user profile
+        const user = await this.userRepo.findById(cart.userId)
+        const orderMessageToBranch = `You got an order ${order.orderNumber} from ${user?.username}`
+
         await Promise.all(
-            cart.items.map(item => this.branchInventoryRepo.decrementStock(item.product.id, item.quantity))
+            cart.items.map(async (item) => {
+                // Repo : get branch inventory by id
+                const branchInventory = await this.branchInventoryRepo.findById(item.product.id)
+                if (!branchInventory) throw { code: 404, message: `Inventory not found` }
+        
+                const stockBefore: number = branchInventory.currentStock
+                const stockAfter: number = stockBefore - item.quantity
+                const quantityChange: number = item.quantity
+        
+                // Repo : update product qty
+                await this.branchInventoryRepo.decrementStock(item.product.id, item.quantity)
+        
+                // Repo : create stock journal 
+                await this.stockJournalRepo.createStockJournal(
+                    branchInventory.productId, item.product.id, 'OUT', quantityChange, stockBefore, stockAfter, 'ORDER', order.id, orderMessageToBranch
+                )
+            })
         )
 
         // Repo : delete cart and its items
         await this.cartRepo.deleteCart(cartId)
 
-        // Repo : create stock journal Soon LOL ....
+        // Mailer : inform user that an order has been made
+        const emailHtml = getOrderCreatedPaymentTemplate({
+            username: user?.username ?? "",
+            orderNumber: order.orderNumber,
+            amount: finalPrice,
+            paymentDeadline: order.paymentDeadline
+        }, true) // for now
+
+        await Mailer.client.sendMail({
+            from: `"Alfatihah Online Grocery" <${process.env.SMTP_USER}>`,
+            to: user?.email,
+            subject: "Order Checkout",
+            html: emailHtml,
+        })
 
         return { orderId: order.id, paymentId: payment.id }
     }
@@ -100,5 +146,39 @@ export class OrderService {
     
         // Repo : delete order 
         await this.orderRepo.deleteOrder(orderId)
+    }
+
+    // For Task Scheduling / Cron
+    async getUnprocessedOrdersToRemind() {
+        // Repo : get processing branch order
+        const branchs = await this.branchRepo.findBranchsOrders()
+    
+        for (const dt of branchs) {
+            if (!dt.orders.length) continue
+    
+            // Remind every employee
+            for (const emp of dt.employees) {
+                if (!emp.user?.username) continue
+    
+                const emailHtml = getBranchOrderBroadcastTemplate({
+                    username: emp.user.username,
+                    storeName: dt.storeName,
+                    schedules: dt.schedules,
+                    orders: dt.orders
+                })
+    
+                await Mailer.client.sendMail({
+                    from: `"Alfatihah Online Grocery" <${process.env.SMTP_USER}>`,
+                    to: emp.user.email,
+                    subject: `Branch Orders - ${dt.storeName}`,
+                    html: emailHtml,
+                })
+            }
+        }
+    }
+
+    async getExpiredOrder() {
+        // Repo : get expired order
+        await this.orderRepo.cancelExpiredUnpaidOrders()
     }
 }

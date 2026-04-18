@@ -1,6 +1,9 @@
 import { CartRepository } from "../repositories/cart.repository"
 import { CartItemRepository } from "../repositories/cart_item.repository"
 import { BranchInventoryRepository } from "../repositories/branch_inventory.repository"
+import { cronCartReminderMaxDays } from "../../../constants/feature.const"
+import { Mailer } from "../../../config/mailer";
+import { CartGroup, getCartReminderEmailTemplate } from "../views/cart.view";
 
 export class CartService {
     private cartRepo = new CartRepository()
@@ -42,5 +45,46 @@ export class CartService {
             await this.cartItemRepo.createCartItem(cart.id, branchInventory.id, finalQty)
 
         return { cartId: cart.id, cartItem }
+    }
+
+    async deleteCartById(userId: string, cartId: string) {
+        // Repo : find cart and validate ownership
+        const cart = await this.cartRepo.findByIdAndUser(cartId, userId)
+        if (!cart) throw { code: 404, message: 'Cart not found' }
+    
+        // Repo : delete cart items
+        await this.cartItemRepo.deleteByCartId(cartId)
+    
+        // Repo : delete cart
+        await this.cartRepo.deleteCartById(cartId)
+    
+        return { cartId }
+    }
+
+    // For Task Scheduling / Cron
+    async getAllCartsToRemind() {
+        // Repo : get all cart with max days
+        const carts = await this.cartRepo.findAllCartsCron(cronCartReminderMaxDays)
+
+        // View : mailer template for cart reminder broadcast
+        for (const cart of carts) {
+            const cartGroups: CartGroup[] = [{
+                storeName: cart.branch.storeName,
+                items: cart.items.map(item => ({
+                    productName: item.product.product.productName,
+                    quantity: item.quantity,
+                    price: item.product.product.basePrice,
+                }))
+            }]
+    
+            const emailHtml = getCartReminderEmailTemplate(cart.user.username ?? "Customer", cartGroups)
+    
+            await Mailer.client.sendMail({
+                from: `"Alfatihah Online Grocery" <${process.env.SMTP_USER}>`,
+                to: cart.user.email,
+                subject: "My Cart - Alfatihah Apps",
+                html: emailHtml,
+            })
+        }
     }
 }

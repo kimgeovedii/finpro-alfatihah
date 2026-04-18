@@ -47,5 +47,14 @@ export const cartRepository = {
     },
     async getAllCarts(page: number = 1): Promise<CartResponse> {
         return await apiFetch<any>(`/carts?page=${page}`, "get")
+    },
+    async deleteCart(cartId: string): Promise<{ cartId: string }> {
+        return await apiFetch<{ cartId: string }>(`/carts/delete/${cartId}`, "delete")
+    },
+    async deleteCartItem(cartItemId: string): Promise<{ cartItemId: string }> {
+        return await apiFetch<{ cartItemId: string }>(`/carts/items/delete/${cartItemId}`, "delete")
+    },
+    async updateCartItem(cartItemId: string, qty: number) {
+        return await apiFetch(`/carts/items/update-qty/${cartItemId}`, "put", { qty })
     }
 }

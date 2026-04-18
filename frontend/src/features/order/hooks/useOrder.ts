@@ -1,5 +1,16 @@
 import { useEffect, useState } from "react"
 import { orderRepository, OrderData, OrderMeta } from "../repositories/order.repository"
+import { useOrderService } from "../services/order.service"
+
+export const useOrderSummary = () => {
+    const { summary, fetchOrderSummary, isLoadingSummary, error } = useOrderService()
+
+    useEffect(() => {
+        fetchOrderSummary()
+    }, [])
+
+    return { summary, isLoadingSummary, error }
+}
 
 export const useAllOrderData = () => {
     const [orders, setOrders] = useState<OrderData[]>([])
@@ -27,4 +38,29 @@ export const useAllOrderData = () => {
     }, [])
 
     return { orders, meta, isLoading, fetchAllOrders }
+}
+
+export const useOrderDetailData = (orderNumber: string) => {
+    const [order, setOrder] = useState<OrderData>()
+    const [isLoading, setIsLoading] = useState(false)
+
+    const fetchOrderDetail = async (orderNumber: string) => {
+        setIsLoading(true)
+
+        try {
+            const res = await orderRepository.getOrderDetailByOrderNumber(orderNumber)
+
+            setOrder(res)
+        } catch (err) {
+            console.error("Failed to fetch order", err)
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    useEffect(() => {
+        fetchOrderDetail(orderNumber)
+    }, [])
+
+    return { order, isLoading, fetchOrderDetail }
 }
