@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { ProductService } from "../services/product.service";
+import { sendSuccess } from "../../../utils/apiResponse";
 
 export class ProductController {
   private productService: ProductService;
@@ -21,9 +22,7 @@ export class ProductController {
         Number(limit),
       );
 
-      res
-        .status(200)
-        .send({ message: "Get all products successfully", data, meta });
+      sendSuccess(res, { data, meta }, "Get all products successfully");
     } catch (error) {
       next(error);
     }
@@ -38,7 +37,7 @@ export class ProductController {
       const data = await this.productService.getProductById(
         req.params.id as string,
       );
-      res.status(200).send({ message: "Get product successfully", data });
+      sendSuccess(res, data, "Get product successfully");
     } catch (error) {
       next(error);
     }
@@ -53,7 +52,7 @@ export class ProductController {
       const data = await this.productService.getProductBySlug(
         req.params.slugName as string,
       );
-      res.status(200).send({ message: "Get product successfully", data });
+      sendSuccess(res, data, "Get product successfully");
     } catch (error) {
       next(error);
     }
@@ -66,7 +65,7 @@ export class ProductController {
   ) => {
     try {
       const data = await this.productService.createProduct(req.body);
-      res.status(200).send({ message: "Create product successfully", data });
+      sendSuccess(res, data, "Create product successfully");
     } catch (error) {
       next(error);
     }
@@ -82,7 +81,7 @@ export class ProductController {
         req.params.id as string,
         req.body,
       );
-      res.status(200).send({ message: "Update product successfully", data });
+      sendSuccess(res, data, "Update product successfully");
     } catch (error) {
       next(error);
     }
@@ -97,7 +96,7 @@ export class ProductController {
       const data = await this.productService.deleteProduct(
         req.params.id as string,
       );
-      res.status(200).send({ message: "Delete product successfully", data });
+      sendSuccess(res, data, "Delete product successfully");
     } catch (error) {
       next(error);
     }
