@@ -3,11 +3,29 @@ import { Button } from '@/components/ui/button';
 import { AddressSelectionCard } from '@/features/cart/components/AddressSelectionCard';
 import { CartPaymentSummaryCard } from '@/features/cart/components/CartPaymentSummaryCard';
 import { PaymentMethodSelect } from '@/features/cart/components/PaymentMethodSelect';
+import { VouchersSelectionCard } from '@/features/cart/components/VouchersSelectionCard';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { useState } from 'react';
+
+const vouchersData = [
+  { code: "DISC10", description: "Discount 10%" },
+  { code: "FREESHIP", description: "Free Shipping" },
+  { code: "WELCOME", description: "Welcome Bonus" },
+]
 
 export default function CartDetailPage() {
+  const [appliedVoucher, setAppliedVoucher] = useState<string | null>(null)
+
+  const handleApply = (code: string) => {
+    setAppliedVoucher(code)
+  }
+
+  const handleRemove = () => {
+    setAppliedVoucher(null)
+  }
+  
   // For repo fetching
   const params = useParams()
   const orderNumber = params?.orderNumber as string
@@ -36,6 +54,12 @@ export default function CartDetailPage() {
             phone: "08114882001",
             distance: 40
           }}/>
+          <VouchersSelectionCard
+            vouchers={vouchersData}
+            appliedVoucher={appliedVoucher}
+            onApply={handleApply}
+            onRemove={handleRemove}
+          />
         </div>
         <div className='flex-1 flex flex-col space-y-5'>
           <PaymentMethodSelect selectedMethod={'MANUAL'} onSelectMethod={()=>{}}/>

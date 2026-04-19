@@ -1,5 +1,5 @@
 import React from "react"
-import { CreditCardIcon, WalletIcon } from "@heroicons/react/24/outline"
+import { CheckIcon, CreditCardIcon, WalletIcon } from "@heroicons/react/24/outline"
 
 type PaymentMethodType = "MANUAL" | "GATEWAY"
 
@@ -20,16 +20,9 @@ export const PaymentMethodSelect: React.FC<Props> = ({ selectedMethod, onSelectM
                         return (
                             <button onClick={() => onSelectMethod("MANUAL")} className={`relative flex flex-col items-start gap-2 p-4 rounded-2xl border-2 transition-all duration-200 text-left
                                 ${ isSelected ? "border-emerald-700 bg-white shadow-sm" : "border-slate-200 bg-slate-100 hover:border-slate-300"}`}>
-                                {
-                                    isSelected && 
-                                        <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-700 flex items-center justify-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 text-white" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                            </svg>
-                                        </div>
-                                }
+                                { isSelected && <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-700 flex items-center justify-center"><CheckIcon className="w-3 h-3 text-white"/></div> }
                                 <div className={`${isSelected ? "text-emerald-700" : "text-slate-400"}`}>
-                                    <WalletIcon className="w-6 h-6" />
+                                    <WalletIcon className="w-6 h-6"/>
                                 </div>
                                 <div>
                                     <p className={`font-bold text-sm mb-0 ${isSelected ? "text-slate-800" : "text-slate-500"}`}>Manual</p>
@@ -46,16 +39,9 @@ export const PaymentMethodSelect: React.FC<Props> = ({ selectedMethod, onSelectM
                         return (
                             <button onClick={() => onSelectMethod("GATEWAY")} className={`relative flex flex-col items-start gap-2 p-4 rounded-2xl border-2 transition-all duration-200 text-left
                                 ${ isSelected ? "border-emerald-700 bg-white shadow-sm" : "border-slate-200 bg-slate-100 hover:border-slate-300"}`}>
-                                {
-                                    isSelected && 
-                                        <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-700 flex items-center justify-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 text-white" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                            </svg>
-                                        </div>
-                                }
+                                { isSelected && <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-700 flex items-center justify-center"><CheckIcon className="w-3 h-3 text-white"/></div> }
                                 <div className={`${isSelected ? "text-emerald-700" : "text-slate-400"}`}>
-                                    <CreditCardIcon className="w-6 h-6" />
+                                    <CreditCardIcon className="w-6 h-6"/>
                                 </div>
                                 <div>
                                     <p className={`font-bold text-sm mb-0 ${isSelected ? "text-slate-800" : "text-slate-500"}`}>Gateway</p>
