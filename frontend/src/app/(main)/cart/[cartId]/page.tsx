@@ -1,5 +1,6 @@
 "use client";
 import { Button } from '@/components/ui/button';
+import { AddressSelectionCard } from '@/features/cart/components/AddressSelectionCard';
 import { CartPaymentSummaryCard } from '@/features/cart/components/CartPaymentSummaryCard';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
@@ -21,7 +22,19 @@ export default function CartDetailPage() {
       </div>
       <div className='flex w-full gap-5'>
         <div className='flex-1 flex flex-col space-y-5'>
-          
+          <AddressSelectionCard branch={{
+            name: 'Toko Cabang Surabaya',
+            address: 'Jl. Tunjungan No. 88, Genteng, Surabaya',
+            schedule: 'MON (08:30 - 21:30), TUE (08:30 - 21:30), WED (08:30 - 21:30), FRI (08:30 - 21:30), SUN (08:30 - 21:30)',
+            imageUrl: undefined,
+            statusOpen: "Open",
+          }} address={{
+            label: "FlazeFy",
+            address: "Jl. Mawar",
+            recipientName: "Leo",
+            phone: "08114882001",
+            distance: 40
+          }}/>
         </div>
         <div className='flex-1 flex flex-col space-y-5'>
           <CartPaymentSummaryCard
