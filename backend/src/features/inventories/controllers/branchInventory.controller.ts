@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { BranchInventoryService } from "../services/branchInventory.service";
 import { AuthRequest } from "../../../middleware/auth.middleware";
+import { sendSuccess } from "../../../utils/apiResponse";
 
 export class BranchInventoryController {
   private branchInventoryService: BranchInventoryService;
@@ -23,11 +24,11 @@ export class BranchInventoryController {
           Number(limit),
         );
 
-      res.status(200).send({
-        message: "Get all branch inventories successfully",
-        data,
-        meta,
-      });
+      sendSuccess(
+        res,
+        { data, meta },
+        "Get all branch inventories successfully",
+      );
     } catch (error) {
       next(error);
     }
@@ -45,11 +46,9 @@ export class BranchInventoryController {
 
       const data = await this.branchInventoryService.createBranchInventory(
         req.body,
-        userId
+        userId,
       );
-      res
-        .status(200)
-        .send({ message: "Create branch inventory successfully", data });
+      sendSuccess(res, data, "Create branch inventory successfully");
     } catch (error) {
       next(error);
     }
@@ -68,11 +67,9 @@ export class BranchInventoryController {
       const data = await this.branchInventoryService.updateBranchInventory(
         req.params.id as string,
         req.body,
-        userId
+        userId,
       );
-      res
-        .status(200)
-        .send({ message: "Update branch inventory successfully", data });
+      sendSuccess(res, data, "Update branch inventory successfully");
     } catch (error) {
       next(error);
     }
@@ -90,11 +87,9 @@ export class BranchInventoryController {
 
       const data = await this.branchInventoryService.deleteBranchInventory(
         req.params.id as string,
-        userId
+        userId,
       );
-      res
-        .status(200)
-        .send({ message: "Delete branch inventory successfully", data });
+      sendSuccess(res, data, "Delete branch inventory successfully");
     } catch (error) {
       next(error);
     }

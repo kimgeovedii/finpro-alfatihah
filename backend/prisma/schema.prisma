@@ -305,6 +305,8 @@ model products {
   productName       String               @map("product_name")
   slugName          String               @unique @map("slug_name")
   description       String
+  sku               String               @unique
+  weight            Float
   categoryId        String               @map("category_id")
   basePrice         Float                @map("base_price")
   createdAt         DateTime             @default(now()) @map("created_at")

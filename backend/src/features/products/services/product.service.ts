@@ -15,8 +15,14 @@ export class ProductService {
     const skip = (page - 1) * limit;
     const take = limit;
 
+    const where: any = { ...filters };
+    if (where.search) {
+      where.productName = { contains: where.search, mode: "insensitive" };
+      delete where.search;
+    }
+
     const { data, total } = await this.productRepository.findAllProducts(
-      filters,
+      where,
       skip,
       take,
     );
