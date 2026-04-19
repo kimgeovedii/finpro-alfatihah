@@ -1,0 +1,71 @@
+import React from "react"
+import { CreditCardIcon, WalletIcon } from "@heroicons/react/24/outline"
+
+type PaymentMethodType = "MANUAL" | "GATEWAY"
+
+interface Props {
+    selectedMethod: PaymentMethodType
+    onSelectMethod: (method: PaymentMethodType) => void
+}
+
+export const PaymentMethodSelect: React.FC<Props> = ({ selectedMethod, onSelectMethod }) => {
+    return (
+        <div className="bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 mb-4">
+            <h5 className="font-bold mb-3">Payment Method</h5>
+            <div className="grid grid-cols-2 gap-3">
+                {
+                    (() => {
+                        const isSelected = selectedMethod === "MANUAL"
+
+                        return (
+                            <button onClick={() => onSelectMethod("MANUAL")} className={`relative flex flex-col items-start gap-2 p-4 rounded-2xl border-2 transition-all duration-200 text-left
+                                ${ isSelected ? "border-emerald-700 bg-white shadow-sm" : "border-slate-200 bg-slate-100 hover:border-slate-300"}`}>
+                                {
+                                    isSelected && 
+                                        <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-700 flex items-center justify-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                            </svg>
+                                        </div>
+                                }
+                                <div className={`${isSelected ? "text-emerald-700" : "text-slate-400"}`}>
+                                    <WalletIcon className="w-6 h-6" />
+                                </div>
+                                <div>
+                                    <p className={`font-bold text-sm mb-0 ${isSelected ? "text-slate-800" : "text-slate-500"}`}>Manual</p>
+                                    <p className={`text-xs ${isSelected ? "text-slate-500" : "text-slate-400"}`}>QRIS/Transfer</p>
+                                </div>
+                            </button>
+                        )
+                    })()
+                }
+                {
+                    (() => {
+                        const isSelected = selectedMethod === "GATEWAY"
+
+                        return (
+                            <button onClick={() => onSelectMethod("GATEWAY")} className={`relative flex flex-col items-start gap-2 p-4 rounded-2xl border-2 transition-all duration-200 text-left
+                                ${ isSelected ? "border-emerald-700 bg-white shadow-sm" : "border-slate-200 bg-slate-100 hover:border-slate-300"}`}>
+                                {
+                                    isSelected && 
+                                        <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-700 flex items-center justify-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                            </svg>
+                                        </div>
+                                }
+                                <div className={`${isSelected ? "text-emerald-700" : "text-slate-400"}`}>
+                                    <CreditCardIcon className="w-6 h-6" />
+                                </div>
+                                <div>
+                                    <p className={`font-bold text-sm mb-0 ${isSelected ? "text-slate-800" : "text-slate-500"}`}>Gateway</p>
+                                    <p className={`text-xs ${isSelected ? "text-slate-500" : "text-slate-400"}`}>OVO/Dana/Gopay</p>
+                                </div>
+                            </button>
+                        )
+                    })()
+                }
+            </div>
+        </div>
+    )
+}

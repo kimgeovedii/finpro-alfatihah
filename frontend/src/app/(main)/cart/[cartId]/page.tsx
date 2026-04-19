@@ -2,6 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { AddressSelectionCard } from '@/features/cart/components/AddressSelectionCard';
 import { CartPaymentSummaryCard } from '@/features/cart/components/CartPaymentSummaryCard';
+import { PaymentMethodSelect } from '@/features/cart/components/PaymentMethodSelect';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -37,6 +38,7 @@ export default function CartDetailPage() {
           }}/>
         </div>
         <div className='flex-1 flex flex-col space-y-5'>
+          <PaymentMethodSelect selectedMethod={'MANUAL'} onSelectMethod={()=>{}}/>
           <CartPaymentSummaryCard
             totalItem={2}
             shippingCost={10000}
