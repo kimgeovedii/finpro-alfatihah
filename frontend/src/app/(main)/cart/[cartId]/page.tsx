@@ -1,6 +1,7 @@
 "use client";
 import { Button } from '@/components/ui/button';
 import { AddressSelectionCard } from '@/features/cart/components/AddressSelectionCard';
+import { CartDetailItemListCard } from '@/features/cart/components/CartDetailItemListCard';
 import { CartPaymentSummaryCard } from '@/features/cart/components/CartPaymentSummaryCard';
 import { PaymentMethodSelect } from '@/features/cart/components/PaymentMethodSelect';
 import { VouchersSelectionCard } from '@/features/cart/components/VouchersSelectionCard';
@@ -62,6 +63,20 @@ export default function CartDetailPage() {
           />
         </div>
         <div className='flex-1 flex flex-col space-y-5'>
+          <CartDetailItemListCard
+            items={[
+              {
+                branchInventoriesId: "INV-001",
+                productName: "Coca Cola",
+                description: "Soda",
+                category: "Drinks",
+                imageUrl: "https://via.placeholder.com/150",
+                quantity: 1,
+                basePrice: 120000,
+                totalPrice: 120000,
+              }
+            ]}
+          />
           <PaymentMethodSelect selectedMethod={'MANUAL'} onSelectMethod={()=>{}}/>
           <CartPaymentSummaryCard
             totalItem={2}
