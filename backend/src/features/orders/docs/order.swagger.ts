@@ -604,3 +604,76 @@
  *                 success: { type: boolean, example: false }
  *                 message: { type: string, example: Internal server error }
  */
+
+/**
+ * @openapi
+ * /api/orders/summary/{branchId}:
+ *   get:
+ *     summary: Get order summary by branch id  
+ *     description: Returns revenue statistics and order counts for the authenticated user, including monthly revenue, revenue change percentage, active shipments, processing orders, finished orders, and last month's finished orders.
+ *     tags: [Order]
+ *     parameters:
+ *       - in: path
+ *         name: branchId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: fb6359b6-7841-4145-b7fc-eb08c660a3b3
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Order summary fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Order summary fetched
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     totalRevenue:
+ *                       type: number
+ *                       example: 1500000
+ *                     revenueChangePercent:
+ *                       type: number
+ *                       example: 12.5
+ *                     activeShipments:
+ *                       type: integer
+ *                       example: 4
+ *                     processingOrder:
+ *                       type: integer
+ *                       example: 3
+ *                     finishedOrder:
+ *                       type: integer
+ *                       example: 10
+ *                     finishedOrderLastMonth:
+ *                       type: integer
+ *                       example: 7
+ *
+ *       401:
+ *         description: Unauthorized - No token provided
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: false }
+ *                 message: { type: string, example: No token provided }
+ *
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: false }
+ *                 message: { type: string, example: Internal server error }
+ */
