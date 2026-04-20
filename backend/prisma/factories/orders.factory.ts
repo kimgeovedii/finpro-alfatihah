@@ -21,17 +21,15 @@ class OrderFactory {
     private randomOrderStatus = (): OrderStatus => randomEnumValue(Object.values(OrderStatus))
 
     public create = async () => {
-        // Get random customer from repo
-        const user = await this.userRepository.findRandomUser(UserRole.CUSTOMER)
-        if (!user) throw new Error('Cannot create order without user')
+        // Get random address FIRST to guarantee the user actually has an address
+        const addresses = await prisma.address.findMany({ select: { id: true, userId: true } })
+        if (addresses.length === 0) throw new Error('Cannot create order without address')
+        
+        const randomAddress = faker.helpers.arrayElement(addresses)
 
         // Get random branch from repo
         const branch = await this.branchRepository.findRandomBranch()
         if (!branch) throw new Error('Cannot create order without branch')
-
-        // Get random address from repo
-        const address = await this.addressRepository.findRandomByUserId(user.id)
-        if (!address) throw new Error('Cannot create order without address')
 
         // Generate pricing
         const totalPrice = faker.number.int({ min: 50000, max: 500000 })
@@ -54,9 +52,9 @@ class OrderFactory {
             data: {
                 id: faker.string.uuid(),
                 orderNumber: `${orderCode}-${Date.now()}-${faker.number.int({ min: 100, max: 999 })}`,
-                userId: user.id,
+                userId: randomAddress.userId,
                 branchId: branch.id,
-                addressId: address.id,
+                addressId: randomAddress.id,
                 status,
                 totalPrice,
                 finalPrice,

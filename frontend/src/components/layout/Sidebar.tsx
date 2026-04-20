@@ -11,7 +11,8 @@ import {
   Cog6ToothIcon,
   GlobeAmericasIcon,
   ShoppingCartIcon,
-  ArrowsRightLeftIcon
+  ArrowsRightLeftIcon,
+  CubeIcon
 } from '@heroicons/react/24/outline'
 
 const NAV_ITEMS = [
@@ -19,6 +20,11 @@ const NAV_ITEMS = [
     title: 'Dashboard',
     href: '/dashboard',
     icon: <HomeIcon className="w-5 h-5" />
+  },
+  {
+    title: 'Products',
+    href: '/dashboard/products',
+    icon: <CubeIcon className="w-5 h-5" />
   },
   {
     title: 'Cart',
@@ -73,7 +79,9 @@ export const Sidebar = () => {
         <p className="px-2 text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Main Menu</p>
         
         {NAV_ITEMS.map((item) => {
-          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
+          const isActive = item.href === '/dashboard'
+            ? pathname === '/dashboard'
+            : pathname === item.href || pathname.startsWith(`${item.href}/`)
           
           return (
             <Link 

@@ -1,21 +1,17 @@
 import { faker } from "@faker-js/faker"
 import { prisma } from "../../src/config/prisma"
 import { UserRole } from "@prisma/client"
+import { UserRepository } from "../../src/features/user/repositories/user.repository"
 
 class VoucherReferralFactory {
+    private userRepository: UserRepository;
+
+    constructor() {
+        this.userRepository = new UserRepository();
+    }
+
     private async findRandomCustomer() {
-        const count = await prisma.user.count({
-            where: { role: UserRole.CUSTOMER }
-        })
-        if (count === 0) return null
-
-        const skip = Math.floor(Math.random() * count)
-
-        return prisma.user.findFirst({
-            where: { role: UserRole.CUSTOMER },
-            skip,
-            select: { id: true }
-        })
+        return this.userRepository.findRandomUser(UserRole.CUSTOMER);
     }
 
     public create = async (userId?: string) => {
@@ -57,10 +53,8 @@ class VoucherReferralFactory {
 
     // Create referral records for all customers
     public createForAllCustomers = async () => {
-        const customers = await prisma.user.findMany({
-            where: { role: UserRole.CUSTOMER },
-            select: { id: true }
-        })
+        const users = await this.userRepository.findAll();
+        const customers = users.filter((u: any) => u.role === UserRole.CUSTOMER);
 
         if (customers.length === 0) {
             return []

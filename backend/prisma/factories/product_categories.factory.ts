@@ -1,7 +1,12 @@
 import { faker } from "@faker-js/faker"
-import { prisma } from "../../src/config/prisma"
+import { ProductCategoryService } from "../../src/features/products/services/productCategory.service"
 
 class ProductCategoriesFactory {
+    private productCategoryService: ProductCategoryService;
+
+    constructor() {
+        this.productCategoryService = new ProductCategoryService();
+    }
     private categories = [
         'Fruits',
         'Vegetables',
@@ -42,14 +47,12 @@ class ProductCategoriesFactory {
         // Simple slug generation
         const slugName = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 
-        return prisma.product_categories.create({
-            data: {
-                id: faker.string.uuid(),
-                name,
-                slugName,
-                description,
-                createdAt: faker.date.past({ years: 1 }),
-            },
+        return this.productCategoryService.createCategory({
+            id: faker.string.uuid(),
+            name,
+            slugName,
+            description,
+            createdAt: faker.date.past({ years: 1 }),
         })
     }
 
