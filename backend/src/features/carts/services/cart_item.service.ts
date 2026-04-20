@@ -3,6 +3,10 @@ import { CartItemRepository } from "../repositories/cart_item.repository"
 export class CartItemService {
     private cartItemRepo = new CartItemRepository()
 
+    async getCartItemQtyByProductIdBranchId(userId: string, productId: string, branchId: string) {
+        return await this.cartItemRepo.findCartItemByProductIdBranchId(userId, productId, branchId)
+    }
+
     async updateCartItemQty(userId: string, cartItemId: string, payload: { qty: number }) {
         let { qty } = payload
 
