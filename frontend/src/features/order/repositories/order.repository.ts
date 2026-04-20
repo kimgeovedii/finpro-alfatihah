@@ -78,10 +78,21 @@ export type OrderSummaryData = {
     totalFinalPrice: number
     totalPrice: number
 }
+export type OrderSummaryByBranchIdData = {
+    totalRevenue: number 
+    revenueChangePercent: number 
+    activeShipments: number 
+    processingOrder: number
+    finishedOrder: number 
+    finishedOrderLastMonth: number
+}
 
 export const orderRepository = {
     async getOrderSummary(): Promise<OrderSummaryData> {
         return await apiFetch<OrderSummaryData>("/orders/summary","get")
+    },
+    async getOrderSummaryByBranchId(branchId: string): Promise<OrderSummaryByBranchIdData> {
+        return await apiFetch<OrderSummaryByBranchIdData>(`/orders/summary/${branchId}`,"get")
     },
     async getAllOrders(page: number = 1): Promise<OrderResponse> {
         return await apiFetch<OrderResponse>(`/orders/transaction?page=${page}`, "get")

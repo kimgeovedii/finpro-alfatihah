@@ -13,6 +13,16 @@ export const useOrderSummary = () => {
     return { summary, isLoadingSummary, error }
 }
 
+export const useOrderSummaryByBranchId = (branchId: string) => {
+    const { summaryByBranchId, fetchOrderSummaryByBranchId, isLoadingSummaryByBranchId, error } = useOrderService()
+
+    useEffect(() => {
+        fetchOrderSummaryByBranchId(branchId)
+    }, [])
+
+    return { summaryByBranchId, isLoadingSummaryByBranchId, error }
+}
+
 export const useAllOrderData = () => {
     const [orders, setOrders] = useState<OrderData[]>([])
     const [meta, setMeta] = useState<PaginationMeta | null>(null)

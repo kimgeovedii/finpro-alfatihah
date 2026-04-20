@@ -1,8 +1,12 @@
 'use client'
 import { OrderTableSection } from "@/features/order/components/OrderManagementTable"
 import { OrderSummaryByBranchCard } from "@/features/order/components/OrderSummaryByBranchCard"
+import { useOrderSummary, useOrderSummaryByBranchId } from "@/features/order/hooks/useOrder"
 
 export default function ManageOrdersPage() {
+    const branchId = "c2c2f038-e002-4f18-a450-796848f5ce27" // for now
+    const { summaryByBranchId, isLoadingSummaryByBranchId } = useOrderSummaryByBranchId(branchId)
+
     const dummyOrders = [
         {
             id: "1",
@@ -36,7 +40,14 @@ export default function ManageOrdersPage() {
             <div className="flex items-center justify-between">
                 <div className="w-full">
                 <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight mb-4">Manage Order</h1>
-                <OrderSummaryByBranchCard totalRevenue={1000} revenueChangePercent={1000} activeShipments={20} processingOrder={10} finishedOrder={10} finishedOrderLastMonth={10}/>
+                <OrderSummaryByBranchCard 
+                    totalRevenue={summaryByBranchId?.totalRevenue ?? 0} 
+                    revenueChangePercent={summaryByBranchId?.revenueChangePercent ?? 0} 
+                    activeShipments={summaryByBranchId?.activeShipments ?? 0} 
+                    processingOrder={summaryByBranchId?.processingOrder ?? 0} 
+                    finishedOrder={summaryByBranchId?.finishedOrder ?? 0} 
+                    finishedOrderLastMonth={summaryByBranchId?.finishedOrderLastMonth ?? 0}
+                />
                 <OrderTableSection
                     orders={dummyOrders}
                     meta={dummyMeta}
