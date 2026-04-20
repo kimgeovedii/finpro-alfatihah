@@ -1,5 +1,6 @@
 'use client'
 import { OrderTableSection } from "@/features/order/components/OrderManagementTable"
+import { OrderSummaryByBranchCard } from "@/features/order/components/OrderSummaryByBranchCard"
 
 export default function ManageOrdersPage() {
     const dummyOrders = [
@@ -31,14 +32,20 @@ export default function ManageOrdersPage() {
     }
 
     return (
-        <div className="space-y-6 w-full max-w-[1080px] mx-auto">
-            <OrderTableSection
-                orders={dummyOrders}
-                meta={dummyMeta}
-                isLoading={false}
-                onPageChange={(page) => console.log("Change page:", page)}
-                onSearch={(query) => console.log("Search query:", query)}
-            />
+        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto">
+            <div className="flex items-center justify-between">
+                <div className="w-full">
+                <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight mb-4">Manage Order</h1>
+                <OrderSummaryByBranchCard totalRevenue={1000} revenueChangePercent={1000} activeShipments={20} processingOrder={10} finishedOrder={10} finishedOrderLastMonth={10}/>
+                <OrderTableSection
+                    orders={dummyOrders}
+                    meta={dummyMeta}
+                    isLoading={false}
+                    onPageChange={(page) => console.log("Change page:", page)}
+                    onSearch={(query) => console.log("Search query:", query)}
+                />
+                </div>
+            </div>
         </div>
     )
 }
