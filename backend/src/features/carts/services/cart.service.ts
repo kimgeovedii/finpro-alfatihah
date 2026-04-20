@@ -7,6 +7,7 @@ import { CartGroup, getCartReminderEmailTemplate } from "../views/cart.view";
 import { courierShippingDefault, weightGramsShippingDefault } from "../../../constants/business.const";
 import { isWithinDeliveryRange } from "../../../utils/location";
 import { getCityIdFromCoords, getShippingCost } from "../../../utils/shipping";
+import { getStoreOpenStatus } from "../../../utils/business";
 
 export class CartService {
     private cartRepo = new CartRepository()
@@ -18,6 +19,7 @@ export class CartService {
     }
 
     async getCartDetailById(userId: string, cartId: string, addressId: string | null) {
+        // Repo : get cart detail by id
         let cart = await this.cartRepo.findCartById(userId, cartId)
         if (!cart) throw { code: 404, message: 'Cart not found' }
         
@@ -105,8 +107,11 @@ export class CartService {
                 throw { code: 422, message: 'Your address invalid' }
             }
         }
+
+        // Helper : get store open status by schedule and current server time
+        const openStatus = getStoreOpenStatus(cart.branch.schedules)
     
-        return { ...cart, shipping }
+        return { ...cart, shipping, openStatus }
     }
 
     async getCartSummary(userId: string, branchId: string | null) {

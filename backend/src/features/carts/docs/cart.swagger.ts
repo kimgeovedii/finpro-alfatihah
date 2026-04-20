@@ -427,3 +427,150 @@
  *                 success: { type: boolean, example: false }
  *                 message: { type: string, example: Internal server error }
  */
+
+/**
+ * @openapi
+ * /api/carts/{cartId}:
+ *   get:
+ *     summary: Get cart detail by cartId
+ *     description: Return detailed cart information including branch info, items, user addresses, summary (total price & qty), and calculated shipping cost based on selected or nearest valid address.
+ *     tags: [Cart]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: cartId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *           example: f4b8160a-a0d2-4e3e-a6f0-b1995f6ffc32
+ *       - in: query
+ *         name: addressId
+ *         required: false
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *           example: 08e65cdc-e5a9-4665-a0a4-64ad3aae64f5
+ *     responses:
+ *       200:
+ *         description: Cart fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 message: { type: string, example: Cart fetched }
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     branch:
+ *                       type: object
+ *                       properties:
+ *                         storeName: { type: string, example: Main Branch }
+ *                         latitude: { type: number, example: -6.913071095629721 }
+ *                         longitude: { type: number, example: 107.61796357086735 }
+ *                         address: { type: string, example: Jakarta }
+ *                         maxDeliveryDistance: { type: number, example: 10 }
+ *                         schedules:
+ *                           type: array
+ *                           items:
+ *                             type: object
+ *                             properties:
+ *                               startTime: { type: string, example: "08:30" }
+ *                               endTime: { type: string, example: "21:30" }
+ *                               dayName: { type: string, example: THU }
+ *                     items:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           quantity: { type: integer, example: 20 }
+ *                           product:
+ *                             type: object
+ *                             properties:
+ *                               product:
+ *                                 type: object
+ *                                 properties:
+ *                                   productName: { type: string, example: Canned Peas }
+ *                                   description: { type: string, example: Green peas, healthy and convenient }
+ *                                   category:
+ *                                     type: object
+ *                                     properties:
+ *                                       id: { type: string, format: uuid }
+ *                                       name: { type: string, example: Canned Goods }
+ *                                       slugName: { type: string, example: canned-goods }
+ *                                       description: { type: string, example: Canned goods for long-term storage }
+ *                                   basePrice: { type: number, example: 16023 }
+ *                                   productImages:
+ *                                     type: array
+ *                                     items:
+ *                                       type: object
+ *                                       properties:
+ *                                         imageUrl: { type: string, example: https://picsum.photos/seed/O7zmL/800/600 }
+ *                     user:
+ *                       type: object
+ *                       properties:
+ *                         addresses:
+ *                           type: array
+ *                           items:
+ *                             type: object
+ *                             properties:
+ *                               id: { type: string, format: uuid }
+ *                               address: { type: string, example: Jl. Merdeka No. 10, Bandung }
+ *                               lat: { type: number, example: -6.9175 }
+ *                               long: { type: number, example: 107.6191 }
+ *                               label: { type: string, example: Rumah }
+ *                               receiptName: { type: string, example: Akim Mustofa }
+ *                               phone: { type: string, example: "081234567890" }
+ *                               isPrimary: { type: boolean, example: true }
+ *                     totalBasePrice: { type: number, example: 24241893 }
+ *                     totalQty: { type: number, example: 641 }
+ *                     shipping:
+ *                       type: object
+ *                       properties:
+ *                         shippingCost: { type: number, example: 8000 }
+ *                         distance: { type: number, example: 0.5081978361819555 }
+ *                         courier: { type: string, example: jne }
+ *
+ *       401:
+ *         description: Unauthorized - No token provided
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: false }
+ *                 message: { type: string, example: No token provided }
+ *
+ *       404:
+ *         description: Cart or Address not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: false }
+ *                 message: { type: string, example: Cart not found }
+ *
+ *       422:
+ *         description: Address outside delivery range or invalid
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: false }
+ *                 message: { type: string, example: None of your address in shipping range }
+ *
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: false }
+ *                 message: { type: string, example: Internal server error }
+ */
