@@ -15,7 +15,6 @@ export default function TransactionPage() {
           <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">
             My History
           </h1>
-          <br/>
           {
             !isLoadingSummary && summary ? 
               <OrderSummaryCard 

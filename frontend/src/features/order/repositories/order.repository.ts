@@ -1,3 +1,4 @@
+import { PaginationMeta } from "@/types/global"
 import { Schedule } from "@/types/schedule"
 import { apiFetch } from "@/utils/api"
 
@@ -65,16 +66,9 @@ export type OrderData = {
     items: OrderItem[]
 }
 
-export type OrderMeta = {
-    page: number
-    limit: number
-    total: number
-    total_page: number
-}
-
 export type OrderResponse = {
     data: OrderData[]
-    meta: OrderMeta
+    meta: PaginationMeta
 }
 
 export type OrderStatus = "WAITING_PAYMENT" | "WAITING_PAYMENT_CONFIRMATION" | "PROCESSING" | "SHIPPED" | "CONFIRMED" | "CANCELLED"

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
-import { orderRepository, OrderData, OrderMeta } from "../repositories/order.repository"
+import { orderRepository, OrderData } from "../repositories/order.repository"
 import { useOrderService } from "../services/order.service"
+import { PaginationMeta } from "@/types/global"
 
 export const useOrderSummary = () => {
     const { summary, fetchOrderSummary, isLoadingSummary, error } = useOrderService()
@@ -14,7 +15,7 @@ export const useOrderSummary = () => {
 
 export const useAllOrderData = () => {
     const [orders, setOrders] = useState<OrderData[]>([])
-    const [meta, setMeta] = useState<OrderMeta | null>(null)
+    const [meta, setMeta] = useState<PaginationMeta | null>(null)
     const [isLoading, setIsLoading] = useState(false)
 
     const fetchAllOrders = async (page = 1) => {

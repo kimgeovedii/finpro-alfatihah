@@ -6,7 +6,7 @@ import { UploadIcon } from "lucide-react"
 import React, { useRef } from "react"
 import { useUploadPaymentEvidence } from "../hooks/usePayment"
 import Swal from "sweetalert2"
-import { allowedMimeTypesPaymentEvidence, maxSizePaymentEvidence } from "@/constants/business.const"
+import { allowedMimeTypesPaymentEvidence, maxSizePaymentEvidence, statusColorMap } from "@/constants/business.const"
 import { PhotoIcon } from "@heroicons/react/24/outline"
 import Link from "next/link"
 
@@ -35,14 +35,6 @@ export const OrderItemCard: React.FC<Props> = ({ orderId, orderNumber, status, t
     const { uploadEvidence, isUploading } = useUploadPaymentEvidence()
 
     // Color mapping
-    const statusColorMap: Record<string, string> = {
-        CANCELLED: "bg-red-400",
-        WAITING_PAYMENT: "bg-orange-400",
-        WAITING_PAYMENT_CONFIRMATION: "bg-orange-400",
-        PROCESSING: "bg-blue-400",
-        SHIPPED: "bg-purple-400",
-        CONFIRMED: "bg-emerald-400",
-    }
     const statusClass = statusColorMap[status] || "bg-slate-400"
     const finalStatus = status.replaceAll('_',' ')
 
