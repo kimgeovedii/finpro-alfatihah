@@ -45,6 +45,57 @@ export class OrderRepository {
     }
   }
 
+  async getOrderSummarByBranchId(userId: string, branchId: string) {
+    const now = new Date()
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+    const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+    const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0)
+
+    const [ currentRevenueAgg, lastRevenueAgg, activeShipments, processingOrder, finishedOrder, finishedOrderLastMonth ] = await Promise.all([
+      prisma.orders.aggregate({
+        where: {
+          userId,
+          branchId,
+          status: 'CONFIRMED',
+          createdAt: { gte: startOfMonth }
+        },
+        _sum: { finalPrice: true }
+      }),
+      prisma.orders.aggregate({
+        where: {
+          userId,
+          branchId,
+          status: 'CONFIRMED',
+          createdAt: { gte: startOfLastMonth, lte: endOfLastMonth }
+        },
+        _sum: { finalPrice: true }
+      }),
+      prisma.orders.count({
+        where: { userId, status: 'SHIPPED', branchId } 
+      }),
+      prisma.orders.count({
+        where: { userId, status: 'PROCESSING', branchId }
+      }),
+      prisma.orders.count({
+        where: { userId, status: 'CONFIRMED', branchId }
+      }),
+      prisma.orders.count({
+        where: {
+          userId,
+          branchId,
+          status: 'CONFIRMED',
+          createdAt: { gte: startOfLastMonth, lte: endOfLastMonth }
+        }
+      })
+    ])
+
+    const totalRevenue = currentRevenueAgg._sum.finalPrice ?? 0
+    const lastRevenue = lastRevenueAgg._sum.finalPrice ?? 0
+    const revenueChangePercent = lastRevenue === 0 ? 100 : ((totalRevenue - lastRevenue) / lastRevenue) * 100
+
+    return { totalRevenue, revenueChangePercent, activeShipments, processingOrder, finishedOrder, finishedOrderLastMonth }
+  }  
+
   async findOrderById(orderId: string) {
     return await prisma.orders.findFirst({
       where: { id: orderId },

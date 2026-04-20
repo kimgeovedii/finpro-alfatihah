@@ -22,6 +22,23 @@ export class OrderController {
         }
     }
 
+    getTransactionSummaryByBranchId = async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user?.userId 
+            const branchId = req.params?.branchId as string
+
+            // Validate the UUID format
+            if (!uuidRegex.test(branchId)) throw { code: 400, message: 'branchId is not valid UUID' }
+            
+            // Service
+            const result = await this.orderService.getOrderSummaryByBranchId(userId, branchId)
+
+            return sendSuccess(res, result, "Order fetched")
+        } catch (error: any) {
+            next(error)
+        }
+    }
+
     getAllTransaction = async (req: AuthRequest, res: Response, next: NextFunction) => {
         try {
             const userId = req.user?.userId 

@@ -33,6 +33,10 @@ export class OrderService {
         return await this.orderRepo.getOrderSummary(userId)
     }
 
+    async getOrderSummaryByBranchId(userId: string, branchId: string) {
+        return await this.orderRepo.getOrderSummarByBranchId(userId, branchId)
+    }
+
     async addCartToOrder(userId: string, payload: { cartId: string, voucherId?: string, addressId: string }) {
         const { cartId, addressId } = payload
 

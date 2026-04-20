@@ -18,6 +18,7 @@ class OrderRouter {
         this.router.get("/transaction", this.orderController.getAllTransaction)
         this.router.get("/transaction/:orderNumber", this.orderController.getOrderDetailByOrderNumber)
         this.router.get("/summary", this.orderController.getTransactionSummary)
+        this.router.get("/summary/:branchId", this.orderController.getTransactionSummaryByBranchId)
         this.router.post("/checkout", this.orderController.postAddCheckoutOrder)
         this.router.delete("/:orderId", this.orderController.deleteOrderById)
     }
