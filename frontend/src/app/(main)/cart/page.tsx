@@ -1,6 +1,6 @@
 "use client";
 
-import { useAllCartData, useCartSummary, useDeleteCart, useUpdateCartItem } from "@/features/cart/hooks/useCart"
+import { useAllCartData, useCartSummary, useDeleteCart, useDeleteCartItem, useUpdateCartItem } from "@/features/cart/hooks/useCart"
 import { CartSummary } from "@/features/cart/components/CartSummary"
 import { BranchHeader } from "@/features/cart/components/BranchHeader";
 import { CartItemCard } from "@/features/cart/components/CartItemCard";
@@ -10,6 +10,7 @@ export default function CartPage() {
   const { summary, isLoading, fetchCartSummary } = useCartSummary()
   const { carts, meta, isLoadingAllCart, fetchAllCarts } = useAllCartData()
   const { deleteCart, isDeleting } = useDeleteCart()
+  const { deleteCartItem, isDeletingItem } = useDeleteCartItem()
   const { updateCartItem, isUpdatingItem } = useUpdateCartItem()
 
   const handleRemoveCart = async (cartId: string) => {
@@ -50,7 +51,7 @@ export default function CartPage() {
     })
     if (!confirm.isConfirmed) return
 
-    const success = await deleteCart(cartItemId)
+    const success = await deleteCartItem(cartItemId)
     if (success) {
       await Swal.fire({
         title: "Item deleted",
@@ -145,7 +146,7 @@ export default function CartPage() {
                         basePrice={dt.product.product.basePrice} mainImage="/mainImages/coke.png" qty={dt.quantity} currentStock={dt.product.currentStock}
                         onDecrease={() => handleDecrease(dt.id, dt.quantity,dt.product.product.productName)}
                         onIncrease={() => handleIncrease(dt.id, dt.quantity, dt.product.currentStock)}                        
-                        onRemove={() => handleRemoveCartItem(cart.id, `(${dt.quantity}) ${dt.product.product.productName}`)}
+                        onRemove={() => handleRemoveCartItem(dt.id, `(${dt.quantity}) ${dt.product.product.productName}`)}
                       />
                     ))
                   }
