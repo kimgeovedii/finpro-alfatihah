@@ -18,6 +18,7 @@ class CartRouter {
         this.router.delete("/delete/:cartId", authMiddleware, this.cartController.deleteCartById)
         this.router.get("/summary", authMiddleware, this.cartController.getCartSummary)
         this.router.get("/", authMiddleware, this.cartController.getAllCarts)
+        this.router.get("/:cartId", authMiddleware, this.cartController.getCartDetailById)
     }
 }
 

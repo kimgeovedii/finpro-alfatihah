@@ -1,15 +1,16 @@
-import { BuildingOfficeIcon, TrashIcon } from "@heroicons/react/24/outline"
+import { BuildingOfficeIcon, ShoppingCartIcon, TrashIcon } from "@heroicons/react/24/outline"
 import Link from "next/link"
 import React from "react"
 
 type Props = {
     id: string
+    cartId: string
     storeName: string
 
     onRemove: () => void
 }
 
-export const BranchHeader: React.FC<Props> = ({ storeName, id, onRemove }) => {
+export const BranchHeader: React.FC<Props> = ({ storeName, id, cartId, onRemove }) => {
     return (
         <div className="flex items-center gap-3 mb-4 mt-10">
             <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
@@ -22,6 +23,11 @@ export const BranchHeader: React.FC<Props> = ({ storeName, id, onRemove }) => {
             <button onClick={onRemove} className="bg-white text-slate-400 border border-slate-400 hover:text-red-500 hover:border-red-500 transition cursor-pointer flex gap-2 items-center rounded-xl px-3 py-1">
                 <TrashIcon className="w-5 h-5"/> Remove
             </button>
+            <Link href={`/cart/${cartId}`}>
+                <button className="bg-emerald-600 text-white shadow hover:bg-emerald-700 transition flex gap-2 items-center font-600 rounded-xl px-3 py-1">
+                    <ShoppingCartIcon className="w-5 h-5"/> Buy This
+                </button>
+            </Link>
         </div>
     )
 }

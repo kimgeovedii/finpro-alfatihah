@@ -1,3 +1,4 @@
+import { Schedule } from "@/types/schedule"
 import { apiFetch } from "@/utils/api"
 
 export type PaymentData = {
@@ -6,18 +7,12 @@ export type PaymentData = {
     status: string
 }
 
-export type BranchSchedule = {
-    startTime: string
-    endTime: string
-    dayName: string
-}
-
 export type BranchData = {
     id: string
     storeName: string
     address: string
     city: string
-    schedules: BranchSchedule[]
+    schedules: Schedule[]
 }
 
 export type AddressData = {

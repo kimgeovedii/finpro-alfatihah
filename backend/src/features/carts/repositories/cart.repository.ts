@@ -25,6 +25,70 @@ export class CartRepository {
     return { totalItems, totalQty }
   }
 
+  async findCartById(userId: string, cartId: string) {
+    const cart = await prisma.carts.findFirst({
+      where: { id: cartId, userId},
+      select: {
+        branch: {
+          select: {
+            storeName: true, latitude: true, longitude: true, address: true, maxDeliveryDistance: true, schedules: {
+              select: {
+                startTime: true, endTime: true, dayName: true
+              }
+            }
+          }
+        },
+        items: {
+          orderBy: {
+            product: {
+              product: { productName: 'asc' }
+            }
+          },
+          select: {
+            id: true,
+            quantity: true,
+            product: {
+              select: {
+                product: {
+                  select: {
+                    productName: true, description: true, category: true, basePrice: true, productImages: {
+                      select: { imageUrl: true },
+                      where: { isPrimary: true }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        user: {
+          select: {
+            addresses: {
+              select: {
+                id: true, address: true, lat: true, type: true, label: true, receiptName: true, phone: true, long: true, isPrimary: true
+              }
+            }
+          }
+        }
+      }
+    })
+
+    if (!cart) return null
+
+    // Count summary for total price & qty
+    const { totalBasePrice, totalQty  } = cart.items.reduce((acc, item) => {
+      const price = item.product.product.basePrice || 0
+      const qty = item.quantity || 0
+
+      acc.totalBasePrice += price * qty
+      acc.totalQty += qty
+      
+      return acc
+    }, { totalBasePrice: 0, totalQty: 0 })
+
+    return { ...cart, totalBasePrice, totalQty }
+  }
+
   async findAllCarts(page: number, limit: number, userId: string, branchId: string | null) {
     const skip = (page - 1) * limit
 

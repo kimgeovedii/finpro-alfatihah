@@ -16,6 +16,7 @@ class CartItemRouter {
     private initializeRoutes() {
         this.router.put("/update-qty/:cartItemId", authMiddleware, this.cartItemController.putUpdateCartItemQty)
         this.router.delete("/delete/:cartItemId", authMiddleware, this.cartItemController.deleteCartItemById)
+        this.router.get("/branch/:branchId/product/:productId", authMiddleware, this.cartItemController.getCartItemQtyByProductIdBranchId)
     }
 }
 
