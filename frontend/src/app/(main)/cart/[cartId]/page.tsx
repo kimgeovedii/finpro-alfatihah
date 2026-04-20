@@ -16,23 +16,36 @@ const vouchersData = [
   { code: "WELCOME", description: "Welcome Bonus" },
 ]
 
+const addressList = [
+  {
+    id: "ADDR-1",
+    label: "Home",
+    address: "Jl. Mawar No. 1",
+    receiptName: "Leo",
+    phone: "08114882001",
+    distance: 2
+  },
+  {
+    id: "ADDR-2",
+    label: "Office",
+    address: "Jl. Melati No. 99",
+    receiptName: "Leo",
+    phone: "08114882001",
+    distance: 5
+  }
+]
+
 export default function CartDetailPage() {
   const [appliedVoucher, setAppliedVoucher] = useState<string | null>(null)
 
-  const handleApply = (code: string) => {
-    setAppliedVoucher(code)
-  }
-
-  const handleRemove = () => {
-    setAppliedVoucher(null)
-  }
+  const handleApply = (code: string) => setAppliedVoucher(code)
+  const handleRemove = () => setAppliedVoucher(null)
   
-  // For repo fetching
   const params = useParams()
   const orderNumber = params?.orderNumber as string
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto w-full">
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto">
       <div className='flex items-center gap-3 mb-5'>
         <Link href={'/cart'}>
           <Button variant='destructive' className='text-md px-3 py-5'>
@@ -42,19 +55,15 @@ export default function CartDetailPage() {
       </div>
       <div className='flex w-full gap-5'>
         <div className='flex-1 flex flex-col space-y-5'>
-          <AddressSelectionCard branch={{
-            name: 'Toko Cabang Surabaya',
-            address: 'Jl. Tunjungan No. 88, Genteng, Surabaya',
-            schedule: 'MON (08:30 - 21:30), TUE (08:30 - 21:30), WED (08:30 - 21:30), FRI (08:30 - 21:30), SUN (08:30 - 21:30)',
-            imageUrl: undefined,
-            statusOpen: "Open",
-          }} address={{
-            label: "FlazeFy",
-            address: "Jl. Mawar",
-            recipientName: "Leo",
-            phone: "08114882001",
-            distance: 40
-          }}/>
+          <AddressSelectionCard
+            branch={{
+              name: 'Toko Cabang Surabaya',
+              address: 'Jl. Tunjungan No. 88, Genteng, Surabaya',
+              schedule: 'MON (08:30 - 21:30), TUE (08:30 - 21:30), WED (08:30 - 21:30), FRI (08:30 - 21:30), SUN (08:30 - 21:30)',
+              statusOpen: "Open",
+            }}
+            addressList={addressList}
+          />
           <VouchersSelectionCard
             vouchers={vouchersData}
             appliedVoucher={appliedVoucher}
