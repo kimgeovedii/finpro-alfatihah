@@ -486,6 +486,7 @@
  *                       items:
  *                         type: object
  *                         properties:
+ *                           id: { type: string, format: uuid }
  *                           quantity: { type: integer, example: 20 }
  *                           product:
  *                             type: object

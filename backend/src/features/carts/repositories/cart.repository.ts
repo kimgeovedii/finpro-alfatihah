@@ -45,6 +45,7 @@ export class CartRepository {
             }
           },
           select: {
+            id: true,
             quantity: true,
             product: {
               select: {

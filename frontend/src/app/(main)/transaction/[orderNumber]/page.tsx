@@ -9,6 +9,7 @@ import { useParams } from 'next/navigation';
 import { Check, Package, Truck, Home } from "lucide-react"
 import { OrderStatusStepsCard } from '@/features/order/components/OrderStatusStepsCard';
 import { useOrderDetailData } from '@/features/order/hooks/useOrder';
+import { formatListSchedule } from '@/utils/converter.util';
 
 export default function TransactionDetailPage() {
   // For repo fetching
@@ -43,11 +44,7 @@ export default function TransactionDetailPage() {
     }
   ]
   
-  const DAY_ORDER = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
-
-  const scheduleText = order?.branch?.schedules?.sort((a, b) => DAY_ORDER.indexOf(a.dayName) - DAY_ORDER.indexOf(b.dayName))
-    .map(s => `${s.dayName} (${s.startTime} - ${s.endTime})`)
-    .join(", ") ?? "-"
+  const scheduleText = order?.branch?.schedules ? formatListSchedule(order?.branch?.schedules) : '-'
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto w-full">

@@ -5,10 +5,14 @@ import { CartDetailItemListCard } from '@/features/cart/components/CartDetailIte
 import { CartPaymentSummaryCard } from '@/features/cart/components/CartPaymentSummaryCard';
 import { PaymentMethodSelect } from '@/features/cart/components/PaymentMethodSelect';
 import { VouchersSelectionCard } from '@/features/cart/components/VouchersSelectionCard';
+import { useCartDetailData } from '@/features/cart/hooks/useCart';
+import { useRouter } from 'next/navigation'
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import Swal from 'sweetalert2';
+import { formatListSchedule } from '@/utils/converter.util';
 
 const vouchersData = [
   { code: "DISC10", description: "Discount 10%" },
@@ -16,33 +20,55 @@ const vouchersData = [
   { code: "WELCOME", description: "Welcome Bonus" },
 ]
 
-const addressList = [
-  {
-    id: "ADDR-1",
-    label: "Home",
-    address: "Jl. Mawar No. 1",
-    receiptName: "Leo",
-    phone: "08114882001",
-    distance: 2
-  },
-  {
-    id: "ADDR-2",
-    label: "Office",
-    address: "Jl. Melati No. 99",
-    receiptName: "Leo",
-    phone: "08114882001",
-    distance: 5
-  }
-]
-
 export default function CartDetailPage() {
-  const [appliedVoucher, setAppliedVoucher] = useState<string | null>(null)
+  const router = useRouter()
+  const params = useParams()
+  const cartId = params?.cartId as string
 
+  const { cart, isLoading, error } = useCartDetailData(cartId)
+
+  const [appliedVoucher, setAppliedVoucher] = useState<string | null>(null)
   const handleApply = (code: string) => setAppliedVoucher(code)
   const handleRemove = () => setAppliedVoucher(null)
-  
-  const params = useParams()
-  const orderNumber = params?.orderNumber as string
+
+  useEffect(() => {
+    if (!isLoading && !cart && error) {
+      Swal.fire({
+        icon: "error",
+        title: "Cart Not Found",
+        text: error,
+        confirmButtonText: "Back to Cart",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+      }).then((result) => {
+        if (result.isConfirmed) router.push('/')
+      })
+    }
+  }, [cart, isLoading, error, router])
+
+  if (isLoading || !cart) return <div className="p-10 text-center text-slate-400">Loading...</div>
+
+  const shippingCost = cart.shipping?.shippingCost ?? 0
+  const totalBasePrice = cart.totalBasePrice
+  const scheduleText = cart?.branch?.schedules ? formatListSchedule(cart?.branch?.schedules) : '-'
+  const addressList = cart.user.addresses.map(dt => ({
+    id: dt.id,
+    label: dt.label,
+    address: dt.address,
+    receiptName: dt.receiptName,
+    phone: dt.phone,
+    distance: cart.shipping?.distance ?? 0
+  }))
+  const items = cart.items.map((dt, idx) => ({
+    id: dt.id,
+    productName: dt.product.product.productName,
+    description: dt.product.product.description,
+    category: dt.product.product.category.name,
+    imageUrl: dt.product.product.productImages?.[0]?.imageUrl,
+    quantity: dt.quantity,
+    basePrice: dt.product.product.basePrice,
+    totalPrice: dt.product.product.basePrice * dt.quantity
+  }))
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto">
@@ -57,10 +83,10 @@ export default function CartDetailPage() {
         <div className='flex-1 flex flex-col space-y-5'>
           <AddressSelectionCard
             branch={{
-              name: 'Toko Cabang Surabaya',
-              address: 'Jl. Tunjungan No. 88, Genteng, Surabaya',
-              schedule: 'MON (08:30 - 21:30), TUE (08:30 - 21:30), WED (08:30 - 21:30), FRI (08:30 - 21:30), SUN (08:30 - 21:30)',
-              statusOpen: "Open",
+              name: cart?.branch.storeName,
+              address: cart.branch.address,
+              schedule: scheduleText,
+              statusOpen: cart.openStatus,
             }}
             addressList={addressList}
           />
@@ -73,27 +99,16 @@ export default function CartDetailPage() {
         </div>
         <div className='flex-1 flex flex-col space-y-5'>
           <CartDetailItemListCard
-            items={[
-              {
-                branchInventoriesId: "INV-001",
-                productName: "Coca Cola",
-                description: "Soda",
-                category: "Drinks",
-                imageUrl: "https://via.placeholder.com/150",
-                quantity: 1,
-                basePrice: 120000,
-                totalPrice: 120000,
-              }
-            ]}
+            items={items}
           />
           <PaymentMethodSelect selectedMethod={'MANUAL'} onSelectMethod={()=>{}}/>
           <CartPaymentSummaryCard
-            totalItem={2}
-            shippingCost={10000}
-            totalPrice={200000}
-            totalDiscountProduct={1000}
-            totalDiscountVoucher={1000}
-            finalPrice={50000}
+            totalItem={cart.totalQty}
+            shippingCost={cart.shipping?.shippingCost ?? 0}
+            totalPrice={cart.totalBasePrice}
+            totalDiscountProduct={0}
+            totalDiscountVoucher={0}
+            finalPrice={shippingCost + totalBasePrice}
           />
         </div>
       </div>

@@ -2,7 +2,7 @@ import { TrashIcon } from "@heroicons/react/24/outline"
 import React from "react"
 
 type CartItem = {
-    branchInventoriesId: string
+    id: string
     productName: string
     description: string
     category: string
@@ -49,7 +49,7 @@ export const CartDetailItemListCard: React.FC<Props> = ({ items }) => {
                                     </button>
                                     <div className="flex items-center bg-slate-100/70 rounded-full p-1 shadow-inner mt-2 gap-1">
                                         <button className="w-5 h-5 flex items-center justify-center rounded-full text-slate-600 hover:bg-white transition">-</button>
-                                        <span className="w-5 text-center font-semibold text-slate-800 text-sm">2</span>
+                                        <span className="w-5 text-center font-semibold text-slate-800 text-sm">{dt.quantity}</span>
                                         <button className="w-5 h-5 flex items-center justify-center rounded-full bg-emerald-600 text-white shadow hover:bg-emerald-700 transition">+</button>
                                     </div>
                                 </div>
