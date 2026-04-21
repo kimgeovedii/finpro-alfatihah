@@ -16,7 +16,15 @@ export class PaymentService {
         if (!order) throw { code: 404, message: 'Order not found' }
         
         // Add logic to check expired payment time
-        if (new Date() > new Date(order.paymentDeadline)) throw { code: 422, message: 'Payment deadline has passed' }
+        if (new Date() > new Date(order.paymentDeadline)) {
+            // Repo : update order by order id
+            await this.orderRepo.updateOrderStatusById(orderId, 'CANCELLED')
+
+            // Repo : update payment by order id
+            await this.paymentRepo.updatePaymentStatusById(order.payments[0].id, null, false)
+
+            throw { code: 422, message: 'Payment deadline has passed' }
+        }
 
         // Repo : update payment by order id
         const paymentUpdated = await this.paymentRepo.updatePaymentEvidenceByOrderId(orderId, filePath)
@@ -57,6 +65,11 @@ export class PaymentService {
     }
 
     async putUpdatePaymentStatusById(userId: string, paymentId: string, payload: { isConfirm: boolean }) {
+        // Repo : get current payment to make sure evidence exist
+        const checkPayment = await this.paymentRepo.findById(paymentId)
+        if (checkPayment?.method === "GATEWAY") throw { code: 422, message: 'Only manual payment can be validated' }
+        if (checkPayment?.evidence === null) throw { code: 422, message: 'Evidence not uploaded yet' }
+
         // Repo : get employee id by user id
         const employee = await this.employeeRepo.findEmployeeByUserId(userId)
         if (!employee) throw { code: 404, message: 'Employee not found' }

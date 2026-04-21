@@ -7,12 +7,14 @@ export class OrderRepository {
       where: { id, status, 
         payments: {
           every: {
-            status: PaymentStatus.PENDING
+            status: PaymentStatus.PENDING, method: "MANUAL"
           }
         } 
       },
       select: {
-        paymentDeadline: true, branchId: true, finalPrice: true
+        paymentDeadline: true, branchId: true, finalPrice: true, payments: {
+          select: { id: true }
+        }
       }
     })
   }

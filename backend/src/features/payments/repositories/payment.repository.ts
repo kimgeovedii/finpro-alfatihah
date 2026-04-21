@@ -10,13 +10,15 @@ export class PaymentRepository {
         })
     }
 
-    async updatePaymentStatusById(id: string, adminId: string, isConfirm: boolean) {
+    async updatePaymentStatusById(id: string, adminId: string | null, isConfirm: boolean) {
         return await prisma.payments.update({
             where: { id },
             data: { 
                 status: isConfirm ? "SUCCESS" : "REJECTED",
-                approvedAt: new Date,
-                approvedBy: adminId 
+                ...(adminId && {
+                    approvedAt: new Date(),
+                    approvedBy: adminId,
+                }),
             },
             select: {
                 orderId: true, order: {
@@ -31,6 +33,8 @@ export class PaymentRepository {
             }
         })
     }
+
+    findById = async (id: string) => prisma.payments.findFirst({ where: { id } })
 
     findByOrderId = async (orderId: string) => prisma.payments.findFirst({ where: { orderId } })
 }

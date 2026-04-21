@@ -166,6 +166,16 @@
  *               properties:
  *                 success: { type: boolean, example: false }
  *                 message: { type: string, example: No token provided }
+ * 
+ *       422:
+ *         description: Payment cannot validated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: false }
+ *                 message: { type: string, example: Evidence not uploaded yet }
  *
  *       404:
  *         description: Payment not found
