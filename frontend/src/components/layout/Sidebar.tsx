@@ -13,6 +13,8 @@ import {
   ShoppingCartIcon,
   ArrowsRightLeftIcon,
   CubeIcon,
+  UsersIcon,
+  TagIcon,
 } from "@heroicons/react/24/outline";
 
 const NAV_ITEMS = [
@@ -29,7 +31,12 @@ const NAV_ITEMS = [
   {
     title: "Categories",
     href: "/dashboard/categories",
-    icon: <CubeIcon className="w-5 h-5" />,
+    icon: <TagIcon className="w-5 h-5" />,
+  },
+  {
+    title: "Accounts",
+    href: "/dashboard/accounts",
+    icon: <UsersIcon className="w-5 h-5" />,
   },
   {
     title: "Cart",

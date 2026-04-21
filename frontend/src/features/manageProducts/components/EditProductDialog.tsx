@@ -125,8 +125,6 @@ export const EditProductDialog: React.FC<EditProductDialogProps> = ({
                       readOnly
                       placeholder="organic-avocados"
                       value={formik.values.slugName}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
                       className="h-9 bg-gray-100 cursor-not-allowed"
                     />
                     {formik.touched.slugName && formik.errors.slugName && (
