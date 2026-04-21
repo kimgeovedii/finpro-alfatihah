@@ -29,15 +29,23 @@ export const useAllOrderData = () => {
     const [orders, setOrders] = useState<OrderData[]>([])
     const [meta, setMeta] = useState<PaginationMeta | null>(null)
     const [isLoading, setIsLoading] = useState(false)
-
-    const fetchAllOrders = async (page = 1) => {
+  
+    const [filters, setFilters] = useState<{
+        orderNumber?: string
+        dateStart?: string
+        dateEnd?: string
+    }>({})
+  
+    const fetchAllOrders = async (page = 1, newFilters?: typeof filters) => {
         setIsLoading(true)
-
+    
         try {
-            const res = await orderRepository.getAllOrders(page)
-
+            const appliedFilters = newFilters ?? filters
+            if (newFilters) setFilters(newFilters)
+    
+            const res = await orderRepository.getAllOrders(page, appliedFilters)
+    
             setOrders((prev) => page === 1 ? res.data : [...prev, ...res.data])
-
             setMeta(res.meta)
         } catch (err) {
             console.error("Failed to fetch orders", err)
@@ -45,11 +53,11 @@ export const useAllOrderData = () => {
             setIsLoading(false)
         }
     }
-
+  
     useEffect(() => {
         fetchAllOrders(1)
     }, [])
-
+  
     return { orders, meta, isLoading, fetchAllOrders }
 }
 

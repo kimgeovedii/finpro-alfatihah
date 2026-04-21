@@ -226,6 +226,24 @@
  *           type: string
  *           format: uuid
  *           example: fb6359b6-7841-4145-b7fc-eb08c660a3b3
+ *       - in: query
+ *         name: dateStart
+ *         required: false
+ *         schema:
+ *           type: string
+ *           example: 2026-04-01
+ *       - in: query
+ *         name: dateEnd
+ *         required: false
+ *         schema:
+ *           type: string
+ *           example: 2026-04-02
+ *       - in: query
+ *         name: orderNumber
+ *         required: false
+ *         schema:
+ *           type: string
+ *           example: ORD-1776295220556-163
  *     responses:
  *       200:
  *         description: Orders fetched successfully

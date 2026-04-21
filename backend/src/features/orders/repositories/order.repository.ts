@@ -192,12 +192,22 @@ export class OrderRepository {
     }
   }
 
-  async findAllOrders(page: number, limit: number, userId: string, branchId: string | null) {
+  async findAllOrders(page: number, limit: number, userId: string, branchId: string | null, orderNumber: string | null, dateStart: string | null, dateEnd: string | null) {
     const skip = (page - 1) * limit
 
     const where: Prisma.ordersWhereInput = {
       userId,
-      ...(branchId && { branchId })
+      ...(branchId && { branchId }),
+      ...(orderNumber && {
+        orderNumber: {
+          contains: orderNumber, mode: "insensitive"
+        }
+      }),
+      ...(dateStart && dateEnd && {
+        createdAt: {
+          gte: new Date(dateStart), lte: new Date(dateEnd)
+        }
+      })
     }
 
     const [rawData, total] = await Promise.all([

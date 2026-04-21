@@ -48,12 +48,18 @@ export class OrderController {
             const page = Number(req.query.page) || 1
             const limit = Number(req.query.limit) || paginationDefault
             const branchId = typeof req.query.branchId === 'string' ? req.query.branchId.trim() : null
+            const orderNumber = typeof req.query.orderNumber === 'string' ? req.query.orderNumber.trim() : null
+            const dateStart = typeof req.query.dateStart === 'string' ? req.query.dateStart.trim() : null
+            const dateEnd = typeof req.query.dateEnd === 'string' ? req.query.dateEnd.trim() : null
 
             // Validate the UUID format
             if (branchId && !uuidRegex.test(branchId)) throw { code: 400, message: 'branchId is not valid UUID' }
+
+            // Validate date pair (must come together)
+            if ((dateStart && !dateEnd) || (!dateStart && dateEnd)) throw { code: 400, message: 'dateStart and dateEnd must be provided together' }
             
             // Service
-            const result = await this.orderService.getAllOrders(page, limit, userId, branchId)
+            const result = await this.orderService.getAllOrders(page, limit, userId, branchId, orderNumber, dateStart, dateEnd)
 
             return sendSuccess(res, {
                 data: result.data,

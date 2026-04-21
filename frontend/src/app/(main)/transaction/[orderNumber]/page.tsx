@@ -22,25 +22,25 @@ export default function TransactionDetailPage() {
       key: "WAITING_PAYMENT",
       label: "Order Placed",
       sub: "Waiting for payment",
-      icon: <Check className="w-4 h-4" />
+      icon: <Check className="w-4 h-4"/>
     },
     {
       key: "PROCESSING",
       label: "Processed",
       sub: "Preparing your order",
-      icon: <Package className="w-4 h-4" />
+      icon: <Package className="w-4 h-4"/>
     },
     {
       key: "SHIPPED",
       label: "Shipped",
       sub: "On the way",
-      icon: <Truck className="w-4 h-4" />
+      icon: <Truck className="w-4 h-4"/>
     },
     {
       key: "CONFIRMED",
       label: "Delivered",
       sub: "Order completed",
-      icon: <Home className="w-4 h-4" />
+      icon: <Home className="w-4 h-4"/>
     }
   ]
   
@@ -57,7 +57,7 @@ export default function TransactionDetailPage() {
       </div>
       <div className='flex w-full gap-5'>
         <div className='flex-1 flex flex-col space-y-5'>
-          <OrderStatusStepsCard statusSteps={statusSteps} currentStatus={order?.status && order?.status === "WAITING_PAYMENT_CONFIRMATION" ? "WAITING_PAYMENT" : order?.status ?? ""} />
+          <OrderStatusStepsCard statusSteps={statusSteps} currentStatus={order?.status && order?.status === "WAITING_PAYMENT_CONFIRMATION" ? "WAITING_PAYMENT" : order?.status ?? ""}/>
           <OrderDetailBranchCard
             branch={{
               name: order?.branch?.storeName ?? "-",
@@ -73,7 +73,7 @@ export default function TransactionDetailPage() {
               createdAt: order?.createdAt ? new Date(order.createdAt).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" }) : "-",
               paymentDeadlineAt: order?.paymentDeadline ? new Date(order.paymentDeadline).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" }) : "-",
             }}
-          />
+         />
         </div>
         <div className='flex-1 flex flex-col space-y-5'>
           <OrderDetailItemListCard
@@ -87,14 +87,14 @@ export default function TransactionDetailPage() {
               basePrice: item.product.product.basePrice,
               totalPrice: item.product.product.basePrice * item.quantity,
             })) ?? []}
-          />
+         />
           <PaymentSummaryCard
             totalItem={order?.items?.reduce((acc, item) => acc + item.quantity, 0) ?? 0}
             shippingCost={order?.shippingCost ?? 0}
             totalPrice={order?.totalPrice ?? 0}
             totalSaving={0}
             finalPrice={order?.finalPrice ?? 0}
-          />
+         />
         </div>
       </div>
     </div>

@@ -22,8 +22,8 @@ export class OrderService {
     private paymentRepo = new PaymentRepository()
     private userRepo = new UserRepository()
 
-    async getAllOrders(page: number, limit: number, userId: string, branchId: string | null) {
-        return await this.orderRepo.findAllOrders(page, limit, userId, branchId)
+    async getAllOrders(page: number, limit: number, userId: string, branchId: string | null, orderNumber: string | null, dateStart: string | null, dateEnd: string | null) {
+        return await this.orderRepo.findAllOrders(page, limit, userId, branchId, orderNumber, dateStart, dateEnd)
     }
 
     async getAllOrderByBranchId(page: number, limit: number, branchId: string, status: OrderStatus | null) {
