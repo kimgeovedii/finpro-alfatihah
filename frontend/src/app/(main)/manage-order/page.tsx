@@ -1,6 +1,6 @@
 'use client'
 import { OrderStatus } from "@/constants/business.const"
-import { OrderTableItem, OrderTableSection } from "@/features/order/components/OrderManagementTable"
+import { OrderTableItem, OrderManagementTable } from "@/features/order/components/OrderManagementTable"
 import { OrderSummaryByBranchCard } from "@/features/order/components/OrderSummaryByBranchCard"
 import { useOrderManagement, useOrderSummaryByBranchId } from "@/features/order/hooks/useOrder"
 import { useUpdatePaymentStatusById } from "@/features/order/hooks/usePayment"
@@ -59,7 +59,7 @@ export default function ManageOrdersPage() {
                         finishedOrder={summaryByBranchId?.finishedOrder ?? 0}
                         finishedOrderLastMonth={summaryByBranchId?.finishedOrderLastMonth ?? 0}
                     />
-                    <OrderTableSection
+                    <OrderManagementTable
                         orders={tableOrders}
                         meta={meta}
                         isLoading={isLoading}

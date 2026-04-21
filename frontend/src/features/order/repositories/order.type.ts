@@ -1,4 +1,5 @@
 import { OrderStatus } from "@/constants/business.const"
+import { AddressData } from "@/types/address.type"
 import { PaginationMeta } from "@/types/global.type"
 import { PaymentData } from "@/types/payment.type"
 import { ProductImage } from "@/types/product.type"
@@ -10,15 +11,6 @@ export type BranchData = {
     address: string
     city: string
     schedules: Schedule[]
-}
-
-export type AddressData = {
-    label: string
-    type: string
-    receiptName: string
-    notes: string
-    phone: string
-    address: string
 }
 
 export type ProductDetail = {

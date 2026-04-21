@@ -6,11 +6,14 @@ import { Button } from "@/components/ui/button"
 import { OrderStatus, statusColorMap } from "@/constants/business.const"
 import { Badge } from "@/components/ui/badge"
 import { formatDate } from "@/utils/converter.util"
-import { BanknotesIcon } from "@heroicons/react/24/outline"
+import { BanknotesIcon, CheckBadgeIcon, CheckIcon } from "@heroicons/react/24/outline"
 import { CopyField } from "@/components/button/CopyField"
 import { PaymentData } from "@/types/payment.type"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import Image from "next/image"
+import Link from "next/link"
+import { PaginationMeta } from "@/types/global.type"
+import { CheckCheck } from "lucide-react"
 
 export type OrderTableItem = {
     id: string
@@ -23,16 +26,9 @@ export type OrderTableItem = {
     payments: PaymentData[]
 }
 
-export type OrderTableMeta = {
-    page: number
-    limit: number
-    total: number
-    total_page: number
-}
-
 type Props = {
     orders: OrderTableItem[]
-    meta: OrderTableMeta | null
+    meta: PaginationMeta | null
     isLoading: boolean
     activeStatus: OrderStatus | "ALL"
     onPageChange: (page: number) => void
@@ -50,7 +46,7 @@ const STATUS_FILTERS: { label: string; value: OrderStatus | "ALL" }[] = [
     { label: "Cancelled", value: "CANCELLED" },
 ]
 
-export const OrderTableSection: React.FC<Props> = ({ orders, meta, isLoading, onPageChange, onSearch, activeStatus, onStatusChange, onValidatePaymentEvidence }) => {
+export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading, onPageChange, onSearch, activeStatus, onStatusChange, onValidatePaymentEvidence }) => {
     const [search, setSearch] = useState("")
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearch(e.target.value)
@@ -149,17 +145,33 @@ export const OrderTableSection: React.FC<Props> = ({ orders, meta, isLoading, on
                                                                 <Image src={dt.payments[0].evidence ?? ""} className="w-full mx-auto h-full mb-2 rounded-lg" alt={dt.payments[0].evidence ?? ""} width={100} height={100}/>
                                                                 <p className="mb-0">Transaction Amount</p>
                                                                 <p className="font-bold mb-4">Rp {dt.finalPrice.toLocaleString("id-ID")}</p>
-                                                                <Button className="w-full bg-green-100 text-green-500 border-1 border-green-500 hover:bg-green-500 hover:text-white cursor-pointer mb-2" onClick={(e) => onValidatePaymentEvidence(dt.payments[0].id, true)}>Confirm</Button>
-                                                                <Button className="w-full bg-red-100 text-red-500 border-1 border-red-500 hover:bg-red-500 hover:text-white cursor-pointer" onClick={(e) => onValidatePaymentEvidence(dt.payments[0].id, false)}>Reject</Button>
+                                                                {
+                                                                    dt.status === "WAITING_PAYMENT_CONFIRMATION" && 
+                                                                        <>
+                                                                            <Button className="w-full bg-green-100 text-green-500 border-1 border-green-500 hover:bg-green-500 hover:text-white cursor-pointer mb-2" onClick={(e) => onValidatePaymentEvidence(dt.payments[0].id, true)}>Confirm</Button>
+                                                                            <Button className="w-full bg-red-100 text-red-500 border-1 border-red-500 hover:bg-red-500 hover:text-white cursor-pointer" onClick={(e) => onValidatePaymentEvidence(dt.payments[0].id, false)}>Reject</Button>
+                                                                        </>
+                                                                }
                                                             </div>
                                                         </DialogContent>
                                                     </Dialog>
-                                                :
-                                                    <>-</>
+                                                : dt.status === "CANCELLED" ? 
+                                                    <>-</> 
+                                                : 
+                                                    <div className="bg-green-100 text-green-600 rounded-lg w-8 h-8 p-[5px] mx-auto">
+                                                        <CheckIcon className="w-5 h-5"/>
+                                                    </div>
                                             }
                                         </TableCell>
                                         <TableCell>
-                                            <Button className="bg-transparent text-teal-700 font-semibold text-sm hover:underline">View Details</Button>
+                                            {
+                                                dt.status !== "WAITING_PAYMENT" && dt.status !== "WAITING_PAYMENT_CONFIRMATION" ?
+                                                    <Link href={`/manage-order/${dt.orderNumber}`}>
+                                                        <Button className="bg-transparent text-teal-700 font-semibold text-sm hover:underline">Manage</Button>
+                                                    </Link>
+                                                :
+                                                    <>-</>
+                                            }
                                         </TableCell>
                                     </TableRow>
                                 )
