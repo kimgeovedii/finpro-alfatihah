@@ -3,7 +3,7 @@ import { OrderRepository } from "../repositories/order.repository"
 import { EmployeeRepository } from "../repositories/employee.repository"
 import { PaymentRepository } from "../repositories/payment.repository"
 import { Mailer } from "../../../config/mailer"
-import { getPaymentConfirmationTemplate } from "../views/payment.view"
+import { getPaymentConfirmationTemplate, getPaymentConfirmedTemplate } from "../views/payment.view"
 
 export class PaymentService {
     private orderRepo = new OrderRepository()
@@ -54,5 +54,30 @@ export class PaymentService {
         }
 
         return payment
+    }
+
+    async putUpdatePaymentStatusById(userId: string, paymentId: string, payload: { isConfirm: boolean }) {
+        // Repo : get employee id by user id
+        const employee = await this.employeeRepo.findEmployeeByUserId(userId)
+        if (!employee) throw { code: 404, message: 'Employee not found' }
+        
+        // Repo : update payment status
+        const payment = await this.paymentRepo.updatePaymentStatusById(paymentId, employee?.id, payload.isConfirm)
+        
+        // Repo : update order by order id
+        await this.orderRepo.updateOrderStatusById(payment.orderId, 'PROCESSING')
+
+        // Mailer : broadcast email to all admin store if a payment's evidence has been uploaded
+        const emailHtml = getPaymentConfirmedTemplate({
+            username: payment.order.user.username,
+            orderNumber: payment.order.orderNumber
+        })
+
+        await Mailer.client.sendMail({
+            from: `"Alfatihah Online Grocery" <${process.env.SMTP_USER}>`,
+            to: payment.order.user.email,
+            subject: "Payment Confirmed!",
+            html: emailHtml,
+        })
     }
 }

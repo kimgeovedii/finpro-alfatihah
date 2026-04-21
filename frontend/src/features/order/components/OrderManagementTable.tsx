@@ -7,6 +7,10 @@ import { OrderStatus, statusColorMap } from "@/constants/business.const"
 import { Badge } from "@/components/ui/badge"
 import { formatDate } from "@/utils/converter.util"
 import { BanknotesIcon } from "@heroicons/react/24/outline"
+import { CopyField } from "@/components/button/CopyField"
+import { PaymentData } from "@/types/payment.type"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import Image from "next/image"
 
 export type OrderTableItem = {
     id: string
@@ -16,6 +20,7 @@ export type OrderTableItem = {
     createdAt: string
     finalPrice: number
     status: OrderStatus
+    payments: PaymentData[]
 }
 
 export type OrderTableMeta = {
@@ -33,6 +38,7 @@ type Props = {
     onPageChange: (page: number) => void
     onStatusChange: (status: OrderStatus | "ALL") => void
     onSearch?: (query: string) => void
+    onValidatePaymentEvidence: (paymentId: string, isConfirm: boolean) => void
 }
 
 const STATUS_FILTERS: { label: string; value: OrderStatus | "ALL" }[] = [
@@ -44,7 +50,7 @@ const STATUS_FILTERS: { label: string; value: OrderStatus | "ALL" }[] = [
     { label: "Cancelled", value: "CANCELLED" },
 ]
 
-export const OrderTableSection: React.FC<Props> = ({ orders, meta, isLoading, onPageChange, onSearch, activeStatus, onStatusChange }) => {
+export const OrderTableSection: React.FC<Props> = ({ orders, meta, isLoading, onPageChange, onSearch, activeStatus, onStatusChange, onValidatePaymentEvidence }) => {
     const [search, setSearch] = useState("")
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearch(e.target.value)
@@ -114,7 +120,9 @@ export const OrderTableSection: React.FC<Props> = ({ orders, meta, isLoading, on
                                 
                                 return (
                                     <TableRow key={dt.id} className="hover:bg-slate-50">
-                                        <TableCell className="font-semibold text-slate-800">#{dt.orderNumber}</TableCell>
+                                        <TableCell className="font-semibold text-slate-800">
+                                            <CopyField label="Order number" value={dt.orderNumber} customClass="text-sm font-semibold"/>
+                                        </TableCell>
                                         <TableCell>
                                             <p className="font-medium text-slate-800">{dt.customerName}</p>
                                             <p className="text-xs text-slate-400">{dt.customerEmail}</p>
@@ -125,7 +133,30 @@ export const OrderTableSection: React.FC<Props> = ({ orders, meta, isLoading, on
                                             <Badge className={`capitalize font-semibold ${statusClass}`}>{finalStatus}</Badge>
                                         </TableCell>
                                         <TableCell>
-                                            <Button className="bg-transparent text-teal-700 font-semibold text-sm hover:underline border-teal-700 border-1 rounded-lg p-2 hover:bg-teal-700 hover:text-white cursor-pointer"><BanknotesIcon className="w-5 h-5"/></Button>
+                                            {
+                                                dt.status !== "WAITING_PAYMENT" && dt.payments.length > 0 && dt.payments[0].method === "MANUAL" && dt.payments[0].evidence !== null ?        
+                                                    <Dialog>
+                                                        <DialogTrigger asChild>
+                                                            <Button className="bg-transparent text-teal-700 font-semibold text-sm hover:underline border-teal-700 border-1 rounded-lg p-2 hover:bg-teal-700 hover:text-white cursor-pointer">
+                                                                <BanknotesIcon className="w-5 h-5"/>
+                                                            </Button>
+                                                        </DialogTrigger>
+                                                        <DialogContent className="w-full max-w-[700px] rounded-2xl">
+                                                            <DialogHeader>
+                                                                <DialogTitle className="font-bold mb-3">Payment Evidence</DialogTitle>
+                                                            </DialogHeader>
+                                                            <div className="flex flex-col mt-2 text-center">
+                                                                <Image src={dt.payments[0].evidence ?? ""} className="w-full mx-auto h-full mb-2 rounded-lg" alt={dt.payments[0].evidence ?? ""} width={100} height={100}/>
+                                                                <p className="mb-0">Transaction Amount</p>
+                                                                <p className="font-bold mb-4">Rp {dt.finalPrice.toLocaleString("id-ID")}</p>
+                                                                <Button className="w-full bg-green-100 text-green-500 border-1 border-green-500 hover:bg-green-500 hover:text-white cursor-pointer mb-2" onClick={(e) => onValidatePaymentEvidence(dt.payments[0].id, true)}>Confirm</Button>
+                                                                <Button className="w-full bg-red-100 text-red-500 border-1 border-red-500 hover:bg-red-500 hover:text-white cursor-pointer" onClick={(e) => onValidatePaymentEvidence(dt.payments[0].id, false)}>Reject</Button>
+                                                            </div>
+                                                        </DialogContent>
+                                                    </Dialog>
+                                                :
+                                                    <>-</>
+                                            }
                                         </TableCell>
                                         <TableCell>
                                             <Button className="bg-transparent text-teal-700 font-semibold text-sm hover:underline">View Details</Button>
