@@ -30,7 +30,7 @@ export class OrderService {
         return await this.orderRepo.findAllOrdersByBranchId(page, limit, branchId, status)
     }
 
-    async getOrderDetailByOrderNumber(userId: string, orderNumber: string) {
+    async getOrderDetailByOrderNumber(userId: string | null, orderNumber: string) {
         return await this.orderRepo.findOrderDetailByOrderNumber(userId, orderNumber)
     }
 

@@ -103,6 +103,7 @@ export class OrderController {
     getOrderDetailByOrderNumber = async (req: AuthRequest, res: Response, next: NextFunction) => {
         try {
             const userId = req.user?.userId 
+            const isAdmin = true // for now
 
             // Route param
             const orderNumber = req.params.orderNumber as string
@@ -111,7 +112,7 @@ export class OrderController {
             if (!orderNumber.startsWith(`${orderCode}-`)) throw { code: 400, message: "Invalid order number format. Must start with 'ORD-'" }    
 
             // Service
-            const result = await this.orderService.getOrderDetailByOrderNumber(userId, orderNumber)
+            const result = await this.orderService.getOrderDetailByOrderNumber(isAdmin ? null : userId, orderNumber)
 
             return sendSuccess(res, result, "Order fetched")
         } catch (error: any) {

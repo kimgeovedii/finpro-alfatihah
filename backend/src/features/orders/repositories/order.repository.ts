@@ -110,48 +110,86 @@ export class OrderRepository {
     })
   }
 
-  async findOrderDetailByOrderNumber(userId: string, orderNumber: string) {
-    return await prisma.orders.findFirst({
-      where: { orderNumber, userId },
-      select: {
-        orderNumber: true, status: true, totalPrice: true, finalPrice: true, shippingCost: true, paymentDeadline: true, shippedAt: true, confirmedAt: true, rejectedAt: true, createdAt: true,
-        branch: {
-          select: {
-            id: true, storeName: true, address: true, city: true, schedules: {
-              select: {
-                startTime: true, endTime: true, dayName: true
+  async findOrderDetailByOrderNumber(userId: string | null, orderNumber: string) {
+    if (userId) {
+      return await prisma.orders.findFirst({
+        where: { orderNumber, userId },
+        select: {
+          orderNumber: true, status: true, totalPrice: true, finalPrice: true, shippingCost: true, paymentDeadline: true, shippedAt: true, confirmedAt: true, rejectedAt: true, createdAt: true,
+          branch: {
+            select: {
+              id: true, storeName: true, address: true, city: true, schedules: {
+                select: {
+                  startTime: true, endTime: true, dayName: true
+                }
               }
             }
-          }
-        },
-        address: {
-          select: {
-            label: true, type: true, receiptName: true, notes: true, phone: true, address: true
-          }
-        },
-        items: {
-          select: {
-            id: true, quantity: true, product: {
-              select: {
-                product: {
-                  select: {
-                    productName: true, description: true, basePrice: true, productImages: {
-                      select: { imageUrl: true },
-                      where: { isPrimary: true }
+          },
+          address: {
+            select: {
+              label: true, type: true, receiptName: true, notes: true, phone: true, address: true
+            }
+          },
+          items: {
+            select: {
+              id: true, quantity: true, product: {
+                select: {
+                  product: {
+                    select: {
+                      productName: true, description: true, basePrice: true, productImages: {
+                        select: { imageUrl: true },
+                        where: { isPrimary: true }
+                      }
                     }
                   }
                 }
               }
             }
-          }
-        },
-        payments: {
-          select: {
-            method: true, status: true, approvedAt: true, evidence: true, rejectedAt: true
+          },
+          payments: {
+            select: {
+              method: true, status: true, approvedAt: true, evidence: true, rejectedAt: true
+            }
           }
         }
-      }
-    })
+      })
+    } else {
+      return await prisma.orders.findFirst({
+        where: { orderNumber },
+        select: {
+          orderNumber: true, status: true, totalPrice: true, finalPrice: true, shippingCost: true, shippedAt: true, confirmedAt: true, rejectedAt: true, createdAt: true,
+          branch: {
+            select: { id: true, storeName: true, address: true }
+          },
+          address: {
+            select: {
+              label: true, type: true, receiptName: true, notes: true, phone: true, address: true
+            }
+          },
+          items: {
+            select: {
+              id: true, quantity: true, product: {
+                select: {
+                  currentStock: true, product: {
+                    select: {
+                      productName: true, description: true, basePrice: true, productImages: {
+                        select: { imageUrl: true },
+                        where: { isPrimary: true }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          payments: {
+            select: {
+              method: true, status: true, approvedAt: true, evidence: true, rejectedAt: true
+            }
+          }
+        }
+      })
+    }
   }
 
   async findAllOrders(page: number, limit: number, userId: string, branchId: string | null) {

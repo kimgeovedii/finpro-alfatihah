@@ -1,6 +1,6 @@
 import React from "react"
 
-type StatusInfo = {
+export type StatusInfo = {
     key: string 
     label: string 
     sub: string 

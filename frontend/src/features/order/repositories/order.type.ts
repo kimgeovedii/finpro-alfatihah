@@ -22,6 +22,7 @@ export type ProductDetail = {
 
 export type OrderItemProduct = {
     product: ProductDetail
+    currentStock: number
 }
 
 export type OrderItem = {

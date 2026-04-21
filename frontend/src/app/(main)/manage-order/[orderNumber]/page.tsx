@@ -5,44 +5,12 @@ import { useParams } from "next/navigation"
 import { ArrowLeftIcon } from "@heroicons/react/24/outline"
 import { Button } from "@/components/ui/button"
 import { OrderMatchingTable } from "@/features/order/components/OrderMatchingTable"
+import { useOrderDetailData } from "@/features/order/hooks/useOrder"
 
 export default function ManageOrdersDetailPage() {
   const params = useParams()
   const orderNumber = params?.orderNumber as string
-
-  const dummyItems = [  
-    {
-      id: "1",
-      quantity: 20,
-      price: 10000,
-      stockBefore: 30,
-      stockAfter: 10,
-      product: { productName: "Coca Cola", imageUrl: "" },
-    },
-    {
-      id: "2",
-      quantity: 5,
-      price: 25000,
-      stockBefore: 3,
-      stockAfter: 0,
-      product: { productName: "Sprite 500ml", imageUrl: "" },
-    },
-    {
-      id: "3",
-      quantity: 10,
-      price: 15000,
-      stockBefore: 50,
-      stockAfter: 40,
-      product: { productName: "Aqua 600ml", imageUrl: "" },
-    },
-  ]
-
-  const dummyMeta = {
-    page: 1,
-    limit: 10,
-    total: 3,
-    total_page: 1,
-  }
+  const { order, isLoading, fetchOrderDetail } = useOrderDetailData(orderNumber)
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto">
@@ -56,10 +24,23 @@ export default function ManageOrdersDetailPage() {
       <div className="flex w-full">
         <OrderMatchingTable
           orderNumber={orderNumber}
-          items={dummyItems}
-          meta={dummyMeta}
-          isLoading={false}
-          onPageChange={(page) => console.log("page:", page)}
+          items={
+            order?.items?.map(dt => ({
+              id: dt.id,
+              quantity: dt.quantity,
+              price: dt.product.product.basePrice,
+              stockBefore: dt.product.currentStock,
+              stockAfter: dt.product.currentStock - dt.quantity,
+              product: { 
+                productName: dt.product.product.productName, 
+                imageUrl: dt.product.product.productImages[0].imageUrl 
+              },
+            })) ?? []
+          }
+          shippingCost={order?.shippingCost ?? 0}
+          finalPrice={order?.finalPrice ?? 0}
+          isLoading={isLoading}
+          payments={order?.payments ?? []}
         />
       </div>
     </div>

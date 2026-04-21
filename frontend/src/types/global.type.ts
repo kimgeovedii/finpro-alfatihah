@@ -4,3 +4,11 @@ export type PaginationMeta = {
     total: number
     total_page: number
 }
+
+export type StatusInfo = {
+    key: string 
+    label: string 
+    sub: string 
+    icon: any
+    isLast?: boolean
+}
