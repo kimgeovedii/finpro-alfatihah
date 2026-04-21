@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { OrderStatus, Prisma } from "@prisma/client";
 import { prisma } from "../../../config/prisma";
 import { orderCode, paymentDeadline } from "../../../constants/business.const";
 
@@ -45,6 +45,57 @@ export class OrderRepository {
     }
   }
 
+  async getOrderSummarByBranchId(userId: string, branchId: string) {
+    const now = new Date()
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+    const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+    const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0)
+
+    const [ currentRevenueAgg, lastRevenueAgg, activeShipments, processingOrder, finishedOrder, finishedOrderLastMonth ] = await Promise.all([
+      prisma.orders.aggregate({
+        where: {
+          userId,
+          branchId,
+          status: 'CONFIRMED',
+          createdAt: { gte: startOfMonth }
+        },
+        _sum: { finalPrice: true }
+      }),
+      prisma.orders.aggregate({
+        where: {
+          userId,
+          branchId,
+          status: 'CONFIRMED',
+          createdAt: { gte: startOfLastMonth, lte: endOfLastMonth }
+        },
+        _sum: { finalPrice: true }
+      }),
+      prisma.orders.count({
+        where: { userId, status: 'SHIPPED', branchId } 
+      }),
+      prisma.orders.count({
+        where: { userId, status: 'PROCESSING', branchId }
+      }),
+      prisma.orders.count({
+        where: { userId, status: 'CONFIRMED', branchId }
+      }),
+      prisma.orders.count({
+        where: {
+          userId,
+          branchId,
+          status: 'CONFIRMED',
+          createdAt: { gte: startOfLastMonth, lte: endOfLastMonth }
+        }
+      })
+    ])
+
+    const totalRevenue = currentRevenueAgg._sum.finalPrice ?? 0
+    const lastRevenue = lastRevenueAgg._sum.finalPrice ?? 0
+    const revenueChangePercent = lastRevenue === 0 ? 100 : ((totalRevenue - lastRevenue) / lastRevenue) * 100
+
+    return { totalRevenue, revenueChangePercent, activeShipments, processingOrder, finishedOrder, finishedOrderLastMonth }
+  }  
+
   async findOrderById(orderId: string) {
     return await prisma.orders.findFirst({
       where: { id: orderId },
@@ -59,48 +110,86 @@ export class OrderRepository {
     })
   }
 
-  async findOrderDetailByOrderNumber(userId: string, orderNumber: string) {
-    return await prisma.orders.findFirst({
-      where: { orderNumber, userId },
-      select: {
-        orderNumber: true, status: true, totalPrice: true, finalPrice: true, shippingCost: true, paymentDeadline: true, shippedAt: true, confirmedAt: true, rejectedAt: true, createdAt: true,
-        branch: {
-          select: {
-            id: true, storeName: true, address: true, city: true, schedules: {
-              select: {
-                startTime: true, endTime: true, dayName: true
+  async findOrderDetailByOrderNumber(userId: string | null, orderNumber: string) {
+    if (userId) {
+      return await prisma.orders.findFirst({
+        where: { orderNumber, userId },
+        select: {
+          orderNumber: true, status: true, totalPrice: true, finalPrice: true, shippingCost: true, paymentDeadline: true, shippedAt: true, confirmedAt: true, rejectedAt: true, createdAt: true,
+          branch: {
+            select: {
+              id: true, storeName: true, address: true, city: true, schedules: {
+                select: {
+                  startTime: true, endTime: true, dayName: true
+                }
               }
             }
-          }
-        },
-        address: {
-          select: {
-            label: true, type: true, receiptName: true, notes: true, phone: true, address: true
-          }
-        },
-        items: {
-          select: {
-            id: true, quantity: true, product: {
-              select: {
-                product: {
-                  select: {
-                    productName: true, description: true, basePrice: true, productImages: {
-                      select: { imageUrl: true },
-                      where: { isPrimary: true }
+          },
+          address: {
+            select: {
+              label: true, type: true, receiptName: true, notes: true, phone: true, address: true
+            }
+          },
+          items: {
+            select: {
+              id: true, quantity: true, product: {
+                select: {
+                  product: {
+                    select: {
+                      productName: true, description: true, basePrice: true, productImages: {
+                        select: { imageUrl: true },
+                        where: { isPrimary: true }
+                      }
                     }
                   }
                 }
               }
             }
-          }
-        },
-        payments: {
-          select: {
-            method: true, status: true, approvedAt: true, evidence: true, rejectedAt: true
+          },
+          payments: {
+            select: {
+              method: true, status: true, approvedAt: true, evidence: true, rejectedAt: true
+            }
           }
         }
-      }
-    })
+      })
+    } else {
+      return await prisma.orders.findFirst({
+        where: { orderNumber },
+        select: {
+          orderNumber: true, status: true, totalPrice: true, finalPrice: true, shippingCost: true, shippedAt: true, confirmedAt: true, rejectedAt: true, createdAt: true,
+          branch: {
+            select: { id: true, storeName: true, address: true }
+          },
+          address: {
+            select: {
+              label: true, type: true, receiptName: true, notes: true, phone: true, address: true
+            }
+          },
+          items: {
+            select: {
+              id: true, quantity: true, product: {
+                select: {
+                  currentStock: true, product: {
+                    select: {
+                      productName: true, description: true, basePrice: true, productImages: {
+                        select: { imageUrl: true },
+                        where: { isPrimary: true }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          payments: {
+            select: {
+              method: true, status: true, approvedAt: true, evidence: true, rejectedAt: true
+            }
+          }
+        }
+      })
+    }
   }
 
   async findAllOrders(page: number, limit: number, userId: string, branchId: string | null) {
@@ -150,6 +239,39 @@ export class OrderRepository {
     })
 
     const data = branchId ? (mapped[0] ?? null) : mapped
+
+    return { data, total }
+  }
+
+  async findAllOrdersByBranchId(page: number, limit: number, branchId: string, status: OrderStatus | null) {
+    const skip = (page - 1) * limit
+    const where: Prisma.ordersWhereInput = { 
+      branchId,
+      ...(status && { status })
+    }
+
+    const [data, total] = await Promise.all([
+      prisma.orders.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true, orderNumber: true, createdAt: true, status: true, finalPrice: true, 
+          payments: {
+            select: { 
+              id: true, evidence: true, method: true, status: true 
+            }
+          },
+          user: {
+            select: {
+              username: true, email: true
+            }
+          }
+        }
+      }),
+      prisma.orders.count({ where })
+    ])
 
     return { data, total }
   }

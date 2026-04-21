@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
         hostname: "upload.wikimedia.org",
       },
     ],
+    domains: ['picsum.photos'],
   },
 };
 

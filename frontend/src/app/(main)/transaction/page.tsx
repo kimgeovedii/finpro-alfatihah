@@ -1,5 +1,5 @@
 "use client";
-
+import { Button } from "@/components/ui/button";
 import { OrderItemCard } from "@/features/order/components/OrderItemCard";
 import { OrderSummaryCard } from "@/features/order/components/OrderSummaryCard";
 import { useAllOrderData, useOrderSummary } from "@/features/order/hooks/useOrder";
@@ -15,7 +15,6 @@ export default function TransactionPage() {
           <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">
             My History
           </h1>
-          <br/>
           {
             !isLoadingSummary && summary ? 
               <OrderSummaryCard 
@@ -49,7 +48,7 @@ export default function TransactionPage() {
                 />
               ))
             }
-            { meta && meta.page < meta.total_page && <button className="mt-4 px-4 py-2 bg-slate-800 text-white rounded-lg" onClick={() => fetchAllOrders(meta.page + 1)}>See More</button> }
+            { meta && meta.page < meta.total_page && <Button className="mt-4 px-4 py-2 bg-slate-800 text-white rounded-lg" onClick={() => fetchAllOrders(meta.page + 1)}>See More</Button> }
           </div>
         </div>
       </div>

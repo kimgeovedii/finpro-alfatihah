@@ -14,11 +14,13 @@ class CartRouter {
     }
 
     private initializeRoutes() {
-        this.router.post("/add-to-cart", authMiddleware, this.cartController.postAddBranchInventoryToCart)
-        this.router.delete("/delete/:cartId", authMiddleware, this.cartController.deleteCartById)
-        this.router.get("/summary", authMiddleware, this.cartController.getCartSummary)
-        this.router.get("/", authMiddleware, this.cartController.getAllCarts)
-        this.router.get("/:cartId", authMiddleware, this.cartController.getCartDetailById)
+        this.router.use(authMiddleware)
+
+        this.router.get("/summary", this.cartController.getCartSummary)
+        this.router.get("/", this.cartController.getAllCarts)
+        this.router.get("/:cartId", this.cartController.getCartDetailById)
+        this.router.post("/add-to-cart", this.cartController.postAddBranchInventoryToCart)
+        this.router.delete("/delete/:cartId", this.cartController.deleteCartById)
     }
 }
 

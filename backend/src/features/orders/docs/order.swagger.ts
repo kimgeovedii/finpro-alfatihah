@@ -604,3 +604,185 @@
  *                 success: { type: boolean, example: false }
  *                 message: { type: string, example: Internal server error }
  */
+
+/**
+ * @openapi
+ * /api/orders/summary/{branchId}:
+ *   get:
+ *     summary: Get order summary by branch id  
+ *     description: Returns revenue statistics and order counts for the authenticated user, including monthly revenue, revenue change percentage, active shipments, processing orders, finished orders, and last month's finished orders.
+ *     tags: [Order]
+ *     parameters:
+ *       - in: path
+ *         name: branchId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: fb6359b6-7841-4145-b7fc-eb08c660a3b3
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Order summary fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Order summary fetched
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     totalRevenue:
+ *                       type: number
+ *                       example: 1500000
+ *                     revenueChangePercent:
+ *                       type: number
+ *                       example: 12.5
+ *                     activeShipments:
+ *                       type: integer
+ *                       example: 4
+ *                     processingOrder:
+ *                       type: integer
+ *                       example: 3
+ *                     finishedOrder:
+ *                       type: integer
+ *                       example: 10
+ *                     finishedOrderLastMonth:
+ *                       type: integer
+ *                       example: 7
+ *
+ *       401:
+ *         description: Unauthorized - No token provided
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: false }
+ *                 message: { type: string, example: No token provided }
+ *
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: false }
+ *                 message: { type: string, example: Internal server error }
+ */
+
+/**
+ * @openapi
+ * /api/orders/transaction/management/{branchId}:
+ *   get:
+ *     summary: Get all transactions by branch id
+ *     description: Retrieve all orders for a specific branch, optionally filtered by status. Supports pagination and returns user information with each order.
+ *     tags: [Order]
+ *     parameters:
+ *       - in: path
+ *         name: branchId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *           example: 61904921-d090-4196-87b5-27aac626154c
+ *       - in: query
+ *         name: status
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [ALL, WAITING_PAYMENT, WAITING_PAYMENT_CONFIRMATION, PROCESSING, SHIPPED, CONFIRMED, CANCELLED]
+ *           example: ALL
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           example: 14
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Orders fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 message: { type: string, example: Order fetched }
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     data:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id: { type: string, format: uuid, example: ba33cfd5-10ad-4cfc-b36f-0b3d5655da2c }
+ *                           orderNumber: { type: string, example: ORD-1776299113950 }
+ *                           createdAt: { type: string, format: date-time, example: 2026-04-16T00:25:13.979Z }
+ *                           status: { type: string, example: CANCELLED }
+ *                           finalPrice: { type: number, example: 51375639 }
+ *                           payments:
+ *                             type: array
+ *                             items:
+ *                               type: object
+ *                               properties:
+ *                                 evidence: { type: string, format: uri, nullable: true, example: null }
+ *                                 method: { type: string, enum: [MANUAL, AUTOMATIC], example: MANUAL }
+ *                                 status: { type: string, enum: [PENDING, CONFIRMED, REJECTED], example: PENDING }
+ *                           user:
+ *                             type: object
+ *                             properties:
+ *                               username: { type: string, example: akimmustofa }
+ *                               email: { type: string, example: flazen.edu@gmail.com }
+ *                     meta:
+ *                       type: object
+ *                       properties:
+ *                         page: { type: integer, example: 1 }
+ *                         limit: { type: integer, example: 14 }
+ *                         total: { type: integer, example: 5 }
+ *                         total_page: { type: integer, example: 1 }
+ *
+ *       400:
+ *         description: Validation error - branchId is not valid UUID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: false }
+ *                 message: { type: string, example: branchId is not valid UUID }
+ *
+ *       401:
+ *         description: Unauthorized - No token provided
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: false }
+ *                 message: { type: string, example: No token provided }
+ *
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: false }
+ *                 message: { type: string, example: Internal server error }
+ */

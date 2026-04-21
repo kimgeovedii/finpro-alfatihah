@@ -5,6 +5,7 @@ import { AuthRequest } from "../../../middleware/auth.middleware"
 import { OrderService } from "../services/order.service"
 import { paginationDefault, uuidRegex } from "../../../constants/feature.const"
 import { orderCode } from "../../../constants/business.const"
+import { OrderStatus } from "@prisma/client"
 
 export class OrderController {
     private orderService = new OrderService()
@@ -15,6 +16,23 @@ export class OrderController {
             
             // Service
             const result = await this.orderService.getOrderSummary(userId)
+
+            return sendSuccess(res, result, "Order fetched")
+        } catch (error: any) {
+            next(error)
+        }
+    }
+
+    getTransactionSummaryByBranchId = async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user?.userId 
+            const branchId = req.params?.branchId as string
+
+            // Validate the UUID format
+            if (!uuidRegex.test(branchId)) throw { code: 400, message: 'branchId is not valid UUID' }
+            
+            // Service
+            const result = await this.orderService.getOrderSummaryByBranchId(userId, branchId)
 
             return sendSuccess(res, result, "Order fetched")
         } catch (error: any) {
@@ -48,9 +66,44 @@ export class OrderController {
         }
     }
 
+    getAllTransactionManagementByBranchId = async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            // Route param
+            const branchId = req.params.branchId as string
+
+            // Query param
+            const page = Number(req.query.page) || 1
+            const limit = Number(req.query.limit) || paginationDefault
+            const rawStatus = typeof req.query.status === 'string' ? req.query.status.trim() : null
+
+            // Validate the UUID format
+            if (!uuidRegex.test(branchId)) throw { code: 400, message: 'branchId is not valid UUID' }
+
+            // Validate status 
+            let status: OrderStatus | null = null
+            if (rawStatus && rawStatus !== "ALL") {
+                if (!Object.values(OrderStatus).includes(rawStatus as OrderStatus)) throw { code: 400, message: 'status is not valid' }
+                status = rawStatus as OrderStatus
+            }
+
+            // Service
+            const result = await this.orderService.getAllOrderByBranchId(page, limit, branchId, status)
+
+            return sendSuccess(res, {
+                data: result.data,
+                meta: {
+                    page, limit, total: result.total, total_page: Math.ceil(result.total / limit),
+                },
+            }, "Order fetched")
+        } catch (error: any) {
+            next(error)
+        }
+    }
+
     getOrderDetailByOrderNumber = async (req: AuthRequest, res: Response, next: NextFunction) => {
         try {
             const userId = req.user?.userId 
+            const isAdmin = true // for now
 
             // Route param
             const orderNumber = req.params.orderNumber as string
@@ -59,7 +112,7 @@ export class OrderController {
             if (!orderNumber.startsWith(`${orderCode}-`)) throw { code: 400, message: "Invalid order number format. Must start with 'ORD-'" }    
 
             // Service
-            const result = await this.orderService.getOrderDetailByOrderNumber(userId, orderNumber)
+            const result = await this.orderService.getOrderDetailByOrderNumber(isAdmin ? null : userId, orderNumber)
 
             return sendSuccess(res, result, "Order fetched")
         } catch (error: any) {

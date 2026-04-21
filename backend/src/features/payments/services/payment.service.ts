@@ -3,7 +3,7 @@ import { OrderRepository } from "../repositories/order.repository"
 import { EmployeeRepository } from "../repositories/employee.repository"
 import { PaymentRepository } from "../repositories/payment.repository"
 import { Mailer } from "../../../config/mailer"
-import { getPaymentConfirmationTemplate } from "../views/payment.view"
+import { getPaymentConfirmationTemplate, getPaymentConfirmedTemplate } from "../views/payment.view"
 
 export class PaymentService {
     private orderRepo = new OrderRepository()
@@ -16,7 +16,15 @@ export class PaymentService {
         if (!order) throw { code: 404, message: 'Order not found' }
         
         // Add logic to check expired payment time
-        if (new Date() > new Date(order.paymentDeadline)) throw { code: 422, message: 'Payment deadline has passed' }
+        if (new Date() > new Date(order.paymentDeadline)) {
+            // Repo : update order by order id
+            await this.orderRepo.updateOrderStatusById(orderId, 'CANCELLED')
+
+            // Repo : update payment by order id
+            await this.paymentRepo.updatePaymentStatusById(order.payments[0].id, null, false)
+
+            throw { code: 422, message: 'Payment deadline has passed' }
+        }
 
         // Repo : update payment by order id
         const paymentUpdated = await this.paymentRepo.updatePaymentEvidenceByOrderId(orderId, filePath)
@@ -54,5 +62,37 @@ export class PaymentService {
         }
 
         return payment
+    }
+
+    async putUpdatePaymentStatusById(userId: string, paymentId: string, payload: { isConfirm: boolean }) {
+        // Repo : get current payment to make sure evidence exist
+        const checkPayment = await this.paymentRepo.findById(paymentId)
+        if (checkPayment?.method === "GATEWAY") throw { code: 422, message: 'Only manual payment can be validated' }
+        if (checkPayment?.evidence === null) throw { code: 422, message: 'Evidence not uploaded yet' }
+
+        // Repo : get employee id by user id
+        const employee = await this.employeeRepo.findEmployeeByUserId(userId)
+        if (!employee) throw { code: 404, message: 'Employee not found' }
+        
+        // Repo : update payment status
+        const payment = await this.paymentRepo.updatePaymentStatusById(paymentId, employee?.id, payload.isConfirm)
+        if (!payment) throw { code: 404, message: 'Payment not found' }
+        
+        // Repo : update order by order id
+        const order = await this.orderRepo.updateOrderStatusById(payment.orderId, 'PROCESSING')
+        if (!order) throw { code: 404, message: 'Order not found' }
+
+        // Mailer : broadcast email to all admin store if a payment's evidence has been uploaded
+        const emailHtml = getPaymentConfirmedTemplate({
+            username: payment.order.user.username,
+            orderNumber: payment.order.orderNumber
+        })
+
+        await Mailer.client.sendMail({
+            from: `"Alfatihah Online Grocery" <${process.env.SMTP_USER}>`,
+            to: payment.order.user.email,
+            subject: "Payment Confirmed!",
+            html: emailHtml,
+        })
     }
 }

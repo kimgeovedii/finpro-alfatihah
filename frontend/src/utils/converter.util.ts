@@ -1,5 +1,5 @@
 import { dayOrderRule } from "@/constants/business.const"
-import { Schedule } from "@/types/schedule"
+import { Schedule } from "@/types/schedule.type"
 
 export const formatDate = (isoString: string, withTime: boolean = false): string => {
     const date = new Date(isoString)

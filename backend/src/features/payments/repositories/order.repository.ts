@@ -7,18 +7,20 @@ export class OrderRepository {
       where: { id, status, 
         payments: {
           every: {
-            status: PaymentStatus.PENDING
+            status: PaymentStatus.PENDING, method: "MANUAL"
           }
         } 
       },
       select: {
-        paymentDeadline: true, branchId: true, finalPrice: true
+        paymentDeadline: true, branchId: true, finalPrice: true, payments: {
+          select: { id: true }
+        }
       }
     })
   }
 
   async updateOrderStatusById(id: string, status: OrderStatus) {
-    return await prisma.orders.updateMany({
+    return await prisma.orders.update({
       where: { id },
       data: { status }
     })
