@@ -16,6 +16,7 @@ class OrderRouter {
     private initializeRoutes() {
         this.router.use(authMiddleware)
         this.router.get("/transaction", this.orderController.getAllTransaction)
+        this.router.get("/transaction/management/:branchId", this.orderController.getAllTransactionManagementByBranchId)
         this.router.get("/transaction/:orderNumber", this.orderController.getOrderDetailByOrderNumber)
         this.router.get("/summary", this.orderController.getTransactionSummary)
         this.router.get("/summary/:branchId", this.orderController.getTransactionSummaryByBranchId)

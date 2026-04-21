@@ -10,6 +10,7 @@ import { StockJournalRepository } from "../repositories/stok_journal.repository"
 import { UserRepository } from "../repositories/user.repository"
 import { Mailer } from "../../../config/mailer";
 import { getBranchOrderBroadcastTemplate, getOrderCreatedPaymentTemplate } from "../views/order.view"
+import { OrderStatus } from "@prisma/client"
 
 export class OrderService {
     private orderRepo = new OrderRepository()
@@ -23,6 +24,10 @@ export class OrderService {
 
     async getAllOrders(page: number, limit: number, userId: string, branchId: string | null) {
         return await this.orderRepo.findAllOrders(page, limit, userId, branchId)
+    }
+
+    async getAllOrderByBranchId(page: number, limit: number, branchId: string, status: OrderStatus | null) {
+        return await this.orderRepo.findAllOrdersByBranchId(page, limit, branchId, status)
     }
 
     async getOrderDetailByOrderNumber(userId: string, orderNumber: string) {

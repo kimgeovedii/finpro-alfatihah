@@ -5,6 +5,7 @@ import { AuthRequest } from "../../../middleware/auth.middleware"
 import { OrderService } from "../services/order.service"
 import { paginationDefault, uuidRegex } from "../../../constants/feature.const"
 import { orderCode } from "../../../constants/business.const"
+import { OrderStatus } from "@prisma/client"
 
 export class OrderController {
     private orderService = new OrderService()
@@ -53,6 +54,40 @@ export class OrderController {
             
             // Service
             const result = await this.orderService.getAllOrders(page, limit, userId, branchId)
+
+            return sendSuccess(res, {
+                data: result.data,
+                meta: {
+                    page, limit, total: result.total, total_page: Math.ceil(result.total / limit),
+                },
+            }, "Order fetched")
+        } catch (error: any) {
+            next(error)
+        }
+    }
+
+    getAllTransactionManagementByBranchId = async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            // Route param
+            const branchId = req.params.branchId as string
+
+            // Query param
+            const page = Number(req.query.page) || 1
+            const limit = Number(req.query.limit) || paginationDefault
+            const rawStatus = typeof req.query.status === 'string' ? req.query.status.trim() : null
+
+            // Validate the UUID format
+            if (!uuidRegex.test(branchId)) throw { code: 400, message: 'branchId is not valid UUID' }
+
+            // Validate status 
+            let status: OrderStatus | null = null
+            if (rawStatus && rawStatus !== "ALL") {
+                if (!Object.values(OrderStatus).includes(rawStatus as OrderStatus)) throw { code: 400, message: 'status is not valid' }
+                status = rawStatus as OrderStatus
+            }
+
+            // Service
+            const result = await this.orderService.getAllOrderByBranchId(page, limit, branchId, status)
 
             return sendSuccess(res, {
                 data: result.data,

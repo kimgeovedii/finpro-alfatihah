@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { OrderTableStatus, statusColorMap } from "@/constants/business.const"
 import { Badge } from "@/components/ui/badge"
 import { formatDate } from "@/utils/converter.util"
+import { BanknotesIcon } from "@heroicons/react/24/outline"
 
 export type OrderTableItem = {
     id: string
@@ -82,7 +83,7 @@ export const OrderTableSection: React.FC<Props> = ({ orders, meta, isLoading, on
                     ))
                 }
             </div>
-            <Table>
+            <Table className="table-center">
                 <TableHeader>
                     <TableRow className="uppercase text-xs tracking-wider text-slate-400">
                         <TableHead className="font-semibold">Order ID</TableHead>
@@ -90,18 +91,19 @@ export const OrderTableSection: React.FC<Props> = ({ orders, meta, isLoading, on
                         <TableHead className="font-semibold">Date</TableHead>
                         <TableHead className="font-semibold">Total Price</TableHead>
                         <TableHead className="font-semibold">Status</TableHead>
-                        <TableHead className="font-semibold text-right">Actions</TableHead>
+                        <TableHead className="font-semibold">Payment</TableHead>
+                        <TableHead className="font-semibold">Actions</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {
                         isLoading ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="text-center text-slate-400 py-10">Loading...</TableCell>
+                                <TableCell colSpan={6} className="text-slate-400 py-10">Loading...</TableCell>
                             </TableRow>
                         ) : filteredOrders.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="text-center text-slate-400 py-10">No orders found</TableCell>
+                                <TableCell colSpan={6} className="text-slate-400 py-10">No orders found</TableCell>
                             </TableRow>
                         ) : (
                             filteredOrders.map(dt => {
@@ -121,7 +123,10 @@ export const OrderTableSection: React.FC<Props> = ({ orders, meta, isLoading, on
                                         <TableCell>
                                             <Badge className={`capitalize font-semibold ${statusClass}`}>{finalStatus}</Badge>
                                         </TableCell>
-                                        <TableCell className="text-right">
+                                        <TableCell>
+                                            <button className="text-teal-700 font-semibold text-sm hover:underline border-teal-700 border-1 rounded-lg p-2 hover:bg-teal-700 hover:text-white cursor-pointer"><BanknotesIcon className="w-5 h-5"/></button>
+                                        </TableCell>
+                                        <TableCell>
                                             <button className="text-teal-700 font-semibold text-sm hover:underline">View Details</button>
                                         </TableCell>
                                     </TableRow>

@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { OrderStatus, Prisma } from "@prisma/client";
 import { prisma } from "../../../config/prisma";
 import { orderCode, paymentDeadline } from "../../../constants/business.const";
 
@@ -201,6 +201,39 @@ export class OrderRepository {
     })
 
     const data = branchId ? (mapped[0] ?? null) : mapped
+
+    return { data, total }
+  }
+
+  async findAllOrdersByBranchId(page: number, limit: number, branchId: string, status: OrderStatus | null) {
+    const skip = (page - 1) * limit
+    const where: Prisma.ordersWhereInput = { 
+      branchId,
+      ...(status && { status })
+    }
+
+    const [data, total] = await Promise.all([
+      prisma.orders.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true, orderNumber: true, createdAt: true, status: true, totalPrice: true, finalPrice: true, 
+          payments: {
+            select: { 
+              id: true, evidence: true, method: true, status: true 
+            }
+          },
+          user: {
+            select: {
+              username: true, email: true
+            }
+          }
+        }
+      }),
+      prisma.orders.count({ where })
+    ])
 
     return { data, total }
   }

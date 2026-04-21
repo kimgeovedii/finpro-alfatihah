@@ -170,3 +170,7 @@ input[type=number] {
 .swal2-popup button {
   border-radius: 20px;
 }
+
+table.table-center thead tr th, table.table-center tbody tr th, table.table-center tbody tr td {
+  text-align: center !important;
+}
