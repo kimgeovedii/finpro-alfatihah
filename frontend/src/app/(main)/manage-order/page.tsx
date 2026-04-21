@@ -1,5 +1,5 @@
 'use client'
-import { OrderTableStatus } from "@/constants/business.const"
+import { OrderStatus } from "@/constants/business.const"
 import { OrderTableItem, OrderTableSection } from "@/features/order/components/OrderManagementTable"
 import { OrderSummaryByBranchCard } from "@/features/order/components/OrderSummaryByBranchCard"
 import { useOrderManagement, useOrderSummaryByBranchId } from "@/features/order/hooks/useOrder"
@@ -16,7 +16,7 @@ export default function ManageOrdersPage() {
         customerEmail: o.user.email,
         createdAt: o.createdAt,
         finalPrice: o.finalPrice,
-        status: o.status as OrderTableStatus,
+        status: o.status as OrderStatus,
     }))
 
     return (

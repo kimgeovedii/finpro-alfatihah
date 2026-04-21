@@ -3,7 +3,7 @@ import { useState } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { OrderTableStatus, statusColorMap } from "@/constants/business.const"
+import { OrderStatus, statusColorMap } from "@/constants/business.const"
 import { Badge } from "@/components/ui/badge"
 import { formatDate } from "@/utils/converter.util"
 import { BanknotesIcon } from "@heroicons/react/24/outline"
@@ -15,7 +15,7 @@ export type OrderTableItem = {
     customerEmail: string
     createdAt: string
     finalPrice: number
-    status: OrderTableStatus
+    status: OrderStatus
 }
 
 export type OrderTableMeta = {
@@ -29,13 +29,13 @@ type Props = {
     orders: OrderTableItem[]
     meta: OrderTableMeta | null
     isLoading: boolean
-    activeStatus: OrderTableStatus | "ALL"
+    activeStatus: OrderStatus | "ALL"
     onPageChange: (page: number) => void
-    onStatusChange: (status: OrderTableStatus | "ALL") => void
+    onStatusChange: (status: OrderStatus | "ALL") => void
     onSearch?: (query: string) => void
 }
 
-const STATUS_FILTERS: { label: string; value: OrderTableStatus | "ALL" }[] = [
+const STATUS_FILTERS: { label: string; value: OrderStatus | "ALL" }[] = [
     { label: "All Orders", value: "ALL" },
     { label: "Waiting Payment", value: "WAITING_PAYMENT" },
     { label: "Processing", value: "PROCESSING" },

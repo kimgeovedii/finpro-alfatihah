@@ -16,6 +16,7 @@ class PaymentRouter {
 
     private initializeRoutes() {
         this.router.use(authMiddleware)
+        
         this.router.post("/manual/evidence/:orderId", memoryUploader().single("img"), this.paymentController.postAddEvidenceManualPayment)
     }
 }

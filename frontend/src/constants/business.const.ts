@@ -1,5 +1,5 @@
 export const dayOrderRule = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
-export type OrderTableStatus = "WAITING_PAYMENT" | "WAITING_PAYMENT_CONFIRMATION" | "PROCESSING" | "SHIPPED" | "CONFIRMED" | "CANCELLED"
+export type OrderStatus = "WAITING_PAYMENT" | "WAITING_PAYMENT_CONFIRMATION" | "PROCESSING" | "SHIPPED" | "CONFIRMED" | "CANCELLED"
 export const statusColorMap: Record<string, string> = {
     CANCELLED: "bg-red-400",
     WAITING_PAYMENT: "bg-orange-400",

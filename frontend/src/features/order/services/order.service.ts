@@ -1,5 +1,6 @@
 import { create } from "zustand"
-import { orderRepository, OrderSummaryByBranchIdData, OrderSummaryData } from "../repositories/order.repository"
+import { orderRepository } from "../repositories/order.repository"
+import { OrderSummaryByBranchIdData, OrderSummaryData } from "../repositories/order.type"
 
 type OrderState = {
     summary: OrderSummaryData | null

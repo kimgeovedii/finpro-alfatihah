@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react"
-import { orderRepository, OrderData, ManagementOrderResponse, ManagementOrderItem } from "../repositories/order.repository"
+import { orderRepository } from "../repositories/order.repository"
 import { useOrderService } from "../services/order.service"
-import { PaginationMeta } from "@/types/global"
-import { OrderTableStatus } from "@/constants/business.const"
+import { PaginationMeta } from "@/types/global.type"
+import { OrderStatus } from "@/constants/business.const"
+import { ManagementOrderItem, ManagementOrderResponse, OrderData } from "../repositories/order.type"
 
 export const useOrderSummary = () => {
     const { summary, fetchOrderSummary, isLoadingSummary, error } = useOrderService()
@@ -56,10 +57,10 @@ export const useOrderManagement = (branchId: string) => {
     const [orders, setOrders] = useState<ManagementOrderItem[]>([])
     const [meta, setMeta] = useState<ManagementOrderResponse["meta"] | null>(null)
     const [isLoading, setIsLoading] = useState(false)
-    const [status, setStatus] = useState<OrderTableStatus | "ALL">("ALL")
+    const [status, setStatus] = useState<OrderStatus | "ALL">("ALL")
     const [page, setPage] = useState(1)
 
-    const fetchOrders = async (nextPage: number, nextStatus: OrderTableStatus | "ALL") => {
+    const fetchOrders = async (nextPage: number, nextStatus: OrderStatus | "ALL") => {
         setIsLoading(true)
         try {
             const res = await orderRepository.getAllOrdersByBranchId(nextPage, branchId, nextStatus)
@@ -77,7 +78,7 @@ export const useOrderManagement = (branchId: string) => {
     }, [page, status])
 
     const handlePageChange = (nextPage: number) => setPage(nextPage)
-    const handleStatusChange = (nextStatus: OrderTableStatus | "ALL") => {
+    const handleStatusChange = (nextStatus: OrderStatus | "ALL") => {
         setPage(1)
         setStatus(nextStatus)
     }
