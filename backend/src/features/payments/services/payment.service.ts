@@ -63,9 +63,11 @@ export class PaymentService {
         
         // Repo : update payment status
         const payment = await this.paymentRepo.updatePaymentStatusById(paymentId, employee?.id, payload.isConfirm)
+        if (!payment) throw { code: 404, message: 'Payment not found' }
         
         // Repo : update order by order id
-        await this.orderRepo.updateOrderStatusById(payment.orderId, 'PROCESSING')
+        const order = await this.orderRepo.updateOrderStatusById(payment.orderId, 'PROCESSING')
+        if (!order) throw { code: 404, message: 'Order not found' }
 
         // Mailer : broadcast email to all admin store if a payment's evidence has been uploaded
         const emailHtml = getPaymentConfirmedTemplate({
