@@ -29,7 +29,9 @@ type Props = {
     orders: OrderTableItem[]
     meta: OrderTableMeta | null
     isLoading: boolean
+    activeStatus: OrderTableStatus | "ALL"
     onPageChange: (page: number) => void
+    onStatusChange: (status: OrderTableStatus | "ALL") => void
     onSearch?: (query: string) => void
 }
 
@@ -42,16 +44,14 @@ const STATUS_FILTERS: { label: string; value: OrderTableStatus | "ALL" }[] = [
     { label: "Cancelled", value: "CANCELLED" },
 ]
 
-export const OrderTableSection: React.FC<Props> = ({ orders, meta, isLoading, onPageChange, onSearch }) => {
-    const [activeStatus, setActiveStatus] = useState<OrderTableStatus | "ALL">("ALL")
+export const OrderTableSection: React.FC<Props> = ({ orders, meta, isLoading, onPageChange, onSearch, activeStatus, onStatusChange }) => {
     const [search, setSearch] = useState("")
-
-    const handleStatusChange = (status: OrderTableStatus | "ALL") => setActiveStatus(status)
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearch(e.target.value)
         onSearch?.(e.target.value)
     }
 
+    // Filtering
     const filteredOrders = orders.filter((o) => {
         const matchStatus = activeStatus === "ALL" || o.status === activeStatus
         const matchSearch = search === "" || o.orderNumber.toLowerCase().includes(search.toLowerCase()) || o.customerName.toLowerCase().includes(search.toLowerCase())
@@ -59,6 +59,7 @@ export const OrderTableSection: React.FC<Props> = ({ orders, meta, isLoading, on
         return matchStatus && matchSearch
     })
 
+    // Pagination 
     const currentPage = meta?.page ?? 1
     const totalPages = meta?.total_page ?? 1
     const totalOrders = meta?.total ?? 0
@@ -76,10 +77,10 @@ export const OrderTableSection: React.FC<Props> = ({ orders, meta, isLoading, on
             <div className="flex gap-2 mb-5 flex-wrap">
                 {
                     STATUS_FILTERS.map((f) => (
-                        <button key={f.value} onClick={() => handleStatusChange(f.value)} className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
+                        <Button key={f.value} onClick={() => onStatusChange(f.value)} className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
                             activeStatus === f.value ? "bg-teal-700 text-white" : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"}`}>
                             {f.label}
-                        </button>
+                        </Button>
                     ))
                 }
             </div>
@@ -124,10 +125,10 @@ export const OrderTableSection: React.FC<Props> = ({ orders, meta, isLoading, on
                                             <Badge className={`capitalize font-semibold ${statusClass}`}>{finalStatus}</Badge>
                                         </TableCell>
                                         <TableCell>
-                                            <button className="text-teal-700 font-semibold text-sm hover:underline border-teal-700 border-1 rounded-lg p-2 hover:bg-teal-700 hover:text-white cursor-pointer"><BanknotesIcon className="w-5 h-5"/></button>
+                                            <Button className="bg-transparent text-teal-700 font-semibold text-sm hover:underline border-teal-700 border-1 rounded-lg p-2 hover:bg-teal-700 hover:text-white cursor-pointer"><BanknotesIcon className="w-5 h-5"/></Button>
                                         </TableCell>
                                         <TableCell>
-                                            <button className="text-teal-700 font-semibold text-sm hover:underline">View Details</button>
+                                            <Button className="bg-transparent text-teal-700 font-semibold text-sm hover:underline">View Details</Button>
                                         </TableCell>
                                     </TableRow>
                                 )

@@ -734,7 +734,6 @@
  *                           orderNumber: { type: string, example: ORD-1776299113950 }
  *                           createdAt: { type: string, format: date-time, example: 2026-04-16T00:25:13.979Z }
  *                           status: { type: string, example: CANCELLED }
- *                           totalPrice: { type: number, example: 51375639 }
  *                           finalPrice: { type: number, example: 51375639 }
  *                           payments:
  *                             type: array

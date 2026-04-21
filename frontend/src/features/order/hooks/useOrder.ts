@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react"
-import { orderRepository, OrderData } from "../repositories/order.repository"
+import { orderRepository, OrderData, ManagementOrderResponse, ManagementOrderItem } from "../repositories/order.repository"
 import { useOrderService } from "../services/order.service"
 import { PaginationMeta } from "@/types/global"
+import { OrderTableStatus } from "@/constants/business.const"
 
 export const useOrderSummary = () => {
     const { summary, fetchOrderSummary, isLoadingSummary, error } = useOrderService()
@@ -49,6 +50,39 @@ export const useAllOrderData = () => {
     }, [])
 
     return { orders, meta, isLoading, fetchAllOrders }
+}
+
+export const useOrderManagement = (branchId: string) => {
+    const [orders, setOrders] = useState<ManagementOrderItem[]>([])
+    const [meta, setMeta] = useState<ManagementOrderResponse["meta"] | null>(null)
+    const [isLoading, setIsLoading] = useState(false)
+    const [status, setStatus] = useState<OrderTableStatus | "ALL">("ALL")
+    const [page, setPage] = useState(1)
+
+    const fetchOrders = async (nextPage: number, nextStatus: OrderTableStatus | "ALL") => {
+        setIsLoading(true)
+        try {
+            const res = await orderRepository.getAllOrdersByBranchId(nextPage, branchId, nextStatus)
+            setOrders(res.data)
+            setMeta(res.meta)
+        } catch (err) {
+            console.error("Failed to fetch management orders", err)
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    useEffect(() => {
+        fetchOrders(page, status)
+    }, [page, status])
+
+    const handlePageChange = (nextPage: number) => setPage(nextPage)
+    const handleStatusChange = (nextStatus: OrderTableStatus | "ALL") => {
+        setPage(1)
+        setStatus(nextStatus)
+    }
+
+    return { orders, meta, isLoading, status, page, handlePageChange, handleStatusChange }
 }
 
 export const useOrderDetailData = (orderNumber: string) => {

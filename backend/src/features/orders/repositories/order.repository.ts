@@ -219,7 +219,7 @@ export class OrderRepository {
         take: limit,
         orderBy: { createdAt: 'desc' },
         select: {
-          id: true, orderNumber: true, createdAt: true, status: true, totalPrice: true, finalPrice: true, 
+          id: true, orderNumber: true, createdAt: true, status: true, finalPrice: true, 
           payments: {
             select: { 
               id: true, evidence: true, method: true, status: true 
