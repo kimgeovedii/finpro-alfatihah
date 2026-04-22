@@ -4,6 +4,8 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Check, Home, Package, Truck } from "lucide-react"
 import { PaymentData } from "@/types/payment.type"
+import { Button } from "@/components/ui/button"
+import { ArchiveBoxIcon } from "@heroicons/react/24/outline"
 
 type OrderMatchingProduct = {
     productName: string
@@ -27,9 +29,10 @@ type Props = {
     shippingCost: number 
     finalPrice: number
     onSearch?: (query: string) => void
+    onShipping: (orderNumber: string) => void
 }
 
-export const OrderMatchingTable: React.FC<Props> = ({ orderNumber, items, isLoading, payments, onSearch, shippingCost, finalPrice }) => {
+export const OrderMatchingTable: React.FC<Props> = ({ orderNumber, items, isLoading, payments, onSearch, shippingCost, finalPrice, onShipping }) => {
     const [search, setSearch] = useState("")
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -139,6 +142,7 @@ export const OrderMatchingTable: React.FC<Props> = ({ orderNumber, items, isLoad
                                     }
                                 </TableBody>
                             </Table>
+                            <Button className="mt-5 w-full py-5 bg-emerald-600" onClick={(e) => onShipping(orderNumber)}><ArchiveBoxIcon/> Shipping Now!</Button>
                         </div>
                     </div>
                 </div>

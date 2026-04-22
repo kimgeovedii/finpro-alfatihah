@@ -5,12 +5,35 @@ import { useParams } from "next/navigation"
 import { ArrowLeftIcon } from "@heroicons/react/24/outline"
 import { Button } from "@/components/ui/button"
 import { OrderMatchingTable } from "@/features/order/components/OrderMatchingTable"
-import { useOrderDetailData } from "@/features/order/hooks/useOrder"
+import { useOrderDetailData, useUpdateOrderStatusById } from "@/features/order/hooks/useOrder"
+import Swal from "sweetalert2"
 
 export default function ManageOrdersDetailPage() {
   const params = useParams()
   const orderNumber = params?.orderNumber as string
   const { order, isLoading, fetchOrderDetail } = useOrderDetailData(orderNumber)
+  const { updateOrder, isUpdatingOrder } = useUpdateOrderStatusById()
+
+  const handleShippingOrder = async (orderNumber: string) => {
+    const confirm = await Swal.fire({
+        title: "Order Shipping",
+        text: `Are you sure want to shipping this order?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, proceed",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#2d766f",
+    })
+    if (!confirm.isConfirmed) return
+
+    const { success, message } = await updateOrder(orderNumber)
+    await Swal.fire({
+      title: success ? "Order shipped!" : "Opps!",
+      text: message,
+      icon: success ? "success" : "error",
+      confirmButtonColor: "#10b981",
+    })
+  }
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto">
@@ -41,6 +64,7 @@ export default function ManageOrdersDetailPage() {
           finalPrice={order?.finalPrice ?? 0}
           isLoading={isLoading}
           payments={order?.payments ?? []}
+          onShipping={handleShippingOrder}
         />
       </div>
     </div>

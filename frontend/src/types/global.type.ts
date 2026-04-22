@@ -12,3 +12,8 @@ export type StatusInfo = {
     icon: any
     isLast?: boolean
 }
+
+export type CommandResult = {
+    success: boolean
+    message: string
+}

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { orderRepository } from "../repositories/order.repository"
 import { useOrderService } from "../services/order.service"
-import { PaginationMeta } from "@/types/global.type"
+import { CommandResult, PaginationMeta } from "@/types/global.type"
 import { OrderStatus } from "@/constants/business.const"
 import { ManagementOrderItem, ManagementOrderResponse, OrderData } from "../repositories/order.type"
 
@@ -117,4 +117,29 @@ export const useOrderDetailData = (orderNumber: string) => {
     }, [])
 
     return { order, isLoading, fetchOrderDetail }
+}
+  
+export const useUpdateOrderStatusById = () => {
+    const [isUpdatingOrder, setIsUpdatingOrder] = useState(false)
+    const [errorUpdateOrder, setError] = useState<string | null>(null)
+  
+    const updateOrder = async (orderNumber: string): Promise<CommandResult> => {
+        setIsUpdatingOrder(true)
+        setError(null)
+    
+        try {
+            const res = await orderRepository.putUpdateOrderStatusById(orderNumber)
+    
+            return { success: true, message: res?.message || "Order updated successfully" }
+        } catch (err: any) {
+            const message = err?.message || "Failed to update order"
+            setError(message)
+    
+            return { success: false, message }
+        } finally {
+            setIsUpdatingOrder(false)
+        }
+    }
+  
+    return { updateOrder, isUpdatingOrder, errorUpdateOrder }
 }

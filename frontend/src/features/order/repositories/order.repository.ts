@@ -22,5 +22,8 @@ export const orderRepository = {
     },
     async getOrderDetailByOrderNumber(orderNumber: string): Promise<OrderData> {
         return await apiFetch<OrderData>(`/orders/transaction/${orderNumber}`, "get")
+    },
+    async putUpdateOrderStatusById(orderNumber: string): Promise<{ message: string }> {
+        return await apiFetch<{ message: string }>(`/orders/shipping/${orderNumber}`, "post")
     }
 }

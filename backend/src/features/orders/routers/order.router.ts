@@ -28,6 +28,7 @@ class OrderRouter {
         this.router.use("/summary", summaryRouter)
 
         this.router.post("/checkout", this.orderController.postAddCheckoutOrder)
+        this.router.post("/shipping/:orderNumber", this.orderController.postAddShipping)
         this.router.delete("/:orderId", this.orderController.deleteOrderById)
     }
 }

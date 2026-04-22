@@ -137,3 +137,39 @@ export const getOrderCreatedPaymentTemplate = (data: OrderCreated, isManual: boo
         </html>
     `
 }
+
+type OrderShippedPayload = {
+    username: string | null
+    orderNumber: string
+}
+
+export const getOrderShippedTemplate = (data: OrderShippedPayload) => {
+    return `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            ${mailTemplateStyle()}
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>Order shipped! 🎉🎉🎉</h1>
+                </div>
+                <div class="content">
+                    <p>Hello <strong>${data.username}</strong>, your order has been shipped. Please wait while our courier sending your order. Thanks for your trust with Alfatihah</p>
+                    <div class="context-box" style="margin-bottom:16px;">
+                        <p style="margin:0 0 6px 0;"><strong>Order ID:</strong> ${data.orderNumber}</p>
+                    </div>
+                    <p>
+                        Best regards,<br/>
+                        <strong>Alfatihah</strong>
+                    </p>
+                </div>
+                <div class="footer">
+                    © ${new Date().getFullYear()} Alfatihah. All rights reserved.
+                </div>
+            </div>
+        </body>
+        </html>
+    `
+}

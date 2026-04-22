@@ -192,6 +192,48 @@ export class OrderRepository {
     }
   }
 
+  async isMatchingQuantityStock(orderNumber: string) {
+    const items = await prisma.orders.findFirst({
+      where: { orderNumber },
+      select: {
+        items: {
+          select: {
+            quantity: true, product: {
+              select: { currentStock: true }
+            }
+          }
+        }
+      }
+    })
+
+    if (!items) return false
+
+    return items.items.every(dt => dt.quantity <= (dt.product?.currentStock ?? 0))
+  }
+
+  async updateOrderStatusById(orderNumber: string, status: OrderStatus) {
+    return await prisma.$transaction(async (tx) => {
+      await tx.orders.updateMany({
+        where: { orderNumber },
+        data: { status }
+      })
+  
+      const order = await tx.orders.findFirst({
+        where: { orderNumber },
+        orderBy: { createdAt: 'desc' }, 
+        select: {
+          id: true, user: {
+            select: {
+              id: true, username: true, email: true
+            }
+          }
+        }
+      })
+  
+      return order
+    })
+  }
+
   async findAllOrders(page: number, limit: number, userId: string, branchId: string | null, orderNumber: string | null, dateStart: string | null, dateEnd: string | null) {
     const skip = (page - 1) * limit
 

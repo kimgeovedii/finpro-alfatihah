@@ -9,7 +9,7 @@ import { PaymentRepository } from "../repositories/payment.repository"
 import { StockJournalRepository } from "../repositories/stok_journal.repository"
 import { UserRepository } from "../repositories/user.repository"
 import { Mailer } from "../../../config/mailer";
-import { getBranchOrderBroadcastTemplate, getOrderCreatedPaymentTemplate } from "../views/order.view"
+import { getBranchOrderBroadcastTemplate, getOrderCreatedPaymentTemplate, getOrderShippedTemplate } from "../views/order.view"
 import { OrderStatus } from "@prisma/client"
 
 export class OrderService {
@@ -138,6 +138,29 @@ export class OrderService {
         })
 
         return { orderId: order.id, paymentId: payment.id }
+    }
+
+    async addShipping(orderNumber: string) {
+        // Repo : check if all stock product is enough to be shipped
+        const isReady = await this.orderRepo.isMatchingQuantityStock(orderNumber)
+        if (!isReady) throw { code: 422, message: 'Your stock is not ready yet to be shipped' }
+
+        // Repo : update order status
+        const order = await this.orderRepo.updateOrderStatusById(orderNumber, 'SHIPPED')
+        if (!order) throw { code: 404, message: 'Order not found' }
+        
+        // Mailer : inform user that an order has been shipped
+        const emailHtml = getOrderShippedTemplate({
+            username: order.user?.username ?? "",
+            orderNumber: orderNumber
+        })
+
+        await Mailer.client.sendMail({
+            from: `"Alfatihah Online Grocery" <${process.env.SMTP_USER}>`,
+            to: order.user?.email,
+            subject: "Order is on the way",
+            html: emailHtml,
+        })
     }
 
     async deleteOrderById(userId: string, orderId: string) {
