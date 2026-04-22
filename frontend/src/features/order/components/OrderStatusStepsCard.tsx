@@ -1,4 +1,5 @@
 import React from "react"
+import { OrderConfirmButton } from "./OrderConfirmButton"
 
 export type StatusInfo = {
     key: string 
@@ -10,9 +11,11 @@ export type StatusInfo = {
 type Props = {
     statusSteps: StatusInfo[]
     currentStatus: string
+    orderNumber: string
+    onConfirm: (orderNumber: string) => void
 }
 
-export const OrderStatusStepsCard: React.FC<Props> = ({ statusSteps, currentStatus }) => {
+export const OrderStatusStepsCard: React.FC<Props> = ({ statusSteps, currentStatus, onConfirm, orderNumber }) => {
     const getStepState = (stepKey: string, currentStatus: string): "done" | "active" | "upcoming" => {
         const currentIdx = statusSteps.findIndex(s => s.key === currentStatus)
         const stepIdx = statusSteps.findIndex(s => s.key === stepKey)
@@ -57,6 +60,7 @@ export const OrderStatusStepsCard: React.FC<Props> = ({ statusSteps, currentStat
                     })
                 }
             </div>
+            <OrderConfirmButton orderNumber={orderNumber} onConfirm={onConfirm}/>
         </div>
     )
 }

@@ -168,3 +168,28 @@ export const useCancelOrderStatusById = () => {
   
     return { cancelOrder, isCancellingOrder, errorCancelOrder }
 }
+
+export const useConfirmOrderStatusById = () => {
+    const [isConfirmingOrder, setIsConfirmingOrder] = useState(false)
+    const [errorConfirmOrder, setError] = useState<string | null>(null)
+  
+    const confirmOrder = async (orderNumber: string): Promise<CommandResult> => {
+        setIsConfirmingOrder(true)
+        setError(null)
+    
+        try {
+            const res = await orderRepository.postConfirmOrderStatusById(orderNumber)
+    
+            return { success: true, message: res?.message || "Order confirm successfully" }
+        } catch (err: any) {
+            const message = err?.message || "Failed to confirm order"
+            setError(message)
+    
+            return { success: false, message }
+        } finally {
+            setIsConfirmingOrder(false)
+        }
+    }
+  
+    return { confirmOrder, isConfirmingOrder, errorConfirmOrder }
+}

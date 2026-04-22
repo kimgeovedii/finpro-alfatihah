@@ -13,6 +13,7 @@ import { getBranchOrderBroadcastTemplate, getOrderCreatedPaymentTemplate } from 
 import { OrderStatus, UserRole } from "@prisma/client"
 import { getOrderMailTemplate } from "../../../utils/template"
 import { orderAutoConfirmLimitHour } from "../../../constants/business.const"
+import { EmployeeRepository } from "../repositories/employee.repository"
 
 export class OrderService {
     private orderRepo = new OrderRepository()
@@ -23,6 +24,7 @@ export class OrderService {
     private branchInventoryRepo = new BranchInventoryRepository()
     private paymentRepo = new PaymentRepository()
     private userRepo = new UserRepository()
+    private employeeRepo = new EmployeeRepository()
 
     async getAllOrders(page: number, limit: number, userId: string, branchId: string | null, orderNumber: string | null, dateStart: string | null, dateEnd: string | null) {
         return await this.orderRepo.findAllOrders(page, limit, userId, branchId, orderNumber, dateStart, dateEnd)
@@ -229,6 +231,48 @@ export class OrderService {
                 subject: "Order is cancelled",
                 html: emailHtml,
             })
+        }
+    }
+
+    async addConfirmOrder(userId: string, orderNumber: string) {
+        // Repo : get order item
+        const order = await this.orderRepo.findOrderById(orderNumber, "orderNumber")
+        if (!order) throw { code: 404, message: 'Order not found' }
+
+        // Check if this order belongs to user
+        if (order.userId !== userId) throw { code: 403, message: 'Forbidden access to this order' }
+
+        // Prevent double confirmed order
+        if (order.status === "CONFIRMED") throw { code: 422, message: 'Order already confirmed' }
+
+        // Make sure only order who still shipped can be confirmed
+        if (order.status !== "SHIPPED") throw { code: 422, message: 'Only order who still in shipped can be cancelled' }
+
+        // Repo : update order status
+        const orderNew = await this.orderRepo.updateOrderStatusById(orderNumber, 'CONFIRMED')
+        if (!orderNew) throw { code: 404, message: 'Order not found' }
+
+        // Repo : get employee by branch id 
+        const employees = await this.employeeRepo.findEmployeeByBranchId(order.branchId)
+
+        if (employees !== null) {
+            // Mailer : broadcast email to all admin store if a payment's evidence has been uploaded
+            for (const dt of employees) {
+                // Mailer : inform user that an order has been shipped
+                const emailHtml = getOrderMailTemplate({
+                    username: dt.user?.username ?? "",
+                    orderNumber: orderNumber,
+                    title: 'Order confirmed! 🎉',
+                    content: "An order has been delivered to our beloved customer. Congrats!"
+                })
+
+                await Mailer.client.sendMail({
+                    from: `"Alfatihah Online Grocery" <${process.env.SMTP_USER}>`,
+                    to: dt.user?.email,
+                    subject: "Order is confirmed",
+                    html: emailHtml,
+                })
+            }
         }
     }
 

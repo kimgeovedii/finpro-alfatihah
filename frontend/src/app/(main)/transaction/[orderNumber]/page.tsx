@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { Check, Package, Truck, Home } from "lucide-react"
 import { OrderStatusStepsCard } from '@/features/order/components/OrderStatusStepsCard';
-import { useCancelOrderStatusById, useOrderDetailData } from '@/features/order/hooks/useOrder';
+import { useCancelOrderStatusById, useConfirmOrderStatusById, useOrderDetailData } from '@/features/order/hooks/useOrder';
 import { formatListSchedule } from '@/utils/converter.util';
 import Swal from 'sweetalert2';
 
@@ -17,7 +17,7 @@ export default function TransactionDetailPage() {
   const params = useParams()
   const orderNumber = params?.orderNumber as string
   const { order, isLoading, fetchOrderDetail } = useOrderDetailData(orderNumber)
-
+  const { confirmOrder, isConfirmingOrder } = useConfirmOrderStatusById()
   const { cancelOrder, isCancellingOrder } = useCancelOrderStatusById()
 
   const handleCancelOrder = async (orderNumber: string) => {
@@ -35,6 +35,27 @@ export default function TransactionDetailPage() {
     const { success, message } = await cancelOrder(orderNumber)
     await Swal.fire({
       title: success ? "Order cancel!" : "Opps!",
+      text: message,
+      icon: success ? "success" : "error",
+      confirmButtonColor: "#10b981",
+    })
+  }
+
+  const handleConfirmOrder = async (orderNumber: string) => {
+    const confirm = await Swal.fire({
+      title: "Order Confirmation",
+      text: `Are you sure want to confirm this order?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, proceed",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#2d766f",
+    })
+    if (!confirm.isConfirmed) return 
+
+    const { success, message } = await confirmOrder(orderNumber)
+    await Swal.fire({
+      title: success ? "Order confirm!" : "Opps!",
       text: message,
       icon: success ? "success" : "error",
       confirmButtonColor: "#10b981",
@@ -81,7 +102,12 @@ export default function TransactionDetailPage() {
       </div>
       <div className='flex w-full gap-5'>
         <div className='flex-1 flex flex-col space-y-5'>
-          <OrderStatusStepsCard statusSteps={statusSteps} currentStatus={order?.status && order?.status === "WAITING_PAYMENT_CONFIRMATION" ? "WAITING_PAYMENT" : order?.status ?? ""}/>
+          <OrderStatusStepsCard 
+            statusSteps={statusSteps} 
+            currentStatus={order?.status && order?.status === "WAITING_PAYMENT_CONFIRMATION" ? "WAITING_PAYMENT" : order?.status ?? ""}
+            orderNumber={orderNumber}
+            onConfirm={handleConfirmOrder}
+          />
           <OrderDetailBranchCard
             branch={{
               name: order?.branch?.storeName ?? "-",

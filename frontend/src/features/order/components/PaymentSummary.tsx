@@ -45,7 +45,7 @@ export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, t
                 { status === 'WAITING_PAYMENT' && <OrderCancelButton orderNumber={orderNumber} onCancel={onCancel}/> }
             </div>
             <div className="flex gap-5 w-full mt-3">
-                { status !== "WAITING_PAYMENT" && status !== "WAITING_PAYMENT_CONFIRMATION" && <Button variant='outline' className="flex-1 h-10 bg-white hover:bg-[#00767a] text-teal-700 hover:text-white font-bold rounded-[8px] shadow-lg border-teal-700 border-1 transition-all duration-300 active:scale-[0.97] disabled:opacity-70"><Receipt/>Download Invoice</Button> }
+                { status && ["SHIPPED","CONFIRMED"].includes(status) && <Button variant='outline' className="flex-1 h-10 bg-white hover:bg-[#00767a] text-teal-700 hover:text-white font-bold rounded-[8px] shadow-lg border-teal-700 border-1 transition-all duration-300 active:scale-[0.97] disabled:opacity-70"><Receipt/>Download Invoice</Button> }
                 <Button className="flex-1 h-10 bg-primary-teal hover:bg-[#00767a] text-white font-bold rounded-[8px] shadow-lg shadow-primary-teal/20 transition-all duration-300 active:scale-[0.97] disabled:opacity-70"><Headset/> Help Center</Button>
             </div>
         </div>

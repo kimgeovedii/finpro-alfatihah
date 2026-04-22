@@ -178,4 +178,23 @@ export class OrderController {
             next(error)
         }
     }
+
+    postConfirmOrder = async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user?.userId
+
+            // Route param
+            const orderNumber = req.params.orderNumber as string
+
+            // Validator order number
+            if (!orderNumber.startsWith(`${orderCode}-`)) throw { code: 400, message: "Invalid order number format. Must start with 'ORD-'" }
+
+            // Service
+            const data = await this.orderService.addConfirmOrder(userId, orderNumber)
+
+            return sendSuccess(res, data, "Order is confirmed!")
+        } catch (error: any) {
+            next(error)
+        }
+    }
 }

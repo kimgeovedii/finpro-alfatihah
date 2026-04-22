@@ -103,7 +103,7 @@ export class OrderRepository {
     return await prisma.orders.findFirst({
       where,
       select: {
-        id: true, userId: true, status: true,
+        id: true, userId: true, status: true, branchId: true,
         items: {
           select: {
             productId: true, quantity: true, product: {
@@ -231,7 +231,10 @@ export class OrderRepository {
     return await prisma.$transaction(async (tx) => {
       await tx.orders.updateMany({
         where: { orderNumber },
-        data: { status, ...(status === "CANCELLED" && { rejectedAt: new Date() }), ...(status === "SHIPPED" && { shippedAt: new Date() }) }
+        data: { status, 
+          ...(status === "CANCELLED" && { rejectedAt: new Date() }), 
+          ...(status === "SHIPPED" && { shippedAt: new Date() }) ,
+          ...(status === "CONFIRMED" && { confirmedAt: new Date() })} 
       })
   
       const order = await tx.orders.findFirst({

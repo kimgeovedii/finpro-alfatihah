@@ -28,5 +28,8 @@ export const orderRepository = {
     },
     async postCancelOrderStatusById(orderNumber: string): Promise<{ message: string }> {
         return await apiFetch<{ message: string }>(`/orders/cancelling/${orderNumber}`, "post")
+    },
+    async postConfirmOrderStatusById(orderNumber: string): Promise<{ message: string }> {
+        return await apiFetch<{ message: string }>(`/orders/confirming/${orderNumber}`, "post")
     }
 }
