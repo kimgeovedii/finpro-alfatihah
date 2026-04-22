@@ -44,4 +44,15 @@ export class productCategoryRepository {
       },
     });
   };
+
+  public findByName = async (name: string) => {
+    return await prisma.product_categories.findFirst({
+      where: {
+        name: {
+          equals: name,
+          mode: "insensitive",
+        },
+      },
+    });
+  };
 }
