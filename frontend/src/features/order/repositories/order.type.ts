@@ -1,17 +1,8 @@
 import { OrderStatus } from "@/constants/business.const"
-import { AddressData } from "@/types/address.type"
+import { AddressData, BranchData } from "@/types/address.type"
 import { PaginationMeta } from "@/types/global.type"
 import { PaymentData } from "@/types/payment.type"
 import { ProductImage } from "@/types/product.type"
-import { Schedule } from "@/types/schedule.type"
-
-export type BranchData = {
-    id: string
-    storeName: string
-    address: string
-    city: string
-    schedules: Schedule[]
-}
 
 export type ProductDetail = {
     productName: string
@@ -48,6 +39,7 @@ export type OrderData = {
     rejectedAt: string | null
     branch: BranchData
     address: AddressData
+    distance: number
     items: OrderItem[]
 }
 

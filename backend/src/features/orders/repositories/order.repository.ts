@@ -1,6 +1,7 @@
 import { OrderStatus, Prisma } from "@prisma/client";
 import { prisma } from "../../../config/prisma";
 import { orderCode, paymentDeadline } from "../../../constants/business.const";
+import { getDistanceInKm } from "../../../utils/location";
 
 export class OrderRepository {
   async findRandomOrder() {
@@ -154,16 +155,16 @@ export class OrderRepository {
         }
       })
     } else {
-      return await prisma.orders.findFirst({
+      const order = await prisma.orders.findFirst({
         where: { orderNumber },
         select: {
           orderNumber: true, status: true, totalPrice: true, finalPrice: true, shippingCost: true, shippedAt: true, confirmedAt: true, rejectedAt: true, createdAt: true,
           branch: {
-            select: { id: true, storeName: true, address: true }
+            select: { id: true, storeName: true, address: true, city: true, latitude: true, longitude: true }
           },
           address: {
             select: {
-              label: true, type: true, receiptName: true, notes: true, phone: true, address: true
+              label: true, type: true, receiptName: true, notes: true, phone: true, address: true, lat: true, long: true
             }
           },
           items: {
@@ -189,6 +190,15 @@ export class OrderRepository {
           }
         }
       })
+
+      if (!order) return null
+
+      let distance = 0
+      if (order.branch?.latitude && order.branch?.longitude && order.address?.lat && order.address?.long) {
+        distance = getDistanceInKm(order.branch.latitude, order.branch.longitude, order.address.lat, order.address.long)
+      }
+
+      return { ...order, distance }
     }
   }
 

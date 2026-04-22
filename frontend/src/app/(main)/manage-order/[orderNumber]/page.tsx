@@ -65,6 +65,10 @@ export default function ManageOrdersDetailPage() {
           isLoading={isLoading}
           payments={order?.payments ?? []}
           onShipping={handleShippingOrder}
+          branch={order?.branch}
+          address={order?.address}
+          status={order?.status}
+          distance={order?.distance}
         />
       </div>
     </div>
