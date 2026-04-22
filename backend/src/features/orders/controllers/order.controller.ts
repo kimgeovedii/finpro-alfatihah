@@ -197,4 +197,14 @@ export class OrderController {
             next(error)
         }
     }
+
+    // Webhook
+    postMidtransWebhook = async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            await this.orderService.handleMidtransWebhook(req.body)
+            return sendSuccess(res, null, "Webhook processed")
+        } catch (error) {
+            next(error)
+        }
+    }
 }
