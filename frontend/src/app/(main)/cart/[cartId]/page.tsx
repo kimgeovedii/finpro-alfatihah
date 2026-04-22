@@ -5,7 +5,7 @@ import { CartDetailItemListCard } from '@/features/cart/components/CartDetailIte
 import { CartPaymentSummaryCard } from '@/features/cart/components/CartPaymentSummaryCard';
 import { PaymentMethodSelect } from '@/features/cart/components/PaymentMethodSelect';
 import { VouchersSelectionCard } from '@/features/cart/components/VouchersSelectionCard';
-import { useCartDetailData } from '@/features/cart/hooks/useCart';
+import { useCartDetailData, useCheckoutCartItem } from '@/features/cart/hooks/useCart';
 import { useRouter } from 'next/navigation'
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
@@ -26,8 +26,11 @@ export default function CartDetailPage() {
   const cartId = params?.cartId as string
 
   const { cart, isLoading, error } = useCartDetailData(cartId)
+  const { checkoutCartItem, isCheckoutItem } = useCheckoutCartItem()
+  const [ appliedVoucher, setAppliedVoucher ] = useState<string | null>(null)
+  const [ selectedAddressId, setSelectedAddressId ] = useState<string | null>(null)
+  const [ paymentMethod, setPaymentMethod ] = useState<"MANUAL" | "GATEWAY">("MANUAL")
 
-  const [appliedVoucher, setAppliedVoucher] = useState<string | null>(null)
   const handleApply = (code: string) => setAppliedVoucher(code)
   const handleRemove = () => setAppliedVoucher(null)
 
@@ -44,7 +47,61 @@ export default function CartDetailPage() {
         if (result.isConfirmed) router.push('/')
       })
     }
+
+    if (cart?.user?.addresses?.length) {
+      const primary = cart.user.addresses.find(a => a.isPrimary) ?? cart.user.addresses[0]
+      setSelectedAddressId(primary.id)
+    }
   }, [cart, isLoading, error, router])
+
+  const handleCheckout = async () => {
+    if (!selectedAddressId) {
+      Swal.fire({
+        icon: "warning",
+        title: "Please select an address",
+        confirmButtonColor: "#10b981",
+      })
+      return
+    }
+
+    const confirmResult = await Swal.fire({
+      icon: "question",
+      title: "Confirm Checkout",
+      text: "Are you sure you want to place this order?",
+      showCancelButton: true,
+      confirmButtonColor: "#10b981",
+      cancelButtonColor: "#ef4444",
+      confirmButtonText: "Yes, place order",
+      cancelButtonText: "Cancel",
+    })
+
+    if (!confirmResult.isConfirmed) return
+
+    const { success, redirectUrl } = await checkoutCartItem(cartId, selectedAddressId, paymentMethod, appliedVoucher ?? undefined)
+
+    if (!success) {
+      Swal.fire({
+        icon: "error",
+        title: "Checkout failed",
+        text: "Something went wrong",
+        confirmButtonColor: "#ef4444",
+      })
+
+      return
+    }
+
+    if (paymentMethod === "GATEWAY" && redirectUrl) {
+      window.location.href = redirectUrl
+      return
+    }
+
+    Swal.fire({
+      icon: "success",
+      title: "Order placed!",
+      text: "Your order has been submitted.",
+      confirmButtonColor: "#10b981",
+    }).then(() => router.push("/transaction"))
+  }  
 
   if (isLoading || !cart) return <div className="p-10 text-center text-slate-400">Loading...</div>
 
@@ -70,6 +127,8 @@ export default function CartDetailPage() {
               schedule: scheduleText,
               statusOpen: cart.openStatus,
             }}
+            selectedAddressId={selectedAddressId}
+            onSelect={(id: string) => setSelectedAddressId(id)}
             addressList={
               cart.user.addresses.map(dt => ({
                 id: dt.id,
@@ -77,6 +136,7 @@ export default function CartDetailPage() {
                 address: dt.address,
                 receiptName: dt.receiptName,
                 phone: dt.phone,
+                isPrimary: dt.isPrimary,
                 distance: cart.shipping?.distance ?? 0
               }))
             }
@@ -91,19 +151,22 @@ export default function CartDetailPage() {
         <div className='flex-1 flex flex-col space-y-5'>
           <CartDetailItemListCard
             items={
-                cart.items.map(dt => ({
-                  id: dt.id,
-                  productName: dt.product.product.productName,
-                  description: dt.product.product.description,
-                  category: dt.product.product.category.name,
-                  imageUrl: dt.product.product.productImages?.[0]?.imageUrl,
-                  quantity: dt.quantity,
-                  basePrice: dt.product.product.basePrice,
-                  totalPrice: dt.product.product.basePrice * dt.quantity
+              cart.items.map(dt => ({
+                id: dt.id,
+                productName: dt.product.product.productName,
+                description: dt.product.product.description,
+                category: dt.product.product.category.name,
+                imageUrl: dt.product.product.productImages?.[0]?.imageUrl,
+                quantity: dt.quantity,
+                basePrice: dt.product.product.basePrice,
+                totalPrice: dt.product.product.basePrice * dt.quantity
               }))
             }
           />
-          <PaymentMethodSelect selectedMethod={'MANUAL'} onSelectMethod={()=>{}}/>
+          <PaymentMethodSelect 
+            selectedMethod={paymentMethod} 
+            onSelectMethod={setPaymentMethod}
+          />
           <CartPaymentSummaryCard
             totalItem={cart.totalQty}
             shippingCost={cart.shipping?.shippingCost ?? 0}
@@ -111,6 +174,7 @@ export default function CartDetailPage() {
             totalDiscountProduct={0}
             totalDiscountVoucher={0}
             finalPrice={shippingCost + totalBasePrice}
+            onCheckout={handleCheckout}
           />
         </div>
       </div>
