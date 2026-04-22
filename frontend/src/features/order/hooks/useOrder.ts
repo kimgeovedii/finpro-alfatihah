@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { orderRepository } from "../repositories/order.repository"
 import { useOrderService } from "../services/order.service"
-import { PaginationMeta } from "@/types/global.type"
+import { CommandResult, PaginationMeta } from "@/types/global.type"
 import { OrderStatus } from "@/constants/business.const"
 import { ManagementOrderItem, ManagementOrderResponse, OrderData } from "../repositories/order.type"
 
@@ -29,15 +29,23 @@ export const useAllOrderData = () => {
     const [orders, setOrders] = useState<OrderData[]>([])
     const [meta, setMeta] = useState<PaginationMeta | null>(null)
     const [isLoading, setIsLoading] = useState(false)
-
-    const fetchAllOrders = async (page = 1) => {
+  
+    const [filters, setFilters] = useState<{
+        orderNumber?: string
+        dateStart?: string
+        dateEnd?: string
+    }>({})
+  
+    const fetchAllOrders = async (page = 1, newFilters?: typeof filters) => {
         setIsLoading(true)
-
+    
         try {
-            const res = await orderRepository.getAllOrders(page)
-
+            const appliedFilters = newFilters ?? filters
+            if (newFilters) setFilters(newFilters)
+    
+            const res = await orderRepository.getAllOrders(page, appliedFilters)
+    
             setOrders((prev) => page === 1 ? res.data : [...prev, ...res.data])
-
             setMeta(res.meta)
         } catch (err) {
             console.error("Failed to fetch orders", err)
@@ -45,11 +53,11 @@ export const useAllOrderData = () => {
             setIsLoading(false)
         }
     }
-
+  
     useEffect(() => {
         fetchAllOrders(1)
     }, [])
-
+  
     return { orders, meta, isLoading, fetchAllOrders }
 }
 
@@ -109,4 +117,79 @@ export const useOrderDetailData = (orderNumber: string) => {
     }, [])
 
     return { order, isLoading, fetchOrderDetail }
+}
+  
+export const useUpdateOrderStatusById = () => {
+    const [isUpdatingOrder, setIsUpdatingOrder] = useState(false)
+    const [errorUpdateOrder, setError] = useState<string | null>(null)
+  
+    const updateOrder = async (orderNumber: string): Promise<CommandResult> => {
+        setIsUpdatingOrder(true)
+        setError(null)
+    
+        try {
+            const res = await orderRepository.postUpdateOrderStatusById(orderNumber)
+    
+            return { success: true, message: res?.message || "Order updated successfully" }
+        } catch (err: any) {
+            const message = err?.message || "Failed to update order"
+            setError(message)
+    
+            return { success: false, message }
+        } finally {
+            setIsUpdatingOrder(false)
+        }
+    }
+  
+    return { updateOrder, isUpdatingOrder, errorUpdateOrder }
+}
+
+export const useCancelOrderStatusById = () => {
+    const [isCancellingOrder, setIsCancellingOrder] = useState(false)
+    const [errorCancelOrder, setError] = useState<string | null>(null)
+  
+    const cancelOrder = async (orderNumber: string): Promise<CommandResult> => {
+        setIsCancellingOrder(true)
+        setError(null)
+    
+        try {
+            const res = await orderRepository.postCancelOrderStatusById(orderNumber)
+    
+            return { success: true, message: res?.message || "Order cancel successfully" }
+        } catch (err: any) {
+            const message = err?.message || "Failed to cancel order"
+            setError(message)
+    
+            return { success: false, message }
+        } finally {
+            setIsCancellingOrder(false)
+        }
+    }
+  
+    return { cancelOrder, isCancellingOrder, errorCancelOrder }
+}
+
+export const useConfirmOrderStatusById = () => {
+    const [isConfirmingOrder, setIsConfirmingOrder] = useState(false)
+    const [errorConfirmOrder, setError] = useState<string | null>(null)
+  
+    const confirmOrder = async (orderNumber: string): Promise<CommandResult> => {
+        setIsConfirmingOrder(true)
+        setError(null)
+    
+        try {
+            const res = await orderRepository.postConfirmOrderStatusById(orderNumber)
+    
+            return { success: true, message: res?.message || "Order confirm successfully" }
+        } catch (err: any) {
+            const message = err?.message || "Failed to confirm order"
+            setError(message)
+    
+            return { success: false, message }
+        } finally {
+            setIsConfirmingOrder(false)
+        }
+    }
+  
+    return { confirmOrder, isConfirmingOrder, errorConfirmOrder }
 }

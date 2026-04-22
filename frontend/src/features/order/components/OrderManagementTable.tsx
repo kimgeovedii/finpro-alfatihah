@@ -6,14 +6,13 @@ import { Button } from "@/components/ui/button"
 import { OrderStatus, statusColorMap } from "@/constants/business.const"
 import { Badge } from "@/components/ui/badge"
 import { formatDate } from "@/utils/converter.util"
-import { BanknotesIcon, CheckBadgeIcon, CheckIcon } from "@heroicons/react/24/outline"
+import { BanknotesIcon, CheckIcon } from "@heroicons/react/24/outline"
 import { CopyField } from "@/components/button/CopyField"
 import { PaymentData } from "@/types/payment.type"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import Image from "next/image"
 import Link from "next/link"
 import { PaginationMeta } from "@/types/global.type"
-import { CheckCheck } from "lucide-react"
 
 export type OrderTableItem = {
     id: string
@@ -155,7 +154,7 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
                                                             </div>
                                                         </DialogContent>
                                                     </Dialog>
-                                                : dt.status === "CANCELLED" ? 
+                                                : dt.status === "CANCELLED" || dt.status === "WAITING_PAYMENT" ? 
                                                     <>-</> 
                                                 : 
                                                     <div className="bg-green-100 text-green-600 rounded-lg w-8 h-8 p-[5px] mx-auto">

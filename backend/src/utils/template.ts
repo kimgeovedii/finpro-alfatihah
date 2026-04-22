@@ -49,3 +49,41 @@ export const mailTemplateStyle = () => {
         </style>
     `
 }
+
+type EmailOrderPayload = {
+    username: string | null
+    orderNumber: string
+    title: string
+    content: string
+}
+
+export const getOrderMailTemplate = (data: EmailOrderPayload) => {
+    return `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            ${mailTemplateStyle()}
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>${data.title}</h1>
+                </div>
+                <div class="content">
+                    <p>Hello <strong>${data.username}</strong>, ${data.content}</p>
+                    <div class="context-box" style="margin-bottom:16px;">
+                        <p style="margin:0 0 6px 0;"><strong>Order ID:</strong> ${data.orderNumber}</p>
+                    </div>
+                    <p>
+                        Best regards,<br/>
+                        <strong>Alfatihah</strong>
+                    </p>
+                </div>
+                <div class="footer">
+                    © ${new Date().getFullYear()} Alfatihah. All rights reserved.
+                </div>
+            </div>
+        </body>
+        </html>
+    `
+}

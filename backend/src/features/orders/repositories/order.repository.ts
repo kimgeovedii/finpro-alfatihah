@@ -1,6 +1,7 @@
-import { OrderStatus, Prisma } from "@prisma/client";
+import { OrderStatus, Prisma, UserRole } from "@prisma/client";
 import { prisma } from "../../../config/prisma";
-import { orderCode, paymentDeadline } from "../../../constants/business.const";
+import { orderAutoConfirmLimitHour, orderCode, paymentDeadline } from "../../../constants/business.const";
+import { getDistanceInKm } from "../../../utils/location";
 
 export class OrderRepository {
   async findRandomOrder() {
@@ -96,26 +97,32 @@ export class OrderRepository {
     return { totalRevenue, revenueChangePercent, activeShipments, processingOrder, finishedOrder, finishedOrderLastMonth }
   }  
 
-  async findOrderById(orderId: string) {
+  async findOrderById(contextId: string, contextTarget: "orderId" | "orderNumber") {
+    const where = contextTarget === "orderId" ? { id: contextId } : { orderNumber: contextId }
+
     return await prisma.orders.findFirst({
-      where: { id: orderId },
+      where,
       select: {
-        id: true, userId: true,
+        id: true, userId: true, status: true, branchId: true,
         items: {
           select: {
-            productId: true, quantity: true,
+            productId: true, quantity: true, product: {
+              select: {
+                id: true
+              }
+            }
           }
         }
       }
     })
   }
 
-  async findOrderDetailByOrderNumber(userId: string | null, orderNumber: string) {
-    if (userId) {
+  async findOrderDetailByOrderNumber(role: UserRole, userId: string, orderNumber: string) {
+    if (role === "CUSTOMER") {
       return await prisma.orders.findFirst({
         where: { orderNumber, userId },
         select: {
-          orderNumber: true, status: true, totalPrice: true, finalPrice: true, shippingCost: true, paymentDeadline: true, shippedAt: true, confirmedAt: true, rejectedAt: true, createdAt: true,
+          id: true, orderNumber: true, status: true, totalPrice: true, finalPrice: true, shippingCost: true, paymentDeadline: true, shippedAt: true, confirmedAt: true, rejectedAt: true, createdAt: true,
           branch: {
             select: {
               id: true, storeName: true, address: true, city: true, schedules: {
@@ -154,16 +161,16 @@ export class OrderRepository {
         }
       })
     } else {
-      return await prisma.orders.findFirst({
+      const order = await prisma.orders.findFirst({
         where: { orderNumber },
         select: {
           orderNumber: true, status: true, totalPrice: true, finalPrice: true, shippingCost: true, shippedAt: true, confirmedAt: true, rejectedAt: true, createdAt: true,
           branch: {
-            select: { id: true, storeName: true, address: true }
+            select: { id: true, storeName: true, address: true, city: true, latitude: true, longitude: true }
           },
           address: {
             select: {
-              label: true, type: true, receiptName: true, notes: true, phone: true, address: true
+              label: true, type: true, receiptName: true, notes: true, phone: true, address: true, lat: true, long: true
             }
           },
           items: {
@@ -189,15 +196,79 @@ export class OrderRepository {
           }
         }
       })
+
+      if (!order) return null
+
+      let distance = 0
+      if (order.branch?.latitude && order.branch?.longitude && order.address?.lat && order.address?.long) {
+        distance = getDistanceInKm(order.branch.latitude, order.branch.longitude, order.address.lat, order.address.long)
+      }
+
+      return { ...order, distance }
     }
   }
 
-  async findAllOrders(page: number, limit: number, userId: string, branchId: string | null) {
+  async isMatchingQuantityStock(orderNumber: string) {
+    const items = await prisma.orders.findFirst({
+      where: { orderNumber },
+      select: {
+        items: {
+          select: {
+            quantity: true, product: {
+              select: { currentStock: true }
+            }
+          }
+        }
+      }
+    })
+
+    if (!items) return false
+
+    return items.items.every(dt => dt.quantity <= (dt.product?.currentStock ?? 0))
+  }
+
+  async updateOrderStatusById(orderNumber: string, status: OrderStatus) {
+    return await prisma.$transaction(async (tx) => {
+      await tx.orders.updateMany({
+        where: { orderNumber },
+        data: { status, 
+          ...(status === "CANCELLED" && { rejectedAt: new Date() }), 
+          ...(status === "SHIPPED" && { shippedAt: new Date() }) ,
+          ...(status === "CONFIRMED" && { confirmedAt: new Date() })} 
+      })
+  
+      const order = await tx.orders.findFirst({
+        where: { orderNumber },
+        orderBy: { createdAt: 'desc' }, 
+        select: {
+          id: true, user: {
+            select: {
+              id: true, username: true, email: true
+            }
+          }
+        }
+      })
+  
+      return order
+    })
+  }
+
+  async findAllOrders(page: number, limit: number, userId: string, branchId: string | null, orderNumber: string | null, dateStart: string | null, dateEnd: string | null) {
     const skip = (page - 1) * limit
 
     const where: Prisma.ordersWhereInput = {
       userId,
-      ...(branchId && { branchId })
+      ...(branchId && { branchId }),
+      ...(orderNumber && {
+        orderNumber: {
+          contains: orderNumber, mode: "insensitive"
+        }
+      }),
+      ...(dateStart && dateEnd && {
+        createdAt: {
+          gte: new Date(dateStart), lte: new Date(dateEnd)
+        }
+      })
     }
 
     const [rawData, total] = await Promise.all([
@@ -297,9 +368,7 @@ export class OrderRepository {
       },
       select: { id: true, orderNumber: true, paymentDeadline: true }
     })
-  } 
-
-  deleteOrder = async (id: string) => prisma.orders.delete({ where: { id } })
+  }
 
   async cancelExpiredUnpaidOrders() {
     const now = new Date()
@@ -342,6 +411,23 @@ export class OrderRepository {
       })
 
       return orderIds.length
+    })
+  }
+
+  async confirmOldShippedOrder() {
+    const cutoffDate = new Date(Date.now() - orderAutoConfirmLimitHour)
+  
+    return await prisma.orders.updateMany({
+      where: {
+        status: "SHIPPED",
+        shippedAt: {
+          not: null,
+          lt: cutoffDate,
+        },
+      },
+      data: {
+        status: "CONFIRMED", confirmedAt: new Date(),
+      },
     })
   }
 }

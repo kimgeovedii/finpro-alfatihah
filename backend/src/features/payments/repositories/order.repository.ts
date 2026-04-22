@@ -6,14 +6,19 @@ export class OrderRepository {
     return await prisma.orders.findFirst({
       where: { id, status, 
         payments: {
-          every: {
-            status: PaymentStatus.PENDING, method: "MANUAL"
-          }
+          every: { method: "MANUAL" }
         } 
       },
       select: {
-        paymentDeadline: true, branchId: true, finalPrice: true, payments: {
+        orderNumber: true, paymentDeadline: true, branchId: true, finalPrice: true, payments: {
           select: { id: true }
+        }, 
+        items: {
+          select: {
+            productId: true, quantity: true, product: {
+              select: { id: true }
+            }
+          }
         }
       }
     })
@@ -22,7 +27,7 @@ export class OrderRepository {
   async updateOrderStatusById(id: string, status: OrderStatus) {
     return await prisma.orders.update({
       where: { id },
-      data: { status }
+      data: { status, ...(status === "CANCELLED" && { rejectedAt: new Date() }) }
     })
   }
 }
