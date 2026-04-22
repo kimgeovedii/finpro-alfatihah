@@ -8,7 +8,7 @@ export type AddressData = {
     type: string
     receiptName: string
     notes: string
-    phone: string
+    phone: string   
     address: string
     isPrimary: boolean
 }

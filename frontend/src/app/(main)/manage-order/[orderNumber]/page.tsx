@@ -5,7 +5,7 @@ import { useParams } from "next/navigation"
 import { ArrowLeftIcon } from "@heroicons/react/24/outline"
 import { Button } from "@/components/ui/button"
 import { OrderMatchingTable } from "@/features/order/components/OrderMatchingTable"
-import { useOrderDetailData, useUpdateOrderStatusById } from "@/features/order/hooks/useOrder"
+import { useCancelOrderStatusById, useOrderDetailData, useUpdateOrderStatusById } from "@/features/order/hooks/useOrder"
 import Swal from "sweetalert2"
 
 export default function ManageOrdersDetailPage() {
@@ -13,22 +13,44 @@ export default function ManageOrdersDetailPage() {
   const orderNumber = params?.orderNumber as string
   const { order, isLoading, fetchOrderDetail } = useOrderDetailData(orderNumber)
   const { updateOrder, isUpdatingOrder } = useUpdateOrderStatusById()
+  const { cancelOrder, isCancellingOrder } = useCancelOrderStatusById()
 
   const handleShippingOrder = async (orderNumber: string) => {
     const confirm = await Swal.fire({
-        title: "Order Shipping",
-        text: `Are you sure want to shipping this order?`,
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes, proceed",
-        cancelButtonText: "Cancel",
-        confirmButtonColor: "#2d766f",
+      title: "Order Shipping",
+      text: `Are you sure want to shipping this order?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, proceed",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#2d766f",
     })
     if (!confirm.isConfirmed) return
 
     const { success, message } = await updateOrder(orderNumber)
     await Swal.fire({
       title: success ? "Order shipped!" : "Opps!",
+      text: message,
+      icon: success ? "success" : "error",
+      confirmButtonColor: "#10b981",
+    })
+  }
+
+  const handleCancelOrder = async (orderNumber: string) => {
+    const confirm = await Swal.fire({
+      title: "Order Rejection",
+      text: `Are you sure want to cancel this order?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, proceed",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#2d766f",
+    })
+    if (!confirm.isConfirmed) return 
+
+    const { success, message } = await cancelOrder(orderNumber)
+    await Swal.fire({
+      title: success ? "Order cancel!" : "Opps!",
       text: message,
       icon: success ? "success" : "error",
       confirmButtonColor: "#10b981",
@@ -65,6 +87,7 @@ export default function ManageOrdersDetailPage() {
           isLoading={isLoading}
           payments={order?.payments ?? []}
           onShipping={handleShippingOrder}
+          onCancel={handleCancelOrder}
           branch={order?.branch}
           address={order?.address}
           status={order?.status}

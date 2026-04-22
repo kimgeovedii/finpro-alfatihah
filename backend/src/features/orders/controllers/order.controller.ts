@@ -159,6 +159,23 @@ export class OrderController {
         }
     }
 
+    postCancelOrder = async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            // Route param
+            const orderNumber = req.params.orderNumber as string
+
+            // Validator order number
+            if (!orderNumber.startsWith(`${orderCode}-`)) throw { code: 400, message: "Invalid order number format. Must start with 'ORD-'" }
+
+            // Service
+            const data = await this.orderService.addCancelOrder(orderNumber)
+
+            return sendSuccess(res, data, "Order is cancelled!")
+        } catch (error: any) {
+            next(error)
+        }
+    }
+
     deleteOrderById = async (req: AuthRequest, res: Response, next: NextFunction) => {
         try {
             const userId = req.user?.userId

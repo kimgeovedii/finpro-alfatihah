@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { ArchiveBoxIcon } from "@heroicons/react/24/outline"
+import { ArchiveBoxIcon, XMarkIcon } from "@heroicons/react/24/outline"
 import { useState } from "react"
 import { OrderMatchingItem } from "./OrderMatchingTable"
 
@@ -12,10 +12,11 @@ type Props = {
     isLoading: boolean
     onShipping: (orderNumber: string) => void
     onSearch?: (query: string) => void
+    onCancel: (orderNumber: string) => void
     orderNumber: string
 }
   
-export const OrderMatchingProcessedSection: React.FC<Props> = ({ items, status, isLoading, onShipping, onSearch, orderNumber}) => {
+export const OrderMatchingProcessedSection: React.FC<Props> = ({ items, status, isLoading, onShipping, onSearch, onCancel, orderNumber}) => {
     const [search, setSearch] = useState("")
     const filteredItems = items.filter(item =>
         search === "" ||
@@ -24,7 +25,6 @@ export const OrderMatchingProcessedSection: React.FC<Props> = ({ items, status, 
 
     return (
         <div className="pb-4 w-full">
-            <p className="text-sm font-semibold text-emerald-600 mb-2">Processed</p>
             <div className="border-1 rounded-lg p-4 shadow-md">
             <Input placeholder="Quick search..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-52 h-9 text-sm"/>
             <Table className="table-center">
@@ -86,7 +86,10 @@ export const OrderMatchingProcessedSection: React.FC<Props> = ({ items, status, 
                 status === "SHIPPED" ?
                     <div className="w-full bg-green-100 text-green-500 p-4 rounded-lg my-2 font-bold text-md text-center">Shipped!</div>
                 :
-                    <Button className="mt-5 w-full py-5 bg-emerald-600" onClick={(e) => onShipping(orderNumber)}><ArchiveBoxIcon/> Shipping Now!</Button>
+                    <div className="mt-5 flex gap-2">
+                        <Button className="flex-1 py-5 bg-emerald-600" onClick={(e) => onShipping(orderNumber)}><ArchiveBoxIcon/> Shipping Now!</Button>
+                        <Button className="flex-1 py-5 bg-red-400" onClick={(e) => onCancel(orderNumber)}><XMarkIcon/> Cancel Order!</Button>
+                    </div>
             }
             </div>
         </div>

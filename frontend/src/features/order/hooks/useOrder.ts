@@ -128,7 +128,7 @@ export const useUpdateOrderStatusById = () => {
         setError(null)
     
         try {
-            const res = await orderRepository.putUpdateOrderStatusById(orderNumber)
+            const res = await orderRepository.postUpdateOrderStatusById(orderNumber)
     
             return { success: true, message: res?.message || "Order updated successfully" }
         } catch (err: any) {
@@ -142,4 +142,29 @@ export const useUpdateOrderStatusById = () => {
     }
   
     return { updateOrder, isUpdatingOrder, errorUpdateOrder }
+}
+
+export const useCancelOrderStatusById = () => {
+    const [isCancellingOrder, setIsCancellingOrder] = useState(false)
+    const [errorCancelOrder, setError] = useState<string | null>(null)
+  
+    const cancelOrder = async (orderNumber: string): Promise<CommandResult> => {
+        setIsCancellingOrder(true)
+        setError(null)
+    
+        try {
+            const res = await orderRepository.postCancelOrderStatusById(orderNumber)
+    
+            return { success: true, message: res?.message || "Order cancel successfully" }
+        } catch (err: any) {
+            const message = err?.message || "Failed to cancel order"
+            setError(message)
+    
+            return { success: false, message }
+        } finally {
+            setIsCancellingOrder(false)
+        }
+    }
+  
+    return { cancelOrder, isCancellingOrder, errorCancelOrder }
 }

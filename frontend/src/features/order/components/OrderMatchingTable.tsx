@@ -31,10 +31,11 @@ type Props = {
     finalPrice: number
     distance?: number
     onSearch?: (query: string) => void
+    onCancel: (orderNumber: string) => void
     onShipping: (orderNumber: string) => void
 }
 
-export const OrderMatchingTable: React.FC<Props> = ({ orderNumber, items, isLoading, payments, onSearch, shippingCost, finalPrice, onShipping, status, branch, address, distance }) => {    
+export const OrderMatchingTable: React.FC<Props> = ({ orderNumber, items, isLoading, payments, onSearch, shippingCost, finalPrice, onShipping, onCancel, status, branch, address, distance }) => {    
     return (
         <div className="bg-white border border-slate-200 rounded-2xl p-6 w-full">
             <div className="flex items-center justify-between mb-5">
@@ -62,7 +63,7 @@ export const OrderMatchingTable: React.FC<Props> = ({ orderNumber, items, isLoad
                     </div>
                     <div className="pb-4 w-full">
                         <p className="text-sm font-semibold text-emerald-600 mb-2">Processed</p>
-                        <OrderMatchingProcessedSection items={items} isLoading={isLoading} onShipping={onShipping} onSearch={onSearch} orderNumber={orderNumber}/>
+                        <OrderMatchingProcessedSection items={items} status={status} isLoading={isLoading} onShipping={onShipping} onCancel={onCancel} onSearch={onSearch} orderNumber={orderNumber}/>
                     </div>
                 </div>
                 <div className="flex gap-3">
@@ -74,17 +75,22 @@ export const OrderMatchingTable: React.FC<Props> = ({ orderNumber, items, isLoad
                     </div>
                     <div className="pb-4 w-full">
                         <p className="text-sm font-semibold text-emerald-600 mb-2">Shipped</p>
-                        <OrderManagementTableShippedSection 
-                            branchCity={branch?.city ?? "-"}
-                            branchAddress={branch?.address ?? "-"}
-                            storeName={branch?.storeName ?? "-"}
-                            distance={distance ?? 0} 
-                            shippedAt={""} 
-                            labelCustomer={address?.label ?? "-"}
-                            addressCustomer={address?.address ?? "-"}
-                            phoneCustomer={address?.phone ?? "-"}
-                            receiptName={address?.receiptName ?? "-"}
-                        />
+                        {
+                            status === "SHIPPED" ?
+                                <OrderManagementTableShippedSection 
+                                    branchCity={branch?.city ?? "-"}
+                                    branchAddress={branch?.address ?? "-"}
+                                    storeName={branch?.storeName ?? "-"}
+                                    distance={distance ?? 0} 
+                                    shippedAt={""} 
+                                    labelCustomer={address?.label ?? "-"}
+                                    addressCustomer={address?.address ?? "-"}
+                                    phoneCustomer={address?.phone ?? "-"}
+                                    receiptName={address?.receiptName ?? "-"}
+                                />
+                            : 
+                                <p className="text-xs text-slate-400">Order shipped</p>
+                        }
                     </div>
                 </div>
                 <div className="flex gap-3">

@@ -97,14 +97,20 @@ export class OrderRepository {
     return { totalRevenue, revenueChangePercent, activeShipments, processingOrder, finishedOrder, finishedOrderLastMonth }
   }  
 
-  async findOrderById(orderId: string) {
+  async findOrderById(contextId: string, contextTarget: "orderId" | "orderNumber") {
+    const where = contextTarget === "orderId" ? { id: contextId } : { orderNumber: contextId }
+
     return await prisma.orders.findFirst({
-      where: { id: orderId },
+      where,
       select: {
-        id: true, userId: true,
+        id: true, userId: true, status: true,
         items: {
           select: {
-            productId: true, quantity: true,
+            productId: true, quantity: true, product: {
+              select: {
+                id: true
+              }
+            }
           }
         }
       }
