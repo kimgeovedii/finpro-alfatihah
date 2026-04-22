@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useCartService } from "../services/cart.service"
-import { CartBranch, CartMeta, cartRepository } from "../repositories/cart.repository"
+import { CartBranch, CartData, CartMeta, cartRepository } from "../repositories/cart.repository"
 
 export const useCartSummary = () => {
     const { summary, fetchCartSummary, isLoading, error } = useCartService()
@@ -106,4 +106,31 @@ export const useDeleteCartItem = () => {
     }
 
     return { deleteCartItem, isDeletingItem, errorItem }
+}
+
+export const useCartDetailData = (cartId: string) => {
+    const [cart, setCart] = useState<CartData | null>(null)
+    const [isLoading, setIsLoading] = useState(false)
+    const [error, setError] = useState<string | null>(null)
+
+    const fetchCartDetail = async (cartId: string) => {
+        setIsLoading(true)
+        setError(null)
+
+        try {
+            const res = await cartRepository.getCartDetailById(cartId)
+            setCart(res)
+        } catch (err: any) {
+            setError(err?.message || "Failed to fetch cart")
+            setCart(null)
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    useEffect(() => {
+        if (cartId) fetchCartDetail(cartId)
+    }, [cartId])
+
+    return { cart, isLoading, error, fetchCartDetail }
 }

@@ -7,6 +7,16 @@ export class CartItemRepository {
         })
     }
 
+    async findCartItemByProductIdBranchId(userId: string, productId: string, branchId: string) {
+        return await prisma.cart_items.findFirst({
+            where: { 
+                cart: { userId },
+                product: { branchId, productId }  
+            },
+            select: { quantity: true }
+        })
+    }
+
     async createCartItem(cartId: string, productId: string, quantity: number) {
         return await prisma.cart_items.create({
             data: { cartId, productId, quantity }

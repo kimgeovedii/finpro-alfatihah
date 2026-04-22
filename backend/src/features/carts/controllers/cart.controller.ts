@@ -53,6 +53,26 @@ export class CartController {
         }
     }
 
+    getCartDetailById = async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user?.userId 
+            const cartId = req.params?.cartId as string
+
+            // Query param
+            const addressId = typeof req.query.branchId === 'string' ? req.query.branchId.trim() : null
+
+            // Validate the UUID format
+            if (!uuidRegex.test(cartId)) throw { code: 400, message: 'cartId is not valid UUID' }
+            
+            // Service
+            const result = await this.cartService.getCartDetailById(userId, cartId, addressId)
+
+            return sendSuccess(res, result, "Cart fetched")
+        } catch (error: any) {
+            next(error)
+        }
+    }
+
     postAddBranchInventoryToCart = async (req: AuthRequest, res: Response, next: NextFunction) => {
         try {
             const userId = req.user?.userId 
