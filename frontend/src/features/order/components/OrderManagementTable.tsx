@@ -154,7 +154,7 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
                                                             </div>
                                                         </DialogContent>
                                                     </Dialog>
-                                                : dt.status === "CANCELLED" ? 
+                                                : dt.status === "CANCELLED" || dt.status === "WAITING_PAYMENT" ? 
                                                     <>-</> 
                                                 : 
                                                     <div className="bg-green-100 text-green-600 rounded-lg w-8 h-8 p-[5px] mx-auto">

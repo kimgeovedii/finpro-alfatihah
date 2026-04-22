@@ -4,7 +4,7 @@ import { UploadIcon } from "lucide-react"
 import React, { useRef } from "react"
 import { useUploadPaymentEvidence } from "../hooks/usePayment"
 import Swal from "sweetalert2"
-import { allowedMimeTypesPaymentEvidence, maxSizePaymentEvidence, statusColorMap } from "@/constants/business.const"
+import { allowedMimeTypesPaymentEvidence, maxSizePaymentEvidence } from "@/constants/business.const"
 
 type Props = {
     orderId: string

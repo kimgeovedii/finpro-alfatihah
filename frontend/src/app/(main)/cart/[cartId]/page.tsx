@@ -51,25 +51,7 @@ export default function CartDetailPage() {
   const shippingCost = cart.shipping?.shippingCost ?? 0
   const totalBasePrice = cart.totalBasePrice
   const scheduleText = cart?.branch?.schedules ? formatListSchedule(cart?.branch?.schedules) : '-'
-  const addressList = cart.user.addresses.map(dt => ({
-    id: dt.id,
-    label: dt.label,
-    address: dt.address,
-    receiptName: dt.receiptName,
-    phone: dt.phone,
-    distance: cart.shipping?.distance ?? 0
-  }))
-  const items = cart.items.map((dt, idx) => ({
-    id: dt.id,
-    productName: dt.product.product.productName,
-    description: dt.product.product.description,
-    category: dt.product.product.category.name,
-    imageUrl: dt.product.product.productImages?.[0]?.imageUrl,
-    quantity: dt.quantity,
-    basePrice: dt.product.product.basePrice,
-    totalPrice: dt.product.product.basePrice * dt.quantity
-  }))
-
+  
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto">
       <div className='flex items-center gap-3 mb-5'>
@@ -88,7 +70,16 @@ export default function CartDetailPage() {
               schedule: scheduleText,
               statusOpen: cart.openStatus,
             }}
-            addressList={addressList}
+            addressList={
+              cart.user.addresses.map(dt => ({
+                id: dt.id,
+                label: dt.label,
+                address: dt.address,
+                receiptName: dt.receiptName,
+                phone: dt.phone,
+                distance: cart.shipping?.distance ?? 0
+              }))
+            }
           />
           <VouchersSelectionCard
             vouchers={vouchersData}
@@ -99,7 +90,18 @@ export default function CartDetailPage() {
         </div>
         <div className='flex-1 flex flex-col space-y-5'>
           <CartDetailItemListCard
-            items={items}
+            items={
+                cart.items.map(dt => ({
+                  id: dt.id,
+                  productName: dt.product.product.productName,
+                  description: dt.product.product.description,
+                  category: dt.product.product.category.name,
+                  imageUrl: dt.product.product.productImages?.[0]?.imageUrl,
+                  quantity: dt.quantity,
+                  basePrice: dt.product.product.basePrice,
+                  totalPrice: dt.product.product.basePrice * dt.quantity
+              }))
+            }
           />
           <PaymentMethodSelect selectedMethod={'MANUAL'} onSelectMethod={()=>{}}/>
           <CartPaymentSummaryCard

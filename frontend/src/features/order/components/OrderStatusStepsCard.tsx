@@ -12,10 +12,11 @@ type Props = {
     statusSteps: StatusInfo[]
     currentStatus: string
     orderNumber: string
+    status?: string
     onConfirm: (orderNumber: string) => void
 }
 
-export const OrderStatusStepsCard: React.FC<Props> = ({ statusSteps, currentStatus, onConfirm, orderNumber }) => {
+export const OrderStatusStepsCard: React.FC<Props> = ({ statusSteps, currentStatus, onConfirm, orderNumber, status }) => {
     const getStepState = (stepKey: string, currentStatus: string): "done" | "active" | "upcoming" => {
         const currentIdx = statusSteps.findIndex(s => s.key === currentStatus)
         const stepIdx = statusSteps.findIndex(s => s.key === stepKey)
@@ -60,7 +61,7 @@ export const OrderStatusStepsCard: React.FC<Props> = ({ statusSteps, currentStat
                     })
                 }
             </div>
-            <OrderConfirmButton orderNumber={orderNumber} onConfirm={onConfirm}/>
+            { status === "SHIPPED" && <OrderConfirmButton orderNumber={orderNumber} onConfirm={onConfirm}/> }
         </div>
     )
 }

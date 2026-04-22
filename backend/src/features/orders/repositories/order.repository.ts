@@ -122,7 +122,7 @@ export class OrderRepository {
       return await prisma.orders.findFirst({
         where: { orderNumber, userId },
         select: {
-          orderNumber: true, status: true, totalPrice: true, finalPrice: true, shippingCost: true, paymentDeadline: true, shippedAt: true, confirmedAt: true, rejectedAt: true, createdAt: true,
+          id: true, orderNumber: true, status: true, totalPrice: true, finalPrice: true, shippingCost: true, paymentDeadline: true, shippedAt: true, confirmedAt: true, rejectedAt: true, createdAt: true,
           branch: {
             select: {
               id: true, storeName: true, address: true, city: true, schedules: {

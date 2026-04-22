@@ -12,8 +12,15 @@ export class OrderRepository {
         } 
       },
       select: {
-        paymentDeadline: true, branchId: true, finalPrice: true, payments: {
+        orderNumber: true, paymentDeadline: true, branchId: true, finalPrice: true, payments: {
           select: { id: true }
+        }, 
+        items: {
+          select: {
+            productId: true, quantity: true, product: {
+              select: { id: true }
+            }
+          }
         }
       }
     })

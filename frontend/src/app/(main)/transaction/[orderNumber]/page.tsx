@@ -107,6 +107,7 @@ export default function TransactionDetailPage() {
             currentStatus={order?.status && order?.status === "WAITING_PAYMENT_CONFIRMATION" ? "WAITING_PAYMENT" : order?.status ?? ""}
             orderNumber={orderNumber}
             onConfirm={handleConfirmOrder}
+            status={order?.status}
           />
           <OrderDetailBranchCard
             branch={{
@@ -120,8 +121,8 @@ export default function TransactionDetailPage() {
               orderStatus: order?.status ?? "-",
               paymentStatus: order?.payments[0].status ?? '-',
               paymentMethod: order?.payments[0].method ?? '-',
-              createdAt: order?.createdAt ? new Date(order.createdAt).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" }) : "-",
-              paymentDeadlineAt: order?.paymentDeadline ? new Date(order.paymentDeadline).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" }) : "-",
+              createdAt: order?.createdAt,
+              paymentDeadline: order?.paymentDeadline,
             }}
          />
         </div>
@@ -137,7 +138,7 @@ export default function TransactionDetailPage() {
               basePrice: item.product.product.basePrice,
               totalPrice: item.product.product.basePrice * item.quantity,
             })) ?? []}
-         />
+          />
           <PaymentSummaryCard
             orderNumber={orderNumber}
             totalItem={order?.items?.reduce((acc, item) => acc + item.quantity, 0) ?? 0}

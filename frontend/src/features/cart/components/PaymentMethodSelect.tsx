@@ -19,7 +19,7 @@ export const PaymentMethodSelect: React.FC<Props> = ({ selectedMethod, onSelectM
                         const isSelected = selectedMethod === "MANUAL"
 
                         return (
-                            <Button onClick={() => onSelectMethod("MANUAL")} className={`bg-transparent relative flex flex-col items-start gap-2 p-4 rounded-2xl border-2 transition-all duration-200 text-left
+                            <Button onClick={() => onSelectMethod("MANUAL")} className={`bg-transparent h-auto relative flex flex-col items-start gap-2 p-4 rounded-2xl border-2 transition-all duration-200 text-left
                                 ${ isSelected ? "border-emerald-700 bg-white shadow-sm" : "border-slate-200 bg-slate-100 hover:border-slate-300"}`}>
                                 { isSelected && <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-700 flex items-center justify-center"><CheckIcon className="w-3 h-3 text-white"/></div> }
                                 <div className={`${isSelected ? "text-emerald-700" : "text-slate-400"}`}>
@@ -38,7 +38,7 @@ export const PaymentMethodSelect: React.FC<Props> = ({ selectedMethod, onSelectM
                         const isSelected = selectedMethod === "GATEWAY"
 
                         return (
-                            <Button onClick={() => onSelectMethod("GATEWAY")} className={`bg-transparent relative flex flex-col items-start gap-2 p-4 rounded-2xl border-2 transition-all duration-200 text-left
+                            <Button onClick={() => onSelectMethod("GATEWAY")} className={`bg-transparent h-auto relative flex flex-col items-start gap-2 p-4 rounded-2xl border-2 transition-all duration-200 text-left
                                 ${ isSelected ? "border-emerald-700 bg-white shadow-sm" : "border-slate-200 bg-slate-100 hover:border-slate-300"}`}>
                                 { isSelected && <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-700 flex items-center justify-center"><CheckIcon className="w-3 h-3 text-white"/></div> }
                                 <div className={`${isSelected ? "text-emerald-700" : "text-slate-400"}`}>

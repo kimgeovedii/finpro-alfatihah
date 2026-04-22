@@ -16,8 +16,8 @@ type OrderInfo = {
     orderStatus: string 
     paymentStatus: string
     paymentMethod: string
-    createdAt: string
-    paymentDeadlineAt: string
+    createdAt?: string | null
+    paymentDeadline?: string | null
 }
 
 type Props = {
@@ -84,13 +84,13 @@ export const OrderDetailBranchCard: React.FC<Props> = ({ branch, orderInfo }) =>
                     </div>
                     <div>
                         <p className="text-[11px] text-slate-400 uppercase tracking-wider">Created at</p>
-                        <p className="text-sm font-semibold text-slate-700">{formatDate(orderInfo.createdAt, true)}</p>
+                        <p className="text-sm font-semibold text-slate-700">{orderInfo.createdAt ? formatDate(orderInfo.createdAt, true) : <>-</>}</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-3 flex-1 justify-end text-end">
                     <div>
                         <p className="text-[11px] text-slate-400 uppercase tracking-wider">Payment Deadline</p>
-                        <p className="text-sm font-semibold text-slate-700">{formatDate(orderInfo.paymentDeadlineAt, true)}</p>
+                        <p className="text-sm font-semibold text-slate-700">{orderInfo.paymentDeadline ? formatDate(orderInfo.paymentDeadline, true) : <>-</>}</p>
                     </div>
                     <div className="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center text-red-400">
                         <Clock className="w-4 h-4" />

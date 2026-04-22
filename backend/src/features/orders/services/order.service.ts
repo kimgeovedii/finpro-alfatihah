@@ -12,7 +12,6 @@ import { Mailer } from "../../../config/mailer";
 import { getBranchOrderBroadcastTemplate, getOrderCreatedPaymentTemplate } from "../views/order.view"
 import { OrderStatus, UserRole } from "@prisma/client"
 import { getOrderMailTemplate } from "../../../utils/template"
-import { orderAutoConfirmLimitHour } from "../../../constants/business.const"
 import { EmployeeRepository } from "../repositories/employee.repository"
 
 export class OrderService {
