@@ -10,7 +10,7 @@ import { StockJournalRepository } from "../repositories/stok_journal.repository"
 import { UserRepository } from "../repositories/user.repository"
 import { Mailer } from "../../../config/mailer";
 import { getBranchOrderBroadcastTemplate, getOrderCreatedPaymentTemplate } from "../views/order.view"
-import { OrderStatus } from "@prisma/client"
+import { OrderStatus, UserRole } from "@prisma/client"
 import { getOrderMailTemplate } from "../../../utils/template"
 import { orderAutoConfirmLimitHour } from "../../../constants/business.const"
 
@@ -32,8 +32,8 @@ export class OrderService {
         return await this.orderRepo.findAllOrdersByBranchId(page, limit, branchId, status)
     }
 
-    async getOrderDetailByOrderNumber(userId: string | null, orderNumber: string) {
-        return await this.orderRepo.findOrderDetailByOrderNumber(userId, orderNumber)
+    async getOrderDetailByOrderNumber(role: UserRole, userId: string, orderNumber: string) {
+        return await this.orderRepo.findOrderDetailByOrderNumber(role, userId, orderNumber)
     }
 
     async getOrderSummary(userId: string) {
@@ -167,12 +167,25 @@ export class OrderService {
         })
     }
 
-    async addCancelOrder(orderNumber: string) {
+    async addCancelOrder(userId: string, role: UserRole, orderNumber: string) {
         // Repo : get order item
         const order = await this.orderRepo.findOrderById(orderNumber, "orderNumber")
         if (!order) throw { code: 404, message: 'Order not found' }
-        // Make sure only order who still in store (not shipped or confirmed yet)
-        if (order.status === "SHIPPED" || order.status === "CONFIRMED") throw { code: 422, message: 'Only order who still in store can be cancelled' }
+
+        if (role === "ADMIN") { 
+            // Make sure only order who still in store (not shipped or confirmed yet)
+            if (order.status === "SHIPPED" || order.status === "CONFIRMED") throw { code: 422, message: 'Only order who still in store can be cancelled' }
+        } else {
+            // Check if this order belongs to user
+            if (order.userId !== userId) throw { code: 403, message: 'Forbidden access to this order' }
+
+            // Prevent double cancelled order
+            if (order.status === "CANCELLED") throw { code: 422, message: 'Order already cancelled' }
+
+            // Check if this order still cancelable (status = waiting payment)
+            if (order.status !== "WAITING_PAYMENT") throw { code: 422, message: 'You can only cancel orders that have not been paid' }
+        }
+
         // Prevent double cancelled order
         if (order.status === "CANCELLED") throw { code: 422, message: 'Order already cancelled' }
         const orderMessageToBranch = `An order ${orderNumber} has been cancelled`
@@ -201,37 +214,22 @@ export class OrderService {
         const orderNew = await this.orderRepo.updateOrderStatusById(orderNumber, 'CANCELLED')
         if (!orderNew) throw { code: 404, message: 'Order not found' }
         
-        // Mailer : inform user that an order has been shipped
-        const emailHtml = getOrderMailTemplate({
-            username: orderNew.user?.username ?? "",
-            orderNumber: orderNumber,
-            title: 'Order cancelled! 🙏',
-            content: "your order has been cancel. We're very sorry about this, your payment will be refunded as soon as possible. Thanks for your trust with Alfatihah"
-        })
+        if (role === "ADMIN") {
+            // Mailer : inform user that an order has been shipped
+            const emailHtml = getOrderMailTemplate({
+                username: orderNew.user?.username ?? "",
+                orderNumber: orderNumber,
+                title: 'Order cancelled! 🙏',
+                content: "your order has been cancel. We're very sorry about this, your payment will be refunded as soon as possible. Thanks for your trust with Alfatihah"
+            })
 
-        await Mailer.client.sendMail({
-            from: `"Alfatihah Online Grocery" <${process.env.SMTP_USER}>`,
-            to: orderNew.user?.email,
-            subject: "Order is cancelled",
-            html: emailHtml,
-        })
-    }
-
-    async deleteOrderById(userId: string, orderId: string) {
-        // Repo : find order by id
-        const order = await this.orderRepo.findOrderById(orderId, "orderId")
-        if (!order) throw { code: 404, message: 'Order not found' }
-    
-        // Check if this order belongs to user
-        if (order.userId !== userId) throw { code: 403, message: 'Forbidden access to this order' }
-    
-        // Repo : restore stock for each order item in branch inventories
-        await Promise.all(
-            order.items.map(item => this.branchInventoryRepo.incrementStock(item.productId, item.quantity))
-        )
-    
-        // Repo : delete order 
-        await this.orderRepo.deleteOrder(orderId)
+            await Mailer.client.sendMail({
+                from: `"Alfatihah Online Grocery" <${process.env.SMTP_USER}>`,
+                to: orderNew.user?.email,
+                subject: "Order is cancelled",
+                html: emailHtml,
+            })
+        }
     }
 
     // For Task Scheduling / Cron

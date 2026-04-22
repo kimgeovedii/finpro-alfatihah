@@ -83,6 +83,7 @@ export default function ManageOrdersDetailPage() {
             })) ?? []
           }
           shippingCost={order?.shippingCost ?? 0}
+          confirmedAt={order?.confirmedAt}
           finalPrice={order?.finalPrice ?? 0}
           isLoading={isLoading}
           payments={order?.payments ?? []}

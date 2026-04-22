@@ -21,8 +21,8 @@ export class OrderCron {
         }, { timezone: cronTimezone })
 
         // Every hour
-        // cron.schedule("0 * * * *", async () => {
-        cron.schedule("* * * * *", async () => {
+        cron.schedule("0 * * * *", async () => {
+        // cron.schedule("* * * * *", async () => {
             try {
                 // Service : check order's payment deadline
                 console.log("Running order reminder cron...")

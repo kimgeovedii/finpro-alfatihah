@@ -6,14 +6,13 @@ import { Button } from "@/components/ui/button"
 import { OrderStatus, statusColorMap } from "@/constants/business.const"
 import { Badge } from "@/components/ui/badge"
 import { formatDate } from "@/utils/converter.util"
-import { BanknotesIcon, CheckBadgeIcon, CheckIcon } from "@heroicons/react/24/outline"
+import { BanknotesIcon, CheckIcon } from "@heroicons/react/24/outline"
 import { CopyField } from "@/components/button/CopyField"
 import { PaymentData } from "@/types/payment.type"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import Image from "next/image"
 import Link from "next/link"
 import { PaginationMeta } from "@/types/global.type"
-import { CheckCheck } from "lucide-react"
 
 export type OrderTableItem = {
     id: string

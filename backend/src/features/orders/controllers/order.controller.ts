@@ -109,7 +109,7 @@ export class OrderController {
     getOrderDetailByOrderNumber = async (req: AuthRequest, res: Response, next: NextFunction) => {
         try {
             const userId = req.user?.userId 
-            const isAdmin = true // for now
+            const role = req.user?.role
 
             // Route param
             const orderNumber = req.params.orderNumber as string
@@ -118,7 +118,7 @@ export class OrderController {
             if (!orderNumber.startsWith(`${orderCode}-`)) throw { code: 400, message: "Invalid order number format. Must start with 'ORD-'" }    
 
             // Service
-            const result = await this.orderService.getOrderDetailByOrderNumber(isAdmin ? null : userId, orderNumber)
+            const result = await this.orderService.getOrderDetailByOrderNumber(role, userId, orderNumber)
 
             return sendSuccess(res, result, "Order fetched")
         } catch (error: any) {
@@ -161,6 +161,9 @@ export class OrderController {
 
     postCancelOrder = async (req: AuthRequest, res: Response, next: NextFunction) => {
         try {
+            const userId = req.user?.userId
+            const role = req.user?.role
+
             // Route param
             const orderNumber = req.params.orderNumber as string
 
@@ -168,25 +171,9 @@ export class OrderController {
             if (!orderNumber.startsWith(`${orderCode}-`)) throw { code: 400, message: "Invalid order number format. Must start with 'ORD-'" }
 
             // Service
-            const data = await this.orderService.addCancelOrder(orderNumber)
+            const data = await this.orderService.addCancelOrder(userId, role, orderNumber)
 
             return sendSuccess(res, data, "Order is cancelled!")
-        } catch (error: any) {
-            next(error)
-        }
-    }
-
-    deleteOrderById = async (req: AuthRequest, res: Response, next: NextFunction) => {
-        try {
-            const userId = req.user?.userId
-
-            // Route param
-            const orderId = req.params.orderId as string
-    
-            // Service
-            await this.orderService.deleteOrderById(userId, orderId)
-
-            return sendSuccess(res, "Order deleted!")
         } catch (error: any) {
             next(error)
         }

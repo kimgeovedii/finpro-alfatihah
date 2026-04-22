@@ -83,8 +83,8 @@ export const OrderMatchingProcessedSection: React.FC<Props> = ({ items, status, 
                 </TableBody>
             </Table>
             {
-                status === "SHIPPED" || status === "CANCELLED" ?
-                    <div className={`w-full bg-${status === "SHIPPED" ? 'green' : 'red'}-100 text-${status === "SHIPPED" ? 'green' : 'red'}-500 p-3 rounded-lg my-2 font-bold text-md text-center`}>{status}!</div>
+                status && ["SHIPPED", "CANCELLED", "CONFIRMED"].includes(status) ?
+                    <div className={`w-full bg-${status === "SHIPPED" || status === "CONFIRMED" ? 'green' : 'red'}-100 text-${status === "SHIPPED" || status === "CONFIRMED" ? 'green' : 'red'}-500 p-3 rounded-lg my-2 font-bold text-md text-center`}>{status}!</div>
                 :
                     <div className="mt-5 flex gap-2">
                         <Button className="flex-1 py-5 bg-emerald-600" onClick={(e) => onShipping(orderNumber)}><ArchiveBoxIcon/> Shipping Now!</Button>

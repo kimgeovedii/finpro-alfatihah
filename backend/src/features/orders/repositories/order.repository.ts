@@ -1,4 +1,4 @@
-import { OrderStatus, Prisma } from "@prisma/client";
+import { OrderStatus, Prisma, UserRole } from "@prisma/client";
 import { prisma } from "../../../config/prisma";
 import { orderAutoConfirmLimitHour, orderCode, paymentDeadline } from "../../../constants/business.const";
 import { getDistanceInKm } from "../../../utils/location";
@@ -117,8 +117,8 @@ export class OrderRepository {
     })
   }
 
-  async findOrderDetailByOrderNumber(userId: string | null, orderNumber: string) {
-    if (userId) {
+  async findOrderDetailByOrderNumber(role: UserRole, userId: string, orderNumber: string) {
+    if (role === "CUSTOMER") {
       return await prisma.orders.findFirst({
         where: { orderNumber, userId },
         select: {
@@ -365,9 +365,7 @@ export class OrderRepository {
       },
       select: { id: true, orderNumber: true, paymentDeadline: true }
     })
-  } 
-
-  deleteOrder = async (id: string) => prisma.orders.delete({ where: { id } })
+  }
 
   async cancelExpiredUnpaidOrders() {
     const now = new Date()

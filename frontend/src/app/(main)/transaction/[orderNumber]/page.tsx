@@ -8,14 +8,38 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { Check, Package, Truck, Home } from "lucide-react"
 import { OrderStatusStepsCard } from '@/features/order/components/OrderStatusStepsCard';
-import { useOrderDetailData } from '@/features/order/hooks/useOrder';
+import { useCancelOrderStatusById, useOrderDetailData } from '@/features/order/hooks/useOrder';
 import { formatListSchedule } from '@/utils/converter.util';
+import Swal from 'sweetalert2';
 
 export default function TransactionDetailPage() {
   // For repo fetching
   const params = useParams()
   const orderNumber = params?.orderNumber as string
   const { order, isLoading, fetchOrderDetail } = useOrderDetailData(orderNumber)
+
+  const { cancelOrder, isCancellingOrder } = useCancelOrderStatusById()
+
+  const handleCancelOrder = async (orderNumber: string) => {
+    const confirm = await Swal.fire({
+      title: "Order Rejection",
+      text: `Are you sure want to cancel this order?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, proceed",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#2d766f",
+    })
+    if (!confirm.isConfirmed) return 
+
+    const { success, message } = await cancelOrder(orderNumber)
+    await Swal.fire({
+      title: success ? "Order cancel!" : "Opps!",
+      text: message,
+      icon: success ? "success" : "error",
+      confirmButtonColor: "#10b981",
+    })
+  }
 
   const statusSteps = [
     {
@@ -89,12 +113,18 @@ export default function TransactionDetailPage() {
             })) ?? []}
          />
           <PaymentSummaryCard
+            orderNumber={orderNumber}
             totalItem={order?.items?.reduce((acc, item) => acc + item.quantity, 0) ?? 0}
             shippingCost={order?.shippingCost ?? 0}
             totalPrice={order?.totalPrice ?? 0}
             totalSaving={0}
-            finalPrice={order?.finalPrice ?? 0}
-         />
+            finalPrice={order?.finalPrice ?? 0} 
+            orderId={order?.id ?? '-'} 
+            status={order?.status ?? '-'} 
+            paymentDeadline={order?.paymentDeadline ?? '-'} 
+            paymentEvidence={order?.payments[0].evidence}
+            onCancel={handleCancelOrder}         
+          />
         </div>
       </div>
     </div>

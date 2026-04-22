@@ -131,16 +131,16 @@
 
 /**
  * @openapi
- * /api/orders/{orderId}:
- *   delete:
- *     summary: Delete order by id
- *     description: Delete an order by its ID, restoring branch inventory stock for each item. Order items and payments are removed automatically via cascade.
+ * /api/orders/cancelling/{orderNumber}:
+ *   post:
+ *     summary: Cancel order by order number
+ *     description: Cancel an order by its ID, restoring branch inventory stock for each item.
  *     tags: [Order]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: orderId
+ *         name: orderNumber
  *         required: true
  *         schema:
  *           type: string

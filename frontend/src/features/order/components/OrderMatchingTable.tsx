@@ -4,6 +4,8 @@ import { OrderManagementTableOrderPlacedSection } from "./OrderMatchingTableOrde
 import { OrderManagementTableShippedSection } from "./OrderMatchingTableShippedSection"
 import { AddressData, BranchData } from "@/types/address.type"
 import { OrderMatchingProcessedSection } from "./OrderMatchingTableProcessedSection"
+import { OrderManagementTableOrderDeliveredSection } from "./OrderMatchingTableOrderDelivered"
+import { CopyField } from "@/components/button/CopyField"
 
 export type OrderMatchingProduct = {
     productName: string
@@ -26,6 +28,7 @@ type Props = {
     payments: PaymentData[]
     branch?: BranchData
     address?: AddressData
+    confirmedAt?: string | null
     isLoading: boolean
     shippingCost: number 
     finalPrice: number
@@ -35,11 +38,11 @@ type Props = {
     onShipping: (orderNumber: string) => void
 }
 
-export const OrderMatchingTable: React.FC<Props> = ({ orderNumber, items, isLoading, payments, onSearch, shippingCost, finalPrice, onShipping, onCancel, status, branch, address, distance }) => {    
+export const OrderMatchingTable: React.FC<Props> = ({ orderNumber, items, isLoading, payments, onSearch, shippingCost, finalPrice, onShipping, onCancel, status, branch, address, distance, confirmedAt }) => {    
     return (
         <div className="bg-white border border-slate-200 rounded-2xl p-6 w-full">
             <div className="flex items-center justify-between mb-5">
-                <h2 className="text-lg font-semibold text-slate-800">#{orderNumber}</h2>
+                <CopyField label="Order number" value={orderNumber}/>
             </div>
             <div className="flex flex-col">
                 <div className="flex gap-3">
@@ -76,7 +79,7 @@ export const OrderMatchingTable: React.FC<Props> = ({ orderNumber, items, isLoad
                     <div className="pb-4 w-full">
                         <p className="text-sm font-semibold text-emerald-600 mb-2">Shipped</p>
                         {
-                            status === "SHIPPED" ?
+                            status === "SHIPPED" || status === "CONFIRMED" ?
                                 <OrderManagementTableShippedSection 
                                     branchCity={branch?.city ?? "-"}
                                     branchAddress={branch?.address ?? "-"}
@@ -99,9 +102,9 @@ export const OrderMatchingTable: React.FC<Props> = ({ orderNumber, items, isLoad
                             <Home className="w-4 h-4"/>
                         </div>
                     </div>
-                    <div className="pb-4">
-                        <p className="text-sm font-semibold text-emerald-600">Delivered</p>
-                        <p className="text-xs text-slate-400">Order completed</p>
+                    <div className="pb-4 w-full">
+                        <p className="text-sm font-semibold text-emerald-600 mb-2">Delivered</p>
+                        { status === "CONFIRMED" ? <OrderManagementTableOrderDeliveredSection confirmedAt={confirmedAt}/> : <p className="text-xs text-slate-400">Order delivered</p> }
                     </div>
                 </div>
             </div>
