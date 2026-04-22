@@ -245,7 +245,7 @@ export class OrderService {
         if (order.status === "CONFIRMED") throw { code: 422, message: 'Order already confirmed' }
 
         // Make sure only order who still shipped can be confirmed
-        if (order.status !== "SHIPPED") throw { code: 422, message: 'Only order who still in shipped can be cancelled' }
+        if (order.status !== "SHIPPED") throw { code: 422, message: 'Only order who still in shipped can be confirmed' }
 
         // Repo : update order status
         const orderNew = await this.orderRepo.updateOrderStatusById(orderNumber, 'CONFIRMED')

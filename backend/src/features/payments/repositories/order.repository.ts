@@ -6,9 +6,7 @@ export class OrderRepository {
     return await prisma.orders.findFirst({
       where: { id, status, 
         payments: {
-          every: {
-            status: PaymentStatus.PENDING, method: "MANUAL"
-          }
+          every: { method: "MANUAL" }
         } 
       },
       select: {

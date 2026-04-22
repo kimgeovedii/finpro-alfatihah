@@ -1,11 +1,12 @@
+import { PaymentStatus } from "@prisma/client";
 import { prisma } from "../../../config/prisma";
 
 export class PaymentRepository {
-    async updatePaymentEvidenceByOrderId(orderId: string, evidence: string) {
+    async updatePaymentEvidenceByOrderId(orderId: string, evidence: string | null, status: PaymentStatus) {
         return await prisma.payments.updateMany({
             where: { orderId },
             data: {
-                evidence, method: 'MANUAL', status: 'PENDING',
+                evidence, method: 'MANUAL', status,
             }
         })
     }
