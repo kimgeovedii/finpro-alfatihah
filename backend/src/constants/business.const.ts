@@ -2,6 +2,7 @@
 export const shippingRatePerKM: number = 1000 
 export const baseShippingCost: number = 5000   
 export const paymentDeadline: number = 60 * 60 * 1000 // 1 hour
+export const orderAutoConfirmLimitHour: number = 60 * 60 * 1000 * 168 // 168 hours / 7 days
 export const orderCode: string = 'ORD'
 
 // Third service

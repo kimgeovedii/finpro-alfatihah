@@ -44,6 +44,16 @@ const NAV_ITEMS = [
     icon: <ShoppingCartIcon className="w-5 h-5" />,
   },
   {
+    title: 'Manage Order',
+    href: '/manage-order',
+    icon: <ClipboardDocumentCheckIcon className="w-5 h-5" />
+  },
+  {
+    title: 'Manage Project',
+    href: '/manage-project',
+    icon: <BriefcaseIcon className="w-5 h-5" />
+  },
+  {
     title: "My Transaction",
     href: "/transaction",
     icon: <ArrowsRightLeftIcon className="w-5 h-5" />,

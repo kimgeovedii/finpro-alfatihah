@@ -8,39 +8,84 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { Check, Package, Truck, Home } from "lucide-react"
 import { OrderStatusStepsCard } from '@/features/order/components/OrderStatusStepsCard';
-import { useOrderDetailData } from '@/features/order/hooks/useOrder';
+import { useCancelOrderStatusById, useConfirmOrderStatusById, useOrderDetailData } from '@/features/order/hooks/useOrder';
 import { formatListSchedule } from '@/utils/converter.util';
+import Swal from 'sweetalert2';
 
 export default function TransactionDetailPage() {
   // For repo fetching
   const params = useParams()
   const orderNumber = params?.orderNumber as string
   const { order, isLoading, fetchOrderDetail } = useOrderDetailData(orderNumber)
+  const { confirmOrder, isConfirmingOrder } = useConfirmOrderStatusById()
+  const { cancelOrder, isCancellingOrder } = useCancelOrderStatusById()
+
+  const handleCancelOrder = async (orderNumber: string) => {
+    const confirm = await Swal.fire({
+      title: "Order Rejection",
+      text: `Are you sure want to cancel this order?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, proceed",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#2d766f",
+    })
+    if (!confirm.isConfirmed) return 
+
+    const { success, message } = await cancelOrder(orderNumber)
+    await Swal.fire({
+      title: success ? "Order cancel!" : "Opps!",
+      text: message,
+      icon: success ? "success" : "error",
+      confirmButtonColor: "#10b981",
+    })
+  }
+
+  const handleConfirmOrder = async (orderNumber: string) => {
+    const confirm = await Swal.fire({
+      title: "Order Confirmation",
+      text: `Are you sure want to confirm this order?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, proceed",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#2d766f",
+    })
+    if (!confirm.isConfirmed) return 
+
+    const { success, message } = await confirmOrder(orderNumber)
+    await Swal.fire({
+      title: success ? "Order confirm!" : "Opps!",
+      text: message,
+      icon: success ? "success" : "error",
+      confirmButtonColor: "#10b981",
+    })
+  }
 
   const statusSteps = [
     {
       key: "WAITING_PAYMENT",
       label: "Order Placed",
       sub: "Waiting for payment",
-      icon: <Check className="w-4 h-4" />
+      icon: <Check className="w-4 h-4"/>
     },
     {
       key: "PROCESSING",
       label: "Processed",
       sub: "Preparing your order",
-      icon: <Package className="w-4 h-4" />
+      icon: <Package className="w-4 h-4"/>
     },
     {
       key: "SHIPPED",
       label: "Shipped",
       sub: "On the way",
-      icon: <Truck className="w-4 h-4" />
+      icon: <Truck className="w-4 h-4"/>
     },
     {
       key: "CONFIRMED",
       label: "Delivered",
       sub: "Order completed",
-      icon: <Home className="w-4 h-4" />
+      icon: <Home className="w-4 h-4"/>
     }
   ]
   
@@ -57,7 +102,13 @@ export default function TransactionDetailPage() {
       </div>
       <div className='flex w-full gap-5'>
         <div className='flex-1 flex flex-col space-y-5'>
-          <OrderStatusStepsCard statusSteps={statusSteps} currentStatus={order?.status && order?.status === "WAITING_PAYMENT_CONFIRMATION" ? "WAITING_PAYMENT" : order?.status ?? ""} />
+          <OrderStatusStepsCard 
+            statusSteps={statusSteps} 
+            currentStatus={order?.status && order?.status === "WAITING_PAYMENT_CONFIRMATION" ? "WAITING_PAYMENT" : order?.status ?? ""}
+            orderNumber={orderNumber}
+            onConfirm={handleConfirmOrder}
+            status={order?.status}
+          />
           <OrderDetailBranchCard
             branch={{
               name: order?.branch?.storeName ?? "-",
@@ -70,10 +121,10 @@ export default function TransactionDetailPage() {
               orderStatus: order?.status ?? "-",
               paymentStatus: order?.payments[0].status ?? '-',
               paymentMethod: order?.payments[0].method ?? '-',
-              createdAt: order?.createdAt ? new Date(order.createdAt).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" }) : "-",
-              paymentDeadlineAt: order?.paymentDeadline ? new Date(order.paymentDeadline).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" }) : "-",
+              createdAt: order?.createdAt,
+              paymentDeadline: order?.paymentDeadline,
             }}
-          />
+         />
         </div>
         <div className='flex-1 flex flex-col space-y-5'>
           <OrderDetailItemListCard
@@ -89,11 +140,17 @@ export default function TransactionDetailPage() {
             })) ?? []}
           />
           <PaymentSummaryCard
+            orderNumber={orderNumber}
             totalItem={order?.items?.reduce((acc, item) => acc + item.quantity, 0) ?? 0}
             shippingCost={order?.shippingCost ?? 0}
             totalPrice={order?.totalPrice ?? 0}
             totalSaving={0}
-            finalPrice={order?.finalPrice ?? 0}
+            finalPrice={order?.finalPrice ?? 0} 
+            orderId={order?.id ?? '-'} 
+            status={order?.status ?? '-'} 
+            paymentDeadline={order?.paymentDeadline ?? '-'} 
+            paymentEvidence={order?.payments[0].evidence}
+            onCancel={handleCancelOrder}         
           />
         </div>
       </div>

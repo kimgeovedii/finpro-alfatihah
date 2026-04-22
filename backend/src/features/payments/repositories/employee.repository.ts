@@ -13,4 +13,13 @@ export class EmployeeRepository {
             }
         })
     }
+
+    async findEmployeeByUserId(userId: string) {
+        return await prisma.employee.findFirst({
+            where: { 
+                userId, role: 'STORE_ADMIN'
+            },
+            select: { id: true }
+        })
+    }
 }

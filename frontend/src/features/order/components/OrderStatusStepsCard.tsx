@@ -1,6 +1,7 @@
 import React from "react"
+import { OrderConfirmButton } from "./OrderConfirmButton"
 
-type StatusInfo = {
+export type StatusInfo = {
     key: string 
     label: string 
     sub: string 
@@ -10,9 +11,12 @@ type StatusInfo = {
 type Props = {
     statusSteps: StatusInfo[]
     currentStatus: string
+    orderNumber: string
+    status?: string
+    onConfirm: (orderNumber: string) => void
 }
 
-export const OrderStatusStepsCard: React.FC<Props> = ({ statusSteps, currentStatus }) => {
+export const OrderStatusStepsCard: React.FC<Props> = ({ statusSteps, currentStatus, onConfirm, orderNumber, status }) => {
     const getStepState = (stepKey: string, currentStatus: string): "done" | "active" | "upcoming" => {
         const currentIdx = statusSteps.findIndex(s => s.key === currentStatus)
         const stepIdx = statusSteps.findIndex(s => s.key === stepKey)
@@ -26,7 +30,6 @@ export const OrderStatusStepsCard: React.FC<Props> = ({ statusSteps, currentStat
     return (
         <div className="bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
             <p className="text-slate-800 font-bold mb-5">Order Progress</p>
-
             <div className="flex flex-col gap-0">
                 {
                     statusSteps.map((step, idx) => {
@@ -58,6 +61,7 @@ export const OrderStatusStepsCard: React.FC<Props> = ({ statusSteps, currentStat
                     })
                 }
             </div>
+            { status === "SHIPPED" && <OrderConfirmButton orderNumber={orderNumber} onConfirm={onConfirm}/> }
         </div>
     )
 }

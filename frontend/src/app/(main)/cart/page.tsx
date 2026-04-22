@@ -1,10 +1,10 @@
 "use client";
-
 import { useAllCartData, useCartSummary, useDeleteCart, useDeleteCartItem, useUpdateCartItem } from "@/features/cart/hooks/useCart"
 import { CartSummary } from "@/features/cart/components/CartSummary"
 import { BranchHeader } from "@/features/cart/components/BranchHeader";
 import { CartItemCard } from "@/features/cart/components/CartItemCard";
 import Swal from "sweetalert2";
+import { Button } from "@/components/ui/button";
 
 export default function CartPage() {
   const { summary, isLoading, fetchCartSummary } = useCartSummary()
@@ -153,7 +153,7 @@ export default function CartPage() {
                 </div>
               ))
             )}
-            { meta && meta.page < meta.total_page && <button className="mt-4 px-4 py-2 bg-slate-800 text-white rounded-lg" onClick={() => fetchAllCarts(meta.page + 1)}>See More</button> }
+            { meta && meta.page < meta.total_page && <Button className="mt-4 px-4 py-2 bg-slate-800 text-white rounded-lg" onClick={() => fetchAllCarts(meta.page + 1)}>See More</Button> }
           </div>
         </div>
       </div>

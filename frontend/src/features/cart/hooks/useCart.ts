@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react"
 import { useCartService } from "../services/cart.service"
-import { CartBranch, CartData, CartMeta, cartRepository } from "../repositories/cart.repository"
+import { cartRepository } from "../repositories/cart.repository"
+import { CartBranch, CartData } from "../repositories/cart.type"
+import { PaginationMeta } from "@/types/global.type"
 
 export const useCartSummary = () => {
     const { summary, fetchCartSummary, isLoading, error } = useCartService()
@@ -14,7 +16,7 @@ export const useCartSummary = () => {
 
 export const useAllCartData = () => {
     const [carts, setCarts] = useState<CartBranch[]>([])
-    const [meta, setMeta] = useState<CartMeta | null>(null)
+    const [meta, setMeta] = useState<PaginationMeta | null>(null)
     const [isLoadingAllCart, setIsLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
