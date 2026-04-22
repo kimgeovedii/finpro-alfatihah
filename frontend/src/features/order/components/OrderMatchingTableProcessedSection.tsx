@@ -56,35 +56,35 @@ export const OrderMatchingProcessedSection: React.FC<Props> = ({ items, status, 
                         </TableRow>
                     ) : (
                         filteredItems.map(item => {
-                        const matched = item.stockBefore >= item.quantity
-        
-                        return (
-                            <TableRow key={item.id}>
-                                <TableCell>{item.product.productName}</TableCell>
-                                <TableCell>{item.quantity}</TableCell>
-                                {
-                                    status === "PROCESSING" && 
-                                        <>
-                                            <TableCell>{item.stockBefore}</TableCell>
-                                            <TableCell>
-                                                <Badge className={matched ? "bg-teal-100 text-teal-500" : "bg-red-100 text-red-500"}>
-                                                    {matched ? "Matched" : "Insufficient"}
-                                                </Badge>
-                                            </TableCell>
-                                            <TableCell>{item.stockAfter}</TableCell>
-                                        </>
-                                }
-                                <TableCell>Rp {item.price.toLocaleString()}</TableCell>
-                                <TableCell>Rp {(item.price * item.quantity).toLocaleString()}</TableCell>
-                            </TableRow>
-                        )
+                            const matched = item.stockBefore >= item.quantity
+            
+                            return (
+                                <TableRow key={item.id}>
+                                    <TableCell>{item.product.productName}</TableCell>
+                                    <TableCell>{item.quantity}</TableCell>
+                                    {
+                                        status === "PROCESSING" && 
+                                            <>
+                                                <TableCell>{item.stockBefore}</TableCell>
+                                                <TableCell>
+                                                    <Badge className={matched ? "bg-teal-100 text-teal-500" : "bg-red-100 text-red-500"}>
+                                                        {matched ? "Matched" : "Insufficient"}
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell>{item.stockAfter}</TableCell>
+                                            </>
+                                    }
+                                    <TableCell>Rp {item.price.toLocaleString()}</TableCell>
+                                    <TableCell>Rp {(item.price * item.quantity).toLocaleString()}</TableCell>
+                                </TableRow>
+                            )
                         })
                     )}
                 </TableBody>
             </Table>
             {
-                status === "SHIPPED" ?
-                    <div className="w-full bg-green-100 text-green-500 p-4 rounded-lg my-2 font-bold text-md text-center">Shipped!</div>
+                status === "SHIPPED" || status === "CANCELLED" ?
+                    <div className={`w-full bg-${status === "SHIPPED" ? 'green' : 'red'}-100 text-${status === "SHIPPED" ? 'green' : 'red'}-500 p-3 rounded-lg my-2 font-bold text-md text-center`}>{status}!</div>
                 :
                     <div className="mt-5 flex gap-2">
                         <Button className="flex-1 py-5 bg-emerald-600" onClick={(e) => onShipping(orderNumber)}><ArchiveBoxIcon/> Shipping Now!</Button>

@@ -22,7 +22,7 @@ export class OrderRepository {
   async updateOrderStatusById(id: string, status: OrderStatus) {
     return await prisma.orders.update({
       where: { id },
-      data: { status }
+      data: { status, ...(status === "CANCELLED" && { rejectedAt: new Date() }) }
     })
   }
 }

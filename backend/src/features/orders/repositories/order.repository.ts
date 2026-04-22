@@ -1,6 +1,6 @@
 import { OrderStatus, Prisma } from "@prisma/client";
 import { prisma } from "../../../config/prisma";
-import { orderCode, paymentDeadline } from "../../../constants/business.const";
+import { orderAutoConfirmLimitHour, orderCode, paymentDeadline } from "../../../constants/business.const";
 import { getDistanceInKm } from "../../../utils/location";
 
 export class OrderRepository {
@@ -231,7 +231,7 @@ export class OrderRepository {
     return await prisma.$transaction(async (tx) => {
       await tx.orders.updateMany({
         where: { orderNumber },
-        data: { status }
+        data: { status, ...(status === "CANCELLED" && { rejectedAt: new Date() }), ...(status === "SHIPPED" && { shippedAt: new Date() }) }
       })
   
       const order = await tx.orders.findFirst({
@@ -410,6 +410,23 @@ export class OrderRepository {
       })
 
       return orderIds.length
+    })
+  }
+
+  async confirmOldShippedOrder() {
+    const cutoffDate = new Date(Date.now() - orderAutoConfirmLimitHour)
+  
+    return await prisma.orders.updateMany({
+      where: {
+        status: "SHIPPED",
+        shippedAt: {
+          not: null,
+          lt: cutoffDate,
+        },
+      },
+      data: {
+        status: "CONFIRMED", confirmedAt: new Date(),
+      },
     })
   }
 }

@@ -12,6 +12,7 @@ import { Mailer } from "../../../config/mailer";
 import { getBranchOrderBroadcastTemplate, getOrderCreatedPaymentTemplate } from "../views/order.view"
 import { OrderStatus } from "@prisma/client"
 import { getOrderMailTemplate } from "../../../utils/template"
+import { orderAutoConfirmLimitHour } from "../../../constants/business.const"
 
 export class OrderService {
     private orderRepo = new OrderRepository()
@@ -265,5 +266,10 @@ export class OrderService {
     async getExpiredOrder() {
         // Repo : get expired order
         await this.orderRepo.cancelExpiredUnpaidOrders()
+    }
+
+    async getOldShippedOrder() {
+        // Repo : get order that has been shipped for more than n hours
+        await this.orderRepo.confirmOldShippedOrder()
     }
 }
