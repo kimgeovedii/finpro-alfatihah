@@ -6,24 +6,29 @@ import { useAuthService } from '@/features/auth/service/auth.service'
 
 const NAV_ITEMS = [
   {
-    title: 'Dashboard',
-    href: '/dashboard',
-    icon: <HomeIcon className="w-5 h-5" />
+    title: "Dashboard",
+    href: "/dashboard",
+    icon: <HomeIcon className="w-5 h-5" />,
   },
   {
-    title: 'Products',
-    href: '/dashboard/products',
-    icon: <CubeIcon className="w-5 h-5" />
+    title: "Products",
+    href: "/dashboard/products",
+    icon: <CubeIcon className="w-5 h-5" />,
   },
   {
-    title: 'Cart',
-    href: '/cart',
-    icon: <ShoppingCartIcon className="w-5 h-5" />
+    title: "Categories",
+    href: "/dashboard/categories",
+    icon: <TagIcon className="w-5 h-5" />,
   },
   {
-    title: 'My Transaction',
-    href: '/transaction',
-    icon: <ArrowsRightLeftIcon className="w-5 h-5" />
+    title: "Accounts",
+    href: "/dashboard/accounts",
+    icon: <UsersIcon className="w-5 h-5" />,
+  },
+  {
+    title: "Cart",
+    href: "/cart",
+    icon: <ShoppingCartIcon className="w-5 h-5" />,
   },
   {
     title: 'Manage Order',
@@ -36,21 +41,31 @@ const NAV_ITEMS = [
     icon: <BriefcaseIcon className="w-5 h-5" />
   },
   {
-    title: 'Tracking Document',
-    href: '/tracking',
-    icon: <ClipboardDocumentCheckIcon className="w-5 h-5" />
+    title: "My Transaction",
+    href: "/transaction",
+    icon: <ArrowsRightLeftIcon className="w-5 h-5" />,
   },
   {
-    title: 'Master Data',
-    href: '/master-data',
-    icon: <ServerStackIcon className="w-5 h-5" />
+    title: "Manage Project",
+    href: "/manage-project",
+    icon: <BriefcaseIcon className="w-5 h-5" />,
   },
   {
-    title: 'Settings',
-    href: '/settings',
-    icon: <Cog6ToothIcon className="w-5 h-5" />
-  }
-]
+    title: "Tracking Document",
+    href: "/tracking",
+    icon: <ClipboardDocumentCheckIcon className="w-5 h-5" />,
+  },
+  {
+    title: "Master Data",
+    href: "/master-data",
+    icon: <ServerStackIcon className="w-5 h-5" />,
+  },
+  {
+    title: "Settings",
+    href: "/settings",
+    icon: <Cog6ToothIcon className="w-5 h-5" />,
+  },
+];
 
 export const Sidebar = () => {
   const cartItems = useAuthService((state) => state.cartItems)
@@ -60,7 +75,7 @@ export const Sidebar = () => {
     <aside className="fixed inset-y-0 left-0 z-50 w-64 bg-white/70 backdrop-blur-3xl border-r border-white/60 shadow-[4px_0_24px_rgba(0,0,0,0.02)] transition-transform duration-300 md:translate-x-0 hidden md:block">
       <div className="flex h-16 items-center px-6 border-b border-emirald-100/50">
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-tr from-emerald-500 to-green-400 text-white shadow-sm">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-tr from-emerald-500 to-green-400 text-white shadow-sm">
             <GlobeAmericasIcon className="h-5 w-5" />
           </div>
           <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-700 to-teal-600">Alfatihah</span>
@@ -94,5 +109,5 @@ export const Sidebar = () => {
         }
       </div>
     </aside>
-  )
-}
+  );
+};
