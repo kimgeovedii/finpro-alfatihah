@@ -77,6 +77,7 @@ export default function ManageOrdersPage() {
                                 finishedOrderLastMonth={summaryByBranchId?.finishedOrderLastMonth ?? 0}
                             />
                     }
+                    <hr className="my-4"/>
                     {
                         isLoading ? 
                             <SkeletonBox extraClass={'min-h-[480px]'}/>

@@ -5,6 +5,7 @@ import { AuthRepository } from "../repositories/auth.repository";
 import { authMiddleware } from "../../../middleware/auth.middleware";
 import { loginRateLimiter } from "../../../middleware/rate-limiter.middleware";
 import rateLimit from "express-rate-limit";
+import { CartRepository } from "../repositories/cart.repository";
 
 const refreshRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -36,7 +37,8 @@ class AuthRouter {
     this.router = Router();
 
     const authRepository = new AuthRepository();
-    const authService = new AuthService(authRepository);
+    const cartRepository = new CartRepository();
+    const authService = new AuthService(authRepository, cartRepository);
     this.authController = new AuthController(authService);
 
     this.registerRoutes();
