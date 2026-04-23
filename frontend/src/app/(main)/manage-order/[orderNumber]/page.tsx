@@ -8,6 +8,7 @@ import { OrderMatchingTable } from "@/features/order/components/OrderMatchingTab
 import { useCancelOrderStatusById, useOrderDetailData, useUpdateOrderStatusById } from "@/features/order/hooks/useOrder"
 import Swal from "sweetalert2"
 import { SkeletonBox } from "@/components/layout/SkeletonBox"
+import { MessageBox } from "@/components/layout/MessageBox"
 
 export default function ManageOrdersDetailPage() {
   const params = useParams()
@@ -67,40 +68,44 @@ export default function ManageOrdersDetailPage() {
           </Button>
         </Link>
       </div>
-      <div className="flex w-full">
+      
         {
           isLoading ? 
             <SkeletonBox extraClass={'min-h-[400px]'}/>
           :
-            <OrderMatchingTable
-              orderNumber={orderNumber}
-              items={
-                order?.items?.map(dt => ({
-                  id: dt.id,
-                  quantity: dt.quantity,
-                  price: dt.product.product.basePrice,
-                  stockBefore: dt.product.currentStock,
-                  stockAfter: dt.product.currentStock - dt.quantity,
-                  product: { 
-                    productName: dt.product.product.productName, 
-                    imageUrl: dt.product.product.productImages[0].imageUrl 
-                  },
-                })) ?? []
-              }
-              shippingCost={order?.shippingCost ?? 0}
-              confirmedAt={order?.confirmedAt}
-              finalPrice={order?.finalPrice ?? 0}
-              isLoading={isLoading}
-              payments={order?.payments ?? []}
-              onShipping={handleShippingOrder}
-              onCancel={handleCancelOrder}
-              branch={order?.branch}
-              address={order?.address}
-              status={order?.status}
-              distance={order?.distance}
-            />
+            !order ? 
+              <MessageBox context={'No order found'} image={"/assets/empty.png"} urlButton={'/manage-order'} titleButton='Back to Order' description={`We're sorry, we cannot find <b>${orderNumber}</b> order. Double check your order number or contact our call center for more information`}/>
+            :
+              <div className="flex w-full">
+                <OrderMatchingTable
+                  orderNumber={orderNumber}
+                  items={
+                    order?.items?.map(dt => ({
+                      id: dt.id,
+                      quantity: dt.quantity,
+                      price: dt.product.product.basePrice,
+                      stockBefore: dt.product.currentStock,
+                      stockAfter: dt.product.currentStock - dt.quantity,
+                      product: { 
+                        productName: dt.product.product.productName, 
+                        imageUrl: dt.product.product.productImages[0].imageUrl 
+                      },
+                    })) ?? []
+                  }
+                  shippingCost={order?.shippingCost ?? 0}
+                  confirmedAt={order?.confirmedAt}
+                  finalPrice={order?.finalPrice ?? 0}
+                  isLoading={isLoading}
+                  payments={order?.payments ?? []}
+                  onShipping={handleShippingOrder}
+                  onCancel={handleCancelOrder}
+                  branch={order?.branch}
+                  address={order?.address}
+                  status={order?.status}
+                  distance={order?.distance}
+                />
+              </div>
         }
-      </div>
     </div>
   )
 }

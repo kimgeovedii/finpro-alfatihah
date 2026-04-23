@@ -83,7 +83,7 @@ export default function CartPage() {
     fetchAllCarts(1)
   }
   
-  const handleDecrease = async (cartItemId: string, qty: number, productName: string) => {
+  const handleDecrease = async (cartItemId: string, cartId: string, qty: number, productName: string) => {
     if (qty <= 1) {
       const confirm = await Swal.fire({
         title: "Remove item?",
@@ -96,7 +96,7 @@ export default function CartPage() {
   
       if (!confirm.isConfirmed) return
   
-      const success = await deleteCart(cartItemId)
+      const success = await deleteCart(cartId)
       if (success) {
         await Swal.fire({
           title: "Item deleted",
@@ -135,32 +135,32 @@ export default function CartPage() {
           <hr className="my-5"/>
           <div>
             {
-              isLoadingAllCart ? (
+              isLoadingAllCart ?
                 <div className="flex flex-col space-y-2">
                   <SkeletonBox extraClass={'min-h-[20px]'}/>
                   <SkeletonBox extraClass={'min-h-[120px]'}/>
                   <SkeletonBox extraClass={'min-h-[120px]'}/>
                 </div>
-            ) : carts.length === 0 ? (
-              <MessageBox context={'No items in carts'} image={"/assets/empty.png"} urlButton={'/dashboard/products'} titleButton='Browse Now!' description="Don't miss out! Browse our products today and discover many exciting offers before they run out"/>
-            ) : (
-              carts.map((cart: any) => (
-                <div key={cart.id} className="mb-6">
-                  <BranchHeader id={cart.branch.id} storeName={cart.branch.storeName} onRemove={() => handleRemoveCart(cart.id)} cartId={cart.id}/>
-                  {
-                    cart.items.map((dt: any) => (
-                      <CartItemCard key={dt.id}
-                        slugName={dt.product.id} branchId={cart.branchId} productName={dt.product.product.productName} description={dt.product.product.description} 
-                        basePrice={dt.product.product.basePrice} mainImage="/mainImages/coke.png" qty={dt.quantity} currentStock={dt.product.currentStock}
-                        onDecrease={() => handleDecrease(dt.id, dt.quantity,dt.product.product.productName)}
-                        onIncrease={() => handleIncrease(dt.id, dt.quantity, dt.product.currentStock)}                        
-                        onRemove={() => handleRemoveCartItem(dt.id, `(${dt.quantity}) ${dt.product.product.productName}`)}
-                      />
-                    ))
-                  }
-                </div>
-              ))
-            )}
+              : carts.length === 0 ? 
+                <MessageBox context={'No items in carts'} image={"/assets/empty.png"} urlButton={'/dashboard/products'} titleButton='Browse Now!' description="Don't miss out! Browse our products today and discover many exciting offers before they run out"/>
+              : 
+                carts.map((cart: any) => (
+                  <div key={cart.id} className="mb-6">
+                    <BranchHeader id={cart.branch.id} storeName={cart.branch.storeName} onRemove={() => handleRemoveCart(cart.id)} cartId={cart.id}/>
+                    {
+                      cart.items.map((dt: any) => (
+                        <CartItemCard key={dt.id}
+                          slugName={dt.product.id} branchId={cart.branchId} productName={dt.product.product.productName} description={dt.product.product.description} 
+                          basePrice={dt.product.product.basePrice} mainImage="/mainImages/coke.png" qty={dt.quantity} currentStock={dt.product.currentStock}
+                          onDecrease={() => handleDecrease(dt.id, cart.id, dt.quantity,dt.product.product.productName)}
+                          onIncrease={() => handleIncrease(dt.id, dt.quantity, dt.product.currentStock)}                        
+                          onRemove={() => handleRemoveCartItem(dt.id, `(${dt.quantity}) ${dt.product.product.productName}`)}
+                        />
+                      ))
+                    }
+                  </div>
+                ))
+            }
             { meta && meta.page < meta.total_page && <Button className="mt-4 px-4 py-2 bg-slate-800 text-white rounded-lg" onClick={() => fetchAllCarts(meta.page + 1)}>See More</Button> }
           </div>
         </div>

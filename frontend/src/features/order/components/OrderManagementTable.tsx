@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import Image from "next/image"
 import Link from "next/link"
 import { PaginationMeta } from "@/types/global.type"
+import { MessageBox } from "@/components/layout/MessageBox"
 
 export type OrderTableItem = {
     id: string
@@ -101,11 +102,13 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
                     {
                         isLoading ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="text-slate-400 py-10">Loading...</TableCell>
+                                <TableCell colSpan={7} className="text-slate-400 py-10">Loading...</TableCell>
                             </TableRow>
                         ) : filteredOrders.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="text-slate-400 py-10">No orders found</TableCell>
+                                <TableCell colSpan={7} className="text-slate-400 py-10">
+                                    <MessageBox context={'No orders found'} image={"/assets/empty.png"} description={`No <b>${activeStatus}</b> order / transaction found`}/>
+                                </TableCell>
                             </TableRow>
                         ) : (
                             filteredOrders.map(dt => {

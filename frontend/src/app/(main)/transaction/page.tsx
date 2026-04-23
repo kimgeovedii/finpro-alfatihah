@@ -1,4 +1,5 @@
 "use client";
+import { MessageBox } from "@/components/layout/MessageBox";
 import { SkeletonBox } from "@/components/layout/SkeletonBox";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -97,12 +98,13 @@ export default function TransactionPage() {
                   orderId={dt.id} orderNumber={dt.orderNumber} status={dt.status} totalPrice={dt.totalPrice} finalPrice={dt.finalPrice} shippingCost={dt.shippingCost}
                   paymentDeadline={dt.paymentDeadline} totalItems={dt.totalItems} productList={dt.productList} createdAt={dt.createdAt} paymentMethod={dt.payments[0]?.method}
                   paymentStatus={dt.payments[0]?.status} paymentEvidence={dt.payments[0]?.evidence}
-                  onComplete={() => console.log("complete")}
-                  onDetail={() => console.log("detail")}
                 />
               ))
             }
-            { meta && meta.page < meta.total_page && <Button className="mt-4 px-4 py-2 bg-slate-800 text-white rounded-lg" onClick={() => fetchAllOrders(meta.page + 1)}>See More</Button> }
+            { 
+              !isLoading && orders.length === 0 && <MessageBox context={'No orders found'} image={"/assets/empty.png"} urlButton={'/dashboard/products'} titleButton='Browse Now!' description={"It looks like you haven't made any transactions yet. Buy a product now and get an extra discount"}/>
+            }
+            { meta && meta.page < meta.total_page && <Button className="mt-4 px-4 py-1 bg-teal-700 text-white rounded-lg mx-auto block" onClick={() => fetchAllOrders(meta.page + 1)}>See More</Button> }
           </div>
         </div>
       </div>

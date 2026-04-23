@@ -180,10 +180,7 @@ export default function CartDetailPage() {
               }))
             }
           />
-          <PaymentMethodSelect 
-            selectedMethod={paymentMethod} 
-            onSelectMethod={setPaymentMethod}
-          />
+          <PaymentMethodSelect selectedMethod={paymentMethod} onSelectMethod={setPaymentMethod}/>
           <CartPaymentSummaryCard
             totalItem={cart.totalQty}
             shippingCost={cart.shipping?.shippingCost ?? 0}
