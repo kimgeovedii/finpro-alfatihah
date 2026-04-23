@@ -7,12 +7,13 @@ import { OrderStatus, statusColorMap } from "@/constants/business.const"
 import { Badge } from "@/components/ui/badge"
 import { formatDate } from "@/utils/converter.util"
 import { BanknotesIcon, CheckIcon } from "@heroicons/react/24/outline"
-import { CopyField } from "@/components/button/CopyField"
+import { CopyFieldButton } from "@/components/button/CopyFieldButton"
 import { PaymentData } from "@/types/payment.type"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import Image from "next/image"
 import Link from "next/link"
 import { PaginationMeta } from "@/types/global.type"
+import { MessageBox } from "@/components/layout/MessageBox"
 
 export type OrderTableItem = {
     id: string
@@ -53,9 +54,9 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
     }
 
     // Filtering
-    const filteredOrders = orders.filter((o) => {
-        const matchStatus = activeStatus === "ALL" || o.status === activeStatus
-        const matchSearch = search === "" || o.orderNumber.toLowerCase().includes(search.toLowerCase()) || o.customerName.toLowerCase().includes(search.toLowerCase())
+    const filteredOrders = orders.filter(dt => {
+        const matchStatus = activeStatus === "ALL" || dt.status === activeStatus
+        const matchSearch = search === "" || dt.orderNumber.toLowerCase().includes(search.toLowerCase()) || dt.customerName.toLowerCase().includes(search.toLowerCase())
         
         return matchStatus && matchSearch
     })
@@ -100,12 +101,16 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
                 <TableBody>
                     {
                         isLoading ? (
+                            // Render loading element
                             <TableRow>
-                                <TableCell colSpan={6} className="text-slate-400 py-10">Loading...</TableCell>
+                                <TableCell colSpan={7} className="text-slate-400 py-10">Loading...</TableCell>
                             </TableRow>
                         ) : filteredOrders.length === 0 ? (
+                            // Render failed fetching condition
                             <TableRow>
-                                <TableCell colSpan={6} className="text-slate-400 py-10">No orders found</TableCell>
+                                <TableCell colSpan={7} className="text-slate-400 py-10">
+                                    <MessageBox context={'No orders found'} image={"/assets/empty.png"} description={`No <b>${activeStatus}</b> order / transaction found`}/>
+                                </TableCell>
                             </TableRow>
                         ) : (
                             filteredOrders.map(dt => {
@@ -116,7 +121,7 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
                                 return (
                                     <TableRow key={dt.id} className="hover:bg-slate-50">
                                         <TableCell className="font-semibold text-slate-800">
-                                            <CopyField label="Order number" value={dt.orderNumber} customClass="text-sm font-semibold"/>
+                                            <CopyFieldButton label="Order number" value={dt.orderNumber} customClass="text-sm font-semibold"/>
                                         </TableCell>
                                         <TableCell>
                                             <p className="font-medium text-slate-800">{dt.customerName}</p>

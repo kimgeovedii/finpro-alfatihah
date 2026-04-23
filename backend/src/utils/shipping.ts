@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { courierShippingDefault, weightGramsShippingDefault } from '../constants/business.const'
+import { courierShippingDefault, isShipmentTesting, mockShipmentCity, mockShipmentPricePerGram, weightGramsShippingDefault } from '../constants/business.const'
 
 const RAJA_ONGKIR_BASE_URL = 'https://rajaongkir.komerce.id/api/v1'
 const OPENCAGE_BASE_URL = 'https://api.opencagedata.com/geocode/v1/json'
@@ -8,6 +8,8 @@ const OPENCAGE_API_KEY = process.env.OPENCAGE_API_KEY!
 
 // Reverse geocode lat/long to city name using OpenCage
 const getCityFromCoords = async (lat: number, long: number): Promise<string> => {
+    if (isShipmentTesting) return mockShipmentCity
+    
     // Exec the API
     const response = await axios.get(OPENCAGE_BASE_URL, {
         params: {
@@ -30,6 +32,8 @@ const getCityFromCoords = async (lat: number, long: number): Promise<string> => 
 
 // Search destination id from Raja Ongkir V2 by city name
 const getLocationId = async (cityName: string): Promise<number> => {
+    if (isShipmentTesting) return 151
+
     // Exec the API
     const response = await axios.get(`${RAJA_ONGKIR_BASE_URL}/destination/domestic-destination`, {
         params: {
@@ -54,6 +58,8 @@ export const getCityIdFromCoords = async (lat: number, long: number): Promise<nu
 
 // Calculate the shipping cost by origin, dest id, courier, and weight
 export const getShippingCost = async (originId: number, destinationId: number, weightGrams: number = weightGramsShippingDefault, courier: string = courierShippingDefault): Promise<number> => {
+    if (isShipmentTesting) return mockShipmentPricePerGram * weightGrams
+
     const params = new URLSearchParams()
     params.append('origin', String(originId))
     params.append('destination', String(destinationId))

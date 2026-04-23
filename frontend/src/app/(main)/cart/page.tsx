@@ -5,14 +5,18 @@ import { BranchHeader } from "@/features/cart/components/BranchHeader";
 import { CartItemCard } from "@/features/cart/components/CartItemCard";
 import Swal from "sweetalert2";
 import { Button } from "@/components/ui/button";
+import { MessageBox } from "@/components/layout/MessageBox";
+import { SkeletonBox } from "@/components/layout/SkeletonBox";
 
 export default function CartPage() {
+  // Handle hook
   const { summary, isLoading, fetchCartSummary } = useCartSummary()
   const { carts, meta, isLoadingAllCart, fetchAllCarts } = useAllCartData()
   const { deleteCart, isDeleting } = useDeleteCart()
   const { deleteCartItem, isDeletingItem } = useDeleteCartItem()
   const { updateCartItem, isUpdatingItem } = useUpdateCartItem()
 
+  // Handle action
   const handleRemoveCart = async (cartId: string) => {
     const confirm = await Swal.fire({
       title: "Remove cart?",
@@ -81,7 +85,7 @@ export default function CartPage() {
     fetchAllCarts(1)
   }
   
-  const handleDecrease = async (cartItemId: string, qty: number, productName: string) => {
+  const handleDecrease = async (cartItemId: string, cartId: string, qty: number, productName: string) => {
     if (qty <= 1) {
       const confirm = await Swal.fire({
         title: "Remove item?",
@@ -91,10 +95,9 @@ export default function CartPage() {
         confirmButtonText: "Yes, remove",
         confirmButtonColor: "#ef4444",
       })
-  
       if (!confirm.isConfirmed) return
   
-      const success = await deleteCart(cartItemId)
+      const success = await deleteCart(cartId)
       if (success) {
         await Swal.fire({
           title: "Item deleted",
@@ -118,41 +121,43 @@ export default function CartPage() {
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto">
       <div className="flex items-center justify-between">
         <div className="w-full">
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">
-            Your Basket
-          </h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">Your Basket</h1>
           {
-            isLoading ? <p className="text-slate-400 mt-1">Loading...</p> : 
-              <CartSummary
-                totalItems={summary?.totalItems ?? 0}
-                totalQty={summary?.totalQty ?? 0}
-              />
+            // Render loading element
+            isLoading ? <SkeletonBox extraClass={'min-h-[30px]'}/> : <CartSummary totalItems={summary?.totalItems ?? 0} totalQty={summary?.totalQty ?? 0}/>
           }
           <hr className="my-5"/>
           <div>
             {
-              isLoadingAllCart ? (
-              <p className="text-slate-400">Loading carts...</p>
-            ) : carts.length === 0 ? (
-              <p className="text-slate-500">No items in cart</p>
-            ) : (
-              carts.map((cart: any) => (
-                <div key={cart.id} className="mb-6">
-                  <BranchHeader id={cart.branch.id} storeName={cart.branch.storeName} onRemove={() => handleRemoveCart(cart.id)} cartId={cart.id}/>
-                  {
-                    cart.items.map((dt: any) => (
-                      <CartItemCard key={dt.id}
-                        slugName={dt.product.id} branchId={cart.branchId} productName={dt.product.product.productName} description={dt.product.product.description} 
-                        basePrice={dt.product.product.basePrice} mainImage="/mainImages/coke.png" qty={dt.quantity} currentStock={dt.product.currentStock}
-                        onDecrease={() => handleDecrease(dt.id, dt.quantity,dt.product.product.productName)}
-                        onIncrease={() => handleIncrease(dt.id, dt.quantity, dt.product.currentStock)}                        
-                        onRemove={() => handleRemoveCartItem(dt.id, `(${dt.quantity}) ${dt.product.product.productName}`)}
-                      />
-                    ))
-                  }
+              isLoadingAllCart ?
+                // Render loading element
+                <div className="flex flex-col space-y-2">
+                  <SkeletonBox extraClass={'min-h-[20px]'}/>
+                  <SkeletonBox extraClass={'min-h-[120px]'}/>
+                  <SkeletonBox extraClass={'min-h-[120px]'}/>
                 </div>
-              ))
-            )}
+              : carts.length === 0 ? 
+                // Render failed fetching condition
+                <MessageBox context={'No items in carts'} image={"/assets/empty.png"} urlButton={'/dashboard/products'} titleButton='Browse Now!' description="Don't miss out! Browse our products today and discover many exciting offers before they run out"/>
+              : 
+                carts.map(ct => (
+                  <div key={ct.id} className="mb-6">
+                    <BranchHeader id={ct.branch.id} storeName={ct.branch.storeName} onRemove={() => handleRemoveCart(ct.id)} cartId={ct.id}/>
+                    {
+                      ct.items.map(dt => (
+                        <CartItemCard key={dt.id}
+                          slugName={dt.product.id} branchId={ct.branchId} productName={dt.product.product.productName} description={dt.product.product.description} 
+                          basePrice={dt.product.product.basePrice} mainImage="/mainImages/coke.png" qty={dt.quantity} currentStock={dt.product.currentStock}
+                          onDecrease={() => handleDecrease(dt.id, ct.id, dt.quantity,dt.product.product.productName)}
+                          onIncrease={() => handleIncrease(dt.id, dt.quantity, dt.product.currentStock)}                        
+                          onRemove={() => handleRemoveCartItem(dt.id, `(${dt.quantity}) ${dt.product.product.productName}`)}
+                        />
+                      ))
+                    }
+                  </div>
+                ))
+            }
+            {/* Pagination */}
             { meta && meta.page < meta.total_page && <Button className="mt-4 px-4 py-2 bg-slate-800 text-white rounded-lg" onClick={() => fetchAllCarts(meta.page + 1)}>See More</Button> }
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { CopyField } from "@/components/button/CopyField"
+import { CopyFieldButton } from "@/components/button/CopyFieldButton"
 import { formatDate } from "@/utils/converter.util"
 import { BuildingOfficeIcon } from "@heroicons/react/24/outline"
 import { CalendarDays, Clock, MapPin } from "lucide-react"
@@ -59,7 +59,7 @@ export const OrderDetailBranchCard: React.FC<Props> = ({ branch, orderInfo }) =>
     return (
         <div className="bg-white rounded-3xl">
             <div className="p-5 pb-0">
-                <CopyField label="Order number" value={orderInfo.orderNumber} customClass="text-lg font-semibold"/>
+                <CopyFieldButton label="Order number" value={orderInfo.orderNumber} customClass="text-lg font-semibold"/>
                 <hr className="my-4"/>
                 <div className="flex flex-col space-y-2">
                     <div className="flex justify-between items-center">

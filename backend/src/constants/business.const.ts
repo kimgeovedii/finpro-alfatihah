@@ -6,9 +6,12 @@ export const orderAutoConfirmLimitHour: number = 60 * 60 * 1000 * 168 // 168 hou
 export const orderCode: string = 'ORD'
 
 // Third service
-// Raja Ongkir : Shippment
+// Raja Ongkir : Shipment
 export const weightGramsShippingDefault: number = 1000 // 1 kg
 export const courierShippingDefault: string = 'jne' 
+export const isShipmentTesting: boolean = true
+export const mockShipmentCity: string = "Jakarta"
+export const mockShipmentPricePerGram: number = 5
 // Multer & Cloudinary : File handling
 export const maxSizePaymentEvidence: number = 2 * 1024 * 1024 // 2 mb
 export const allowedMimeTypesPaymentEvidence: string[] = ["image/jpeg", "image/png", "image/jpg"]

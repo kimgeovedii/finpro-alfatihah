@@ -29,21 +29,21 @@ export class PaymentService {
 
             const orderMessageToBranch = `An order ${order.orderNumber} has been cancelled`
             await Promise.all(
-                order.items.map(async (item) => {
+                order.items.map(async (dt) => {
                     // Repo : get branch inventory by id
-                    const branchInventory = await this.branchInventoryRepo.findById(item.product.id)
+                    const branchInventory = await this.branchInventoryRepo.findById(dt.product.id)
                     if (!branchInventory) throw { code: 404, message: `Inventory not found` }
             
                     const stockBefore: number = branchInventory.currentStock
-                    const stockAfter: number = stockBefore + item.quantity
-                    const quantityChange: number = item.quantity
+                    const stockAfter: number = stockBefore + dt.quantity
+                    const quantityChange: number = dt.quantity
             
                     // Repo : update product qty
-                    await this.branchInventoryRepo.incrementStock(item.product.id, item.quantity)
+                    await this.branchInventoryRepo.incrementStock(dt.product.id, dt.quantity)
             
                     // Repo : create stock journal 
                     await this.stockJournalRepo.createStockJournal(
-                        branchInventory.productId, item.product.id, 'IN', quantityChange, stockBefore, stockAfter, 'ORDER', orderId, orderMessageToBranch
+                        branchInventory.productId, dt.product.id, 'IN', quantityChange, stockBefore, stockAfter, 'ORDER', orderId, orderMessageToBranch
                     )
                 })
             )

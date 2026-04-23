@@ -202,7 +202,10 @@ export class CartRepository {
 
   async findByIdAndUser(cartId: string, userId: string) {
     return await prisma.carts.findFirst({
-      where: { id: cartId, userId }
+      where: { id: cartId, userId },
+      select: {
+        items: true
+      }
     })
   }
 

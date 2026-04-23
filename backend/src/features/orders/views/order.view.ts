@@ -25,15 +25,15 @@ type Payload = {
 }
 
 export const getBranchOrderBroadcastTemplate = (data: Payload) => {
-    const scheduleHtml = data.schedules.map(sc => `${sc.dayName} (${sc.startTime} - ${sc.endTime})`).join(", ")
+    const scheduleHtml = data.schedules.map(dt => `${dt.dayName} (${dt.startTime} - ${dt.endTime})`).join(", ")
 
-    const ordersHtml = data.orders.map(or => {
-        const date = or.confirmedAt ?? or.createdAt
+    const ordersHtml = data.orders.map(dt => {
+        const date = dt.confirmedAt ?? dt.createdAt
 
         return `
             <tr>
-                <td>${or.orderNumber}</td>
-                <td>${or.status.replace("_"," ")}</td>
+                <td>${dt.orderNumber}</td>
+                <td>${dt.status.replace("_"," ")}</td>
                 <td>${new Date(date).toLocaleString("id-ID")}</td>
             </tr>
         `

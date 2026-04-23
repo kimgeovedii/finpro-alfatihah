@@ -143,7 +143,11 @@ export class OrderRepository {
                 select: {
                   product: {
                     select: {
-                      productName: true, description: true, basePrice: true, productImages: {
+                      productName: true, description: true, basePrice: true, 
+                      category: {
+                        select: { name: true }
+                      },
+                      productImages: {
                         select: { imageUrl: true },
                         where: { isPrimary: true }
                       }
@@ -303,7 +307,7 @@ export class OrderRepository {
     // Sum quantity & combine product name
     const mapped = rawData.map(order => {
       const totalItems = order.items.reduce((sum, item) => sum + item.quantity, 0)
-      const productList = order.items.map(item => item.product.product.productName).join(', ')
+      const productList = order.items.map(dt => dt.product.product.productName).join(', ')
       const { items, ...rest } = order
 
       return { ...rest, totalItems, productList }
@@ -358,11 +362,11 @@ export class OrderRepository {
         orderNumber, userId, branchId, addressId, totalPrice, finalPrice, shippingCost,
         status: 'WAITING_PAYMENT', paymentDeadline: paymentDeadlineTime,
         items: {
-          create: items.map(item => ({
-            productId: item.product.id,
-            discountId: item.discountId ?? null,
-            price: item.product.product.basePrice,
-            quantity: item.quantity,
+          create: items.map(dt => ({
+            productId: dt.product.id,
+            discountId: dt.discountId ?? null,
+            price: dt.product.product.basePrice,
+            quantity: dt.quantity,
           }))
         }
       },
@@ -385,10 +389,9 @@ export class OrderRepository {
         },
         select: { id: true }
       })
-
       if (!orders.length) return 0
 
-      const orderIds = orders.map(o => o.id)
+      const orderIds = orders.map(dt => dt.id)
 
       await tx.payments.updateMany({
         where: {
@@ -421,8 +424,7 @@ export class OrderRepository {
       where: {
         status: "SHIPPED",
         shippedAt: {
-          not: null,
-          lt: cutoffDate,
+          not: null, lt: cutoffDate,
         },
       },
       data: {
