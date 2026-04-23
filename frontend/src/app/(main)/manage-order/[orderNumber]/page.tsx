@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { OrderMatchingTable } from "@/features/order/components/OrderMatchingTable"
 import { useCancelOrderStatusById, useOrderDetailData, useUpdateOrderStatusById } from "@/features/order/hooks/useOrder"
 import Swal from "sweetalert2"
+import { SkeletonBox } from "@/components/layout/SkeletonBox"
 
 export default function ManageOrdersDetailPage() {
   const params = useParams()
@@ -67,33 +68,38 @@ export default function ManageOrdersDetailPage() {
         </Link>
       </div>
       <div className="flex w-full">
-        <OrderMatchingTable
-          orderNumber={orderNumber}
-          items={
-            order?.items?.map(dt => ({
-              id: dt.id,
-              quantity: dt.quantity,
-              price: dt.product.product.basePrice,
-              stockBefore: dt.product.currentStock,
-              stockAfter: dt.product.currentStock - dt.quantity,
-              product: { 
-                productName: dt.product.product.productName, 
-                imageUrl: dt.product.product.productImages[0].imageUrl 
-              },
-            })) ?? []
-          }
-          shippingCost={order?.shippingCost ?? 0}
-          confirmedAt={order?.confirmedAt}
-          finalPrice={order?.finalPrice ?? 0}
-          isLoading={isLoading}
-          payments={order?.payments ?? []}
-          onShipping={handleShippingOrder}
-          onCancel={handleCancelOrder}
-          branch={order?.branch}
-          address={order?.address}
-          status={order?.status}
-          distance={order?.distance}
-        />
+        {
+          isLoading ? 
+            <SkeletonBox extraClass={'min-h-[400px]'}/>
+          :
+            <OrderMatchingTable
+              orderNumber={orderNumber}
+              items={
+                order?.items?.map(dt => ({
+                  id: dt.id,
+                  quantity: dt.quantity,
+                  price: dt.product.product.basePrice,
+                  stockBefore: dt.product.currentStock,
+                  stockAfter: dt.product.currentStock - dt.quantity,
+                  product: { 
+                    productName: dt.product.product.productName, 
+                    imageUrl: dt.product.product.productImages[0].imageUrl 
+                  },
+                })) ?? []
+              }
+              shippingCost={order?.shippingCost ?? 0}
+              confirmedAt={order?.confirmedAt}
+              finalPrice={order?.finalPrice ?? 0}
+              isLoading={isLoading}
+              payments={order?.payments ?? []}
+              onShipping={handleShippingOrder}
+              onCancel={handleCancelOrder}
+              branch={order?.branch}
+              address={order?.address}
+              status={order?.status}
+              distance={order?.distance}
+            />
+        }
       </div>
     </div>
   )

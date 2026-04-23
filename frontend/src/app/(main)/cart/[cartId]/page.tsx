@@ -13,6 +13,7 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import { formatListSchedule } from '@/utils/converter.util';
+import { SkeletonBox } from '@/components/layout/SkeletonBox';
 
 const vouchersData = [
   { code: "DISC10", description: "Discount 10%" },
@@ -103,7 +104,23 @@ export default function CartDetailPage() {
     }).then(() => router.push("/transaction"))
   }  
 
-  if (isLoading || !cart) return <div className="p-10 text-center text-slate-400">Loading...</div>
+  if (isLoading || !cart) {
+    return (
+      <div className="flex flex-col space-y-2">
+        <div className='flex w-full gap-3'>
+          <div className='flex-1 flex flex-col space-y-2'>
+            <SkeletonBox extraClass={'min-h-[400px]'}/>
+            <SkeletonBox extraClass={'min-h-[360px]'}/>
+          </div>
+          <div className='flex-1 flex flex-col space-y-2'>
+            <SkeletonBox extraClass={'min-h-[190px]'}/>
+            <SkeletonBox extraClass={'min-h-[190px]'}/>
+            <SkeletonBox extraClass={'min-h-[360px]'}/>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   const shippingCost = cart.shipping?.shippingCost ?? 0
   const totalBasePrice = cart.totalBasePrice

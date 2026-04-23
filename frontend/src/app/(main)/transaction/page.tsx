@@ -1,4 +1,5 @@
 "use client";
+import { SkeletonBox } from "@/components/layout/SkeletonBox";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { OrderItemCard } from "@/features/order/components/OrderItemCard";
@@ -53,7 +54,18 @@ export default function TransactionPage() {
                 totalWaitingOrder={(summary?.ordersByStatus?.WAITING_PAYMENT ?? 0) + (summary?.ordersByStatus?.WAITING_PAYMENT_CONFIRMATION ?? 0)}
                 totalCancelledOrder={summary?.ordersByStatus?.CANCELLED ?? 0}
               />   
-            : <p className="text-slate-400 mt-1">Loading...</p>
+            : 
+              <>
+                <SkeletonBox extraClass={'min-h-[20px]'}/>
+                <div className='flex w-full gap-3'>
+                  <div className='flex-1 flex flex-col'>
+                    <SkeletonBox extraClass={'min-h-[120px]'}/>
+                  </div>
+                  <div className='flex-1 flex flex-col'>
+                    <SkeletonBox extraClass={'min-h-[120px]'}/>
+                  </div>
+                </div>
+              </>
           }    
           <hr className="my-5"/>
           <div className="flex flex-wrap items-end gap-3 mb-5 bg-white p-3 rounded-xl">
@@ -72,7 +84,12 @@ export default function TransactionPage() {
             <Button onClick={handleSearch} className="h-9"><MagnifyingGlassIcon/> Search</Button>
           </div>
           <div>
-            { isLoading && <p>Loading...</p> }
+            { isLoading && 
+              <div className="flex flex-col space-y-2">
+                <SkeletonBox extraClass={'min-h-[300px]'}/>
+                <SkeletonBox extraClass={'min-h-[300px]'}/>
+              </div>
+            }
             {
               !isLoading && orders.map((dt, idx) => (
                 <OrderItemCard

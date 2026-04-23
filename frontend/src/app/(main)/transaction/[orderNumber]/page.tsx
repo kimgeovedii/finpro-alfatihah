@@ -11,6 +11,7 @@ import { OrderStatusStepsCard } from '@/features/order/components/OrderStatusSte
 import { useCancelOrderStatusById, useConfirmOrderStatusById, useOrderDetailData } from '@/features/order/hooks/useOrder';
 import { formatListSchedule } from '@/utils/converter.util';
 import Swal from 'sweetalert2';
+import { SkeletonBox } from '@/components/layout/SkeletonBox';
 
 export default function TransactionDetailPage() {
   // For repo fetching
@@ -102,56 +103,76 @@ export default function TransactionDetailPage() {
       </div>
       <div className='flex w-full gap-5'>
         <div className='flex-1 flex flex-col space-y-5'>
-          <OrderStatusStepsCard 
-            statusSteps={statusSteps} 
-            currentStatus={order?.status && order?.status === "WAITING_PAYMENT_CONFIRMATION" ? "WAITING_PAYMENT" : order?.status ?? ""}
-            orderNumber={orderNumber}
-            onConfirm={handleConfirmOrder}
-            status={order?.status}
-          />
-          <OrderDetailBranchCard
-            branch={{
-              name: order?.branch?.storeName ?? "-",
-              address: `${order?.branch?.address}, ${order?.branch?.city}`,
-              schedule: scheduleText,
-              imageUrl: "/images/branch.jpg",
-            }}
-            orderInfo={{
-              orderNumber,
-              orderStatus: order?.status ?? "-",
-              paymentStatus: order?.payments[0].status ?? '-',
-              paymentMethod: order?.payments[0].method ?? '-',
-              createdAt: order?.createdAt,
-              paymentDeadline: order?.paymentDeadline,
-            }}
-         />
+          {
+            isLoading ?
+              <>
+                <SkeletonBox extraClass={'min-h-[260px]'}/>
+                <SkeletonBox extraClass={'min-h-[400px]'}/>
+              </>
+            :
+              <>
+                <OrderStatusStepsCard 
+                  statusSteps={statusSteps} 
+                  currentStatus={order?.status && order?.status === "WAITING_PAYMENT_CONFIRMATION" ? "WAITING_PAYMENT" : order?.status ?? ""}
+                  orderNumber={orderNumber}
+                  onConfirm={handleConfirmOrder}
+                  status={order?.status}
+                />
+                <OrderDetailBranchCard
+                  branch={{
+                    name: order?.branch?.storeName ?? "-",
+                    address: `${order?.branch?.address}, ${order?.branch?.city}`,
+                    schedule: scheduleText,
+                    imageUrl: "/images/branch.jpg",
+                  }}
+                  orderInfo={{
+                    orderNumber,
+                    orderStatus: order?.status ?? "-",
+                    paymentStatus: order?.payments[0].status ?? '-',
+                    paymentMethod: order?.payments[0].method ?? '-',
+                    createdAt: order?.createdAt,
+                    paymentDeadline: order?.paymentDeadline,
+                  }}
+                />
+              </>
+          }
         </div>
         <div className='flex-1 flex flex-col space-y-5'>
-          <OrderDetailItemListCard
-            items={order?.items?.map(item => ({
-              branchInventoriesId: item.id,
-              productName: item.product.product.productName,
-              description: item.product.product.description,
-              category: "-",
-              imageUrl: item.product.product.productImages?.[0]?.imageUrl ?? "",
-              quantity: item.quantity,
-              basePrice: item.product.product.basePrice,
-              totalPrice: item.product.product.basePrice * item.quantity,
-            })) ?? []}
-          />
-          <PaymentSummaryCard
-            orderNumber={orderNumber}
-            totalItem={order?.items?.reduce((acc, item) => acc + item.quantity, 0) ?? 0}
-            shippingCost={order?.shippingCost ?? 0}
-            totalPrice={order?.totalPrice ?? 0}
-            totalSaving={0}
-            finalPrice={order?.finalPrice ?? 0} 
-            orderId={order?.id ?? '-'} 
-            status={order?.status ?? '-'} 
-            paymentDeadline={order?.paymentDeadline ?? '-'} 
-            paymentEvidence={order?.payments[0].evidence}
-            onCancel={handleCancelOrder}         
-          />
+          {
+            isLoading ?
+              <>
+                <SkeletonBox extraClass={'min-h-[260px]'}/>
+                <SkeletonBox extraClass={'min-h-[260px]'}/>
+              </>
+            :
+              <>
+                <OrderDetailItemListCard
+                  items={order?.items?.map(item => ({
+                    branchInventoriesId: item.id,
+                    productName: item.product.product.productName,
+                    description: item.product.product.description,
+                    category: "-",
+                    imageUrl: item.product.product.productImages?.[0]?.imageUrl ?? "",
+                    quantity: item.quantity,
+                    basePrice: item.product.product.basePrice,
+                    totalPrice: item.product.product.basePrice * item.quantity,
+                  })) ?? []}
+                />
+                <PaymentSummaryCard
+                  orderNumber={orderNumber}
+                  totalItem={order?.items?.reduce((acc, item) => acc + item.quantity, 0) ?? 0}
+                  shippingCost={order?.shippingCost ?? 0}
+                  totalPrice={order?.totalPrice ?? 0}
+                  totalSaving={0}
+                  finalPrice={order?.finalPrice ?? 0} 
+                  orderId={order?.id ?? '-'} 
+                  status={order?.status ?? '-'} 
+                  paymentDeadline={order?.paymentDeadline ?? '-'} 
+                  paymentEvidence={order?.payments[0].evidence}
+                  onCancel={handleCancelOrder}         
+                />
+              </>
+            }
         </div>
       </div>
     </div>

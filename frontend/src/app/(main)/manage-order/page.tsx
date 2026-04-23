@@ -1,4 +1,5 @@
 'use client'
+import { SkeletonBox } from "@/components/layout/SkeletonBox"
 import { OrderStatus } from "@/constants/business.const"
 import { OrderTableItem, OrderManagementTable } from "@/features/order/components/OrderManagementTable"
 import { OrderSummaryByBranchCard } from "@/features/order/components/OrderSummaryByBranchCard"
@@ -51,23 +52,45 @@ export default function ManageOrdersPage() {
             <div className="flex items-center justify-between">
                 <div className="w-full">
                     <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight mb-4">Manage Order</h1>
-                    <OrderSummaryByBranchCard
-                        totalRevenue={summaryByBranchId?.totalRevenue ?? 0}
-                        revenueChangePercent={summaryByBranchId?.revenueChangePercent ?? 0}
-                        activeShipments={summaryByBranchId?.activeShipments ?? 0}
-                        processingOrder={summaryByBranchId?.processingOrder ?? 0}
-                        finishedOrder={summaryByBranchId?.finishedOrder ?? 0}
-                        finishedOrderLastMonth={summaryByBranchId?.finishedOrderLastMonth ?? 0}
-                    />
-                    <OrderManagementTable
-                        orders={tableOrders}
-                        meta={meta}
-                        isLoading={isLoading}
-                        activeStatus={status}
-                        onPageChange={handlePageChange}
-                        onStatusChange={handleStatusChange}
-                        onValidatePaymentEvidence={handleValidatePaymentEvidence}
-                    />
+                    {
+                        isLoadingSummaryByBranchId ?
+                            <>
+                                <div className="flex gap-4 w-full mb-4">
+                                    <div className="flex-1">
+                                        <SkeletonBox extraClass={'min-h-[160px]'}/>
+                                    </div>
+                                    <div className="w-72">
+                                        <SkeletonBox extraClass={'min-h-[160px]'}/>
+                                    </div>
+                                    <div className="w-72">
+                                        <SkeletonBox extraClass={'min-h-[160px]'}/>
+                                    </div>
+                                </div>
+                            </>
+                        :
+                            <OrderSummaryByBranchCard
+                                totalRevenue={summaryByBranchId?.totalRevenue ?? 0}
+                                revenueChangePercent={summaryByBranchId?.revenueChangePercent ?? 0}
+                                activeShipments={summaryByBranchId?.activeShipments ?? 0}
+                                processingOrder={summaryByBranchId?.processingOrder ?? 0}
+                                finishedOrder={summaryByBranchId?.finishedOrder ?? 0}
+                                finishedOrderLastMonth={summaryByBranchId?.finishedOrderLastMonth ?? 0}
+                            />
+                    }
+                    {
+                        isLoading ? 
+                            <SkeletonBox extraClass={'min-h-[480px]'}/>
+                        :
+                            <OrderManagementTable
+                                orders={tableOrders}
+                                meta={meta}
+                                isLoading={isLoading}
+                                activeStatus={status}
+                                onPageChange={handlePageChange}
+                                onStatusChange={handleStatusChange}
+                                onValidatePaymentEvidence={handleValidatePaymentEvidence}
+                            />
+                    }
                 </div>
             </div>
         </div>

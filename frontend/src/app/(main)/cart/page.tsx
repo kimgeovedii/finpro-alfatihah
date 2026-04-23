@@ -5,6 +5,8 @@ import { BranchHeader } from "@/features/cart/components/BranchHeader";
 import { CartItemCard } from "@/features/cart/components/CartItemCard";
 import Swal from "sweetalert2";
 import { Button } from "@/components/ui/button";
+import { MessageBox } from "@/components/layout/MessageBox";
+import { SkeletonBox } from "@/components/layout/SkeletonBox";
 
 export default function CartPage() {
   const { summary, isLoading, fetchCartSummary } = useCartSummary()
@@ -122,7 +124,9 @@ export default function CartPage() {
             Your Basket
           </h1>
           {
-            isLoading ? <p className="text-slate-400 mt-1">Loading...</p> : 
+            isLoading ? 
+              <SkeletonBox extraClass={'min-h-[30px]'}/>
+            : 
               <CartSummary
                 totalItems={summary?.totalItems ?? 0}
                 totalQty={summary?.totalQty ?? 0}
@@ -132,9 +136,13 @@ export default function CartPage() {
           <div>
             {
               isLoadingAllCart ? (
-              <p className="text-slate-400">Loading carts...</p>
+                <div className="flex flex-col space-y-2">
+                  <SkeletonBox extraClass={'min-h-[20px]'}/>
+                  <SkeletonBox extraClass={'min-h-[120px]'}/>
+                  <SkeletonBox extraClass={'min-h-[120px]'}/>
+                </div>
             ) : carts.length === 0 ? (
-              <p className="text-slate-500">No items in cart</p>
+              <MessageBox context={'No items in carts'} image={"/assets/empty.png"} urlButton={'/dashboard/products'} titleButton='Browse Now!' description="Don't miss out! Browse our products today and discover many exciting offers before they run out"/>
             ) : (
               carts.map((cart: any) => (
                 <div key={cart.id} className="mb-6">
