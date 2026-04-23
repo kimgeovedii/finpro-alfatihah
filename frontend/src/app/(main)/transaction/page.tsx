@@ -11,14 +11,15 @@ import { useState } from "react";
 import Swal from "sweetalert2";
 
 export default function TransactionPage() {
+  // Handle hook
   const { summary, isLoadingSummary } = useOrderSummary()
   const { orders, meta, isLoading, fetchAllOrders } = useAllOrderData()
-
   // For filtering
   const [orderNumber, setOrderNumber] = useState("")
   const [dateStart, setDateStart] = useState("")
   const [dateEnd, setDateEnd] = useState("")
 
+  // Handle action
   const handleSearch = () => {
     if ((dateStart && !dateEnd) || (!dateStart && dateEnd)) {
       Swal.fire({
@@ -42,9 +43,7 @@ export default function TransactionPage() {
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto">
       <div className="flex items-center justify-between">
         <div className="w-full">
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">
-            My History
-          </h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">My History</h1>
           {
             !isLoadingSummary && summary ? 
               <OrderSummaryCard 
@@ -56,6 +55,7 @@ export default function TransactionPage() {
                 totalCancelledOrder={summary?.ordersByStatus?.CANCELLED ?? 0}
               />   
             : 
+              // Render loading element
               <>
                 <SkeletonBox extraClass={'min-h-[20px]'}/>
                 <div className='flex w-full gap-3'>
@@ -86,6 +86,7 @@ export default function TransactionPage() {
           </div>
           <div>
             { isLoading && 
+              // Render loading element
               <div className="flex flex-col space-y-2">
                 <SkeletonBox extraClass={'min-h-[300px]'}/>
                 <SkeletonBox extraClass={'min-h-[300px]'}/>
@@ -102,9 +103,13 @@ export default function TransactionPage() {
               ))
             }
             { 
+              // Render failed fetching condition
               !isLoading && orders.length === 0 && <MessageBox context={'No orders found'} image={"/assets/empty.png"} urlButton={'/dashboard/products'} titleButton='Browse Now!' description={"It looks like you haven't made any transactions yet. Buy a product now and get an extra discount"}/>
             }
-            { meta && meta.page < meta.total_page && <Button className="mt-4 px-4 py-1 bg-teal-700 text-white rounded-lg mx-auto block" onClick={() => fetchAllOrders(meta.page + 1)}>See More</Button> }
+            {
+              // Pagination
+              meta && meta.page < meta.total_page && <Button className="mt-4 px-4 py-1 bg-teal-700 text-white rounded-lg mx-auto block" onClick={() => fetchAllOrders(meta.page + 1)}>See More</Button> 
+            }
           </div>
         </div>
       </div>

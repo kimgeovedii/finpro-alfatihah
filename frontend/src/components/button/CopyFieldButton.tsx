@@ -1,4 +1,3 @@
-"use client"
 import { DocumentDuplicateIcon } from "@heroicons/react/24/outline"
 import React from "react"
 import Swal from "sweetalert2"
@@ -10,7 +9,7 @@ type Props = {
     customClass?: string
 }
 
-export const CopyField: React.FC<Props> = ({ label, value, customClass = "text-md font-semibold" }) => {
+export const CopyFieldButton: React.FC<Props> = ({ label, value, customClass = "text-md font-semibold" }) => {
     const handleCopy = async () => {
         try {
             await navigator.clipboard.writeText(value)

@@ -1,12 +1,10 @@
-import { CopyField } from "@/components/button/CopyField"
+import { CopyFieldButton } from "@/components/button/CopyFieldButton"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { formatDate } from "@/utils/converter.util"
-import { UploadIcon } from "lucide-react"
-import React, { useRef } from "react"
-import { useUploadPaymentEvidence } from "../hooks/usePayment"
+import React from "react"
 import Swal from "sweetalert2"
-import { allowedMimeTypesPaymentEvidence, maxSizePaymentEvidence, statusColorMap } from "@/constants/business.const"
+import { statusColorMap } from "@/constants/business.const"
 import { PhotoIcon } from "@heroicons/react/24/outline"
 import Link from "next/link"
 import { PaymentEvidenceUploadButton } from "./PaymentEvidenceUploadButton"
@@ -25,60 +23,12 @@ type Props = {
     paymentMethod?: string
     paymentStatus?: string
     paymentEvidence?: string
-
-    onComplete?: () => void
-    onDetail?: () => void
 }
 
-export const OrderItemCard: React.FC<Props> = ({ orderId, orderNumber, status, totalPrice, finalPrice, shippingCost, paymentDeadline, totalItems, productList, createdAt, onComplete, onDetail, paymentEvidence, paymentMethod, paymentStatus }) => {
-    // For file handling
-    const fileInputRef = useRef<HTMLInputElement>(null)
-    const { uploadEvidence, isUploading } = useUploadPaymentEvidence()
-
+export const OrderItemCard: React.FC<Props> = ({ orderId, orderNumber, status, totalPrice, finalPrice, shippingCost, paymentDeadline, totalItems, productList, createdAt, paymentEvidence, paymentMethod, paymentStatus }) => {
     // Color mapping
     const statusClass = statusColorMap[status] || "bg-slate-400"
     const finalStatus = status.replaceAll('_',' ')
-
-    const handleEvidenceChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0]
-        if (!file) return
-
-        // Validation file type
-        if (!allowedMimeTypesPaymentEvidence.includes(file.type)) {
-            Swal.fire({ 
-                icon:"error", 
-                title: "Upload failed", 
-                text: "Only JPG, JPEG, PNG, and GIF files are allowed.", 
-                confirmButtonColor: "#ef4444" 
-            })
-            return
-        }
-
-        // Validation size
-        if (file.size > maxSizePaymentEvidence) {
-            Swal.fire({ 
-                icon:"error", 
-                title: "Upload failed", 
-                text: "File size must not exceed 10 MB.", 
-                confirmButtonColor: "#ef4444" 
-            })
-            return
-        }
-
-        Swal.fire({ title: "Uploading...", allowOutsideClick: false, didOpen: () => Swal.showLoading() })
-        const result = await uploadEvidence(orderId, file)
-
-        Swal.fire({ 
-            icon: result.success ? "success" : "error", 
-            title: result.success ? result.message : "Upload failed", 
-            text: result.message, 
-            confirmButtonColor: result.success ? "#10b981" : "#ef4444" 
-        })
-    }
-
-    const handleClickUpload = () => {
-        fileInputRef.current?.click()
-    }
 
     const evidenceElement = (url: string) => {
         const handleClick = () => {
@@ -106,7 +56,7 @@ export const OrderItemCard: React.FC<Props> = ({ orderId, orderNumber, status, t
                     <p className="text-slate-500 text-sm mb-0">Order Number</p>
                     <Badge className={`capitalize font-semibold ${statusClass}`}>{finalStatus}</Badge>
                 </div>
-                <CopyField label="Order number" value={orderNumber} />
+                <CopyFieldButton label="Order number" value={orderNumber} />
                 <p className="text-slate-500 text-sm mb-1"><span>({totalItems})</span> Purchased Item</p>
                 <p className="text-slate-500 text-sm font-semibold mb-0">{productList}</p>
                 { status === 'WAITING_PAYMENT' && paymentEvidence === null && <PaymentEvidenceUploadButton orderId={orderId} paymentDeadline={paymentDeadline}/> }

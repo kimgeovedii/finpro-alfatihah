@@ -14,7 +14,7 @@ export default function DashboardPage() {
           <p className="text-slate-500 mt-1">
             {isLoading 
               ? "Loading your farming overview..." 
-              : `Welcome back, ${user?.name || "User"}. Here's what's happening.`}
+              : `Welcome back, ${user?.username || "User"}. Here's what's happening.`}
           </p>
         </div>
       </div>

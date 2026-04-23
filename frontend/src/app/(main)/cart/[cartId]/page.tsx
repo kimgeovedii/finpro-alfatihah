@@ -22,24 +22,24 @@ const vouchersData = [
 ]
 
 export default function CartDetailPage() {
-  const router = useRouter()
+  // Handle param
   const params = useParams()
   const cartId = params?.cartId as string
 
+  // Handle hook
+  const router = useRouter()
   const { cart, isLoading, error } = useCartDetailData(cartId)
   const { checkoutCartItem, isCheckoutItem } = useCheckoutCartItem()
   const [ appliedVoucher, setAppliedVoucher ] = useState<string | null>(null)
   const [ selectedAddressId, setSelectedAddressId ] = useState<string | null>(null)
   const [ paymentMethod, setPaymentMethod ] = useState<"MANUAL" | "GATEWAY">("MANUAL")
 
-  const handleApply = (code: string) => setAppliedVoucher(code)
-  const handleRemove = () => setAppliedVoucher(null)
-
+  // Handle hook fetching
   useEffect(() => {
     if (!isLoading && !cart && error) {
       Swal.fire({
         icon: "error",
-        title: "Cart Not Found",
+        title: "Cart not found",
         text: error,
         confirmButtonText: "Back to Cart",
         allowOutsideClick: false,
@@ -50,10 +50,15 @@ export default function CartDetailPage() {
     }
 
     if (cart?.user?.addresses?.length) {
-      const primary = cart.user.addresses.find(a => a.isPrimary) ?? cart.user.addresses[0]
+      const primary = cart.user.addresses.find(dt => dt.isPrimary) ?? cart.user.addresses[0]
       setSelectedAddressId(primary.id)
     }
   }, [cart, isLoading, error, router])
+
+  // Handle action
+  const handleApply = (code: string) => setAppliedVoucher(code)
+
+  const handleRemove = () => setAppliedVoucher(null)
 
   const handleCheckout = async () => {
     if (!selectedAddressId) {
@@ -75,11 +80,9 @@ export default function CartDetailPage() {
       confirmButtonText: "Yes, place order",
       cancelButtonText: "Cancel",
     })
-
     if (!confirmResult.isConfirmed) return
 
     const { success, redirectUrl } = await checkoutCartItem(cartId, selectedAddressId, paymentMethod, appliedVoucher ?? undefined)
-
     if (!success) {
       Swal.fire({
         icon: "error",
@@ -87,7 +90,6 @@ export default function CartDetailPage() {
         text: "Something went wrong",
         confirmButtonColor: "#ef4444",
       })
-
       return
     }
 
@@ -104,6 +106,7 @@ export default function CartDetailPage() {
     }).then(() => router.push("/transaction"))
   }  
 
+  // Render loading element
   if (isLoading || !cart) {
     return (
       <div className="flex flex-col space-y-2">
@@ -122,8 +125,11 @@ export default function CartDetailPage() {
     )
   }
 
+  // Calculate price
   const shippingCost = cart.shipping?.shippingCost ?? 0
   const totalBasePrice = cart.totalBasePrice
+  
+  // Format shop's schedule
   const scheduleText = cart?.branch?.schedules ? formatListSchedule(cart?.branch?.schedules) : '-'
   
   return (

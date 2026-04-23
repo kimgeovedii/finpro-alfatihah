@@ -22,6 +22,7 @@ export default function TransactionDetailPage() {
   const { confirmOrder, isConfirmingOrder } = useConfirmOrderStatusById()
   const { cancelOrder, isCancellingOrder } = useCancelOrderStatusById()
 
+  // Handle action
   const handleCancelOrder = async (orderNumber: string) => {
     const confirm = await Swal.fire({
       title: "Order Rejection",
@@ -64,6 +65,7 @@ export default function TransactionDetailPage() {
     })
   }
 
+  // Order status state props
   const statusSteps = [
     {
       key: "WAITING_PAYMENT",
@@ -91,6 +93,7 @@ export default function TransactionDetailPage() {
     }
   ]
   
+  // Format shop's schedule
   const scheduleText = order?.branch?.schedules ? formatListSchedule(order?.branch?.schedules) : '-'
 
   return (
@@ -104,12 +107,14 @@ export default function TransactionDetailPage() {
       </div>
       {
         !isLoading && (!order || order?.payments.length === 0 ) ?
+          // Render failed fetching condition
           <MessageBox context={'No order found'} image={"/assets/empty.png"} urlButton={'/transaction'} titleButton='Back to Order' description={`We're sorry, we cannot find <b>${orderNumber}</b> order. Double check your order number or contact our call center for more information`}/>
         :
           <div className='flex w-full gap-5'>
             <div className='flex-1 flex flex-col space-y-5'>
               {
                 isLoading ?
+                  // Render loading element
                   <>
                     <SkeletonBox extraClass={'min-h-[260px]'}/>
                     <SkeletonBox extraClass={'min-h-[400px]'}/>
@@ -145,6 +150,7 @@ export default function TransactionDetailPage() {
             <div className='flex-1 flex flex-col space-y-5'>
               {
                 isLoading ?
+                  // Render loading element
                   <>
                     <SkeletonBox extraClass={'min-h-[260px]'}/>
                     <SkeletonBox extraClass={'min-h-[260px]'}/>
@@ -152,15 +158,15 @@ export default function TransactionDetailPage() {
                 :
                   <>
                     <OrderDetailItemListCard
-                      items={order?.items?.map(item => ({
-                        branchInventoriesId: item.id,
-                        productName: item.product.product.productName,
-                        description: item.product.product.description,
-                        category: "-",
-                        imageUrl: item.product.product.productImages?.[0]?.imageUrl ?? "",
-                        quantity: item.quantity,
-                        basePrice: item.product.product.basePrice,
-                        totalPrice: item.product.product.basePrice * item.quantity,
+                      items={order?.items?.map(dt => ({
+                        branchInventoriesId: dt.id,
+                        productName: dt.product.product.productName,
+                        description: dt.product.product.description,
+                        category: dt.product.product.category.name,
+                        imageUrl: dt.product.product.productImages?.[0]?.imageUrl ?? "",
+                        quantity: dt.quantity,
+                        basePrice: dt.product.product.basePrice,
+                        totalPrice: dt.product.product.basePrice * dt.quantity,
                       })) ?? []}
                     />
                     <PaymentSummaryCard

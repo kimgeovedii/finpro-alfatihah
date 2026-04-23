@@ -30,11 +30,7 @@ export const AddressSelectionModal: React.FC<Props> = ({ address, appliedAddress
                 </DialogHeader>
                 <div className="flex flex-col gap-3 mt-2">
                     {
-                        address.map(dt => {
-                            const isSelected = appliedAddress === dt.id
-
-                            return <AddressAdditionalInfoSection key={dt.id} action={() => onSelect(dt.id)} receiptName={dt.receiptName} phone={dt.phone} distance={dt.distance} label={dt.label} address={dt.address} isSelected={isSelected}/>
-                        })
+                        address.map(dt => <AddressAdditionalInfoSection key={dt.id} action={() => onSelect(dt.id)} receiptName={dt.receiptName} phone={dt.phone} distance={dt.distance} label={dt.label} address={dt.address} isSelected={appliedAddress === dt.id}/>)
                     }
                 </div>
             </DialogContent>

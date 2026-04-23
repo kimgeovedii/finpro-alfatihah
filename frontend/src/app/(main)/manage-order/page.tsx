@@ -9,10 +9,13 @@ import Swal from "sweetalert2"
 
 export default function ManageOrdersPage() {
     const branchId = "c2c2f038-e002-4f18-a450-796848f5ce27" // for now
+
+    // Handle hook
     const { summaryByBranchId, isLoadingSummaryByBranchId } = useOrderSummaryByBranchId(branchId)
     const { orders, meta, isLoading, status, handlePageChange, handleStatusChange } = useOrderManagement(branchId)
     const { updatePayment, isUpdatingPayment } = useUpdatePaymentStatusById()
 
+    // Handle action
     const handleValidatePaymentEvidence = async (paymentId: string, isConfirm: boolean) => {
         const confirm = await Swal.fire({
             title: "Validate transaction?",
@@ -54,6 +57,7 @@ export default function ManageOrdersPage() {
                     <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight mb-4">Manage Order</h1>
                     {
                         isLoadingSummaryByBranchId ?
+                            // Render loading element
                             <>
                                 <div className="flex gap-4 w-full mb-4">
                                     <div className="flex-1">
@@ -80,6 +84,7 @@ export default function ManageOrdersPage() {
                     <hr className="my-4"/>
                     {
                         isLoading ? 
+                            // Render loading element
                             <SkeletonBox extraClass={'min-h-[480px]'}/>
                         :
                             <OrderManagementTable
