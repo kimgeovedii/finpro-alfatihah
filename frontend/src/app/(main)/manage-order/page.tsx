@@ -8,7 +8,7 @@ import { useUpdatePaymentStatusById } from "@/features/order/hooks/usePayment"
 import Swal from "sweetalert2"
 
 export default function ManageOrdersPage() {
-    const branchId = "c2c2f038-e002-4f18-a450-796848f5ce27" // for now
+    const branchId = "2474cec8-5a76-42c7-b5ed-dbd9e35d434c" // for now
 
     // Handle hook
     const { summaryByBranchId, isLoadingSummaryByBranchId } = useOrderSummaryByBranchId(branchId)
