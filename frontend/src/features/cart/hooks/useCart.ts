@@ -136,3 +136,26 @@ export const useCartDetailData = (cartId: string) => {
 
     return { cart, isLoading, error, fetchCartDetail }
 }
+
+export const useCheckoutCartItem = () => {
+    const [isCheckoutItem, setIsCheckoutItem] = useState(false)
+    const [errorItem, setError] = useState<string | null>(null)
+
+    const checkoutCartItem = async (cartId: string, addressId: string, paymentMethod: "MANUAL" | "GATEWAY", voucherId?: string): Promise<{ success: boolean, redirectUrl?: string }> => {
+        setIsCheckoutItem(true)
+        setError(null)
+
+        try {
+            const res = await cartRepository.postCheckout(cartId, addressId, paymentMethod, voucherId)
+            console.log("Checkout res:", res)
+            return { success: true, redirectUrl: res.redirectUrl }
+        } catch (err: any) {
+            setError(err.message || "Failed to checkout cart item")
+            return { success: false }
+        } finally {
+            setIsCheckoutItem(false)
+        }
+    }
+
+    return { checkoutCartItem, isCheckoutItem, errorItem }
+}

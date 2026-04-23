@@ -1,4 +1,6 @@
 "use client";
+import { MessageBox } from "@/components/layout/MessageBox";
+import { SkeletonBox } from "@/components/layout/SkeletonBox";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { OrderItemCard } from "@/features/order/components/OrderItemCard";
@@ -9,14 +11,15 @@ import { useState } from "react";
 import Swal from "sweetalert2";
 
 export default function TransactionPage() {
+  // Handle hook
   const { summary, isLoadingSummary } = useOrderSummary()
   const { orders, meta, isLoading, fetchAllOrders } = useAllOrderData()
-
   // For filtering
   const [orderNumber, setOrderNumber] = useState("")
   const [dateStart, setDateStart] = useState("")
   const [dateEnd, setDateEnd] = useState("")
 
+  // Handle action
   const handleSearch = () => {
     if ((dateStart && !dateEnd) || (!dateStart && dateEnd)) {
       Swal.fire({
@@ -40,9 +43,7 @@ export default function TransactionPage() {
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto">
       <div className="flex items-center justify-between">
         <div className="w-full">
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">
-            My History
-          </h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">My History</h1>
           {
             !isLoadingSummary && summary ? 
               <OrderSummaryCard 
@@ -53,7 +54,19 @@ export default function TransactionPage() {
                 totalWaitingOrder={(summary?.ordersByStatus?.WAITING_PAYMENT ?? 0) + (summary?.ordersByStatus?.WAITING_PAYMENT_CONFIRMATION ?? 0)}
                 totalCancelledOrder={summary?.ordersByStatus?.CANCELLED ?? 0}
               />   
-            : <p className="text-slate-400 mt-1">Loading...</p>
+            : 
+              // Render loading element
+              <>
+                <SkeletonBox extraClass={'min-h-[20px]'}/>
+                <div className='flex w-full gap-3'>
+                  <div className='flex-1 flex flex-col'>
+                    <SkeletonBox extraClass={'min-h-[120px]'}/>
+                  </div>
+                  <div className='flex-1 flex flex-col'>
+                    <SkeletonBox extraClass={'min-h-[120px]'}/>
+                  </div>
+                </div>
+              </>
           }    
           <hr className="my-5"/>
           <div className="flex flex-wrap items-end gap-3 mb-5 bg-white p-3 rounded-xl">
@@ -72,7 +85,13 @@ export default function TransactionPage() {
             <Button onClick={handleSearch} className="h-9"><MagnifyingGlassIcon/> Search</Button>
           </div>
           <div>
-            { isLoading && <p>Loading...</p> }
+            { isLoading && 
+              // Render loading element
+              <div className="flex flex-col space-y-2">
+                <SkeletonBox extraClass={'min-h-[300px]'}/>
+                <SkeletonBox extraClass={'min-h-[300px]'}/>
+              </div>
+            }
             {
               !isLoading && orders.map((dt, idx) => (
                 <OrderItemCard
@@ -80,12 +99,17 @@ export default function TransactionPage() {
                   orderId={dt.id} orderNumber={dt.orderNumber} status={dt.status} totalPrice={dt.totalPrice} finalPrice={dt.finalPrice} shippingCost={dt.shippingCost}
                   paymentDeadline={dt.paymentDeadline} totalItems={dt.totalItems} productList={dt.productList} createdAt={dt.createdAt} paymentMethod={dt.payments[0]?.method}
                   paymentStatus={dt.payments[0]?.status} paymentEvidence={dt.payments[0]?.evidence}
-                  onComplete={() => console.log("complete")}
-                  onDetail={() => console.log("detail")}
                 />
               ))
             }
-            { meta && meta.page < meta.total_page && <Button className="mt-4 px-4 py-2 bg-slate-800 text-white rounded-lg" onClick={() => fetchAllOrders(meta.page + 1)}>See More</Button> }
+            { 
+              // Render failed fetching condition
+              !isLoading && orders.length === 0 && <MessageBox context={'No orders found'} image={"/assets/empty.png"} urlButton={'/dashboard/products'} titleButton='Browse Now!' description={"It looks like you haven't made any transactions yet. Buy a product now and get an extra discount"}/>
+            }
+            {
+              // Pagination
+              meta && meta.page < meta.total_page && <Button className="mt-4 px-4 py-1 bg-teal-700 text-white rounded-lg mx-auto block" onClick={() => fetchAllOrders(meta.page + 1)}>See More</Button> 
+            }
           </div>
         </div>
       </div>

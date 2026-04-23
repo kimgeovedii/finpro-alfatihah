@@ -8,9 +8,13 @@ import { generateTokens } from "../utils/generateTokens";
 import { blacklistToken } from "../utils/tokenBlacklist";
 import { Mailer } from "../../../config/mailer";
 import { getRegistrationEmailHtml, getResendVerificationEmailHtml } from "../view/email.view";
+import { CartRepository } from "../repositories/cart.repository";
 
 export class AuthService {
-  constructor(private authRepository: AuthRepository) {}
+  constructor(
+    private authRepository: AuthRepository,
+    private cartRepository: CartRepository
+  ) {}
 
   async register(dto: RegisterDto) {
     const existingUser = await this.authRepository.findByEmail(dto.email);
@@ -113,7 +117,11 @@ export class AuthService {
     
     await this.authRepository.updateLastLogin(user.id);
 
-    return { user: userWithoutPassword, ...tokens };
+    // Repo : get cart summary
+    let cartItems = null
+    if (user.role === "CUSTOMER") cartItems = await this.cartRepository.getCartSummary(user.id)
+
+    return { user: userWithoutPassword, ...tokens, cartItems };
   }
 
   async refreshToken(token: string, device?: string, ip?: string) {
@@ -147,10 +155,15 @@ export class AuthService {
   }
 
   async me(email: string) {
-     const user = await this.authRepository.findByEmail(email);
-     if (!user) return null;
-     const { password, ...userWithoutPassword } = user;
-     return userWithoutPassword;
+    const user = await this.authRepository.findByEmail(email);
+    if (!user) return null;
+    let { password, ...userWithoutPassword } = user;
+
+    // Repo : get cart summary
+    let cartItems = null
+    if (user.role === "CUSTOMER") cartItems = await this.cartRepository.getCartSummary(user.id)
+    
+    return { ...userWithoutPassword, cartItems };
   }
 
   async logout(accessToken: string, refreshToken?: string) {

@@ -19,5 +19,10 @@ export const cartRepository = {
     },
     async getCartDetailById(cartId: string): Promise<CartData> {
         return await apiFetch<CartData>(`/carts/${cartId}`, "get")
+    },
+    async postCheckout(cartId: string, addressId: string, paymentMethod: "MANUAL" | "GATEWAY", voucherId?: string) {
+        return await apiFetch<{ orderId: string, paymentId: string, snapToken?: string, redirectUrl?: string }>(
+            "/orders/checkout", "post", { cartId, addressId, paymentMethod, ...(voucherId && { voucherId }) }
+        )
     }
 }

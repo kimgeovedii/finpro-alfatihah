@@ -14,6 +14,9 @@ class OrderRouter {
     }
 
     private initializeRoutes() {
+        // Webhook
+        this.router.post("/webhook/midtrans", this.orderController.postMidtransWebhook)
+
         this.router.use(authMiddleware)
 
         const transactionRouter = Router()
@@ -30,7 +33,7 @@ class OrderRouter {
         this.router.post("/checkout", this.orderController.postAddCheckoutOrder)
         this.router.post("/shipping/:orderNumber", this.orderController.postAddShipping)
         this.router.post("/cancelling/:orderNumber", this.orderController.postCancelOrder)
-        this.router.post("/confirming/:orderNumber", this.orderController.postConfirmOrder)
+        this.router.post("/confirming/:orderNumber", this.orderController.postConfirmOrder)        
     }
 }
 

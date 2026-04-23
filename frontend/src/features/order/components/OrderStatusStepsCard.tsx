@@ -32,8 +32,8 @@ export const OrderStatusStepsCard: React.FC<Props> = ({ statusSteps, currentStat
             <p className="text-slate-800 font-bold mb-5">Order Progress</p>
             <div className="flex flex-col gap-0">
                 {
-                    statusSteps.map((step, idx) => {
-                        const state = getStepState(step.key, currentStatus)
+                    statusSteps.map((dt, idx) => {
+                        const state = getStepState(dt.key, currentStatus)
                         const isLast = idx === statusSteps.length - 1
 
                         return (
@@ -43,7 +43,7 @@ export const OrderStatusStepsCard: React.FC<Props> = ({ statusSteps, currentStat
                                         ${state === "done" ? "bg-emerald-500 text-white" : ""}
                                         ${state === "active" ? "bg-emerald-600 text-white" : ""}
                                         ${state === "upcoming" ? "bg-slate-100 text-slate-400 border border-slate-200" : ""}
-                                    `}>{step.icon}</div>
+                                    `}>{dt.icon}</div>
                                     {
                                         !isLast && <div className={`w-0.5 flex-1 my-1 rounded-full min-h-[20px] ${state === "done" ? "bg-emerald-400" : "bg-slate-200"}`}/>
                                     }
@@ -53,8 +53,8 @@ export const OrderStatusStepsCard: React.FC<Props> = ({ statusSteps, currentStat
                                         ${state === "active" ? "text-emerald-600" : ""}
                                         ${state === "done" ? "text-slate-700" : ""}
                                         ${state === "upcoming" ? "text-slate-400" : ""}`}
-                                    >{step.label}</p>
-                                    <p className="text-xs text-slate-400 mt-0.5">{step.sub}</p>
+                                    >{dt.label}</p>
+                                    <p className="text-xs text-slate-400 mt-0.5">{dt.sub}</p>
                                 </div>
                             </div>
                         )

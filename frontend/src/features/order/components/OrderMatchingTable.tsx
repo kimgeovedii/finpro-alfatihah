@@ -5,9 +5,9 @@ import { OrderManagementTableShippedSection } from "./OrderMatchingTableShippedS
 import { AddressData, BranchData } from "@/types/address.type"
 import { OrderMatchingProcessedSection } from "./OrderMatchingTableProcessedSection"
 import { OrderManagementTableOrderDeliveredSection } from "./OrderMatchingTableOrderDelivered"
-import { CopyField } from "@/components/button/CopyField"
+import { CopyFieldButton } from "@/components/button/CopyFieldButton"
 
-export type OrderMatchingProduct = {
+type OrderMatchingProduct = {
     productName: string
     imageUrl?: string
 }
@@ -42,7 +42,7 @@ export const OrderMatchingTable: React.FC<Props> = ({ orderNumber, items, isLoad
     return (
         <div className="bg-white border border-slate-200 rounded-2xl p-6 w-full">
             <div className="flex items-center justify-between mb-5">
-                <CopyField label="Order number" value={orderNumber}/>
+                <CopyFieldButton label="Order number" value={orderNumber}/>
             </div>
             <div className="flex flex-col">
                 <div className="flex gap-3">
