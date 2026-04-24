@@ -49,9 +49,10 @@ export class ProductController {
     next: NextFunction,
   ) => {
     try {
-      const data = await this.productService.getProductBySlug(
-        req.params.slugName as string,
-      );
+      const slugName = req.params.slugName as string
+      const storeName = decodeURIComponent(req.params.storeName as string)
+
+      const data = await this.productService.getProductBySlug(slugName, 'dbd7d129-5c7e-4988-b508-680abf957a98', storeName);
       sendSuccess(res, data, "Get product successfully");
     } catch (error) {
       next(error);

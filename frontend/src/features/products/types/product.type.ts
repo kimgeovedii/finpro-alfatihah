@@ -14,14 +14,46 @@ export type ProductCategory = {
   name: string;
 };
 
+export type BranchSchedule = {
+  startTime: string;
+  endTime: string;
+  dayName: string;
+};
+
+export type BranchDetail = {
+  storeName: string;
+  address: string;
+  schedules: BranchSchedule[];
+};
+
+export type CartItem = {
+  quantity: number;
+  cart: {
+    branchId: string;
+  };
+};
+
+export type BranchInventory = {
+  branchId: string;
+  currentStock: number;
+  branch: BranchDetail;
+  cartItems: CartItem[];
+};
+
 export type ProductDetailData = {
   id: string;
   slugName: string;
   productName: string;
   description: string;
+  sku: string;
+  weight: number;
+  categoryId: string;
   basePrice: number;
+  createdAt: string;
+  updatedAt: string;
   category: ProductCategory;
   productImages: ProductImage[];
+  branchInventories: BranchInventory[];
 };
 
 // Component Props

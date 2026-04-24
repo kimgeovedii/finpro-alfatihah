@@ -7,9 +7,10 @@ import { ProductDetailImageGallery } from "./ProductDetailImageGallery";
 import { ProductDetailInfoContent } from "./ProductDetailInfoContent";
 import { ProductDetailCartAction } from "./ProductDetailCartAction";
 import { ProductBreadcrumb } from "./ProductBreadCrumb";
+import { ProductBranchInfoCard } from "./ProductBranchInfo";
 
-export const ProductDetail = ({ slugName }: { slugName: string }) => {
-  const { product, isLoading, error } = useProductDetail(slugName);
+export const ProductDetail = ({ slugName, storeName }: { slugName: string, storeName: string }) => {
+  const { product, isLoading, error } = useProductDetail(slugName, storeName);
   const [qty, setQty] = useState(1);
 
   if (isLoading) {
@@ -64,6 +65,12 @@ export const ProductDetail = ({ slugName }: { slugName: string }) => {
               price={product.basePrice}
             />
 
+            <ProductBranchInfoCard branch={{
+              storeName: product.branchInventories[0].branch.storeName,
+              address: product.branchInventories[0].branch.address,
+              schedules: product.branchInventories[0].branch.schedules
+            }}/>
+
             <ProductDetailCartAction {...cartProps} variant="mobile" />
           </div>
         </div>
@@ -89,6 +96,11 @@ export const ProductDetail = ({ slugName }: { slugName: string }) => {
                 description={product.description}
                 price={product.basePrice}
               />
+              <ProductBranchInfoCard branch={{
+                storeName: product.branchInventories[0].branch.storeName,
+                address: product.branchInventories[0].branch.address,
+                schedules: product.branchInventories[0].branch.schedules
+              }}/>
             </div>
 
             <div className="sticky top-24">

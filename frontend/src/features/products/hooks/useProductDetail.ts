@@ -4,7 +4,7 @@ import { ProductRepository } from "@/features/products/repositories/product.repo
 
 const productRepository = new ProductRepository();
 
-export function useProductDetail(slugName: string) {
+export function useProductDetail(slugName: string, storeName: string) {
   const [product, setProduct] = useState<ProductDetailData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -15,7 +15,7 @@ export function useProductDetail(slugName: string) {
     async function fetchProduct() {
       try {
         setIsLoading(true);
-        const data = await productRepository.getProductBySlug(slugName);
+        const data = await productRepository.getProductBySlug(slugName, storeName);
         if (isMounted) {
           setProduct(data);
           setError(null);
