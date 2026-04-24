@@ -117,6 +117,11 @@ export class CartRepository {
                         select: {
                           name: true, slugName: true,
                         }
+                      },
+                      productImages: {
+                        select: { imageUrl: true },
+                        where: { isPrimary: true },
+                        take: 1
                       }
                     }
                   }
