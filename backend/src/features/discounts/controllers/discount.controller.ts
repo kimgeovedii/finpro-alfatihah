@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { DiscountService } from "../services/discount.service";
+import { sendSuccess } from "../../../utils/apiResponse";
 
 export class DiscountController {
   private discountService: DiscountService;
@@ -21,9 +22,7 @@ export class DiscountController {
         Number(limit),
       );
 
-      res
-        .status(200)
-        .send({ message: "Get all discounts successfully", data, meta });
+      sendSuccess(res, { data, meta }, "Get all discounts successfully");
     } catch (error) {
       next(error);
     }
@@ -36,7 +35,7 @@ export class DiscountController {
   ) => {
     try {
       const data = await this.discountService.createDiscount(req.body);
-      res.status(200).send({ message: "Create discount successfully", data });
+      sendSuccess(res, data, "Create discount successfully");
     } catch (error) {
       next(error);
     }
@@ -52,7 +51,7 @@ export class DiscountController {
         req.params.id as string,
         req.body,
       );
-      res.status(200).send({ message: "Update discount successfully", data });
+      sendSuccess(res, data, "Update discount successfully");
     } catch (error) {
       next(error);
     }
@@ -67,7 +66,7 @@ export class DiscountController {
       const data = await this.discountService.deleteDiscount(
         req.params.id as string,
       );
-      res.status(200).send({ message: "Delete discount successfully", data });
+      sendSuccess(res, data, "Delete discount successfully");
     } catch (error) {
       next(error);
     }

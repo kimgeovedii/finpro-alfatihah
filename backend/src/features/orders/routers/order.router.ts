@@ -14,9 +14,26 @@ class OrderRouter {
     }
 
     private initializeRoutes() {
-        this.router.get("/transaction", authMiddleware, this.orderController.getAllTransaction)
-        this.router.post("/checkout", authMiddleware, this.orderController.postAddCheckoutOrder)
-        this.router.delete("/:orderId", authMiddleware, this.orderController.deleteOrderById)
+        // Webhook
+        this.router.post("/webhook/midtrans", this.orderController.postMidtransWebhook)
+
+        this.router.use(authMiddleware)
+
+        const transactionRouter = Router()
+        transactionRouter.get("/", this.orderController.getAllTransaction)
+        transactionRouter.get("/:orderNumber", this.orderController.getOrderDetailByOrderNumber)
+        transactionRouter.get("/management/:branchId", this.orderController.getAllTransactionManagementByBranchId)
+        this.router.use("/transaction", transactionRouter)
+
+        const summaryRouter = Router()
+        summaryRouter.get("/", this.orderController.getTransactionSummary)
+        summaryRouter.get("/:branchId", this.orderController.getTransactionSummaryByBranchId)
+        this.router.use("/summary", summaryRouter)
+
+        this.router.post("/checkout", this.orderController.postAddCheckoutOrder)
+        this.router.post("/shipping/:orderNumber", this.orderController.postAddShipping)
+        this.router.post("/cancelling/:orderNumber", this.orderController.postCancelOrder)
+        this.router.post("/confirming/:orderNumber", this.orderController.postConfirmOrder)        
     }
 }
 

@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { ProductCategoryService } from "../services/productCategory.service";
+import { sendSuccess } from "../../../utils/apiResponse";
 
 export class ProductCategoryController {
   private productCategoryService: ProductCategoryService;
@@ -22,9 +23,7 @@ export class ProductCategoryController {
           Number(limit),
         );
 
-      res
-        .status(200)
-        .send({ message: "Get all categories successfully", data, meta });
+      sendSuccess(res, { data, meta }, "Get all categories successfully");
     } catch (error) {
       next(error);
     }
@@ -37,7 +36,7 @@ export class ProductCategoryController {
   ) => {
     try {
       const data = await this.productCategoryService.createCategory(req.body);
-      res.status(200).send({ message: "Create category successfully", data });
+      sendSuccess(res, data, "Create category successfully");
     } catch (error) {
       next(error);
     }
@@ -53,7 +52,7 @@ export class ProductCategoryController {
         req.params.id as string,
         req.body,
       );
-      res.status(200).send({ message: "Update category successfully", data });
+      sendSuccess(res, data, "Update category successfully");
     } catch (error) {
       next(error);
     }
@@ -68,7 +67,7 @@ export class ProductCategoryController {
       const data = await this.productCategoryService.deleteCategory(
         req.params.id as string,
       );
-      res.status(200).send({ message: "Delete category successfully", data });
+      sendSuccess(res, data, "Delete category successfully");
     } catch (error) {
       next(error);
     }

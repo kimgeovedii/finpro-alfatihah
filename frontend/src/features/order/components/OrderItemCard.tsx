@@ -1,9 +1,16 @@
-import { CopyField } from "@/components/button/CopyField"
+import { CopyFieldButton } from "@/components/button/CopyFieldButton"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { formatDate } from "@/utils/converter.util"
 import React from "react"
+import Swal from "sweetalert2"
+import { statusColorMap } from "@/constants/business.const"
+import { PhotoIcon } from "@heroicons/react/24/outline"
+import Link from "next/link"
+import { PaymentEvidenceUploadButton } from "./PaymentEvidenceUploadButton"
 
 type Props = {
+    orderId: string
     orderNumber: string
     status: string
     totalPrice: number
@@ -13,22 +20,34 @@ type Props = {
     totalItems: number
     productList: string
     createdAt: string
-
-    onComplete?: () => void
-    onDetail?: () => void
+    paymentMethod?: string
+    paymentStatus?: string
+    paymentEvidence?: string
 }
 
-export const OrderItemCard: React.FC<Props> = ({ orderNumber, status, totalPrice, finalPrice, shippingCost, paymentDeadline, totalItems, productList, createdAt, onComplete, onDetail }) => {
-    const statusColorMap: Record<string, string> = {
-        CANCELLED: "bg-red-400",
-        WAITING_PAYMENT: "bg-orange-400",
-        WAITING_PAYMENT_CONFIRMATION: "bg-orange-400",
-        PROCESSING: "bg-blue-400",
-        SHIPPED: "bg-purple-400",
-        CONFIRMED: "bg-emerald-400",
-    }
+export const OrderItemCard: React.FC<Props> = ({ orderId, orderNumber, status, totalPrice, finalPrice, shippingCost, paymentDeadline, totalItems, productList, createdAt, paymentEvidence, paymentMethod, paymentStatus }) => {
+    // Color mapping
     const statusClass = statusColorMap[status] || "bg-slate-400"
     const finalStatus = status.replaceAll('_',' ')
+
+    const evidenceElement = (url: string) => {
+        const handleClick = () => {
+            Swal.fire({
+                title: "Payment Evidence",
+                imageUrl: url,
+                imageAlt: "Payment Evidence",
+                confirmButtonColor: "#10b981",
+                confirmButtonText: "Close",
+                width: 600,
+            })
+        }
+    
+        return (
+            <Button variant="outline" onClick={handleClick}>
+                <PhotoIcon className="w-4 h-4"/> See Evidence
+            </Button>
+        )
+    }
 
     return (
         <div className="flex items-center justify-between bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 mb-4">
@@ -37,23 +56,41 @@ export const OrderItemCard: React.FC<Props> = ({ orderNumber, status, totalPrice
                     <p className="text-slate-500 text-sm mb-0">Order Number</p>
                     <Badge className={`capitalize font-semibold ${statusClass}`}>{finalStatus}</Badge>
                 </div>
-                <CopyField label="Order number" value={orderNumber} />
-                <p className="text-slate-500 text-sm mb-0"><span>({totalItems})</span> Purchased Item</p>
+                <CopyFieldButton label="Order number" value={orderNumber} />
+                <p className="text-slate-500 text-sm mb-1"><span>({totalItems})</span> Purchased Item</p>
                 <p className="text-slate-500 text-sm font-semibold mb-0">{productList}</p>
+                { status === 'WAITING_PAYMENT' && paymentEvidence === null && <PaymentEvidenceUploadButton orderId={orderId} paymentDeadline={paymentDeadline}/> }
+                {
+                    status === 'WAITING_PAYMENT' && paymentEvidence !== null && 
+                        <>
+                            <hr className="my-3"/>
+                            <div className="bg-green-100 p-2 rounded-lg flex justify-between w-full items-center">
+                                <p className="text-gray-700 font-bold text-sm">Now just wait until your payment validated</p>
+                                <div className="text-end">
+                                    <p className="text-gray-700 font-normal text-sm mb-1">Evidence Uploaded!</p>
+                                    {evidenceElement(paymentEvidence??"")}
+                                </div>
+                            </div>
+                        </>
+                }
+                {
+                    status === 'REJECTED' && paymentEvidence !== null && 
+                        <>
+                            <hr className="my-3"/>
+                            <div className="bg-red-100 p-2 rounded-lg w-full">
+                                <p className="text-gray-700 font-bold text-sm">We're sorry. But your transaction is rejected by our shop</p>
+                                {evidenceElement(paymentEvidence??"")}
+                            </div>
+                        </>
+                }
                 <hr className="my-3"/>
                 <div className="flex justify-between items-center w-full">
-                    <div className="flex gap-4 items-center">
-                        {
-                            status === 'WAITING_PAYMENT' && 
-                                <div className="bg-red-100 p-2 rounded-lg">
-                                    <p className="text-gray-700 font-normal text-sm mb-0">Finish Payment Before</p>
-                                    <p className="text-gray-700 font-bold text-sm">{formatDate(paymentDeadline,true)}</p>
-                                </div>
-                        }
-                        <div>
-                            <p className="text-gray-500 font-normal text-sm mb-0">Checkout At</p>
-                            <p className="text-gray-500 font-bold text-sm">{formatDate(createdAt,false)}</p>
-                        </div>
+                    <div>
+                        <p className="text-gray-500 font-normal text-sm mb-0">Checkout At</p>
+                        <p className="text-gray-500 font-bold text-sm mb-2">{formatDate(createdAt,false)}</p>
+                        <Link href={`/transaction/${orderNumber}`}>
+                            <Button className="bg-teal-700 text-white font-semibold text-sm px-5">Manage</Button>
+                        </Link>
                     </div>
                     <div className="text-end">
                         {

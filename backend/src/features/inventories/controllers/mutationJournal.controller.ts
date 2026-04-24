@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { MutationJournalService } from "../services/mutationJournal.service";
 import { AuthRequest } from "../../../middleware/auth.middleware";
+import { sendSuccess } from "../../../utils/apiResponse";
 
 export class MutationJournalController {
   private mutationJournalService: MutationJournalService;
@@ -9,44 +10,65 @@ export class MutationJournalController {
     this.mutationJournalService = new MutationJournalService();
   }
 
-  public findAllMutations = async (req: Request, res: Response, next: NextFunction) => {
+  public findAllMutations = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const { page = 1, limit = 10, ...filters } = req.query;
       const { data, meta } = await this.mutationJournalService.findAllMutations(
         filters,
         Number(page),
-        Number(limit)
+        Number(limit),
       );
-      res.status(200).send({ message: "Get all mutations successfully", data, meta });
+      sendSuccess(res, { data, meta }, "Get all mutations successfully");
     } catch (error) {
       next(error);
     }
   };
 
-  public findMutationById = async (req: Request, res: Response, next: NextFunction) => {
+  public findMutationById = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
-      const data = await this.mutationJournalService.findMutationById(req.params.id as string);
+      const data = await this.mutationJournalService.findMutationById(
+        req.params.id as string,
+      );
       if (!data) return res.status(404).send({ message: "Mutation not found" });
-      res.status(200).send({ message: "Get mutation successfully", data });
+      sendSuccess(res, data, "Get mutation successfully");
     } catch (error) {
       next(error);
     }
   };
 
-  public createMutation = async (req: Request, res: Response, next: NextFunction) => {
+  public createMutation = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const authReq = req as AuthRequest;
       const userId = authReq.user?.userId;
       if (!userId) throw new Error("User unauthorized");
 
-      const data = await this.mutationJournalService.createMutation(req.body, userId);
-      res.status(201).send({ message: "Create mutation successfully", data });
+      const data = await this.mutationJournalService.createMutation(
+        req.body,
+        userId,
+      );
+      sendSuccess(res, data, "Create mutation successfully");
     } catch (error) {
       next(error);
     }
   };
 
-  public updateMutationStatus = async (req: Request, res: Response, next: NextFunction) => {
+  public updateMutationStatus = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const authReq = req as AuthRequest;
       const userId = authReq.user?.userId;
@@ -58,9 +80,9 @@ export class MutationJournalController {
         req.params.id as string,
         status,
         userId,
-        notes
+        notes,
       );
-      res.status(200).send({ message: "Update mutation status successfully", data });
+      sendSuccess(res, data, "Update mutation status successfully");
     } catch (error) {
       next(error);
     }

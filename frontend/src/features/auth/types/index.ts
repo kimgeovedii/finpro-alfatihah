@@ -7,14 +7,17 @@ export interface LoginPayload {
 export interface User {
   id: string;
   email: string;
-  name: string;
-  role: { id: string; name: string } | null;
+  username: string;
+  cartItems: number;
+  // role: { id: string; name: string } | null;
+  role : string
 }
 
 export interface LoginResponse {
   accessToken: string;
   refreshToken: string;
   user: User;
+  cartItems: number;
 }
 
 export interface AuthState {
@@ -22,6 +25,7 @@ export interface AuthState {
   accessToken: string | null;
   isLoading: boolean;
   error: string | null;
+  cartItems: number;
   login: (payload: LoginPayload) => Promise<void>;
   logout: () => Promise<void>;
   fetchUser: () => Promise<void>;
@@ -29,7 +33,6 @@ export interface AuthState {
   verifyEmailToken: (token: string) => Promise<{ message: string }>;
   clearError: () => void;
 }
-
 
 export interface ApiError {
   message?: string;

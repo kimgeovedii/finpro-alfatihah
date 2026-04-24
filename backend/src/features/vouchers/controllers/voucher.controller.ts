@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { VoucherService } from "../services/voucher.service";
+import { sendSuccess } from "../../../utils/apiResponse";
 
 export class VoucherController {
   private voucherService: VoucherService;
@@ -21,9 +22,7 @@ export class VoucherController {
         Number(limit),
       );
 
-      res
-        .status(200)
-        .send({ message: "Get all vouchers successfully", data, meta });
+      sendSuccess(res, { data, meta }, "Get all vouchers successfully");
     } catch (error) {
       next(error);
     }
@@ -36,7 +35,7 @@ export class VoucherController {
   ) => {
     try {
       const data = await this.voucherService.createVoucher(req.body);
-      res.status(200).send({ message: "Create voucher successfully", data });
+      sendSuccess(res, data, "Create voucher successfully");
     } catch (error) {
       next(error);
     }
@@ -52,7 +51,7 @@ export class VoucherController {
         req.params.id as string,
         req.body,
       );
-      res.status(200).send({ message: "Update voucher successfully", data });
+      sendSuccess(res, data, "Update voucher successfully");
     } catch (error) {
       next(error);
     }
@@ -67,7 +66,7 @@ export class VoucherController {
       const data = await this.voucherService.deleteVoucher(
         req.params.id as string,
       );
-      res.status(200).send({ message: "Delete voucher successfully", data });
+      sendSuccess(res, data, "Delete voucher successfully");
     } catch (error) {
       next(error);
     }

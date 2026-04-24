@@ -1,8 +1,13 @@
 import { faker } from "@faker-js/faker"
-import { prisma } from "../../src/config/prisma"
 import { VoucherType, DiscountValueType } from "@prisma/client"
+import { VoucherService } from "../../src/features/vouchers/services/voucher.service"
 
 class VouchersFactory {
+    private voucherService: VoucherService;
+
+    constructor() {
+        this.voucherService = new VoucherService();
+    }
     private getRandomVoucherType = (): VoucherType => {
         const types = [VoucherType.ORDER, VoucherType.SHIPPING_COST]
         return faker.helpers.arrayElement(types)
@@ -62,20 +67,18 @@ class VouchersFactory {
 
         const name = faker.helpers.arrayElement(voucherNames)
 
-        return prisma.vouchers.create({
-            data: {
-                id: faker.string.uuid(),
-                name,
-                voucherCode: this.generateVoucherCode(),
-                type: voucherType,
-                discountValueType,
-                discountValue,
-                minPurchaseAmount,
-                maxDiscountAmount,
-                quota,
-                expiredDate,
-                createdAt: faker.date.past({ years: 1 }),
-            },
+        return this.voucherService.createVoucher({
+            id: faker.string.uuid(),
+            name,
+            voucherCode: this.generateVoucherCode(),
+            type: voucherType,
+            discountValueType,
+            discountValue,
+            minPurchaseAmount,
+            maxDiscountAmount,
+            quota,
+            expiredDate,
+            createdAt: faker.date.past({ years: 1 }),
         })
     }
 

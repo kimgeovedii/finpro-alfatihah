@@ -9,6 +9,7 @@ export const useAuthService = create<AuthState>((set) => ({
   accessToken: null,
   isLoading: false,
   error: null,
+  cartItems: 0,
 
   login: async (payload: LoginPayload) => {
     set({ isLoading: true, error: null });
@@ -40,6 +41,7 @@ export const useAuthService = create<AuthState>((set) => ({
 
       set({
         user: response.user,
+        cartItems: response.cartItems,
         accessToken: response.accessToken,
         isLoading: false,
       });
@@ -59,7 +61,7 @@ export const useAuthService = create<AuthState>((set) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await authRepository.getMe();
-      set({ user: response, isLoading: false });
+      set({ user: response, cartItems: response.cartItems, isLoading: false });
     } catch (err: any) {
       set({
         error: err.message || "Failed to fetch user data",
