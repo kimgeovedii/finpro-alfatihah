@@ -38,10 +38,30 @@ export class ProductCategoryService {
   };
 
   public createCategory = async (data: any) => {
+    const existing = await this.productCategoryRepository.findByName(data.name);
+    if (existing) {
+      throw new Error("Category name already exists");
+    }
+
+    if (!data.slugName) {
+      data.slugName = data.name.toLowerCase().replace(/ /g, "-");
+    }
+
     return await this.productCategoryRepository.createCategory(data);
   };
 
   public updateCategory = async (id: string, data: any) => {
+    if (data.name) {
+      const existing = await this.productCategoryRepository.findByName(data.name);
+      if (existing && existing.id !== id) {
+        throw new Error("Category name already exists");
+      }
+
+      if (!data.slugName) {
+        data.slugName = data.name.toLowerCase().replace(/ /g, "-");
+      }
+    }
+
     return await this.productCategoryRepository.updateCategory(id, data);
   };
 
