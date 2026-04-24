@@ -1,6 +1,6 @@
 import React from 'react'
 import { Sidebar } from '@/components/layout/Sidebar'
-import { Navbar } from '@/components/layout/Navbar'
+import { Navbar } from '@/components/layout/NavbarDashboard'
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (

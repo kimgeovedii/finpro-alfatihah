@@ -39,6 +39,16 @@ class PaymentFactory {
         if (status === PaymentStatus.SUCCESS) approvedAt = faker.date.recent()
         if (status === PaymentStatus.REJECTED) rejectedAt = faker.date.recent()
 
+        // Get a real employee ID for approvedBy (it's a FK to Employee table)
+        let approvedById: string | null = null
+        if (status === PaymentStatus.SUCCESS) {
+            const employee = await prisma.employee.findFirst({
+                select: { id: true },
+                orderBy: { id: 'asc' },
+            })
+            approvedById = employee?.id ?? null
+        }
+
         return prisma.payments.create({
             data: {
                 id: faker.string.uuid(),
@@ -46,7 +56,7 @@ class PaymentFactory {
                 method,
                 status,
                 evidence: method === PaymentMethod.MANUAL ? faker.image.url() : null,
-                approvedBy: status === PaymentStatus.SUCCESS ? faker.string.uuid() : null,
+                approvedBy: approvedById,
                 approvedAt,
                 rejectedAt,
                 gatewayRef: method === PaymentMethod.GATEWAY ? `PAY-${faker.string.alphanumeric(10)}` : null,
