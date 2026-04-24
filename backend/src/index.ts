@@ -9,11 +9,11 @@ import { swaggerSpec } from "./config/swagger"
 
 // global router aggregates all feature routers
 import globalRouter from "./router";
-import { success } from "zod";
 import { sendError } from "./utils/apiResponse";
 import { Prisma } from "@prisma/client";
 import { CartCron } from "./features/carts/crons/cart.cron";
 import { OrderCron } from "./features/orders/crons/order.cron";
+import { auditError } from "./utils/audit";
 
 class App {
   public app: Application;
@@ -90,7 +90,11 @@ class App {
       const statusCode = err.status || err.code || 500
       
       // Audit server error
-      if (statusCode === 500) return sendError(res, "Something went wrong", 500)
+      if (statusCode === 500) {
+        auditError(err, req)
+        
+        return sendError(res, "Something went wrong", 500)
+      }
 
       return sendError(res, err.message, statusCode)
     })

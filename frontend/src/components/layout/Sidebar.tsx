@@ -1,7 +1,7 @@
 "use client"
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { HomeIcon, BriefcaseIcon, ClipboardDocumentCheckIcon, ServerStackIcon, Cog6ToothIcon, GlobeAmericasIcon, ShoppingCartIcon, ArrowsRightLeftIcon, CubeIcon } from '@heroicons/react/24/outline'
+import { HomeIcon, BriefcaseIcon, ClipboardDocumentCheckIcon, ServerStackIcon, Cog6ToothIcon, GlobeAmericasIcon, ShoppingCartIcon, ArrowsRightLeftIcon, CubeIcon, TagIcon, UsersIcon } from '@heroicons/react/24/outline'
 import { useAuthService } from '@/features/auth/service/auth.service'
 
 const NAV_ITEMS = [
