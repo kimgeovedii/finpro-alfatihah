@@ -4,7 +4,15 @@ export class AuthRepository {
   async findByEmail(email: string) {
     return prisma.user.findUnique({
       where: { email },
+    });
+  }
 
+  async findByProviderId(provider: string, providerId: string) {
+    return prisma.user.findFirst({
+      where: {
+        provider,
+        providerId,
+      },
     });
   }
 
@@ -27,9 +35,36 @@ export class AuthRepository {
     });
   }
 
-  async createUser(data: any) {
+  async createUserEmailOnly(email: string, verificationToken: string, expires: Date) {
     return prisma.user.create({
-      data,
+      data: {
+        email,
+        verificationToken,
+        verificationExpires: expires,
+        provider: "credentials",
+      },
+    });
+  }
+
+  async createGoogleUser(data: { email: string; providerId: string; username?: string; avatar?: string }) {
+    return prisma.user.create({
+      data: {
+        ...data,
+        provider: "google",
+        emailVerifiedAt: new Date(), // Google emails are pre-verified
+      },
+    });
+  }
+
+  async linkGoogleAccount(userId: string, providerId: string, avatar?: string) {
+    return prisma.user.update({
+      where: { id: userId },
+      data: {
+        provider: "google",
+        providerId,
+        ...(avatar && { avatar }),
+        emailVerifiedAt: new Date(),
+      },
     });
   }
 
@@ -39,6 +74,18 @@ export class AuthRepository {
       data: {
         verificationToken: token,
         verificationExpires: expires,
+      },
+    });
+  }
+
+  async setPasswordAndVerify(userId: string, passwordHash: string) {
+    return prisma.user.update({
+      where: { id: userId },
+      data: {
+        password: passwordHash,
+        emailVerifiedAt: new Date(),
+        verificationToken: null,
+        verificationExpires: null,
       },
     });
   }
@@ -76,6 +123,34 @@ export class AuthRepository {
   async deleteAllRefreshTokensByUserId(userId: string) {
     return prisma.token.deleteMany({
       where: { userId },
+    });
+  }
+
+  // Reset Password methods
+  async updateResetPasswordToken(userId: string, token: string, expires: Date) {
+    return prisma.user.update({
+      where: { id: userId },
+      data: {
+        resetPasswordToken: token,
+        resetPasswordExpires: expires,
+      },
+    });
+  }
+
+  async findUserByResetToken(token: string) {
+    return prisma.user.findFirst({
+      where: { resetPasswordToken: token },
+    });
+  }
+
+  async resetPassword(userId: string, passwordHash: string) {
+    return prisma.user.update({
+      where: { id: userId },
+      data: {
+        password: passwordHash,
+        resetPasswordToken: null,
+        resetPasswordExpires: null,
+      },
     });
   }
 }

@@ -1,119 +1,77 @@
-import { create } from "zustand";
+import { apiFetch } from "@/utils/api";
 import Cookies from "js-cookie";
-import { authRepository } from "../repository/auth.repository";
-import { LoginPayload, LoginResponse } from "../types";
-import { AuthState } from "../types";
 
-export const useAuthService = create<AuthState>((set) => ({
-  user: null,
-  accessToken: null,
-  isLoading: false,
-  error: null,
-
-  login: async (payload: LoginPayload) => {
-    set({ isLoading: true, error: null });
-    try {
-      const response = await authRepository.login(payload);
-
-      const cookieOptions: Cookies.CookieAttributes = {
-        sameSite: "strict",
-        expires: 1,
-        ...(process.env.NODE_ENV === "production" ? { secure: true } : {}),
-      };
-
-      Cookies.set("accessToken", response.accessToken, {
-        path: "/",
-        ...cookieOptions,
-        expires: payload.rememberMe ? 30 : 1, 
-      }); 
-      Cookies.set("refreshToken", response.refreshToken, {
-        path: "/",
-        ...cookieOptions,
-        expires: payload.rememberMe ? 30 : 1,
-      }); 
-
-      console.debug(
-        "set tokens",
-        Cookies.get("accessToken"),
-        Cookies.get("refreshToken"),
-      );
-
-      set({
-        user: response.user,
-        accessToken: response.accessToken,
-        isLoading: false,
-      });
-    } catch (err: any) {
-      set({
-        error: err.message || "Login failed",
-        isLoading: false,
-      });
-      throw err;
-    }
+export const authService = {
+  register: async (data: any) => {
+    return apiFetch<any>("/auth/register", "post", data);
   },
 
-  fetchUser: async () => {
-    const token = Cookies.get("accessToken");
-    if (!token) return;
-
-    set({ isLoading: true, error: null });
-    try {
-      const response = await authRepository.getMe();
-      set({ user: response, isLoading: false });
-    } catch (err: any) {
-      set({
-        error: err.message || "Failed to fetch user data",
-        isLoading: false,
-        user: null,
-      });
-    }
+  verifyAndSetPassword: async (data: any) => {
+    return apiFetch<any>("/auth/verify-set-password", "post", data);
   },
 
-  resendVerification: async (email: string) => {
-    set({ isLoading: true, error: null });
-    try {
-      const response = await authRepository.resendVerification(email);
-      set({ isLoading: false });
-      return response;
-    } catch (err: any) {
-      set({
-        error: err.message || "Failed to resend verification email",
-        isLoading: false,
-      });
-      throw err;
-    }
+  login: async (data: any) => {
+    const result: any = await apiFetch<any>("/auth/login", "post", data);
+    const { user, accessToken, refreshToken } = result;
+    
+    // Set cookies for middleware
+    Cookies.set("accessToken", accessToken, { expires: data.rememberMe ? 30 : 1 / 96 }); // 15 mins approx
+    Cookies.set("refreshToken", refreshToken, { expires: data.rememberMe ? 30 : 1 });
+
+    return { user, accessToken, refreshToken };
   },
 
-  verifyEmailToken: async (token: string) => {
-    set({ isLoading: true, error: null });
-    try {
-      const response = await authRepository.verifyEmailToken(token);
-      set({ isLoading: false });
-      return response;
-    } catch (err: any) {
-      set({
-        error: err.message || "Failed to verify email",
-        isLoading: false,
-      });
-      throw err;
-    }
+  employeeLogin: async (data: any) => {
+    const result: any = await apiFetch<any>("/auth/employee/login", "post", data);
+    const { user, accessToken, refreshToken } = result;
+    
+    // Set cookies for middleware
+    Cookies.set("accessToken", accessToken, { expires: data.rememberMe ? 30 : 1 / 96 }); 
+    Cookies.set("refreshToken", refreshToken, { expires: data.rememberMe ? 30 : 1 });
+
+    return { user, accessToken, refreshToken };
+  },
+
+  googleLogin: async (credential: string) => {
+    const result: any = await apiFetch<any>("/auth/google", "post", { credential });
+    const { user, accessToken, refreshToken } = result;
+    
+    Cookies.set("accessToken", accessToken, { expires: 30 });
+    Cookies.set("refreshToken", refreshToken, { expires: 30 });
+
+    return { user, accessToken, refreshToken };
   },
 
   logout: async () => {
+    const refreshToken = Cookies.get("refreshToken");
     try {
-      const refreshToken = Cookies.get("refreshToken");
       if (refreshToken) {
-        await authRepository.logout(refreshToken);
+        await apiFetch<any>("/auth/logout", "post", { refreshToken });
       }
-    } catch (error) {
-      console.error("Server-side logout failed:", error);
+    } catch (err) {
+      console.warn("Logout request failed, but clearing local session anyway.", err);
     } finally {
-      // Always clear local state regardless of server response
       Cookies.remove("accessToken");
       Cookies.remove("refreshToken");
-      set({ user: null, accessToken: null, error: null });
+      if (typeof window !== "undefined") {
+        window.location.href = "/login";
+      }
     }
   },
 
-  clearError: () => set({ error: null }),
-}));
+  requestResetPassword: async (email: string) => {
+    return apiFetch<any>("/auth/reset-password", "post", { email });
+  },
+
+  confirmResetPassword: async (data: any) => {
+    return apiFetch<any>("/auth/confirm-reset-password", "post", data);
+  },
+
+  resendVerification: async (email: string) => {
+    return apiFetch<any>("/auth/resend-verification", "post", { email });
+  },
+
+  me: async () => {
+    return apiFetch<any>("/auth/me", "get");
+  }
+};

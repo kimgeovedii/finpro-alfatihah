@@ -217,3 +217,65 @@
  *                 success: { type: boolean, example: false }
  *                 message: { type: string, example: Internal server error }
  */
+
+/**
+ * @openapi
+ * /api/carts/items/branch/{branchId}/product/{productId}:
+ *   get:
+ *     summary: Get cart item quantity
+ *     description: Retrieve the quantity of a cart item by product ID and branch ID.
+ *     tags: [Cart]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: branchId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         example: 2f4c1a9d-8b7a-4e3a-9d2a-1a2b3c4d5e6f
+ *       - in: path
+ *         name: productId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         example: e4d4d386-2b89-47bf-8162-c74e44c0f908
+ *     responses:
+ *       200:
+ *         description: Cart item fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 message: { type: string, example: Cart item fetched }
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     quantity:
+ *                       type: integer
+ *                       example: 20
+ *
+ *       401:
+ *         description: Unauthorized - No token provided
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: false }
+ *                 message: { type: string, example: No token provided }
+ *
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: false }
+ *                 message: { type: string, example: Internal server error }
+ */

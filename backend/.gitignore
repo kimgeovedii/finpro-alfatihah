@@ -14,7 +14,8 @@ uploads/
 err.txt
 validate.log
 prisma_migrate.log
-
+/src/public
 # IDE
 .vscode/
 .idea/
+requirement.md

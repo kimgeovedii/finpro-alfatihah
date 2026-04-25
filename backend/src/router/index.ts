@@ -3,6 +3,7 @@ import { Router } from "express";
 // import feature routers
 import authRouter from "../features/auth/routers/auth.router";
 import userRouter from "../features/user/routers/user.router";
+import branchRouter from "../features/branch/routers/branch.router";
 import cartRouter from "../features/carts/routers/cart.router"
 import orderRouter from "../features/orders/routers/order.router"
 import cartItemRouter from "../features/carts/routers/cart_item.router"
@@ -13,6 +14,7 @@ import { VoucherRouter } from "../features/vouchers/routers/voucher.router";
 import { BranchInventoryRouter } from "../features/inventories/routers/branchInventory.router";
 import { StockJournalRouter } from "../features/inventories/routers/stockJournal.router";
 import { MutationJournalRouter } from "../features/inventories/routers/mutationJournal.router";
+import paymentRouter from "../features/payments/routers/payment.router";
 
 class GlobalRouter {
   public router: Router;
@@ -25,8 +27,10 @@ class GlobalRouter {
   private registerRoutes() {
     this.router.use("/auth", authRouter);
     this.router.use("/users", userRouter); // Basic user endpoints
+    this.router.use("/branches", branchRouter);
     this.router.use("/carts", cartRouter)
     this.router.use("/orders", orderRouter)
+    this.router.use("/payments", paymentRouter)
     this.router.use("/carts/items", cartItemRouter)
     this.router.use(
       "/product-categories",

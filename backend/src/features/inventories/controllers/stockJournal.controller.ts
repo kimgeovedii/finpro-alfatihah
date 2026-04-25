@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { StockJournalService } from "../services/stockJournal.service";
 import { AuthRequest } from "../../../middleware/auth.middleware";
+import { sendSuccess } from "../../../utils/apiResponse";
 
 export class StockJournalController {
   private stockJournalService: StockJournalService;
@@ -37,11 +38,7 @@ export class StockJournalController {
           Number(limit),
         );
 
-      res.status(200).send({
-        message: "Get all stock journals successfully",
-        data,
-        meta,
-      });
+      sendSuccess(res, { data, meta }, "Get all stock journals successfully");
     } catch (error) {
       next(error);
     }
@@ -59,10 +56,7 @@ export class StockJournalController {
       if (!data)
         return res.status(404).send({ message: "Stock journal not found" });
 
-      res.status(200).send({
-        message: "Get stock journal successfully",
-        data,
-      });
+      sendSuccess(res, data, "Get stock journal successfully");
     } catch (error) {
       next(error);
     }

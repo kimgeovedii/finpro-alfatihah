@@ -1,17 +1,21 @@
 import { faker } from "@faker-js/faker"
 import { prisma } from "../../src/config/prisma"
+import { VoucherService } from "../../src/features/vouchers/services/voucher.service"
 
 class VoucherUsedFactory {
+    private voucherService: VoucherService;
+
+    constructor() {
+        this.voucherService = new VoucherService();
+    }
     private async findRandomVoucher() {
-        const count = await prisma.vouchers.count()
-        if (count === 0) return null
+        const { meta } = await this.voucherService.findAllVouchers({}, 1, 1);
+        if (meta.total === 0) return null;
 
-        const skip = Math.floor(Math.random() * count)
-
-        return prisma.vouchers.findFirst({
-            skip,
-            select: { id: true }
-        })
+        const skip = Math.floor(Math.random() * meta.total);
+        const { data } = await this.voucherService.findAllVouchers({}, skip + 1, 1);
+        
+        return data[0];
     }
 
     private async findRandomOrder() {
@@ -79,9 +83,14 @@ class VoucherUsedFactory {
             select: { id: true }
         })
 
-        const vouchers = await prisma.vouchers.findMany({
-            select: { id: true }
-        })
+        let vouchers: any[] = [];
+        let p2 = 1, h2 = true;
+        while(h2) {
+            const { data, meta } = await this.voucherService.findAllVouchers({}, p2, 50);
+            vouchers.push(...data);
+            if (p2 >= meta.totalPages || data.length === 0) h2 = false;
+            p2++;
+        }
 
         if (orders.length === 0 || vouchers.length === 0) {
             return []

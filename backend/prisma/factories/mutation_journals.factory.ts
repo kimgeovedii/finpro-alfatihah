@@ -1,18 +1,23 @@
 import { faker } from "@faker-js/faker"
 import { prisma } from "../../src/config/prisma"
 import { MutationStatus } from "@prisma/client"
+import { ProductService } from "../../src/features/products/services/product.service"
 
 class MutationJournalsFactory {
+    private productService: ProductService;
+
+    constructor() {
+        this.productService = new ProductService();
+    }
+
     private async findRandomProduct() {
-        const count = await prisma.products.count()
-        if (count === 0) return null
+        const { meta } = await this.productService.findAllProducts({}, 1, 1);
+        if (meta.total === 0) return null;
 
-        const skip = Math.floor(Math.random() * count)
-
-        return prisma.products.findFirst({
-            skip,
-            select: { id: true }
-        })
+        const skip = Math.floor(Math.random() * meta.total);
+        const { data } = await this.productService.findAllProducts({}, skip + 1, 1);
+        
+        return data[0];
     }
 
     private async findRandomEmployee() {

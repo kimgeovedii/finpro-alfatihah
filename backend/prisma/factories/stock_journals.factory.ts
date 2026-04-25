@@ -1,18 +1,23 @@
 import { faker } from "@faker-js/faker"
 import { prisma } from "../../src/config/prisma"
 import { TransactionType, ReferenceType } from "@prisma/client"
+import { BranchInventoryService } from "../../src/features/inventories/services/branchInventory.service"
 
 class StockJournalsFactory {
+    private branchInventoryService: BranchInventoryService;
+
+    constructor() {
+        this.branchInventoryService = new BranchInventoryService();
+    }
+
     private async findRandomBranchInventory() {
-        const count = await prisma.branch_inventories.count()
-        if (count === 0) return null
+        const { meta } = await this.branchInventoryService.findAllBranchInventories({}, 1, 1);
+        if (meta.total === 0) return null;
 
-        const skip = Math.floor(Math.random() * count)
-
-        return prisma.branch_inventories.findFirst({
-            skip,
-            select: { id: true, productId: true, currentStock: true }
-        })
+        const skip = Math.floor(Math.random() * meta.total);
+        const { data } = await this.branchInventoryService.findAllBranchInventories({}, skip + 1, 1);
+        
+        return data[0];
     }
 
     private async findRandomEmployee() {

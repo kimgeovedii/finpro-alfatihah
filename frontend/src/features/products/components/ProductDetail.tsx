@@ -1,0 +1,102 @@
+"use client";
+
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useProductDetail } from "@/features/products/hooks/useProductDetail";
+import { ProductDetailImageGallery } from "./ProductDetailImageGallery";
+import { ProductDetailInfoContent } from "./ProductDetailInfoContent";
+import { ProductDetailCartAction } from "./ProductDetailCartAction";
+import { ProductBreadcrumb } from "./ProductBreadCrumb";
+
+export const ProductDetail = ({ slugName }: { slugName: string }) => {
+  const { product, isLoading, error } = useProductDetail(slugName);
+  const [qty, setQty] = useState(1);
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+        <div className="w-12 h-12 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-emerald-800 font-medium animate-pulse">Loading product...</p>
+      </div>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="rounded-[2rem] bg-white p-8 text-center shadow-[0_30px_60px_rgba(15,23,42,0.08)]">
+          <p className="text-base font-semibold text-slate-700">Unable to load product.</p>
+          <p className="mt-2 text-sm text-slate-500">{error ?? "Please try again later."}</p>
+        </div>
+      </div>
+    );
+  }
+
+  const cartProps = {
+    qty,
+    setQty,
+    price: product.basePrice,
+    totalPrice: product.basePrice * qty,
+  };
+
+  return (
+    <AnimatePresence mode="wait">
+      <motion.section
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="w-full bg-slate-50 min-h-screen text-slate-900"
+      >
+        {/* Mobile Layout */}
+        <div className="lg:hidden flex flex-col pb-32">
+          <div className="w-full overflow-hidden">
+            <ProductDetailImageGallery
+              productImages={product.productImages}
+              productName={product.productName}
+            />
+          </div>
+
+          <div className="px-5 pt-6 pb-6 flex flex-col gap-6">
+            <ProductDetailInfoContent
+              productName={product.productName}
+              categoryName={product.category.name}
+              description={product.description}
+              price={product.basePrice}
+            />
+
+            <ProductDetailCartAction {...cartProps} variant="mobile" />
+          </div>
+        </div>
+
+        {/* Desktop Layout */}
+        <div className="hidden lg:block pt-10 pb-24 px-8 xl:px-12 max-w-[1600px] mx-auto">
+          <div className="mb-8">
+            <ProductBreadcrumb name={product.productName} />
+          </div>
+
+          <div className="grid grid-cols-[1.2fr_1fr_0.8fr] gap-8 xl:gap-14 items-start">
+            <div>
+              <ProductDetailImageGallery
+                productImages={product.productImages}
+                productName={product.productName}
+              />
+            </div>
+
+            <div>
+              <ProductDetailInfoContent
+                productName={product.productName}
+                categoryName={product.category.name}
+                description={product.description}
+                price={product.basePrice}
+              />
+            </div>
+
+            <div className="sticky top-24">
+              <ProductDetailCartAction {...cartProps} variant="desktop" />
+            </div>
+          </div>
+        </div>
+      </motion.section>
+    </AnimatePresence>
+  );
+};

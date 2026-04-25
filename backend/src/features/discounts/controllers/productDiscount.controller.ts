@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { ProductDiscountService } from "../services/productDiscount.service";
+import { sendSuccess } from "../../../utils/apiResponse";
 
 export class ProductDiscountController {
   private productDiscountService: ProductDiscountService;
@@ -20,9 +21,7 @@ export class ProductDiscountController {
         discountId,
         productIds,
       );
-      res
-        .status(200)
-        .send({ message: "Products assigned to discount successfully", data });
+      sendSuccess(res, data, "Products assigned to discount successfully");
     } catch (error) {
       next(error);
     }
@@ -40,9 +39,7 @@ export class ProductDiscountController {
         discountId,
         productId,
       );
-      res
-        .status(200)
-        .send({ message: "Product removed from discount successfully", data });
+      sendSuccess(res, data, "Product removed from discount successfully");
     } catch (error) {
       next(error);
     }
@@ -57,9 +54,7 @@ export class ProductDiscountController {
       const discountId = req.params.discountId as string;
       const data =
         await this.productDiscountService.getProductsByDiscount(discountId);
-      res
-        .status(200)
-        .send({ message: "Get discount products successfully", data });
+      sendSuccess(res, data, "Get discount products successfully");
     } catch (error) {
       next(error);
     }
