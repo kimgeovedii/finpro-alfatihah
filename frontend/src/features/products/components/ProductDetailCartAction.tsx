@@ -18,6 +18,8 @@ export const ProductDetailCartAction = ({
   price,
   totalPrice,
   variant,
+  onAddToCart, 
+  isCreating
 }: ProductDetailCartActionProps) => {
   if (variant === "mobile") {
     // Mobile layout
@@ -108,12 +110,18 @@ export const ProductDetailCartAction = ({
           </div>
 
           <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="w-full py-3 px-6 mb-3 bg-emerald-800 text-white rounded-2xl font-bold text-lg flex justify-between items-center group shadow-lg shadow-emerald-800/10"
+            onClick={onAddToCart}          
+            disabled={isCreating}          
+            whileTap={{ scale: 0.96 }}
+            className="w-full bg-linear-to-r from-emerald-800 to-emerald-600 text-white py-4 rounded-[1.5rem] font-bold text-lg flex items-center justify-center gap-3 shadow-lg shadow-emerald-700/20 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            <span>Add to Cart</span>
-            <ShoppingBagIcon className="w-6 h-6 transition-transform duration-300 group-hover:scale-110" />
+            {
+              isCreating ? 
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              : 
+                <ShoppingBagIcon className="w-6 h-6" />
+            }
+            { isCreating ? "Adding..." : "Add to Cart" }
           </motion.button>
         </div>
       </div>

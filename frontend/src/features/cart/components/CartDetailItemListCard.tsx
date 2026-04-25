@@ -35,8 +35,8 @@ export const CartDetailItemListCard: React.FC<Props> = ({ items }) => {
                             </div>
                             <div className="flex-1 min-w-0">
                                 <p className="text-[10px] font-semibold text-emerald-600 uppercase tracking-wider">{dt.category}</p>
-                                <p className="text-sm font-semibold text-slate-800 truncate">{dt.productName}</p>
-                                <p className="text-xs text-slate-400 truncate">{dt.description}</p>
+                                <p className="text-sm font-semibold text-slate-800">{dt.productName}</p>
+                                <p className="text-xs text-slate-400 line-clamp-3">{dt.description}</p>
                                 <span className="inline-block mt-1 text-[11px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">Qty: {dt.quantity}</span>
                             </div>
                             <div className="text-right flex-shrink-0">

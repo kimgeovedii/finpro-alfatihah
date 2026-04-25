@@ -8,14 +8,33 @@ import { ProductDetailInfoContent } from "./ProductDetailInfoContent";
 import { ProductDetailCartAction } from "./ProductDetailCartAction";
 import { ProductBreadcrumb } from "./ProductBreadCrumb";
 import { ProductBranchInfoCard } from "./ProductBranchInfo";
+import { useCreateCart } from "@/features/cart/hooks/useCart";
+import Swal from "sweetalert2";
 
 export const ProductDetail = ({ slugName, storeName }: { slugName: string, storeName: string }) => {
-  const { product, isLoading, error } = useProductDetail(slugName, storeName);
+  const { product, isLoading, error, fetchProduct } = useProductDetail(slugName, storeName);
   const [qty, setQty] = useState(1);
+  const { createCart, isCreating } = useCreateCart()
 
   useEffect(() => {
     if (product?.branchInventories?.[0]?.cartItems?.[0]?.quantity) setQty(product.branchInventories[0].cartItems[0].quantity)
   }, [product])
+
+  // Handle action
+  const handleCreateCart = async (branchId: string, productId: string, qty: number) => {
+    const success = await createCart(branchId, productId, qty)
+
+    if (success) {
+      await Swal.fire({
+        title: "Product Added!",
+        text: "Item has been added to your cart.",
+        icon: "success",
+        confirmButtonColor: "#10b981",
+      })
+
+      fetchProduct()
+    }
+  }
 
   if (isLoading) {
     return (
@@ -42,6 +61,13 @@ export const ProductDetail = ({ slugName, storeName }: { slugName: string, store
     setQty,
     price: product.basePrice,
     totalPrice: product.basePrice * qty,
+    isCreating,
+    onAddToCart: () =>
+      handleCreateCart(
+        product.branchInventories[0].branchId,
+        product.id,
+        qty 
+      ),
   };
 
   return (

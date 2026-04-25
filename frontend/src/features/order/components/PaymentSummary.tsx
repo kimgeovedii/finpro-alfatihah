@@ -15,10 +15,11 @@ type Props = {
     totalPrice: number
     totalSaving: number
     finalPrice: number
+    paymentMethod?: string | null
     onCancel: (orderNumber: string) => void
 }
 
-export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, totalPrice, totalSaving, finalPrice, orderId, status, paymentDeadline, paymentEvidence, orderNumber, onCancel }) => {
+export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, totalPrice, totalSaving, finalPrice, orderId, status, paymentDeadline, paymentEvidence, orderNumber, onCancel, paymentMethod }) => {
     return (
         <div className="bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 mb-4">
             <h5 className="font-bold mb-3">Payment Summary</h5>
@@ -41,7 +42,7 @@ export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, t
             </div>
             <hr className="mt-3 mb-5"/>
             <div className="flex flex-col gap-3">
-                { status === 'WAITING_PAYMENT' && paymentEvidence === null && <PaymentEvidenceUploadButton orderId={orderId} paymentDeadline={paymentDeadline}/> }
+                { status === 'WAITING_PAYMENT' && paymentEvidence === null && paymentMethod === "MANUAL" && <PaymentEvidenceUploadButton orderId={orderId} paymentDeadline={paymentDeadline}/> }
                 { status === 'WAITING_PAYMENT' && <OrderCancelButton orderNumber={orderNumber} onCancel={onCancel}/> }
             </div>
             <div className="flex gap-5 w-full mt-3">

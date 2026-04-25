@@ -180,6 +180,7 @@ export default function TransactionDetailPage() {
                       status={order?.status ?? '-'} 
                       paymentDeadline={order?.paymentDeadline ?? '-'} 
                       paymentEvidence={order?.payments[0].evidence}
+                      paymentMethod={order?.payments[0].method}
                       onCancel={handleCancelOrder}         
                     />
                   </>

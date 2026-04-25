@@ -75,4 +75,6 @@ export type ProductDetailCartActionProps = {
   price: number;
   totalPrice: number;
   variant: "mobile" | "desktop";
+  isCreating: boolean;         
+  onAddToCart: () => void;
 };

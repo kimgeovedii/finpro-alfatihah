@@ -24,5 +24,10 @@ export const cartRepository = {
         return await apiFetch<{ orderId: string, paymentId: string, snapToken?: string, redirectUrl?: string }>(
             "/orders/checkout", "post", { cartId, addressId, paymentMethod, ...(voucherId && { voucherId }) }
         )
+    },
+    async createCart(branchId: string, productId: string, qty: number = 1) {
+        return await apiFetch<{ branchId: string, productId: string }>(
+            "/carts/add-to-cart", "post", { branchId, productId, qty }
+        )
     }
 }
