@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useFormik } from "formik";
-import * as Yup from "yup";
+import { updateStockValidationSchema } from "../validations/manageStock.validation";
 import {
   Dialog,
   DialogContent,
@@ -25,23 +25,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { BuildingStorefrontIcon, CubeIcon } from "@heroicons/react/24/outline";
-
-const updateStockValidationSchema = Yup.object().shape({
-  actualStock: Yup.number()
-    .min(0, "Stock cannot be negative")
-    .required("Stock level is required"),
-  notes: Yup.string()
-    .min(5, "Reason must be at least 5 characters")
-    .required("Please provide a reason for this stock adjustment"),
-  productId: Yup.string().when("isNew", {
-    is: true,
-    then: (schema) => schema.required("Product is required"),
-  }),
-  branchId: Yup.string().when("isNew", {
-    is: true,
-    then: (schema) => schema.required("Branch is required"),
-  }),
-});
 
 export const UpdateStockDialog: React.FC<UpdateStockDialogProps> = ({
   open,
@@ -95,8 +78,10 @@ export const UpdateStockDialog: React.FC<UpdateStockDialogProps> = ({
     onOpenChange(isOpen);
   };
 
-  const selectedProduct = allProducts.find(p => p.id === formik.values.productId);
-  const selectedBranch = branches.find(b => b.id === formik.values.branchId);
+  const selectedProduct = allProducts.find(
+    (p) => p.id === formik.values.productId,
+  );
+  const selectedBranch = branches.find((b) => b.id === formik.values.branchId);
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -114,12 +99,16 @@ export const UpdateStockDialog: React.FC<UpdateStockDialogProps> = ({
             >
               <DialogHeader className="px-6 pt-6 pb-4 bg-linear-to-r from-[#006666] to-[#004d4d]">
                 <DialogTitle className="text-xl font-bold text-[#bbfffe]">
-                  {inventoryItem ? "Update Stock Level" : "Add New Stock Record"}
+                  {inventoryItem
+                    ? "Update Stock Level"
+                    : "Add New Stock Record"}
                 </DialogTitle>
                 <DialogDescription className="text-[#87eded]/80 text-sm mt-1">
                   {inventoryItem ? (
                     <>
-                      Adjusting stock for <strong>{inventoryItem?.product?.productName}</strong> at <strong>{inventoryItem?.branch?.storeName}</strong>
+                      Adjusting stock for{" "}
+                      <strong>{inventoryItem?.product?.productName}</strong> at{" "}
+                      <strong>{inventoryItem?.branch?.storeName}</strong>
                     </>
                   ) : (
                     "Select a product and branch to manage their inventory."
@@ -142,7 +131,9 @@ export const UpdateStockDialog: React.FC<UpdateStockDialogProps> = ({
                     ) : (
                       <Select
                         value={formik.values.branchId}
-                        onValueChange={(val) => formik.setFieldValue("branchId", val)}
+                        onValueChange={(val) =>
+                          formik.setFieldValue("branchId", val)
+                        }
                       >
                         <SelectTrigger className="w-full rounded-lg border-[#eff1f2] focus:ring-[#006666]/10 text-sm">
                           <SelectValue placeholder="Select Branch" />
@@ -157,7 +148,9 @@ export const UpdateStockDialog: React.FC<UpdateStockDialogProps> = ({
                       </Select>
                     )}
                     {formik.touched.branchId && formik.errors.branchId && (
-                      <p className="text-[10px] font-medium text-red-500 mt-1">{formik.errors.branchId}</p>
+                      <p className="text-[10px] font-medium text-red-500 mt-1">
+                        {formik.errors.branchId}
+                      </p>
                     )}
                   </div>
 
@@ -174,7 +167,9 @@ export const UpdateStockDialog: React.FC<UpdateStockDialogProps> = ({
                     ) : (
                       <Select
                         value={formik.values.productId}
-                        onValueChange={(val) => formik.setFieldValue("productId", val)}
+                        onValueChange={(val) =>
+                          formik.setFieldValue("productId", val)
+                        }
                       >
                         <SelectTrigger className="w-full rounded-lg border-[#eff1f2] focus:ring-[#006666]/10 text-sm">
                           <SelectValue placeholder="Select Product" />
@@ -189,13 +184,18 @@ export const UpdateStockDialog: React.FC<UpdateStockDialogProps> = ({
                       </Select>
                     )}
                     {formik.touched.productId && formik.errors.productId && (
-                      <p className="text-[10px] font-medium text-red-500 mt-1">{formik.errors.productId}</p>
+                      <p className="text-[10px] font-medium text-red-500 mt-1">
+                        {formik.errors.productId}
+                      </p>
                     )}
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <Label htmlFor="actualStock" className="text-[#2c2f30] font-semibold">
+                      <Label
+                        htmlFor="actualStock"
+                        className="text-[#2c2f30] font-semibold"
+                      >
                         New Stock Level
                       </Label>
                       <Input
@@ -219,11 +219,16 @@ export const UpdateStockDialog: React.FC<UpdateStockDialogProps> = ({
                     </div>
                   </div>
                   {formik.touched.actualStock && formik.errors.actualStock && (
-                    <p className="text-[10px] font-medium text-red-500 mt-1">{formik.errors.actualStock}</p>
+                    <p className="text-[10px] font-medium text-red-500 mt-1">
+                      {formik.errors.actualStock}
+                    </p>
                   )}
 
                   <div className="space-y-1.5">
-                    <Label htmlFor="notes" className="text-[#2c2f30] font-semibold">
+                    <Label
+                      htmlFor="notes"
+                      className="text-[#2c2f30] font-semibold"
+                    >
                       Reason / Notes
                     </Label>
                     <Textarea
@@ -237,7 +242,9 @@ export const UpdateStockDialog: React.FC<UpdateStockDialogProps> = ({
                       className="resize-none border-[#eff1f2] focus:ring-[#006666]/10 placeholder:text-[#595c5d]/50 text-sm"
                     />
                     {formik.touched.notes && formik.errors.notes && (
-                      <p className="text-[10px] font-medium text-red-500 mt-1">{formik.errors.notes}</p>
+                      <p className="text-[10px] font-medium text-red-500 mt-1">
+                        {formik.errors.notes}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -258,7 +265,11 @@ export const UpdateStockDialog: React.FC<UpdateStockDialogProps> = ({
                     disabled={isSubmitting || !formik.isValid}
                     className="px-6 py-2 rounded-lg bg-[#006666] text-white text-sm font-bold shadow-lg shadow-[#006666]/10 hover:bg-[#005959] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {isSubmitting ? "Processing..." : inventoryItem ? "Update Stock" : "Add Stock"}
+                    {isSubmitting
+                      ? "Processing..."
+                      : inventoryItem
+                        ? "Update Stock"
+                        : "Add Stock"}
                   </motion.button>
                 </DialogFooter>
               </form>

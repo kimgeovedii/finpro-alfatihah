@@ -149,7 +149,6 @@ export const useManageStock = () => {
             branchId: values.branchId,
             currentStock: values.actualStock,
             notes: values.notes,
-            employeeId: "",
           });
         }
       }

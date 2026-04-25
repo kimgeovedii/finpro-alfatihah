@@ -17,6 +17,7 @@ import {
   PercentBadgeIcon,
 } from "@heroicons/react/24/outline";
 import { useAuthService } from "@/features/auth/hooks/useAuthService";
+import { ChartBarIcon } from "lucide-react";
 
 const NAV_ITEMS = [
   {
@@ -68,6 +69,16 @@ const NAV_ITEMS = [
     title: "Discounts",
     href: "/dashboard/discounts",
     icon: <PercentBadgeIcon className="w-5 h-5" />,
+  },
+  {
+    title: "Reports & Analysis",
+    href: "/dashboard/report",
+    icon: <ChartBarIcon className="w-5 h-5" />,
+  },
+  {
+    title: "Manage Project",
+    href: "/manage-project",
+    icon: <BriefcaseIcon className="w-5 h-5" />,
   },
   {
     title: "Tracking Document",
