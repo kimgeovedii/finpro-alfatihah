@@ -50,7 +50,12 @@ export const useProfile = () => {
   const changeEmail = async (data: any) => {
     setIsLoading(true);
     try {
-      return await profileService.changeEmail(data);
+      const res = await profileService.changeEmail(data);
+      const currentUser = useAuthStore.getState().user;
+      if (currentUser && data.newEmail) {
+        setUser({ ...currentUser, newEmail: data.newEmail });
+      }
+      return res;
     } finally {
       setIsLoading(false);
     }

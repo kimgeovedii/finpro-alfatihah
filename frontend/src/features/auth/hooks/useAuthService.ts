@@ -38,6 +38,19 @@ export const useAuthService = () => {
     }
   }, []);
 
+  const verifyEmailOnly = useCallback(async (token: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      return await authService.verifyEmailOnly(token);
+    } catch (err: any) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   const login = useCallback(async (data: any) => {
     setIsLoading(true);
     setError(null);
@@ -146,6 +159,7 @@ export const useAuthService = () => {
     register,
     verifyEmailToken,
     verifyAndSetPassword: verifyEmailToken,
+    verifyEmailOnly,
     login,
     employeeLogin,
     googleLogin,
@@ -164,6 +178,7 @@ export const useAuthService = () => {
   }), [
     register,
     verifyEmailToken,
+    verifyEmailOnly,
     login,
     employeeLogin,
     googleLogin,

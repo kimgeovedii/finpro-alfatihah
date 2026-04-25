@@ -62,7 +62,7 @@ export const MainNavbar = () => {
             <img
               alt="Alfatihah Logo"
               className="h-full w-auto object-contain"
-              src="https://lh3.googleusercontent.com/aida/ADBb0uimlng99U9JLfa5UWHTmoO9UdJ4FHWo48gGueGV9XYnWqPfL-eVfqFA2xs_AfnUt40QKNeCDDtLp4K6aKVqkdUD3MDxQSkND5xWjQ6RlmyM885AhuTr6r7FtX3O73hRCYywbmfnILCPaW475jKQIyuP4skB9CUk899byIzFzGcKth9h5BMSJ67-87dhO_fmzkTWBkjUvJbKtCmhCF0CBfuUuQ6e-TZcqT0cn5SPX2PqJz31UCLTLMr-rpQmYFKTYY_-OUm010ezsQ"
+              src="https://res.cloudinary.com/dvfywdxnt/image/upload/v1777146483/logo-apps_opuem6.png"
             />
           </Link>
           <div className="hidden md:flex items-center gap-6">
@@ -121,7 +121,7 @@ export const MainNavbar = () => {
               {/* User menu */}
               {isAuthenticated() ? (
                 <div className="flex items-center gap-3">
-                  <Link href="/dashboard" className="active:scale-95 transition-transform">
+                  <Link href="/profile" className="active:scale-95 transition-transform">
                     <div className="flex items-center gap-2">
                       {user?.avatar ? (
                         <img 

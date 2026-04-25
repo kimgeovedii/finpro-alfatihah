@@ -10,6 +10,10 @@ export const authService = {
     return apiFetch<any>("/auth/verify-set-password", "post", data);
   },
 
+  verifyEmailOnly: async (token: string) => {
+    return apiFetch<any>("/auth/verify-email-only", "post", { token });
+  },
+
   login: async (data: any) => {
     const result: any = await apiFetch<any>("/auth/login", "post", data);
     const { user, accessToken, refreshToken } = result;

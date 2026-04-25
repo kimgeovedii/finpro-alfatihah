@@ -27,8 +27,9 @@ export const MapsView = () => {
     () =>
       dynamic(
         () =>
-          import("./LeafletMapContent").then((mod) => mod.LeafletMapContent),
+          import("../../components/common/LeafletMapContent").then((mod) => mod.LeafletMapContent),
         {
+
           ssr: false,
           loading: () => (
             <div className="w-full h-full bg-slate-100 animate-pulse flex items-center justify-center font-bold text-primary">

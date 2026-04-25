@@ -1,5 +1,6 @@
 const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-const logoUrl = `${frontendUrl}/assets/logo-apps.png`;
+const apiUrl = process.env.API_URL || 'http://localhost:8000';
+const logoUrl = "https://res.cloudinary.com/dvfywdxnt/image/upload/v1777146483/logo-apps_opuem6.png"
 
 const getBaseLayout = (title: string, content: string, expiryText: string = "Tautan ini akan kedaluwarsa dalam 1 jam.") => `
   <div style="font-family: Arial, sans-serif; text-align: center; color: #333; max-width: 500px; margin: 0 auto; border: 1px solid #e5e5e5; border-radius: 8px; padding: 30px;">
