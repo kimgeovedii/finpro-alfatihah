@@ -6,6 +6,7 @@ import { authMiddleware } from "../../../middleware/auth.middleware";
 import { loginRateLimiter } from "../../../middleware/rate-limiter.middleware";
 import rateLimit from "express-rate-limit";
 import { CartRepository } from "../repositories/cart.repository";
+import { VoucherReferralRepository } from "../../vouchers/repositories/voucherReferral.repository";
 
 const refreshRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -49,7 +50,8 @@ class AuthRouter {
 
     const authRepository = new AuthRepository();
     const cartRepository = new CartRepository();
-    const authService = new AuthService(authRepository, cartRepository);
+    const voucherReferralRepository = new VoucherReferralRepository();
+    const authService = new AuthService(authRepository, cartRepository, voucherReferralRepository);
     this.authController = new AuthController(authService);
 
     this.registerRoutes();
@@ -58,6 +60,7 @@ class AuthRouter {
   private registerRoutes() {
     this.router.post("/register", registerLimiter, this.authController.register);
     this.router.post("/verify-set-password", this.authController.verifyAndSetPassword);
+    this.router.post("/verify-email-only", this.authController.verifyEmailOnly);
     this.router.post("/google", this.authController.googleLogin);
     
     this.router.post(

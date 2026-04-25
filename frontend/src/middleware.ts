@@ -2,10 +2,14 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 // Routes that do not require authentication
-const publicRoutes = ["/", "/login", "/register", "/verify-email", "/reset-password", "/confirm-reset-password", "/products"];
+const publicRoutes = ["/", "/login", "/register", "/verify-email", "/reset-password", "/confirm-reset-password", "/products", "/employee/login"];
 
 // Routes that require verification (must be verified to access)
 const verifiedOnlyRoutes = ["/profile", "/cart", "/transaction", "/checkout"];
+
+// Routes restricted by role
+const customerOnlyRoutes = ["/cart", "/checkout", "/transaction"];
+const employeeOnlyRoutes = ["/dashboard", "/manage-order"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -29,18 +33,42 @@ export function middleware(request: NextRequest) {
     pathname === route || pathname.startsWith(route + "/")
   );
 
-  // 1. If not logged in and trying to access protected route, redirect to home
+  // 1. If not logged in and trying to access protected route, redirect
   if (!isPublicRoute && !hasToken) {
-    const homeUrl = new URL("/", request.url);
-    homeUrl.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(homeUrl);
+    if (pathname.startsWith("/dashboard") || pathname.startsWith("/manage-order")) {
+      return NextResponse.redirect(new URL("/employee/login", request.url));
+    }
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("redirect", pathname);
+    return NextResponse.redirect(loginUrl);
   }
 
-  // 2. If logged in but accessing verified-only route while unverified
-  if (hasToken && verifiedOnlyRoutes.some(route => pathname.startsWith(route))) {
+  // 2. Role-based guarding
+  if (hasToken && accessToken) {
     try {
-      if (accessToken) {
-        const payload = JSON.parse(atob(accessToken.split(".")[1]));
+      const payload = JSON.parse(atob(accessToken.split(".")[1]));
+      const role = payload.role;
+
+      // Prevent logged-in users from seeing auth pages
+      if ((pathname === "/login" || pathname === "/register" || pathname === "/employee/login")) {
+        if (role === "EMPLOYEE") {
+          return NextResponse.redirect(new URL("/dashboard", request.url));
+        }
+        return NextResponse.redirect(new URL("/", request.url));
+      }
+
+      // Customer trying to access employee routes
+      if (role === "CUSTOMER" && employeeOnlyRoutes.some(route => pathname.startsWith(route))) {
+        return NextResponse.redirect(new URL("/", request.url));
+      }
+
+      // Employee trying to access customer transaction routes
+      if (role === "EMPLOYEE" && customerOnlyRoutes.some(route => pathname.startsWith(route))) {
+        return NextResponse.redirect(new URL("/dashboard", request.url));
+      }
+
+      // 3. If logged in but accessing verified-only route while unverified (for Customers)
+      if (role === "CUSTOMER" && verifiedOnlyRoutes.some(route => pathname.startsWith(route))) {
         if (!payload.emailVerifiedAt) {
           const homeUrl = new URL("/", request.url);
           homeUrl.searchParams.set("unverified", "true");
@@ -48,13 +76,8 @@ export function middleware(request: NextRequest) {
         }
       }
     } catch (e) {
-      // If token is invalid/corrupt, let it pass or redirect to login
+      // Token invalid or other error
     }
-  }
-
-  // 3. Prevent logged-in users from seeing auth pages
-  if ((pathname === "/login" || pathname === "/register") && hasToken) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
   return NextResponse.next();

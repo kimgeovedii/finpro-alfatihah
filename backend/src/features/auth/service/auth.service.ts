@@ -21,11 +21,13 @@ import {
 } from "../view/email.view";
 import { CartRepository } from "../repositories/cart.repository";
 import { verifyGoogleToken } from "../../../config/google";
+import { VoucherReferralRepository } from "../../vouchers/repositories/voucherReferral.repository";
 
 export class AuthService {
   constructor(
     private authRepository: AuthRepository,
-    private cartRepository: CartRepository
+    private cartRepository: CartRepository,
+    private voucherReferralRepository: VoucherReferralRepository
   ) {}
 
   async register(dto: RegisterDto) {
@@ -61,7 +63,25 @@ export class AuthService {
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 1);
 
-    const user = await this.authRepository.createUserEmailOnly(dto.email, verificationToken, expiresAt);
+    // Referral Logic
+    let referredBy = null;
+    if (dto.referralCode) {
+      referredBy = await this.authRepository.findByReferralCode(dto.referralCode);
+    }
+
+    const user = await this.authRepository.createUserEmailOnly(
+      dto.email, 
+      verificationToken, 
+      expiresAt,
+      referredBy?.id
+    );
+
+    // If successfully referred, record it in voucher_referral
+    if (referredBy) {
+      await this.voucherReferralRepository.createVoucherReferral({
+        userId: user.id
+      });
+    }
 
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
     const verificationUrl = `${frontendUrl}/verify-email?token=${verificationToken}`;
@@ -122,6 +142,28 @@ export class AuthService {
     await this.authRepository.setPasswordAndVerify(user.id, hashedPassword);
 
     return { message: "Password has been set successfully. You can now login." };
+  }
+
+  async verifyEmailOnly(token: string) {
+    const user = await this.authRepository.findByVerificationToken(token);
+    
+    if (!user) {
+      throw new Error("Invalid or expired verification token");
+    }
+
+    if (user.verificationExpires && user.verificationExpires < new Date()) {
+      throw new Error("Verification link has expired.");
+    }
+
+    // If there's a pending new email, update it
+    if (user.newEmail) {
+      await this.authRepository.verifyEmailChange(user.id, user.newEmail);
+    } else {
+      // Normal registration verification
+      await this.authRepository.verifyEmail(user.id);
+    }
+
+    return { message: "Email has been verified successfully. You can now login." };
   }
 
   async login(dto: LoginDto, device?: string, ip?: string) {
@@ -301,8 +343,8 @@ export class AuthService {
     }
   }
 
-  async me(email: string) {
-    const user = await this.authRepository.findByEmail(email);
+  async me(userId: string) {
+    const user = await this.authRepository.findById(userId);
     if (!user) return null;
     let { password, ...userWithoutPassword } = user;
 

@@ -15,6 +15,7 @@ import { BranchInventoryRouter } from "../features/inventories/routers/branchInv
 import { StockJournalRouter } from "../features/inventories/routers/stockJournal.router";
 import { MutationJournalRouter } from "../features/inventories/routers/mutationJournal.router";
 import paymentRouter from "../features/payments/routers/payment.router";
+import addressRouter from "../features/address/routers/address.router";
 
 class GlobalRouter {
   public router: Router;
@@ -27,7 +28,9 @@ class GlobalRouter {
   private registerRoutes() {
     this.router.use("/auth", authRouter);
     this.router.use("/users", userRouter); // Basic user endpoints
+    this.router.use("/addresses", addressRouter);
     this.router.use("/branches", branchRouter);
+
     this.router.use("/carts", cartRouter)
     this.router.use("/orders", orderRouter)
     this.router.use("/payments", paymentRouter)

@@ -110,10 +110,15 @@ export const LoginForm = ({ isEmployee = false }: { isEmployee?: boolean }) => {
         <div className="text-left mb-10 text-[#444]">
           <p className="text-lg mb-1 font-medium text-primary-teal/80">Selamat Datang</p>
           <h1 className="text-4xl font-bold mb-2 tracking-tight">
-            Masuk ke <span className="italic font-extrabold text-primary-teal">Akun</span> Anda
+            {isEmployee ? "Portal " : "Masuk ke "}
+            <span className="italic font-extrabold text-primary-teal">
+              {isEmployee ? "Employee" : "Akun"}
+            </span> {isEmployee ? "" : "Anda"}
           </h1>
           <p className="text-gray-500 font-medium">
-            Silakan masukkan detail akun Anda di bawah ini.
+            {isEmployee 
+              ? "Silakan masuk untuk mengelola toko Anda." 
+              : "Silakan masukkan detail akun Anda di bawah ini."}
           </p>
         </div>
 
@@ -197,7 +202,7 @@ export const LoginForm = ({ isEmployee = false }: { isEmployee?: boolean }) => {
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  <span>Masuk Akun</span>
+                  <span>Masuk {isEmployee ? "Portal" : "Akun"}</span>
                   <ArrowRightIcon className="h-5 w-5" />
                 </div>
               )}
