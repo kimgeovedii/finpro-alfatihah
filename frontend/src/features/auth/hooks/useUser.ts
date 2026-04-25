@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useAuthService } from "../service/auth.service";
+import { useAuthService } from "../hooks/useAuthService";
 
 export const useUser = () => {
   const { user, fetchUser, isLoading, error } = useAuthService();
