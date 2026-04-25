@@ -1,6 +1,13 @@
 import { Response } from "express";
 import { AuthService } from "../service/auth.service";
-import { LoginSchema, RegisterSchema } from "../validation/auth.dto";
+import { 
+  LoginSchema, 
+  RegisterSchema, 
+  VerifySetPasswordSchema, 
+  GoogleLoginSchema,
+  ResetPasswordSchema,
+  ConfirmResetPasswordSchema
+} from "../validation/auth.dto";
 import { AuthRequest } from "../../../middleware/auth.middleware";
 import { sendSuccess, sendError } from "../../../utils/apiResponse";
 
@@ -24,6 +31,19 @@ export class AuthController {
     }
   }
 
+  verifyAndSetPassword = async (req: AuthRequest, res: Response) => {
+    try {
+      const result = VerifySetPasswordSchema.safeParse(req.body);
+      if (!result.success) {
+        return sendError(res, "Validation failed", 400, result.error.flatten());
+      }
+      const data = await this.authService.verifyAndSetPassword(result.data);
+      return sendSuccess(res, data, "Password set successfully");
+    } catch (error: any) {
+      return sendError(res, error.message, 400);
+    }
+  }
+
   resendVerification = async (req: AuthRequest, res: Response) => {
     try {
       const { email } = req.body;
@@ -32,20 +52,6 @@ export class AuthController {
       }
       const data = await this.authService.resendVerification(email);
       return sendSuccess(res, data, "Verification email resent");
-    } catch (error: any) {
-      return sendError(res, error.message, 400);
-    }
-  }
-
-  verifyEmail = async (req: AuthRequest, res: Response) => {
-    try {
-      const { token } = req.query;
-      if (!token || typeof token !== "string") {
-        return sendError(res, "Invalid token", 400);
-      }
-
-      const data = await this.authService.verifyEmail(token);
-      return sendSuccess(res, data, "Email verified successfully");
     } catch (error: any) {
       return sendError(res, error.message, 400);
     }
@@ -72,6 +78,50 @@ export class AuthController {
       }
       console.error(error);
       return sendError(res, "Internal server error");
+    }
+  }
+
+  googleLogin = async (req: AuthRequest, res: Response) => {
+    try {
+      const result = GoogleLoginSchema.safeParse(req.body);
+      if (!result.success) {
+        return sendError(res, "Validation failed", 400, result.error.flatten());
+      }
+
+      const device = req.headers["user-agent"] || "Unknown Device";
+      const ip = (req.headers["x-forwarded-for"] || req.socket.remoteAddress || "Unknown IP") as string;
+
+      const data = await this.authService.googleLogin(result.data, device, ip);
+      return sendSuccess(res, data, "Login successful");
+    } catch (error: any) {
+      console.error("Google Login Error:", error);
+      return sendError(res, error.message || "Social login failed", 401);
+    }
+  }
+
+  requestResetPassword = async (req: AuthRequest, res: Response) => {
+    try {
+      const result = ResetPasswordSchema.safeParse(req.body);
+      if (!result.success) {
+        return sendError(res, "Validation failed", 400, result.error.flatten());
+      }
+      const data = await this.authService.requestResetPassword(result.data.email);
+      return sendSuccess(res, data, "Reset link sent");
+    } catch (error: any) {
+      return sendError(res, error.message, 400);
+    }
+  }
+
+  confirmResetPassword = async (req: AuthRequest, res: Response) => {
+    try {
+      const result = ConfirmResetPasswordSchema.safeParse(req.body);
+      if (!result.success) {
+        return sendError(res, "Validation failed", 400, result.error.flatten());
+      }
+      const data = await this.authService.confirmResetPassword(result.data);
+      return sendSuccess(res, data, "Password reset successful");
+    } catch (error: any) {
+      return sendError(res, error.message, 400);
     }
   }
 
@@ -123,5 +173,3 @@ export class AuthController {
     }
   }
 }
-
-

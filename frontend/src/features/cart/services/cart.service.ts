@@ -1,5 +1,6 @@
 import { create } from "zustand"
-import { CartBranch, cartRepository, CartSummaryData } from "../repositories/cart.repository"
+import { cartRepository } from "../repositories/cart.repository"
+import { CartSummaryData } from "../repositories/cart.type"
 
 type CartState = {
     summary: CartSummaryData | null

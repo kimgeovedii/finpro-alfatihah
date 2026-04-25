@@ -1,4 +1,4 @@
-export type UserRole = "CUSTOMER" | "ADMIN";
+export type UserRole = "CUSTOMER" | "EMPLOYEE";
 export type EmployeeRole = "STORE_ADMIN" | "SUPER_ADMIN";
 
 export type Branch = {

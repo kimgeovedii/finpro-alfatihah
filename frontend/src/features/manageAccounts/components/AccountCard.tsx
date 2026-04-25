@@ -50,7 +50,7 @@ export const AccountCard: React.FC<MobileAccountCardProps> = ({
           className={`${
             isStoreAdmin
               ? "bg-teal-50 text-teal-700 border-teal-100"
-              : account.role === "ADMIN"
+              : account.role === "EMPLOYEE"
                 ? "bg-blue-50 text-blue-700 border-blue-100"
                 : "bg-slate-100 text-slate-600 border-slate-200"
           } px-2 py-0 text-[10px] uppercase font-bold`}

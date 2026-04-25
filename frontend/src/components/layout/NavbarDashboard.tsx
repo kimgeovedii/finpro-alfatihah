@@ -1,54 +1,70 @@
-"use client"
-import { useState } from 'react'
-import { useUser } from '@/features/auth/hooks/useUser'
-import { useAuthService } from '@/features/auth/service/auth.service'
-import { useRouter } from 'next/navigation'
-import { BellIcon, ArrowRightStartOnRectangleIcon } from '@heroicons/react/24/outline'
+"use client";
+
+import React from 'react';
+import { 
+  BellIcon, 
+  ArrowRightStartOnRectangleIcon, 
+  UserCircleIcon,
+  MagnifyingGlassIcon
+} from '@heroicons/react/24/outline';
+import Link from 'next/link';
+import { useAuthService } from '@/features/auth/hooks/useAuthService';
+import { useRouter } from 'next/navigation';
 
 export const Navbar = () => {
-  const { user, isLoading } = useUser()
-  const { logout } = useAuthService()
-  const router = useRouter()
-  const [showDropdown, setShowDropdown] = useState(false)
+  const { user, logout } = useAuthService();
+  const router = useRouter();
 
   const handleLogout = async () => {
-    await logout()
-    router.push("/login")
-  }
+    await logout();
+    router.push('/login');
+  };
 
   return (
-    <header className="sticky top-0 z-40 w-full backdrop-blur-xl bg-white/60 border-b border-white/40 shadow-sm transition-all duration-300">
-      <div className="flex h-16 items-center justify-between px-6">
-        <div className="flex items-center gap-4 text-emerald-800 font-semibold text-lg hidden md:block">Welcome back</div>
-        <div className="flex flex-1 items-center justify-end gap-5">
-          <button className="relative p-2 text-slate-500 hover:bg-emerald-50 rounded-full transition-colors">
-            <BellIcon className="w-5 h-5" />
-            <span className="absolute top-1 right-2 w-2 h-2 bg-red-400 rounded-full border border-white"></span>
+    <header className="sticky top-0 z-20 flex h-20 w-full items-center justify-between border-b border-slate-100 bg-white/80 px-8 backdrop-blur-md">
+      {/* Search Bar */}
+      <div className="hidden w-full max-w-md items-center gap-3 rounded-2xl bg-slate-50 px-4 py-2.5 transition-all focus-within:bg-white focus-within:ring-2 focus-within:ring-emerald-500/20 md:flex">
+        <MagnifyingGlassIcon className="h-5 w-5 text-slate-400" />
+        <input 
+          type="text" 
+          placeholder="Search products, orders, etc..." 
+          className="w-full bg-transparent text-sm font-medium text-slate-600 outline-none placeholder:text-slate-400"
+        />
+      </div>
+
+      {/* Actions */}
+      <div className="flex items-center gap-6">
+        <button className="relative rounded-xl p-2.5 text-slate-500 transition-all hover:bg-slate-50 hover:text-emerald-600 active:scale-95">
+          <BellIcon className="h-6 w-6" />
+          <span className="absolute right-2.5 top-2.5 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-red-500 ring-2 ring-white"></span>
+        </button>
+
+        <div className="h-8 w-px bg-slate-100"></div>
+
+        <div className="flex items-center gap-4">
+          <Link href="/profile" className="flex items-center gap-3 group">
+            <div className="text-right hidden sm:block">
+              <p className="text-sm font-bold text-slate-800 group-hover:text-emerald-600 transition-colors">{user?.username || 'User'}</p>
+              <p className="text-xs font-medium text-slate-400 capitalize">{user?.role || 'Customer'}</p>
+            </div>
+            <div className="h-11 w-11 rounded-2xl bg-slate-100 p-0.5 ring-2 ring-transparent transition-all group-hover:ring-emerald-500/20 shadow-sm overflow-hidden">
+              <img 
+                src={user?.avatar || "https://ui-avatars.com/api/?name=" + (user?.username || "User")} 
+                alt="Profile" 
+                className="h-full w-full rounded-[14px] object-cover"
+              />
+            </div>
+          </Link>
+
+          <button 
+            onClick={handleLogout}
+            className="rounded-xl p-2.5 text-slate-400 transition-all hover:bg-red-50 hover:text-red-500 active:scale-95"
+            title="Logout"
+          >
+            <ArrowRightStartOnRectangleIcon className="h-6 w-6" />
           </button>
-          <div className="relative">
-            <button onClick={() => setShowDropdown(!showDropdown)} className="flex items-center gap-3 pl-1 md:pl-4 pr-1 py-1 rounded-full border border-slate-200 hover:bg-white/50 hover:border-emerald-200 transition-all cursor-pointer">
-              <div className="flex flex-col items-end hidden md:flex">
-                { isLoading ? <div className="h-4 w-24 bg-slate-200 animate-pulse rounded"></div> : <span className="text-sm font-bold text-slate-800 tracking-tight">{user?.username || "User"}</span> }
-                { isLoading ? <div className="h-3 w-16 bg-slate-100 animate-pulse rounded mt-1"></div> : <span className="text-xs font-medium text-emerald-600">{user?.role || "Guest"}</span> }
-              </div>
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 text-white flex items-center justify-center font-bold shadow-md shadow-emerald-200">
-                { user?.username ? user.username.charAt(0).toUpperCase() : "U" }
-              </div>
-            </button>
-            {
-              showDropdown && 
-                <>
-                  <div className="fixed inset-0 z-10" onClick={() => setShowDropdown(false)}></div>
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden z-20 py-1">
-                      <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors flex items-center gap-2">
-                        <ArrowRightStartOnRectangleIcon className="w-4 h-4"/> Logout
-                      </button>
-                  </div>
-                </>
-            }
-          </div>
         </div>
       </div>
     </header>
-  )
-}
+  );
+};

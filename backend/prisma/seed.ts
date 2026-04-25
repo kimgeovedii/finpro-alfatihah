@@ -59,7 +59,7 @@ async function main() {
       email: 'kimgeovedi@gmail.com',
       username: 'kimgeovedi',
       password: defaultPassword,
-      role: UserRole.ADMIN,
+      role: UserRole.EMPLOYEE,
       emailVerifiedAt: new Date(),
     },
   });
@@ -95,7 +95,7 @@ async function main() {
       email: 'storeadmin@example.com',
       username: 'storeadmin',
       password: defaultPassword,
-      role: UserRole.ADMIN,
+      role: UserRole.EMPLOYEE,
       emailVerifiedAt: new Date(),
     },
   });
@@ -107,7 +107,7 @@ async function main() {
       email: 'superadmin@example.com',
       username: 'superadmin',
       password: defaultPassword,
-      role: UserRole.ADMIN,
+      role: UserRole.EMPLOYEE,
       emailVerifiedAt: new Date(),
     },
   });

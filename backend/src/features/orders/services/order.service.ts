@@ -202,7 +202,7 @@ export class OrderService {
         const order = await this.orderRepo.findOrderById(orderNumber, "orderNumber")
         if (!order) throw { code: 404, message: 'Order not found' }
 
-        if (role === "ADMIN") { 
+        if (role === "EMPLOYEE") { 
             // Make sure only order who still in store (not shipped or confirmed yet)
             if (order.status === "SHIPPED" || order.status === "CONFIRMED") throw { code: 422, message: 'Only order who still in store can be cancelled' }
         } else {
@@ -244,7 +244,7 @@ export class OrderService {
         const orderNew = await this.orderRepo.updateOrderStatusById(orderNumber, 'CANCELLED')
         if (!orderNew) throw { code: 404, message: 'Order not found' }
         
-        if (role === "ADMIN") {
+        if (role === "EMPLOYEE") {
             // Mailer : inform user that an order has been shipped
             const emailHtml = getOrderMailTemplate({
                 username: orderNew.user?.username ?? "",

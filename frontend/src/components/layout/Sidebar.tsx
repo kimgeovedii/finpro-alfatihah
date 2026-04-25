@@ -1,8 +1,8 @@
 "use client"
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { HomeIcon, BriefcaseIcon, ClipboardDocumentCheckIcon, ServerStackIcon, Cog6ToothIcon, GlobeAmericasIcon, ShoppingCartIcon, ArrowsRightLeftIcon, CubeIcon } from '@heroicons/react/24/outline'
-import { useAuthService } from '@/features/auth/service/auth.service'
+import { HomeIcon, BriefcaseIcon,TagIcon, ClipboardDocumentCheckIcon, ServerStackIcon, Cog6ToothIcon, GlobeAmericasIcon, ShoppingCartIcon, ArrowsRightLeftIcon, CubeIcon, UsersIcon } from '@heroicons/react/24/outline'
+import { useAuthService } from '@/features/auth/hooks/useAuthService'
 
 const NAV_ITEMS = [
   {
@@ -46,11 +46,6 @@ const NAV_ITEMS = [
     icon: <ArrowsRightLeftIcon className="w-5 h-5" />,
   },
   {
-    title: "Manage Project",
-    href: "/manage-project",
-    icon: <BriefcaseIcon className="w-5 h-5" />,
-  },
-  {
     title: "Tracking Document",
     href: "/tracking",
     icon: <ClipboardDocumentCheckIcon className="w-5 h-5" />,
@@ -68,7 +63,7 @@ const NAV_ITEMS = [
 ];
 
 export const Sidebar = () => {
-  const cartItems = useAuthService((state) => state.cartItems)
+  const { cartItems } = useAuthService()
   const pathname = usePathname()
 
   return (
