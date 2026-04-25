@@ -7,6 +7,12 @@ export class AuthRepository {
     });
   }
 
+  async findById(id: string) {
+    return prisma.user.findUnique({
+      where: { id },
+    });
+  }
+
   async findByProviderId(provider: string, providerId: string) {
     return prisma.user.findFirst({
       where: {
@@ -35,13 +41,17 @@ export class AuthRepository {
     });
   }
 
-  async createUserEmailOnly(email: string, verificationToken: string, expires: Date) {
+  async createUserEmailOnly(email: string, verificationToken: string, expires: Date, referredById?: string) {
+    const myReferralCode = Math.random().toString(36).substring(2, 10).toUpperCase();
+    
     return prisma.user.create({
       data: {
         email,
         verificationToken,
         verificationExpires: expires,
         provider: "credentials",
+        referalCode: myReferralCode,
+        referredById: referredById,
       },
     });
   }
@@ -101,9 +111,28 @@ export class AuthRepository {
     });
   }
 
+  async verifyEmailChange(userId: string, newEmail: string) {
+    return prisma.user.update({
+      where: { id: userId },
+      data: {
+        email: newEmail,
+        newEmail: null,
+        emailVerifiedAt: new Date(),
+        verificationToken: null,
+        verificationExpires: null,
+      },
+    });
+  }
+
   async findByVerificationToken(token: string) {
     return prisma.user.findFirst({
       where: { verificationToken: token },
+    });
+  }
+
+  async findByReferralCode(code: string) {
+    return prisma.user.findUnique({
+      where: { referalCode: code },
     });
   }
 

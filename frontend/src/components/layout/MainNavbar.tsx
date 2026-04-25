@@ -121,7 +121,7 @@ export const MainNavbar = () => {
               {/* User menu */}
               {isAuthenticated() ? (
                 <div className="flex items-center gap-3">
-                  <Link href="/dashboard" className="active:scale-95 transition-transform">
+                  <Link href="/profile" className="active:scale-95 transition-transform">
                     <div className="flex items-center gap-2">
                       {user?.avatar ? (
                         <img 
