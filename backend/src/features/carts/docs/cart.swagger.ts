@@ -218,6 +218,9 @@
  *                                         productName:
  *                                           type: string
  *                                           example: Coca Cola
+ *                                         slugName:
+ *                                           type: string
+ *                                           example: coca-cola
  *                                         description:
  *                                           type: string
  *                                           example: Soft drink that make u diabetes

@@ -3,6 +3,7 @@ export type ProductImage = {
 }
 
 export type ProductItem = {
+    slugName: string
     productName: string
     basePrice: number
     description: string

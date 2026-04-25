@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useProductDetail } from "@/features/products/hooks/useProductDetail";
 import { ProductDetailImageGallery } from "./ProductDetailImageGallery";
@@ -12,6 +12,10 @@ import { ProductBranchInfoCard } from "./ProductBranchInfo";
 export const ProductDetail = ({ slugName, storeName }: { slugName: string, storeName: string }) => {
   const { product, isLoading, error } = useProductDetail(slugName, storeName);
   const [qty, setQty] = useState(1);
+
+  useEffect(() => {
+    if (product?.branchInventories?.[0]?.cartItems?.[0]?.quantity) setQty(product.branchInventories[0].cartItems[0].quantity)
+  }, [product])
 
   if (isLoading) {
     return (
