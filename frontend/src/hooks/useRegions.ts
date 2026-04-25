@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { regionService, Region } from "../service/region.service";
+import { regionService, Region } from "@/services/region.service";
 
 export const useRegions = (formik: any) => {
   const [provinces, setProvinces] = useState<Region[]>([]);

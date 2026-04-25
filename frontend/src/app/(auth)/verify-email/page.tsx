@@ -12,7 +12,7 @@ export default function VerifyEmailPage() {
         className="absolute top-6 left-6 md:top-10 md:left-10 z-30 flex items-center gap-4 transition-all cursor-pointer"
       >
         <img
-          src="/assets/logo-apps.png"
+          src="https://res.cloudinary.com/dvfywdxnt/image/upload/v1777146483/logo-apps_opuem6.png"
           alt="Alfatihah Apps Logo"
           className="h-6 md:h-10 w-auto object-contain"
         />

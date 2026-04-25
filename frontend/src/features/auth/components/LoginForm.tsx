@@ -86,7 +86,7 @@ export const LoginForm = ({ isEmployee = false }: { isEmployee?: boolean }) => {
         className="absolute top-6 left-6 md:top-10 md:left-10 z-30 flex items-center gap-4 transition-all hover:scale-105 active:scale-95"
       >
         <img
-          src="/assets/logo-apps.png"
+          src="https://res.cloudinary.com/dvfywdxnt/image/upload/v1777146483/logo-apps_opuem6.png"
           alt="Alfatihah Logo"
           className="h-8 md:h-12 w-auto object-contain"
         />
