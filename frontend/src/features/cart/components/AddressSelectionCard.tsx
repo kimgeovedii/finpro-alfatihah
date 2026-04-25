@@ -19,17 +19,18 @@ interface DeliveryAddress {
     receiptName: string
     phone: string
     distance: number
+    isPrimary: boolean
 }
 
 type Props = {
     branch: BranchInfo
     addressList: DeliveryAddress[]
+    selectedAddressId: string | null
+    onSelect: (addressId: string) => void
 }
 
-export const AddressSelectionCard: React.FC<Props> = ({ branch, addressList }) => {
-    const [selectedAddressId, setSelectedAddressId] = useState<string | null>(addressList[0]?.id || null)
-
-    const selectedAddress = addressList.find(a => a.id === selectedAddressId)
+export const AddressSelectionCard: React.FC<Props> = ({ branch, addressList, selectedAddressId, onSelect }) => {
+    const selectedAddress = addressList.find(a => a.id === selectedAddressId) ?? null
 
     return (
         <div className="bg-white rounded-3xl">
@@ -67,10 +68,19 @@ export const AddressSelectionCard: React.FC<Props> = ({ branch, addressList }) =
                     <AddressSelectionModal
                         address={addressList}
                         appliedAddress={selectedAddressId}
-                        onSelect={(id) => setSelectedAddressId(id)}
+                        onSelect={onSelect}
                     />
                 </div>
-                { selectedAddress && <AddressAdditionalInfoSection receiptName={selectedAddress.receiptName} phone={selectedAddress.phone} distance={selectedAddress.distance} label={selectedAddress.label} address={selectedAddress.address}/> }  
+                {
+                    selectedAddress && 
+                        <AddressAdditionalInfoSection
+                            receiptName={selectedAddress.receiptName}
+                            phone={selectedAddress.phone}
+                            distance={selectedAddress.distance}
+                            label={selectedAddress.label}
+                            address={selectedAddress.address}
+                        />
+                }
             </div>
         </div>
     )

@@ -12,7 +12,7 @@ datasource db {
 
 enum UserRole {
   CUSTOMER
-  ADMIN
+  EMPLOYEE
 }
 
 enum EmployeeRole {
@@ -89,15 +89,21 @@ model User {
   id       String   @id @default(uuid())
   username String?  @unique
   email    String   @unique
-  password String
+  password String?
   avatar   String?
   role     UserRole @default(CUSTOMER)
+
+  provider   String? // "credentials" | "google"
+  providerId String? @map("provider_id") // Google sub ID
 
   referalCode String? @map("referal_code")
 
   emailVerifiedAt     DateTime?
   verificationToken   String?
   verificationExpires DateTime?
+
+  resetPasswordToken   String?
+  resetPasswordExpires DateTime?
 
   lastLogin DateTime?
   createdAt DateTime  @default(now())

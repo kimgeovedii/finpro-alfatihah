@@ -3,6 +3,7 @@ import { sendSuccess } from "../../../utils/apiResponse"
 import { AuthRequest } from "../../../middleware/auth.middleware"
 import { PaymentService } from "../services/payment.service"
 import { cloudinaryUpload } from "../../../config/cloudinary"
+import { ValidatePaymentEvidenceSchema } from "../validation/payment.dto"
 
 export class PaymentController {
     private paymentService = new PaymentService()
@@ -27,6 +28,25 @@ export class PaymentController {
             const data = await this.paymentService.addEvidenceManualPayment(userId, orderId, filePath)
 
             return sendSuccess(res, data, "Payment checkout!")
+        } catch (error: any) {
+            next(error)
+        }
+    }
+
+    putUpdatePaymentStatusById = async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user?.userId 
+
+            // Validation
+            const payload = ValidatePaymentEvidenceSchema.parse(req.body)
+
+            // Route param
+            const paymentId = req.params.paymentId as string
+
+            // Service
+            await this.paymentService.putUpdatePaymentStatusById(userId, paymentId, payload)
+
+            return sendSuccess(res, "Payment confirmed!")
         } catch (error: any) {
             next(error)
         }

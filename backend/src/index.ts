@@ -58,11 +58,11 @@ class App {
     this.app.use((err: any, req: Request, res: Response, next: NextFunction) => {
       // Zod validation error handler
       if (err instanceof ZodError) {
-        const structuredErrors = err.issues.map(issue => ({
-          field: issue.path.join("."),
-          message: issue.message
+        const structuredErrors = err.issues.map(dt => ({
+          field: dt.path.join("."),
+          message: dt.message
         }))
-        const sentence = structuredErrors.map(e => `${e.field}: ${e.message}`).join(", ")
+        const sentence = structuredErrors.map(dt => `${dt.field}: ${dt.message}`).join(", ")
 
         return sendError(res, {
           message: sentence,
@@ -88,7 +88,7 @@ class App {
       }
 
       const statusCode = err.status || err.code || 500
-      console.log(err)
+      
       // Audit server error
       if (statusCode === 500) return sendError(res, "Something went wrong", 500)
 

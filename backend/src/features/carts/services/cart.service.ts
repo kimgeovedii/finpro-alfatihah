@@ -64,16 +64,16 @@ export class CartService {
                 // If primary not valid, fallback to nearest valid
                 if (!selectedAddress) {
                     const validAddresses = cart.user.addresses
-                        .map(a => {
-                            const rangeValidate = isWithinDeliveryRange(a.lat, a.long, branchLat, branchLong, cart.branch.maxDeliveryDistance)
+                        .map(dt => {
+                            const rangeValidate = isWithinDeliveryRange(dt.lat, dt.long, branchLat, branchLong, cart.branch.maxDeliveryDistance)
     
                             return {
-                                ...a,
+                                ...dt,
                                 distance: rangeValidate.distance,
                                 isInsideRange: rangeValidate.isInsideRange
                             }
                         })
-                        .filter(a => a.isInsideRange)
+                        .filter(dt => dt.isInsideRange)
                         .sort((a, b) => a.distance - b.distance)
     
                     if (validAddresses.length === 0) throw { code: 422, message: 'None of your address in shipping range' }
@@ -170,10 +170,10 @@ export class CartService {
         for (const cart of carts) {
             const cartGroups: CartGroup[] = [{
                 storeName: cart.branch.storeName,
-                items: cart.items.map(item => ({
-                    productName: item.product.product.productName,
-                    quantity: item.quantity,
-                    price: item.product.product.basePrice,
+                items: cart.items.map(dt => ({
+                    productName: dt.product.product.productName,
+                    quantity: dt.quantity,
+                    price: dt.product.product.basePrice,
                 }))
             }]
     

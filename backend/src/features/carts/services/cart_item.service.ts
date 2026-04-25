@@ -1,7 +1,9 @@
+import { CartRepository } from "../repositories/cart.repository"
 import { CartItemRepository } from "../repositories/cart_item.repository"
 
 export class CartItemService {
     private cartItemRepo = new CartItemRepository()
+    private cartRepo = new CartRepository()
 
     async getCartItemQtyByProductIdBranchId(userId: string, productId: string, branchId: string) {
         return await this.cartItemRepo.findCartItemByProductIdBranchId(userId, productId, branchId)
@@ -27,6 +29,12 @@ export class CartItemService {
         if (qty === 0) {
             // Repo : delete cart item by id
             await this.cartItemRepo.deleteCartItemById(cartItemId)
+
+            // Repo : get cart by id
+            const cart = await this.cartRepo.findByIdAndUser(cartItem.cartId, userId)
+            
+            // Repo : delete cart by id
+            if (cart?.items.length === 0) await this.cartRepo.deleteCartById(cartItem.cartId) 
         } else {
             // Make sure requested qty is less or equal stock
             if (qty > stock) throw { code: 422, message: 'Exceeds available stock' }

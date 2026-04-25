@@ -40,8 +40,56 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --color-primary-teal: #008b8b;
-  --color-success-green: #22c55e;
+
+  /* Design System Colors */
+  --color-primary: #00685d;
+  --color-surface-bright: #f6faf8;
+  --color-primary-fixed: #8df5e4;
+  --color-surface-container-low: #f0f5f2;
+  --color-on-secondary-container: #476b65;
+  --color-error-container: #ffdad6;
+  --color-outline-variant: #bcc9c5;
+  --color-secondary-container: #c3ebe2;
+  --color-surface-container-lowest: #ffffff;
+  --color-on-tertiary-container: #fffbff;
+  --color-on-surface-variant: #3d4946;
+  --color-surface: #f6faf8;
+  --color-on-background: #171d1b;
+  --color-on-secondary-fixed-variant: #294d47;
+  --color-secondary-fixed: #c3ebe2;
+  --color-inverse-primary: #70d8c8;
+  --color-surface-tint: #006b5f;
+  --color-primary-fixed-dim: #70d8c8;
+  --color-error: #ba1a1a;
+  --color-tertiary-container: #b05e41;
+  --color-outline: #6d7a77;
+  --color-tertiary: #91462c;
+  --color-inverse-surface: #2c3130;
+  --color-surface-container: #eaefec;
+  --color-on-tertiary: #ffffff;
+  --color-on-primary-fixed: #00201c;
+  --color-tertiary-fixed: #ffdbcf;
+  --color-on-surface: #171d1b;
+  --color-on-tertiary-fixed: #390c00;
+  --color-secondary-fixed-dim: #a8cec6;
+  --color-tertiary-fixed-dim: #ffb59c;
+  --color-on-error: #ffffff;
+  --color-on-secondary: #ffffff;
+  --color-on-primary-container: #f4fffb;
+  --color-surface-variant: #dfe4e1;
+  --color-inverse-on-surface: #edf2ef;
+  --color-on-error-container: #93000a;
+  --color-background: #f6faf8;
+  --color-surface-dim: #d6dbd9;
+  --color-on-tertiary-fixed-variant: #763219;
+  --color-on-primary-fixed-variant: #005048;
+  --color-on-primary: #ffffff;
+  --color-surface-container-highest: #dfe4e1;
+  --color-primary-container: #008376;
+  --color-on-secondary-fixed: #00201c;
+  --color-surface-container-high: #e4e9e7;
+  --color-secondary: #41655f;
+
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -49,6 +97,40 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+@layer utilities {
+  .glass-nav {
+      @apply backdrop-blur-3xl bg-white/80 dark:bg-slate-900/80;
+  }
+  
+  .glass-panel {
+      @apply bg-white/40 backdrop-blur-xl border border-white/30;
+  }
+
+  .map-bg {
+      background-color: #f1f5f9;
+      background-image: 
+          radial-gradient(circle at 20% 30%, #e2e8f0 0%, transparent 40%),
+          radial-gradient(circle at 80% 70%, #e2e8f0 0%, transparent 40%),
+          linear-gradient(rgba(226, 232, 240, 0.4) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(226, 232, 240, 0.4) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+  }
+
+  .map-road {
+      @apply absolute bg-white rounded-full shadow-sm;
+  }
+}
+
+@keyframes pulse-radius {
+    0% { transform: scale(1); opacity: 0.15; }
+    50% { transform: scale(1.05); opacity: 0.1; }
+    100% { transform: scale(1); opacity: 0.15; }
+}
+
+.animate-pulse-radius {
+    animation: pulse-radius 4s ease-in-out infinite;
 }
 
 :root {
@@ -169,4 +251,8 @@ input[type=number] {
 }
 .swal2-popup button {
   border-radius: 20px;
+}
+
+table.table-center thead tr th, table.table-center tbody tr th, table.table-center tbody tr td {
+  text-align: center !important;
 }

@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react"
 import { useCartService } from "../services/cart.service"
-import { CartBranch, CartData, CartMeta, cartRepository } from "../repositories/cart.repository"
+import { cartRepository } from "../repositories/cart.repository"
+import { CartBranch, CartData } from "../repositories/cart.type"
+import { PaginationMeta } from "@/types/global.type"
 
 export const useCartSummary = () => {
     const { summary, fetchCartSummary, isLoading, error } = useCartService()
@@ -14,7 +16,7 @@ export const useCartSummary = () => {
 
 export const useAllCartData = () => {
     const [carts, setCarts] = useState<CartBranch[]>([])
-    const [meta, setMeta] = useState<CartMeta | null>(null)
+    const [meta, setMeta] = useState<PaginationMeta | null>(null)
     const [isLoadingAllCart, setIsLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
@@ -133,4 +135,27 @@ export const useCartDetailData = (cartId: string) => {
     }, [cartId])
 
     return { cart, isLoading, error, fetchCartDetail }
+}
+
+export const useCheckoutCartItem = () => {
+    const [isCheckoutItem, setIsCheckoutItem] = useState(false)
+    const [errorItem, setError] = useState<string | null>(null)
+
+    const checkoutCartItem = async (cartId: string, addressId: string, paymentMethod: "MANUAL" | "GATEWAY", voucherId?: string): Promise<{ success: boolean, redirectUrl?: string }> => {
+        setIsCheckoutItem(true)
+        setError(null)
+
+        try {
+            const res = await cartRepository.postCheckout(cartId, addressId, paymentMethod, voucherId)
+            console.log("Checkout res:", res)
+            return { success: true, redirectUrl: res.redirectUrl }
+        } catch (err: any) {
+            setError(err.message || "Failed to checkout cart item")
+            return { success: false }
+        } finally {
+            setIsCheckoutItem(false)
+        }
+    }
+
+    return { checkoutCartItem, isCheckoutItem, errorItem }
 }

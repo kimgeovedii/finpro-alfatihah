@@ -19,7 +19,9 @@ export const OrderSummaryCard: React.FC<Props> = ({ totalPrice, totalFinalPrice,
     if (totalWaitingOrder > 0) summaryParts.push(<><b>{totalWaitingOrder}</b> awaiting payment</>)
     if (totalCancelledOrder > 0) summaryParts.push(<><b>{totalCancelledOrder}</b> cancelled</>)
 
-    const summaryText = summaryParts.length === 0 ? <>So far you have no orders yet.</> : <>So far you have {summaryParts.map((p, i) => <React.Fragment key={i}>{p}{i < summaryParts.length - 1 ? (i === summaryParts.length - 2 ? " and " : ", ") : ""}</React.Fragment>)}.</>
+    const summaryText = summaryParts.length === 0 ? <>So far you have no orders yet.</> : <>So far you have {
+        summaryParts.map((dt, idx) => <React.Fragment key={idx}>{dt}{idx < summaryParts.length - 1 ? (idx === summaryParts.length - 2 ? " and " : ", ") : ""}</React.Fragment>)
+        }.</>
 
     return (
         <>

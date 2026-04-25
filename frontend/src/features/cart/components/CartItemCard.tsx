@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button"
 import { TrashIcon } from "@heroicons/react/24/outline"
 import Link from "next/link"
 import React from "react"
@@ -31,13 +32,13 @@ export const CartItemCard: React.FC<Props> = ({ slugName, branchId, productName,
                 </div>
             </div>
             <div className="flex items-center gap-6">
-                <button onClick={onRemove} className="text-slate-400 hover:text-red-500 transition cursor-pointer">
+                <Button onClick={onRemove} className="bg-transparent text-slate-400 hover:text-red-500 transition cursor-pointer">
                     <TrashIcon className="w-5 h-5"/>
-                </button>
+                </Button>
                 <div className="flex items-center bg-slate-100/70 rounded-full p-1 shadow-inner">
-                    <button onClick={onDecrease} className="w-10 h-10 flex items-center justify-center rounded-full text-slate-600 hover:bg-white transition">-</button>
+                    <Button onClick={onDecrease} className="bg-transparent w-10 h-10 flex items-center justify-center rounded-full text-slate-600 hover:bg-white transition">-</Button>
                     <span className="w-10 text-center font-semibold text-slate-800">{qty}</span>
-                    <button onClick={onIncrease} className="w-10 h-10 flex items-center justify-center rounded-full bg-emerald-600 text-white shadow hover:bg-emerald-700 transition">+</button>
+                    <Button onClick={onIncrease} className="w-10 h-10 flex items-center justify-center rounded-full bg-emerald-600 text-white shadow hover:bg-emerald-700 transition">+</Button>
                 </div>
             </div>
         </div>

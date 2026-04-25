@@ -13,14 +13,6 @@ class PaymentFactory {
 
     private randomPaymentMethod = (): PaymentMethod => randomEnumValue(Object.values(PaymentMethod))
 
-    private findRandomEmployee = async (): Promise<string | null> => {
-        const count = await prisma.employee.count()
-        if (count === 0) return null
-        const skip = Math.floor(Math.random() * count)
-        const employee = await prisma.employee.findFirst({ skip, select: { id: true } })
-        return employee?.id ?? null
-    }
-
     public create = async () => {
         // Get random order from repo
         const order = await this.orderRepository.findRandomOrder()
@@ -44,12 +36,18 @@ class PaymentFactory {
         // Time logic
         let approvedAt: Date | null = null
         let rejectedAt: Date | null = null
-        let approvedBy: string | null = null
-        if (status === PaymentStatus.SUCCESS) {
-            approvedAt = faker.date.recent()
-            approvedBy = await this.findRandomEmployee()
-        }
+        if (status === PaymentStatus.SUCCESS) approvedAt = faker.date.recent()
         if (status === PaymentStatus.REJECTED) rejectedAt = faker.date.recent()
+
+        // Get a real employee ID for approvedBy (it's a FK to Employee table)
+        let approvedById: string | null = null
+        if (status === PaymentStatus.SUCCESS) {
+            const employee = await prisma.employee.findFirst({
+                select: { id: true },
+                orderBy: { id: 'asc' },
+            })
+            approvedById = employee?.id ?? null
+        }
 
         return prisma.payments.create({
             data: {
@@ -58,7 +56,7 @@ class PaymentFactory {
                 method,
                 status,
                 evidence: method === PaymentMethod.MANUAL ? faker.image.url() : null,
-                approvedBy,
+                approvedBy: approvedById,
                 approvedAt,
                 rejectedAt,
                 gatewayRef: method === PaymentMethod.GATEWAY ? `PAY-${faker.string.alphanumeric(10)}` : null,

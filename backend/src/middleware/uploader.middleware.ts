@@ -64,3 +64,15 @@ export const memoryUploader = () => {
         }
     })
 }
+export const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 1024 * 1024 }, // 1MB
+    fileFilter: (req, file, cb) => {
+        const ext = path.extname(file.originalname).toLowerCase();
+        const allowedExt = [".jpg", ".jpeg", ".png", ".gif"];
+        if (!allowedExt.includes(ext)) {
+            return cb(new Error("Only .jpg, .jpeg, .png and .gif are allowed"));
+        }
+        cb(null, true);
+    }
+});

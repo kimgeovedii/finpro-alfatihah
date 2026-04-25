@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button"
 import { BuildingOfficeIcon, ShoppingCartIcon, TrashIcon } from "@heroicons/react/24/outline"
 import Link from "next/link"
 import React from "react"
@@ -20,13 +21,13 @@ export const BranchHeader: React.FC<Props> = ({ storeName, id, cartId, onRemove 
                 <h3 className="text-xl md:text-xl font-bold text-slate-800 tracking-tight cursor-pointer">{storeName}</h3>
             </Link>
             <div className="flex-1 h-px bg-slate-200 ml-4"></div>
-            <button onClick={onRemove} className="bg-white text-slate-400 border border-slate-400 hover:text-red-500 hover:border-red-500 transition cursor-pointer flex gap-2 items-center rounded-xl px-3 py-1">
+            <Button onClick={onRemove} className="bg-red-400 hover:bg-red-500 hover:shadow transition cursor-pointer flex gap-2 items-center rounded-xl px-3 py-1">
                 <TrashIcon className="w-5 h-5"/> Remove
-            </button>
+            </Button>
             <Link href={`/cart/${cartId}`}>
-                <button className="bg-emerald-600 text-white shadow hover:bg-emerald-700 transition flex gap-2 items-center font-600 rounded-xl px-3 py-1">
-                    <ShoppingCartIcon className="w-5 h-5"/> Buy This
-                </button>
+                <Button className="bg-emerald-600 text-white shadow hover:bg-emerald-700 transition flex gap-2 items-center font-600 rounded-xl px-3 py-1">
+                    <ShoppingCartIcon className="w-5 h-5"/> Checkout
+                </Button>
             </Link>
         </div>
     )

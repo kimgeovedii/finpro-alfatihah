@@ -54,7 +54,7 @@ export const AccountTableRow: React.FC<AccountTableRowProps> = ({
           className={`${
             isStoreAdmin
               ? "bg-teal-50 text-teal-700 border-teal-100"
-              : account.role === "ADMIN"
+              : account.role === "EMPLOYEE"
                 ? "bg-blue-50 text-blue-700 border-blue-100"
                 : "bg-slate-100 text-slate-600 border-slate-200"
           }`}

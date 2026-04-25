@@ -3,10 +3,7 @@ import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 import bcrypt from 'bcryptjs';
 import CartFactory from './factories/carts.factory';
-import CartItemsFactory from './factories/cart_items.factory';
 import OrderFactory from './factories/orders.factory';
-import OrderItemsFactory from './factories/order_items.factory';
-import PaymentFactory from './factories/payments.factory';
 import ProductCategoriesFactory from './factories/product_categories.factory';
 import ProductsFactory from './factories/products.factory';
 import ProductImagesFactory from './factories/product_images.factory';
@@ -62,7 +59,7 @@ async function main() {
       email: 'kimgeovedi@gmail.com',
       username: 'kimgeovedi',
       password: defaultPassword,
-      role: UserRole.ADMIN,
+      role: UserRole.EMPLOYEE,
       emailVerifiedAt: new Date(),
     },
   });
@@ -98,7 +95,7 @@ async function main() {
       email: 'storeadmin@example.com',
       username: 'storeadmin',
       password: defaultPassword,
-      role: UserRole.ADMIN,
+      role: UserRole.EMPLOYEE,
       emailVerifiedAt: new Date(),
     },
   });
@@ -110,7 +107,7 @@ async function main() {
       email: 'superadmin@example.com',
       username: 'superadmin',
       password: defaultPassword,
-      role: UserRole.ADMIN,
+      role: UserRole.EMPLOYEE,
       emailVerifiedAt: new Date(),
     },
   });
@@ -436,35 +433,17 @@ async function main() {
   console.log(`  Mutation Journals: ${totalMutations}`);
   console.log(`  Stock Journals:   ${totalStockJournals}`);
 
-  console.log(`\n🔑 Default password: password123`);
+  // Cart Orders Seeders (Include Cart Items)
   const totalCart = 5
   const cartFactory = new CartFactory()
   await cartFactory.createMany(totalCart, UserRole.CUSTOMER)
   console.log(`  Carts:        ${totalCart}`)
 
-  // Cart Items Seeders
-  const totalCartItems = 20
-  const cartItemsFactory = new CartItemsFactory()
-  await cartItemsFactory.createMany(totalCartItems)
-  console.log(`  Cart Item:    ${totalCartItems}`)
-
-  // Cart Orders Seeders
-  const totalOrder = 10
+  // Cart Orders Seeders (Include Order Items & Payments)
+  const totalOrder = 20
   const orderFactory = new OrderFactory()
   await orderFactory.createMany(totalOrder)
   console.log(`  Order:    ${totalOrder}`)
-
-  // Cart Orders Seeders
-  const totalOrderItems = 10
-  const orderItemsFactory = new OrderItemsFactory()
-  await orderItemsFactory.createMany(totalOrderItems)
-  console.log(`  Order Items:    ${totalOrderItems}`)
-
-  // Cart Payments Seeders
-  const totalPayments = 10
-  const paymentFactory = new PaymentFactory()
-  await paymentFactory.createMany(totalPayments)
-  console.log(`  Payments:    ${totalPayments}`)
 
   console.log(`\n🔑 Default password: password123`);
 }
