@@ -39,6 +39,15 @@ export class BranchInventoryRepository {
     return apiFetch<BranchInventory>(`/branch-inventories/${id}`, "patch", payload);
   }
 
+  async createBranchInventory(payload: {
+    productId: string;
+    branchId: string;
+    currentStock: number;
+    notes: string;
+  }): Promise<BranchInventory> {
+    return apiFetch<BranchInventory>("/branch-inventories", "post", payload);
+  }
+
   async getStockJournals(params: {
     page?: number;
     limit?: number;

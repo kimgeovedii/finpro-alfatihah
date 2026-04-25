@@ -14,28 +14,33 @@ export const StockManagementPage: React.FC = () => {
   const {
     inventory,
     branches,
+    allProducts,
     journals,
     meta,
     isLoading,
     isJournalLoading,
     searchQuery,
     selectedBranchId,
-    simulationRole,
     updateStockOpen,
     journalOpen,
     selectedItem,
     isSubmitting,
-    
+
     handleSearchChange,
     setSelectedBranchId,
-    handleRoleToggle,
     handlePageChange,
     handleUpdateClick,
     handleViewJournal,
     handleUpdateSubmit,
     setUpdateStockOpen,
     setJournalOpen,
+    setSelectedItem,
   } = useManageStock();
+
+  const handleGlobalUpdateClick = () => {
+    setSelectedItem(null);
+    setUpdateStockOpen(true);
+  };
 
   return (
     <motion.div
@@ -50,38 +55,36 @@ export const StockManagementPage: React.FC = () => {
         selectedBranchId={selectedBranchId}
         onBranchChange={setSelectedBranchId}
         branches={branches}
-        simulationRole={simulationRole}
-        onRoleToggle={handleRoleToggle}
-        onAddClick={() => {
-          if (inventory.length > 0) {
-            handleUpdateClick(inventory[0]);
-          }
-        }}
+        onAddClick={handleGlobalUpdateClick}
       />
 
-      {/* Desktop Table View */}
+      {/* Desktop View */}
       <div className="hidden lg:block">
         <StockTable
           inventory={inventory}
           isLoading={isLoading}
           onUpdateStock={handleUpdateClick}
           onViewJournal={handleViewJournal}
-          simulationRole={simulationRole}
         />
         <div className="mt-6 flex justify-end">
           <ProductTablePagination meta={meta} onPageChange={handlePageChange} />
         </div>
       </div>
 
-      {/* Mobile Grid View */}
+      {/* Mobile View */}
       <div className="lg:hidden space-y-4">
         {isLoading ? (
           [...Array(3)].map((_, i) => (
-            <div key={i} className="h-40 bg-white rounded-xl animate-pulse shadow-sm border border-[#eff1f2]" />
+            <div
+              key={i}
+              className="h-40 bg-white rounded-xl animate-pulse shadow-sm border border-[#eff1f2]"
+            />
           ))
         ) : inventory.length === 0 ? (
           <div className="bg-white rounded-xl p-12 text-center border border-[#eff1f2]">
-            <p className="text-[#595c5d] font-medium">No inventory results found.</p>
+            <p className="text-[#595c5d] font-medium">
+              No inventory results found.
+            </p>
           </div>
         ) : (
           <AnimatePresence mode="popLayout">
@@ -92,7 +95,6 @@ export const StockManagementPage: React.FC = () => {
                 index={index}
                 onUpdateStock={handleUpdateClick}
                 onViewJournal={handleViewJournal}
-                simulationRole={simulationRole}
               />
             ))}
           </AnimatePresence>
@@ -102,13 +104,14 @@ export const StockManagementPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Dialogs */}
       <UpdateStockDialog
         open={updateStockOpen}
         onOpenChange={setUpdateStockOpen}
         inventoryItem={selectedItem}
         onSubmit={handleUpdateSubmit}
         isSubmitting={isSubmitting}
+        branches={branches}
+        allProducts={allProducts}
       />
 
       <StockJournalDialog

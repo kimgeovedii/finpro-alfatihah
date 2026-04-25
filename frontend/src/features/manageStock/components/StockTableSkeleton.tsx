@@ -15,7 +15,6 @@ export const StockTableSkeleton: React.FC = () => {
         >
           <td className="py-4 px-6">
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-lg bg-slate-100 animate-pulse shrink-0" />
               <div className="space-y-2">
                 <div className="w-32 h-4 bg-slate-100 animate-pulse rounded" />
                 <div className="w-20 h-3 bg-slate-50 animate-pulse rounded" />

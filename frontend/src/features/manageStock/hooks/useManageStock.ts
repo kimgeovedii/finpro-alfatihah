@@ -4,17 +4,20 @@ import {
   StockJournal,
   Branch,
   PaginationMeta,
-  SimulationRole,
   UpdateStockPayload,
+  ManageProduct,
 } from "../types/manageStock.type";
 import { BranchInventoryRepository } from "../repositories/branchInventory.repository";
+import { ManageProductRepository } from "@/features/manageProducts/repositories/manageProduct.repository";
 import toast from "react-hot-toast";
 
 const repo = new BranchInventoryRepository();
+const productRepo = new ManageProductRepository();
 
 export const useManageStock = () => {
   const [inventory, setInventory] = useState<BranchInventory[]>([]);
   const [branches, setBranches] = useState<Branch[]>([]);
+  const [allProducts, setAllProducts] = useState<ManageProduct[]>([]);
   const [journals, setJournals] = useState<StockJournal[]>([]);
   const [meta, setMeta] = useState<PaginationMeta>({
     total: 0,
@@ -22,16 +25,17 @@ export const useManageStock = () => {
     limit: 10,
     totalPages: 0,
   });
-  
+
   const [isLoading, setIsLoading] = useState(true);
   const [isJournalLoading, setIsJournalLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedBranchId, setSelectedBranchId] = useState("all");
-  const [simulationRole, setSimulationRole] = useState<SimulationRole>(SimulationRole.SUPER_ADMIN);
-  
+
   const [updateStockOpen, setUpdateStockOpen] = useState(false);
   const [journalOpen, setJournalOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<BranchInventory | null>(null);
+  const [selectedItem, setSelectedItem] = useState<BranchInventory | null>(
+    null,
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -81,12 +85,22 @@ export const useManageStock = () => {
     }
   }, []);
 
+  const fetchProducts = useCallback(async () => {
+    try {
+      const response = await productRepo.getAllProducts(1, 100);
+      setAllProducts(response.data || []);
+    } catch (err) {
+      console.error("Failed to load products", err);
+    }
+  }, []);
+
   useEffect(() => {
     fetchInventory(1);
   }, [debouncedSearch, selectedBranchId]);
 
   useEffect(() => {
     fetchBranches();
+    fetchProducts();
   }, []);
 
   const handlePageChange = useCallback(
@@ -95,16 +109,6 @@ export const useManageStock = () => {
     },
     [fetchInventory],
   );
-
-  const handleRoleToggle = (role: SimulationRole) => {
-    setSimulationRole(role);
-    if (role === SimulationRole.STORE_ADMIN) {
-      // For simulation, pick the first branch if in store admin mode
-      if (branches.length > 0) setSelectedBranchId(branches[0].id);
-    } else {
-      setSelectedBranchId("all");
-    }
-  };
 
   const handleUpdateClick = (item: BranchInventory) => {
     setSelectedItem(item);
@@ -125,12 +129,31 @@ export const useManageStock = () => {
     }
   };
 
-  const handleUpdateSubmit = async (values: UpdateStockPayload) => {
-    if (!selectedItem) return;
+  const handleUpdateSubmit = async (
+    values: UpdateStockPayload & { productId?: string; branchId?: string },
+  ) => {
     try {
       setIsSubmitting(true);
-      await repo.updateStock(selectedItem.id, values);
-      toast.success("Stock updated and journal created!");
+      if (selectedItem) {
+        await repo.updateStock(selectedItem.id, values);
+      } else if (values.productId && values.branchId) {
+        const existing = inventory.find(
+          (i) =>
+            i.productId === values.productId && i.branchId === values.branchId,
+        );
+        if (existing) {
+          await repo.updateStock(existing.id, values);
+        } else {
+          await repo.createBranchInventory({
+            productId: values.productId,
+            branchId: values.branchId,
+            currentStock: values.actualStock,
+            notes: values.notes,
+            employeeId: "",
+          });
+        }
+      }
+      toast.success("Stock updated successfully!");
       setUpdateStockOpen(false);
       fetchInventory(meta.page);
     } catch (err) {
@@ -150,21 +173,21 @@ export const useManageStock = () => {
     isJournalLoading,
     searchQuery,
     selectedBranchId,
-    simulationRole,
+    allProducts,
     updateStockOpen,
     journalOpen,
     selectedItem,
     isSubmitting,
-    
+
     handleSearchChange,
     setSelectedBranchId,
-    handleRoleToggle,
     handlePageChange,
     handleUpdateClick,
     handleViewJournal,
     handleUpdateSubmit,
     setUpdateStockOpen,
     setJournalOpen,
+    setSelectedItem,
     fetchInventory,
   };
 };

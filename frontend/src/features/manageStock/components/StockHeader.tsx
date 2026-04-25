@@ -3,7 +3,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { MagnifyingGlassIcon, PlusIcon, BuildingStorefrontIcon, UserGroupIcon, ShieldCheckIcon } from "@heroicons/react/24/outline";
-import { StockHeaderProps, SimulationRole } from "../types/manageStock.type";
+import { StockHeaderProps } from "../types/manageStock.type";
 import {
   Select,
   SelectContent,
@@ -11,15 +11,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
 export const StockHeader: React.FC<StockHeaderProps> = ({
   searchQuery,
   onSearchChange,
   selectedBranchId,
   onBranchChange,
   branches,
-  simulationRole,
-  onRoleToggle,
   onAddClick,
 }) => {
   return (
@@ -38,56 +35,28 @@ export const StockHeader: React.FC<StockHeaderProps> = ({
             Monitor and adjust product inventory across branches.
           </p>
         </div>
-
-        {/* Role Toggle Simulation */}
-        <div className="inline-flex p-1 bg-[#e6e8ea] rounded-xl self-start">
-          <button
-            onClick={() => onRoleToggle(SimulationRole.STORE_ADMIN)}
-            className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-medium transition-all ${
-              simulationRole === SimulationRole.STORE_ADMIN
-                ? "bg-white text-[#006666] shadow-sm"
-                : "text-[#595c5d] hover:text-[#2c2f30]"
-            }`}
-          >
-            <UserGroupIcon className="w-3.5 h-3.5" />
-            Store Admin
-          </button>
-          <button
-            onClick={() => onRoleToggle(SimulationRole.SUPER_ADMIN)}
-            className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-medium transition-all ${
-              simulationRole === SimulationRole.SUPER_ADMIN
-                ? "bg-white text-[#006666] shadow-sm"
-                : "text-[#595c5d] hover:text-[#2c2f30]"
-            }`}
-          >
-            <ShieldCheckIcon className="w-3.5 h-3.5" />
-            Super Admin
-          </button>
-        </div>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
-        {/* Branch Selection - Only for Super Admin */}
-        {simulationRole === SimulationRole.SUPER_ADMIN && (
-          <div className="w-full sm:w-56">
-            <Select value={selectedBranchId} onValueChange={onBranchChange}>
-              <SelectTrigger className="w-full rounded-xl border-none bg-white shadow-sm text-[#2c2f30] h-10">
-                <div className="flex items-center gap-2">
-                  <BuildingStorefrontIcon className="w-4 h-4 text-[#006666]" />
-                  <SelectValue placeholder="Select Branch" />
-                </div>
-              </SelectTrigger>
-              <SelectContent className="rounded-xl border-[#eff1f2]">
-                <SelectItem value="all">All Branches</SelectItem>
-                {branches.map((branch) => (
-                  <SelectItem key={branch.id} value={branch.id}>
-                    {branch.storeName}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
+        {/* Branch Selection */}
+        <div className="w-full sm:w-56">
+          <Select value={selectedBranchId} onValueChange={onBranchChange}>
+            <SelectTrigger className="w-full rounded-xl border-none bg-white shadow-sm text-[#2c2f30] h-10">
+              <div className="flex items-center gap-2">
+                <BuildingStorefrontIcon className="w-4 h-4 text-[#006666]" />
+                <SelectValue placeholder="Select Branch" />
+              </div>
+            </SelectTrigger>
+            <SelectContent className="rounded-xl border-[#eff1f2]">
+              <SelectItem value="all">All Branches</SelectItem>
+              {branches.map((branch) => (
+                <SelectItem key={branch.id} value={branch.id}>
+                  {branch.storeName}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
         <div className="relative w-full sm:w-64">
           <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#595c5d]" />

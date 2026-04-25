@@ -12,7 +12,6 @@ export const StockTable: React.FC<StockTableProps> = ({
   isLoading,
   onUpdateStock,
   onViewJournal,
-  simulationRole,
 }) => {
   return (
     <motion.div
@@ -46,7 +45,6 @@ export const StockTable: React.FC<StockTableProps> = ({
                     index={index}
                     onUpdateStock={onUpdateStock}
                     onViewJournal={onViewJournal}
-                    simulationRole={simulationRole}
                   />
                 ))}
               </AnimatePresence>

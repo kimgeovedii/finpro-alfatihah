@@ -3,7 +3,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { PencilSquareIcon, ClipboardDocumentListIcon, ChartBarIcon, MapPinIcon } from "@heroicons/react/24/outline";
-import { BranchInventory, SimulationRole } from "../types/manageStock.type";
+import { BranchInventory } from "../types/manageStock.type";
 import { Badge } from "@/components/ui/badge";
 
 type MobileStockCardProps = {
@@ -11,7 +11,6 @@ type MobileStockCardProps = {
   index: number;
   onUpdateStock: (item: BranchInventory) => void;
   onViewJournal: (item: BranchInventory) => void;
-  simulationRole: SimulationRole;
 };
 
 export const MobileStockCard: React.FC<MobileStockCardProps> = ({
@@ -19,10 +18,8 @@ export const MobileStockCard: React.FC<MobileStockCardProps> = ({
   index,
   onUpdateStock,
   onViewJournal,
-  simulationRole,
 }) => {
   const product = item.product;
-  const primaryImage = product?.productImages?.[0];
 
   const getStatus = (stock: number) => {
     if (stock <= 0) return { label: "Out of Stock", color: "bg-red-100 text-red-700 border-red-200" };
@@ -41,19 +38,6 @@ export const MobileStockCard: React.FC<MobileStockCardProps> = ({
       className="bg-white rounded-xl shadow-sm border border-[#eff1f2] p-4 space-y-4"
     >
       <div className="flex gap-4">
-        <div className="w-16 h-16 rounded-lg bg-[#e6e8ea] overflow-hidden shrink-0 border border-[#eff1f2]">
-          {primaryImage ? (
-            <img
-              alt={product?.productName}
-              src={primaryImage.imageUrl}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-[#595c5d]">
-              <ChartBarIcon className="w-8 h-8" />
-            </div>
-          )}
-        </div>
         <div className="flex-1 min-w-0">
           <div className="flex justify-between items-start gap-2">
             <div className="min-w-0">

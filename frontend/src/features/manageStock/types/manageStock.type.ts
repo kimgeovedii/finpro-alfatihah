@@ -1,9 +1,8 @@
-import { ManageProduct, PaginationMeta } from "@/features/manageProducts/types/manageProduct.type";
-
-export enum SimulationRole {
-  SUPER_ADMIN = "SUPER_ADMIN",
-  STORE_ADMIN = "STORE_ADMIN",
-}
+import {
+  ManageProduct,
+  PaginationMeta,
+} from "@/features/manageProducts/types/manageProduct.type";
+export type { ManageProduct, PaginationMeta };
 
 export type Branch = {
   id: string;
@@ -58,16 +57,12 @@ export type StockJournalListResponse = {
   meta: PaginationMeta;
 };
 
-// ── Component Props ──
-
 export type StockHeaderProps = {
   searchQuery: string;
   onSearchChange: (value: string) => void;
   selectedBranchId: string;
   onBranchChange: (value: string) => void;
   branches: Branch[];
-  simulationRole: SimulationRole;
-  onRoleToggle: (role: SimulationRole) => void;
   onAddClick: () => void;
 };
 
@@ -76,7 +71,6 @@ export type StockTableProps = {
   isLoading: boolean;
   onUpdateStock: (item: BranchInventory) => void;
   onViewJournal: (item: BranchInventory) => void;
-  simulationRole: SimulationRole;
 };
 
 export type StockTableRowProps = {
@@ -84,7 +78,6 @@ export type StockTableRowProps = {
   index: number;
   onUpdateStock: (item: BranchInventory) => void;
   onViewJournal: (item: BranchInventory) => void;
-  simulationRole: SimulationRole;
 };
 
 export type UpdateStockPayload = {
@@ -96,8 +89,12 @@ export type UpdateStockDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   inventoryItem: BranchInventory | null;
-  onSubmit: (values: UpdateStockPayload) => Promise<void>;
+  onSubmit: (
+    values: UpdateStockPayload & { productId?: string; branchId?: string },
+  ) => Promise<void>;
   isSubmitting: boolean;
+  branches: Branch[];
+  allProducts: ManageProduct[];
 };
 
 export type StockJournalDialogProps = {
