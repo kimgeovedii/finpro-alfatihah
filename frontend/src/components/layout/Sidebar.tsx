@@ -14,6 +14,7 @@ import {
   CubeIcon,
   UsersIcon,
   Square2StackIcon,
+  PercentBadgeIcon,
 } from "@heroicons/react/24/outline";
 import { useAuthService } from "@/features/auth/hooks/useAuthService";
 
@@ -62,6 +63,11 @@ const NAV_ITEMS = [
     title: "Stock",
     href: "/dashboard/stock",
     icon: <Square2StackIcon className="w-5 h-5" />,
+  },
+  {
+    title: "Discounts",
+    href: "/dashboard/discounts",
+    icon: <PercentBadgeIcon className="w-5 h-5" />,
   },
   {
     title: "Tracking Document",

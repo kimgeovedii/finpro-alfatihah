@@ -11,12 +11,28 @@ export class DiscountRepository {
         where: filters,
         skip,
         take,
+        include: {
+          branch: {
+            select: {
+              storeName: true,
+              city: true,
+            },
+          },
+          productDiscounts: {
+            include: {
+              product: {
+                select: {
+                  productName: true,
+                },
+              },
+            },
+          },
+        },
       }),
       prisma.discounts.count({
         where: filters,
       }),
     ]);
-
     return { data, total };
   };
 
