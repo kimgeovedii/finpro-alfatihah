@@ -15,8 +15,14 @@ export class ProductService {
     const skip = (page - 1) * limit;
     const take = limit;
 
+    const where: any = { ...filters };
+    if (where.search) {
+      where.productName = { contains: where.search, mode: "insensitive" };
+      delete where.search;
+    }
+
     const { data, total } = await this.productRepository.findAllProducts(
-      filters,
+      where,
       skip,
       take,
     );
@@ -34,6 +40,10 @@ export class ProductService {
 
   public getProductById = async (id: string) => {
     return await this.productRepository.getProductById(id);
+  };
+
+  public getProductBySlug = async (slugName: string) => {
+    return await this.productRepository.getProductBySlug(slugName);
   };
 
   public createProduct = async (data: any) => {

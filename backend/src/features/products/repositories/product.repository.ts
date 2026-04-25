@@ -48,6 +48,28 @@ export class ProductRepository {
           select: {
             id: true,
             imageUrl: true,
+            isPrimary: true,
+          },
+        },
+      },
+    });
+  };
+
+  public getProductBySlug = async (slugName: string) => {
+    return prisma.products.findUnique({
+      where: { slugName },
+      include: {
+        category: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        productImages: {
+          select: {
+            id: true,
+            imageUrl: true,
+            isPrimary: true,
           },
         },
       },

@@ -1,32 +1,35 @@
 import { apiFetch } from "@/utils/api"
-
-export type OrderData = {
-    id: string
-    orderNumber: string
-    createdAt: string
-    status: string
-    totalPrice: number
-    finalPrice: number
-    shippingCost: number
-    paymentDeadline: string
-    totalItems: number
-    productList: string
-}
-
-export type OrderMeta = {
-    page: number
-    limit: number
-    total: number
-    total_page: number
-}
-
-export type OrderResponse = {
-    data: OrderData[]
-    meta: OrderMeta
-}
+import { ManagementOrderResponse, OrderData, OrderResponse, OrderSummaryByBranchIdData, OrderSummaryData } from "./order.type"
 
 export const orderRepository = {
-    async getAllOrders(page: number = 1): Promise<OrderResponse> {
-        return await apiFetch<any>(`/orders/transaction?page=${page}`, "get")
+    async getOrderSummary(): Promise<OrderSummaryData> {
+        return await apiFetch<OrderSummaryData>("/orders/summary","get")
+    },
+    async getOrderSummaryByBranchId(branchId: string): Promise<OrderSummaryByBranchIdData> {
+        return await apiFetch<OrderSummaryByBranchIdData>(`/orders/summary/${branchId}`,"get")
+    },
+    async getAllOrders(page: number = 1, filters?: { orderNumber?: string, dateStart?: string, dateEnd?: string }): Promise<OrderResponse> {
+        const params = new URLSearchParams({ page: String(page) })
+        
+        if (filters?.orderNumber) params.append("orderNumber", filters.orderNumber)
+        if (filters?.dateStart) params.append("dateStart", filters.dateStart)
+        if (filters?.dateEnd) params.append("dateEnd", filters.dateEnd)
+        
+        return await apiFetch<OrderResponse>(`/orders/transaction?${params.toString()}`,"get")
+    },
+    async getAllOrdersByBranchId(page: number = 1, branchId: string, status: string): Promise<ManagementOrderResponse> {
+        return await apiFetch<ManagementOrderResponse>(`/orders/transaction/management/${branchId}?page=${page}&status=${status}`, "get")
+    },
+    async getOrderDetailByOrderNumber(orderNumber: string): Promise<OrderData> {
+        return await apiFetch<OrderData>(`/orders/transaction/${orderNumber}`, "get")
+    },
+    async postUpdateOrderStatusById(orderNumber: string): Promise<{ message: string }> {
+        return await apiFetch<{ message: string }>(`/orders/shipping/${orderNumber}`, "post")
+    },
+    async postCancelOrderStatusById(orderNumber: string): Promise<{ message: string }> {
+        return await apiFetch<{ message: string }>(`/orders/cancelling/${orderNumber}`, "post")
+    },
+    async postConfirmOrderStatusById(orderNumber: string): Promise<{ message: string }> {
+        return await apiFetch<{ message: string }>(`/orders/confirming/${orderNumber}`, "post")
     }
 }

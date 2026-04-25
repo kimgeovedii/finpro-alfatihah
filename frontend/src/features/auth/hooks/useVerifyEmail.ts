@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useAuthService } from "../service/auth.service";
+import { useAuthService } from "../hooks/useAuthService";
 
 export const useVerifyEmail = () => {
   const searchParams = useSearchParams();
@@ -30,7 +30,7 @@ export const useVerifyEmail = () => {
   useEffect(() => {
     if (token) {
       verifyEmailToken(token)
-        .then((res) => {
+        .then((res: any) => {
           setStatus("success");
           setMessage(res.message || "Email verified successfully!");
           setTimeout(() => {

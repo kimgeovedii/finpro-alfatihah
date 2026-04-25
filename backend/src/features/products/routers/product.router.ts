@@ -19,6 +19,7 @@ export class ProductRouter {
 
   private routes() {
     this.router.get("/", this.productController.findAllProducts);
+    this.router.get("/slug/:slugName", this.productController.getProductBySlug);
     this.router.get("/:id", this.productController.getProductById);
     this.router.post(
       "/",

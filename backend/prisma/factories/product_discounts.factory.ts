@@ -1,29 +1,36 @@
 import { faker } from "@faker-js/faker"
-import { prisma } from "../../src/config/prisma"
+import { ProductService } from "../../src/features/products/services/product.service"
+import { DiscountService } from "../../src/features/discounts/services/discount.service"
+import { ProductDiscountService } from "../../src/features/discounts/services/productDiscount.service"
 
 class ProductDiscountsFactory {
+    private productService: ProductService;
+    private discountService: DiscountService;
+    private productDiscountService: ProductDiscountService;
+
+    constructor() {
+        this.productService = new ProductService();
+        this.discountService = new DiscountService();
+        this.productDiscountService = new ProductDiscountService();
+    }
     private async findRandomProduct() {
-        const count = await prisma.products.count()
-        if (count === 0) return null
+        const { meta } = await this.productService.findAllProducts({}, 1, 1);
+        if (meta.total === 0) return null;
 
-        const skip = Math.floor(Math.random() * count)
-
-        return prisma.products.findFirst({
-            skip,
-            select: { id: true }
-        })
+        const skip = Math.floor(Math.random() * meta.total);
+        const { data } = await this.productService.findAllProducts({}, skip + 1, 1);
+        
+        return data[0];
     }
 
     private async findRandomDiscount() {
-        const count = await prisma.discounts.count()
-        if (count === 0) return null
+        const { meta } = await this.discountService.findAllDiscounts({}, 1, 1);
+        if (meta.total === 0) return null;
 
-        const skip = Math.floor(Math.random() * count)
-
-        return prisma.discounts.findFirst({
-            skip,
-            select: { id: true }
-        })
+        const skip = Math.floor(Math.random() * meta.total);
+        const { data } = await this.discountService.findAllDiscounts({}, skip + 1, 1);
+        
+        return data[0];
     }
 
     public create = async (productId?: string, discountId?: string) => {
@@ -43,26 +50,10 @@ class ProductDiscountsFactory {
             targetDiscountId = discount.id
         }
 
-        // Check if this product-discount combination already exists
-        const existing = await prisma.product_discounts.findFirst({
-            where: {
-                productId: targetProductId,
-                discountId: targetDiscountId
-            }
-        })
+        // The service automatically handles avoiding duplicate assignments natively thanks to its generic repository skipDuplicates strategy
+        await this.productDiscountService.assignProducts(targetDiscountId, [targetProductId]);
 
-        if (existing) {
-            return existing
-        }
-
-        return prisma.product_discounts.create({
-            data: {
-                id: faker.string.uuid(),
-                productId: targetProductId,
-                discountId: targetDiscountId,
-                createdAt: faker.date.past({ years: 1 }),
-            },
-        })
+        return { productId: targetProductId, discountId: targetDiscountId };
     }
 
     public createMany = async (count: number) => {
@@ -76,9 +67,16 @@ class ProductDiscountsFactory {
 
     // Link each discount to 5-15 random products
     public createForAllDiscounts = async () => {
-        const discounts = await prisma.discounts.findMany({
-            select: { id: true }
-        })
+        let discounts: any[] = [];
+        let page = 1;
+        let hasMore = true;
+
+        while(hasMore) {
+           const { data, meta } = await this.discountService.findAllDiscounts({}, page, 50);
+           discounts.push(...data);
+           if (page >= meta.totalPages || data.length === 0) hasMore = false;
+           page++;
+        }
 
         if (discounts.length === 0) {
             throw new Error('Cannot create product discounts without discounts')

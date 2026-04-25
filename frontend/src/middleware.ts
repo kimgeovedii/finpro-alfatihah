@@ -2,14 +2,17 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 // Routes that do not require authentication
-const publicRoutes = ["/", "/login","/verify-email"];
+const publicRoutes = ["/", "/login", "/register", "/verify-email", "/reset-password", "/confirm-reset-password", "/products"];
+
+// Routes that require verification (must be verified to access)
+const verifiedOnlyRoutes = ["/profile", "/cart", "/transaction", "/checkout"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const hasToken =
-    request.cookies.has("accessToken") || request.cookies.has("refreshToken");
+  const accessToken = request.cookies.get("accessToken")?.value;
+  const hasToken = !!accessToken || request.cookies.has("refreshToken");
 
-  // Let Next.js handle static files, API routes, and _next/image requests without interference
+  // Skip static files
   if (
     pathname.startsWith("/_next") ||
     pathname.includes("/favicon.ico") ||
@@ -22,19 +25,36 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Check if the route is explicitly public
-  const isPublicRoute = publicRoutes.includes(pathname);
+  const isPublicRoute = publicRoutes.some(route => 
+    pathname === route || pathname.startsWith(route + "/")
+  );
 
-  // 1. If user is trying to access a protected route WITHOUT a token, redirect to /login
+  // 1. If not logged in and trying to access protected route, redirect to home
   if (!isPublicRoute && !hasToken) {
-    const loginUrl = new URL("/login", request.url);
-    return NextResponse.redirect(loginUrl);
+    const homeUrl = new URL("/", request.url);
+    homeUrl.searchParams.set("redirect", pathname);
+    return NextResponse.redirect(homeUrl);
   }
 
-  // 2. If user is trying to access /login WITH a token, redirect to /dashboard
-  if (pathname === "/login" && hasToken) {
-    const dashboardUrl = new URL("/dashboard", request.url);
-    return NextResponse.redirect(dashboardUrl);
+  // 2. If logged in but accessing verified-only route while unverified
+  if (hasToken && verifiedOnlyRoutes.some(route => pathname.startsWith(route))) {
+    try {
+      if (accessToken) {
+        const payload = JSON.parse(atob(accessToken.split(".")[1]));
+        if (!payload.emailVerifiedAt) {
+          const homeUrl = new URL("/", request.url);
+          homeUrl.searchParams.set("unverified", "true");
+          return NextResponse.redirect(homeUrl);
+        }
+      }
+    } catch (e) {
+      // If token is invalid/corrupt, let it pass or redirect to login
+    }
+  }
+
+  // 3. Prevent logged-in users from seeing auth pages
+  if ((pathname === "/login" || pathname === "/register") && hasToken) {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
   return NextResponse.next();
