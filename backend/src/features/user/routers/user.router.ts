@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { UserController } from "../controllers/user.controller";
+import { EmployeeController } from "../controllers/employee.controller";
 import { UserService } from "../services/user.service";
 import { UserRepository } from "../repositories/user.repository";
 import { authMiddleware } from "../../../middleware/auth.middleware";
@@ -10,12 +11,14 @@ import { upload } from "../../../middleware/uploader.middleware";
 export class UserRouter {
   private router: Router;
   private userController: UserController;
+  private employeeController: EmployeeController;
 
   constructor() {
     this.router = Router();
     const userRepository = new UserRepository();
     const userService = new UserService(userRepository);
     this.userController = new UserController(userService);
+    this.employeeController = new EmployeeController(userService);
     this.initializeRoutes();
   }
 
@@ -34,10 +37,10 @@ export class UserRouter {
     const adminRoutes = Router();
     adminRoutes.use(roleMiddleware([EmployeeRole.SUPER_ADMIN]));
     
-    adminRoutes.get("/", this.userController.getAllAccounts);
-    adminRoutes.post("/", this.userController.createAccount);
-    adminRoutes.put("/:id", this.userController.updateAccount);
-    adminRoutes.delete("/:id", this.userController.deleteAccount);
+    adminRoutes.get("/", this.employeeController.getAllEmployees);
+    adminRoutes.post("/", this.employeeController.createEmployee);
+    adminRoutes.put("/:id", this.employeeController.updateEmployee);
+    adminRoutes.delete("/:id", this.employeeController.deleteEmployee);
 
     this.router.use("/", adminRoutes);
   }

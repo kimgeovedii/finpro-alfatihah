@@ -21,6 +21,17 @@ export const authService = {
     return { user, accessToken, refreshToken };
   },
 
+  employeeLogin: async (data: any) => {
+    const result: any = await apiFetch<any>("/auth/employee/login", "post", data);
+    const { user, accessToken, refreshToken } = result;
+    
+    // Set cookies for middleware
+    Cookies.set("accessToken", accessToken, { expires: data.rememberMe ? 30 : 1 / 96 }); 
+    Cookies.set("refreshToken", refreshToken, { expires: data.rememberMe ? 30 : 1 });
+
+    return { user, accessToken, refreshToken };
+  },
+
   googleLogin: async (credential: string) => {
     const result: any = await apiFetch<any>("/auth/google", "post", { credential });
     const { user, accessToken, refreshToken } = result;

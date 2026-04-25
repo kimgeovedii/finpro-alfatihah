@@ -136,6 +136,10 @@ export class AuthService {
       throw new Error("Invalid credentials");
     }
 
+    if (user.role !== "CUSTOMER") {
+      throw new Error("Akses ditolak. Silakan login melalui portal yang sesuai.");
+    }
+
     if (!user.emailVerifiedAt) {
       throw new Error("Please verify your email before logging in");
     }
@@ -149,10 +153,37 @@ export class AuthService {
     await this.authRepository.createRefreshToken(user.id, tokens.refreshToken, expiresAt, device, ip);
     await this.authRepository.updateLastLogin(user.id);
 
-    let cartItems = null;
-    if (user.role === "CUSTOMER") cartItems = await this.cartRepository.getCartSummary(user.id);
+    const cartItems = await this.cartRepository.getCartSummary(user.id);
 
     return { user: userWithoutPassword, ...tokens, cartItems };
+  }
+
+  async employeeLogin(dto: LoginDto, device?: string, ip?: string) {
+    const user = await this.authRepository.findByEmail(dto.email);
+
+    if (!user || !user.password) {
+      throw new Error("Invalid credentials");
+    }
+
+    const isPasswordValid = await bcrypt.compare(dto.password, user.password);
+    if (!isPasswordValid) {
+      throw new Error("Invalid credentials");
+    }
+
+    if (user.role !== "EMPLOYEE") {
+      throw new Error("Akses ditolak. Akun Anda bukan merupakan akun Employee.");
+    }
+
+    const { password, ...userWithoutPassword } = user;
+    const tokens = generateTokens(user, dto.rememberMe);
+
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + (dto.rememberMe ? 30 : 1));
+
+    await this.authRepository.createRefreshToken(user.id, tokens.refreshToken, expiresAt, device, ip);
+    await this.authRepository.updateLastLogin(user.id);
+
+    return { user: userWithoutPassword, ...tokens };
   }
 
   async googleLogin(dto: GoogleLoginDto, device?: string, ip?: string) {
@@ -175,6 +206,10 @@ export class AuthService {
           avatar: googleUser.picture,
         });
       }
+    }
+
+    if (user.role !== "CUSTOMER") {
+      throw new Error("Akses ditolak. Login Google hanya untuk akun Customer.");
     }
 
     const tokens = generateTokens(user, true);

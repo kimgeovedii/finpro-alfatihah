@@ -22,19 +22,23 @@ import { GoogleLogin } from "@react-oauth/google";
 import { toast } from "sonner";
 import { loginValidationSchema } from "../validations/auth.validation";
 
-export const LoginForm = () => {
+export const LoginForm = ({ isEmployee = false }: { isEmployee?: boolean }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect") || "/";
+  const redirect = searchParams.get("redirect") || (isEmployee ? "/dashboard" : "/");
   
-  const { login, googleLogin, isLoading, user } = useAuthService();
+  const { login, employeeLogin, googleLogin, isLoading, user } = useAuthService();
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (user) {
-      router.push(redirect);
+      if (user.role === "EMPLOYEE") {
+        router.push("/dashboard");
+      } else {
+        router.push(isEmployee ? "/dashboard" : redirect);
+      }
     }
-  }, [user, router, redirect]);
+  }, [user, router, redirect, isEmployee]);
 
   const formik = useFormik({
     initialValues: {
@@ -45,9 +49,12 @@ export const LoginForm = () => {
     validationSchema: loginValidationSchema,
     onSubmit: async (values) => {
       try {
-        await login(values);
+        if (isEmployee) {
+          await employeeLogin(values);
+        } else {
+          await login(values);
+        }
         toast.success("Login successful!");
-        router.push(redirect);
       } catch (err: any) {
         toast.error(err.message || "Invalid credentials");
       }
@@ -85,17 +92,19 @@ export const LoginForm = () => {
         />
       </Link>
 
-      <div className="absolute top-6 right-6 md:top-10 md:right-10 z-30 flex items-center gap-4">
-        <p className="text-sm text-gray-500 hidden md:block font-medium">Belum punya akun?</p>
-        <Link href="/register">
-          <Button
-            variant="outline"
-            className="border-primary-teal text-primary-teal hover:bg-primary-teal hover:text-white rounded-full px-6 font-semibold transition-all duration-300"
-          >
-            Daftar
-          </Button>
-        </Link>
-      </div>
+      {!isEmployee && (
+        <div className="absolute top-6 right-6 md:top-10 md:right-10 z-30 flex items-center gap-4">
+          <p className="text-sm text-gray-500 hidden md:block font-medium">Belum punya akun?</p>
+          <Link href="/register">
+            <Button
+              variant="outline"
+              className="border-primary-teal text-primary-teal hover:bg-primary-teal hover:text-white rounded-full px-6 font-semibold transition-all duration-300"
+            >
+              Daftar
+            </Button>
+          </Link>
+        </div>
+      )}
 
       <div className="relative z-10 w-full max-w-[480px] px-6 py-12">
         <div className="text-left mb-10 text-[#444]">
@@ -195,26 +204,30 @@ export const LoginForm = () => {
             </Button>
           </form>
 
-          <div className="relative my-8">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-gray-100"></span>
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-4 text-gray-400 font-bold tracking-widest">Atau masuk dengan</span>
-            </div>
-          </div>
+          {!isEmployee && (
+            <>
+              <div className="relative my-8">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-gray-100"></span>
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white px-4 text-gray-400 font-bold tracking-widest">Atau masuk dengan</span>
+                </div>
+              </div>
 
-          <div className="flex justify-center w-full">
-            <GoogleLogin
-              onSuccess={handleGoogleSuccess}
-              onError={() => toast.error("Google login failed")}
-              useOneTap
-              theme="outline"
-              size="large"
-              shape="pill"
-              width="384px"
-            />
-          </div>
+              <div className="flex justify-center w-full">
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={() => toast.error("Google login failed")}
+                  useOneTap
+                  theme="outline"
+                  size="large"
+                  shape="pill"
+                  width="384px"
+                />
+              </div>
+            </>
+          )}
         </div>
 
         <p className="mt-8 text-center text-sm text-gray-500 font-medium">

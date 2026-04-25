@@ -73,7 +73,34 @@ export class AuthController {
       if (error.message === "Invalid credentials") {
         return sendError(res, "Invalid credentials", 401);
       }
+      if (error.message.includes("Akses ditolak")) {
+        return sendError(res, error.message, 403);
+      }
       if (error.message === "Please verify your email before logging in") {
+        return sendError(res, error.message, 403);
+      }
+      console.error(error);
+      return sendError(res, "Internal server error");
+    }
+  }
+
+  employeeLogin = async (req: AuthRequest, res: Response) => {
+    try {
+      const result = LoginSchema.safeParse(req.body);
+      if (!result.success) {
+        return sendError(res, "Validation failed", 400, result.error.flatten());
+      }
+
+      const device = req.headers["user-agent"] || "Unknown Device";
+      const ip = (req.headers["x-forwarded-for"] || req.socket.remoteAddress || "Unknown IP") as string;
+
+      const data = await this.authService.employeeLogin(result.data, device, ip);
+      return sendSuccess(res, data, "Login successful");
+    } catch (error: any) {
+      if (error.message === "Invalid credentials") {
+        return sendError(res, "Invalid credentials", 401);
+      }
+      if (error.message.includes("Akses ditolak")) {
         return sendError(res, error.message, 403);
       }
       console.error(error);

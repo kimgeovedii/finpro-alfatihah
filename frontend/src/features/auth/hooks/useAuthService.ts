@@ -53,6 +53,21 @@ export const useAuthService = () => {
     }
   }, [setAuth],);
 
+  const employeeLogin = useCallback(async (data: any) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result: any = await authService.employeeLogin(data);
+      setAuth(result.user, result.accessToken, result.refreshToken);
+      return result;
+    } catch (err: any) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, [setAuth],);
+
   const googleLogin = useCallback(async (credential: string) => {
     setIsLoading(true);
     setError(null);
@@ -132,6 +147,7 @@ export const useAuthService = () => {
     verifyEmailToken,
     verifyAndSetPassword: verifyEmailToken,
     login,
+    employeeLogin,
     googleLogin,
     logout,
     requestResetPassword,
@@ -149,6 +165,7 @@ export const useAuthService = () => {
     register,
     verifyEmailToken,
     login,
+    employeeLogin,
     googleLogin,
     logout,
     requestResetPassword,
