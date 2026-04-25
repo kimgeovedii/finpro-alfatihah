@@ -57,11 +57,14 @@ export class AuthRepository {
   }
 
   async createGoogleUser(data: { email: string; providerId: string; username?: string; avatar?: string }) {
+    const myReferralCode = Math.random().toString(36).substring(2, 10).toUpperCase();
+    
     return prisma.user.create({
       data: {
         ...data,
         provider: "google",
         emailVerifiedAt: new Date(), // Google emails are pre-verified
+        referalCode: myReferralCode,
       },
     });
   }
@@ -135,6 +138,7 @@ export class AuthRepository {
       where: { referalCode: code },
     });
   }
+
 
   async findRefreshToken(token: string) {
     return prisma.token.findUnique({

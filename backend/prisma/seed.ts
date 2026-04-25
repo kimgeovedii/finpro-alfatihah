@@ -127,6 +127,8 @@ async function main() {
       isActive: true,
       city: 'Jakarta Selatan',
       province: 'DKI Jakarta',
+      district: 'Kebayoran Baru',
+      village: 'Senayan',
     },
   });
 
@@ -138,8 +140,10 @@ async function main() {
       longitude: 107.6191,
       maxDeliveryDistance: 10.0,
       isActive: true,
-      city: 'Bandung',
+      city: 'Kota Bandung',
       province: 'Jawa Barat',
+      district: 'Sumur Bandung',
+      village: 'Braga',
     },
   });
 
@@ -151,8 +155,10 @@ async function main() {
       longitude: 112.7521,
       maxDeliveryDistance: 12.0,
       isActive: true,
-      city: 'Surabaya',
+      city: 'Kota Surabaya',
       province: 'Jawa Timur',
+      district: 'Genteng',
+      village: 'Genteng',
     },
   });
 
@@ -226,9 +232,9 @@ async function main() {
 
   await prisma.employee.create({
     data: {
-      fullName: 'Super Admin',
+      fullName: 'Main Super Admin',
       role: EmployeeRole.SUPER_ADMIN,
-      branchId: branchJakarta.id,
+      branchId: null, // No branch for super admin
       userId: superAdminUser.id,
     },
   });
@@ -239,6 +245,15 @@ async function main() {
       role: EmployeeRole.STORE_ADMIN,
       branchId: branchJakarta.id,
       userId: storeAdminUser.id,
+    },
+  });
+
+  await prisma.employee.create({
+    data: {
+      fullName: 'Unassigned Store Admin',
+      role: EmployeeRole.STORE_ADMIN,
+      branchId: null,
+      userId: null,
     },
   });
 
@@ -432,7 +447,7 @@ async function main() {
   console.log(`  Users:            5`);
   console.log(`  Branches:         3`);
   console.log(`  Branch Schedules: ${5 + 2 + 5 + 1 + 7}`);
-  console.log(`  Employees:        4`);
+  console.log(`  Employees:        5`);
   console.log(`  Addresses:        3`);
   console.log(`  Product Categories: ${totalProductCategories}`);
   console.log(`  Products:         ${totalProducts}`);

@@ -14,10 +14,14 @@ import { useRouter } from 'next/navigation';
 export const Navbar = () => {
   const { user, logout } = useAuthService();
   const router = useRouter();
+  console.log(user);
 
   const handleLogout = async () => {
+    // Check role before logging out because logout() clears the user state
+    const isEmployee = user?.role === 'EMPLOYEE' || user?.role === 'SUPER_ADMIN' || user?.role === 'STORE_ADMIN';
+    
     await logout();
-    router.push('/login');
+    router.push(isEmployee ? '/employee/login' : '/login');
   };
 
   return (
