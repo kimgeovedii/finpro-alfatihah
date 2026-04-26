@@ -196,10 +196,35 @@ export class UserRepository {
     });
   }
 
-  async updateProfile(userId: string, data: { username?: string }) {
-    return prisma.user.update({
-      where: { id: userId },
-      data,
+  async updateProfile(userId: string, data: { username?: string; fullName?: string }) {
+    const { username, fullName } = data;
+    
+    return prisma.$transaction(async (tx) => {
+      if (username) {
+        await tx.user.update({
+          where: { id: userId },
+          data: { username }
+        });
+      }
+      
+      if (fullName) {
+        const user = await tx.user.findUnique({
+          where: { id: userId },
+          select: { role: true }
+        });
+        
+        if (user?.role === UserRole.EMPLOYEE) {
+          await tx.employee.update({
+            where: { userId },
+            data: { fullName }
+          });
+        }
+      }
+      
+      return tx.user.findUnique({
+        where: { id: userId },
+        include: { employee: true }
+      });
     });
   }
 

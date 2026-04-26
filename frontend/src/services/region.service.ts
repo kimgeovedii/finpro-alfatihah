@@ -21,19 +21,10 @@ export const regionService = {
     return apiFetch<Region[]>(`/addresses/regions/villages/${districtCode}`, "get");
   },
   searchAddress: async (query: string) => {
-    const res = await axios.get(`https://nominatim.openstreetmap.org/search`, {
-      params: {
-        q: query,
-        format: "json",
-        addressdetails: 1,
-        countrycodes: "id",
-        limit: 5,
-      },
-      headers: {
-        "User-Agent": "Online-Grocery-App/1.0",
-      }
-    });
-    return res.data;
+    return apiFetch<any[]>(`/addresses/geocoding/search?q=${encodeURIComponent(query)}`, "get");
   },
+  reverseGeocode: async (lat: number, lng: number) => {
+    return apiFetch<any>(`/addresses/geocoding/reverse?lat=${lat}&lon=${lng}`, "get");
+  }
 };
 
