@@ -8,16 +8,10 @@ import {
   MagnifyingGlassIcon
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
-import { useSidebarStore } from '@/hooks/useSidebarStore';
-import { useAuthService } from '@/features/auth/hooks/useAuthService';
+import { useDashboardNavbar } from '@/hooks/useDashboardNavbar';
 
 export const Navbar = () => {
-  const { user, logout } = useAuthService();
-  const toggleMobileMenu = useSidebarStore((state) => state.toggleMobileMenu);
-
-  const handleLogout = async () => {
-    await logout();
-  };
+  const { user, handleLogout, toggleMobileMenu } = useDashboardNavbar();
 
   return (
     <header className="sticky top-0 z-50 flex h-20 md:h-24 w-full items-center justify-between bg-white px-4 md:px-8 shadow-sm">
