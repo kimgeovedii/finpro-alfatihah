@@ -19,6 +19,8 @@ export class AddressRouter {
   private initializeRoutes() {
     this.router.get("/regions/:type", this.addressController.getRegions);
     this.router.get("/regions/:type/:code", this.addressController.getRegions);
+    this.router.get("/geocoding/search", this.addressController.searchAddress);
+    this.router.get("/geocoding/reverse", this.addressController.reverseGeocode);
 
     this.router.use(authMiddleware);
 

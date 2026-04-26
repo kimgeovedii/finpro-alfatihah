@@ -10,6 +10,9 @@ export class AuthRepository {
   async findById(id: string) {
     return prisma.user.findUnique({
       where: { id },
+      include: {
+        employee: true,
+      }
     });
   }
 

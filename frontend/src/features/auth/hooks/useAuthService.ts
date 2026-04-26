@@ -99,12 +99,13 @@ export const useAuthService = () => {
   const logout = useCallback(async () => {
     setIsLoading(true);
     try {
-      await authService.logout();
+      const isEmployee = user?.role === 'EMPLOYEE' || user?.role === 'SUPER_ADMIN' || user?.role === 'STORE_ADMIN';
+      await authService.logout(isEmployee);
       clearAuth();
     } finally {
       setIsLoading(false);
     }
-  }, [clearAuth]);
+  }, [clearAuth, user]);
 
   const requestResetPassword = useCallback(async (email: string) => {
     setIsLoading(true);

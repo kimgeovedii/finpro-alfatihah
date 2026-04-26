@@ -74,7 +74,7 @@ export const LoginForm = ({ isEmployee = false }: { isEmployee?: boolean }) => {
   };
 
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center font-sans overflow-hidden bg-white">
+    <div className="relative min-h-screen w-full flex items-center justify-center font-sans overflow-hidden">
       {/* Decorative Background Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-primary-teal/5 rounded-full blur-3xl animate-pulse" />
@@ -122,7 +122,7 @@ export const LoginForm = ({ isEmployee = false }: { isEmployee?: boolean }) => {
           </p>
         </div>
 
-        <div className="bg-white/70 backdrop-blur-xl rounded-3xl p-8 border border-white/50 shadow-2xl shadow-gray-200/50 transition-all duration-500">
+        <div className="bg-white/20 backdrop-blur-xl rounded-3xl p-8 border border-white/50 shadow-2xl shadow-gray-200/50 transition-all duration-500">
           <form onSubmit={formik.handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-semibold text-gray-700 ml-1">Email Address</Label>
@@ -193,7 +193,7 @@ export const LoginForm = ({ isEmployee = false }: { isEmployee?: boolean }) => {
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full h-14 bg-primary-teal hover:bg-[#00767a] text-white font-bold text-lg rounded-2xl shadow-xl shadow-primary-teal/20 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:hover:scale-100"
+              className="w-full h-14 bg-primary-teal hover:opacity-[70%] bg-[#00767a] text-white font-bold text-lg rounded-2xl shadow-xl shadow-primary-teal/20 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:hover:scale-100"
             >
               {isLoading ? (
                 <div className="flex items-center gap-2">

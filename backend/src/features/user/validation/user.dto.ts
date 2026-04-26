@@ -25,6 +25,7 @@ export type UpdateAccountDto = z.infer<typeof UpdateAccountSchema>;
 // Update basic profile
 export const UpdateProfileSchema = z.object({
   username: z.string().min(3, { message: "Username must be at least 3 characters" }).optional(),
+  fullName: z.string().min(3, { message: "Full name must be at least 3 characters" }).optional(),
 });
 
 export type UpdateProfileDto = z.infer<typeof UpdateProfileSchema>;
