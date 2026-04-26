@@ -59,12 +59,16 @@ export function middleware(request: NextRequest) {
 
       // Customer trying to access employee routes
       if (role === "CUSTOMER" && employeeOnlyRoutes.some(route => pathname.startsWith(route))) {
-        return NextResponse.redirect(new URL("/", request.url));
+        return NextResponse.redirect(new URL("/unauthorized", request.url));
       }
 
-      // Employee strict routing: ONLY allow employee routes
-      if (role === "EMPLOYEE" && !employeeOnlyRoutes.some(route => pathname.startsWith(route))) {
-        return NextResponse.redirect(new URL("/dashboard", request.url));
+      // Employee trying to access customer routes
+      const isCustomerRoute = 
+        pathname === "/" || 
+        ["/products", "/cart", "/checkout", "/transaction", "/profile"].some(route => pathname.startsWith(route));
+
+      if (role === "EMPLOYEE" && isCustomerRoute) {
+        return NextResponse.redirect(new URL("/unauthorized", request.url));
       }
 
       // 3. If logged in but accessing verified-only route while unverified (for Customers)
