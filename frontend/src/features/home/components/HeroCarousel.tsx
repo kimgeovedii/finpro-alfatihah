@@ -28,6 +28,71 @@ const slides = [
   }
 ];
 
+// Sub-component: Slide Item
+const SlideItem = ({ slide }: { slide: typeof slides[0] }) => (
+  <div className="absolute inset-0">
+    <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent z-10" />
+    <img
+      src={slide.image}
+      alt={slide.title}
+      className="absolute inset-0 w-full h-full object-cover"
+    />
+    <div className="relative z-20 h-full flex flex-col justify-center px-8 md:px-20 max-w-2xl text-white">
+      <motion.span
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-tertiary px-4 py-1.5 rounded-full text-xs font-bold w-fit mb-4 md:mb-6 tracking-wider uppercase"
+      >
+        {slide.tag}
+      </motion.span>
+      <motion.h1
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="text-3xl md:text-5xl lg:text-6xl font-heading font-black tracking-tight mb-4 leading-[1.1]"
+      >
+        {slide.title}
+      </motion.h1>
+      <motion.p
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="text-sm md:text-lg font-medium opacity-90 mb-6 md:mb-8 max-w-lg hidden sm:block"
+      >
+        {slide.description}
+      </motion.p>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="flex gap-4"
+      >
+        <button className="bg-primary hover:bg-primary-container text-white px-6 py-3 md:px-8 md:py-4 rounded-full font-bold shadow-lg transition-all active:scale-95 text-sm md:text-base">
+          Shop Now
+        </button>
+        <button className="bg-white/20 backdrop-blur-md hover:bg-white/30 text-white px-6 py-3 md:px-8 md:py-4 rounded-full font-bold transition-all active:scale-95 text-sm md:text-base hidden sm:block">
+          View Deals
+        </button>
+      </motion.div>
+    </div>
+  </div>
+);
+
+// Sub-component: Carousel Dots
+const CarouselDots = ({ total, current, onSelect }: { total: number; current: number; onSelect: (i: number) => void }) => (
+  <div className="absolute bottom-6 md:bottom-8 right-8 md:right-12 z-20 flex gap-2">
+    {Array.from({ length: total }).map((_, index) => (
+      <button
+        key={index}
+        onClick={() => onSelect(index)}
+        className={`h-1.5 rounded-full transition-all ${
+          index === current ? "w-12 bg-white" : "w-2 bg-white/50 hover:bg-white/80"
+        }`}
+      />
+    ))}
+  </div>
+);
+
 export const HeroCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -38,20 +103,11 @@ export const HeroCarousel = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const goToSlide = (index: number) => {
-    setCurrentIndex(index);
-  };
-
-  const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1) % slides.length);
-  };
-
-  const prevSlide = () => {
-    setCurrentIndex((prev) => (prev - 1 + slides.length) % slides.length);
-  };
+  const nextSlide = () => setCurrentIndex((prev) => (prev + 1) % slides.length);
+  const prevSlide = () => setCurrentIndex((prev) => (prev - 1 + slides.length) % slides.length);
 
   return (
-    <section className="relative h-[300px] md:h-[500px] w-full rounded-[2.5rem] overflow-hidden group mb-8">
+    <section className="relative h-[300px] md:h-[500px] w-full rounded-[2.5rem] overflow-hidden group mb-2">
       <AnimatePresence mode="wait">
         <motion.div
           key={currentIndex}
@@ -61,83 +117,30 @@ export const HeroCarousel = () => {
           transition={{ duration: 0.5 }}
           className="absolute inset-0"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent z-10" />
-          <img
-            src={slides[currentIndex].image}
-            alt={slides[currentIndex].title}
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-          <div className="relative z-20 h-full flex flex-col justify-center px-8 md:px-20 max-w-2xl text-white">
-            <motion.span
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-tertiary px-4 py-1.5 rounded-full text-xs font-bold w-fit mb-4 md:mb-6 tracking-wider uppercase"
-            >
-              {slides[currentIndex].tag}
-            </motion.span>
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="text-3xl md:text-5xl lg:text-6xl font-heading font-black tracking-tight mb-4 leading-[1.1]"
-            >
-              {slides[currentIndex].title}
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="text-sm md:text-lg font-medium opacity-90 mb-6 md:mb-8 max-w-lg hidden sm:block"
-            >
-              {slides[currentIndex].description}
-            </motion.p>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="flex gap-4"
-            >
-              <button className="bg-primary hover:bg-primary-container text-white px-6 py-3 md:px-8 md:py-4 rounded-full font-bold shadow-lg transition-all active:scale-95 text-sm md:text-base">
-                Shop Now
-              </button>
-              <button className="bg-white/20 backdrop-blur-md hover:bg-white/30 text-white px-6 py-3 md:px-8 md:py-4 rounded-full font-bold transition-all active:scale-95 text-sm md:text-base hidden sm:block">
-                View Deals
-              </button>
-            </motion.div>
-          </div>
+          <SlideItem slide={slides[currentIndex]} />
         </motion.div>
       </AnimatePresence>
 
       {/* Navigation Arrows */}
-      <div className="absolute inset-y-0 left-4 md:left-8 z-20 flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
-        <button 
-          onClick={prevSlide}
-          className="bg-black/30 hover:bg-black/50 backdrop-blur-md text-white p-2 rounded-full transition-colors"
-        >
+      <button 
+        onClick={prevSlide}
+        className="absolute inset-y-0 left-4 md:left-8 z-20 flex items-center opacity-0 group-hover:opacity-100 transition-opacity"
+      >
+        <div className="bg-black/30 hover:bg-black/50 backdrop-blur-md text-white p-2 rounded-full transition-colors">
           <ChevronLeft className="w-6 h-6" />
-        </button>
-      </div>
-      <div className="absolute inset-y-0 right-4 md:right-8 z-20 flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
-        <button 
-          onClick={nextSlide}
-          className="bg-black/30 hover:bg-black/50 backdrop-blur-md text-white p-2 rounded-full transition-colors"
-        >
-          <ChevronRight className="w-6 h-6" />
-        </button>
-      </div>
+        </div>
+      </button>
 
-      {/* Dots */}
-      <div className="absolute bottom-6 md:bottom-8 right-8 md:right-12 z-20 flex gap-2">
-        {slides.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => goToSlide(index)}
-            className={`h-1.5 rounded-full transition-all ${
-              index === currentIndex ? "w-12 bg-white" : "w-2 bg-white/50 hover:bg-white/80"
-            }`}
-          />
-        ))}
-      </div>
+      <button 
+        onClick={nextSlide}
+        className="absolute inset-y-0 right-4 md:right-8 z-20 flex items-center opacity-0 group-hover:opacity-100 transition-opacity"
+      >
+        <div className="bg-black/30 hover:bg-black/50 backdrop-blur-md text-white p-2 rounded-full transition-colors">
+          <ChevronRight className="w-6 h-6" />
+        </div>
+      </button>
+
+      <CarouselDots total={slides.length} current={currentIndex} onSelect={setCurrentIndex} />
     </section>
   );
 };

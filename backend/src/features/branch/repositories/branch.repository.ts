@@ -129,8 +129,8 @@ export class BranchRepository {
   }
 
   async findProductsByBranch(branchId: string, skip: number, take: number) {
-    const where = { branchId };
-    console.log(`Fetching products for branch: ${branchId}, skip: ${skip}, take: ${take}`);
+    const where = { branchId: branchId.trim() };
+    console.log(`[BranchRepository] Fetching products for branch: "${branchId}", skip: ${skip}, take: ${take}`);
 
     const [data, total] = await Promise.all([
       prisma.branch_inventories.findMany({
@@ -140,6 +140,9 @@ export class BranchRepository {
         select: {
           id: true,
           currentStock: true,
+          branch: {
+            select: { id: true, storeName: true, city: true }
+          },
           product: {
             select: {
               id: true,
@@ -160,6 +163,8 @@ export class BranchRepository {
       prisma.branch_inventories.count({ where }),
     ]);
 
+    console.log(`[BranchRepository] Found ${data.length} inventory records, total count: ${total}`);
+
     // Map the result to match the product structure
     try {
       const products = data.map((inv) => {
@@ -170,6 +175,9 @@ export class BranchRepository {
         return {
           ...inv.product,
           currentStock: inv.currentStock,
+          branchName: inv.branch?.storeName,
+          branchId: inv.branch?.id,
+          branchCity: inv.branch?.city,
         };
       }).filter(p => p !== null);
 

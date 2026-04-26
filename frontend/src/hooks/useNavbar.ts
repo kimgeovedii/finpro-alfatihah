@@ -2,11 +2,13 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useAuthService } from "@/features/auth/hooks/useAuthService";
 import { useProductSearch } from "@/hooks/useProductSearch";
 import { useHomeStore } from "@/features/home/service/home.service";
+import { useCartService } from "@/features/cart/services/cart.service";
 import toast from "react-hot-toast";
 
 export const useNavbar = () => {
-  const { user, fetchUser, cartItems, isVerified, isAuthenticated, logout } = useAuthService();
+  const { user, fetchUser, isVerified, isAuthenticated, logout } = useAuthService();
   const { handleSearch: executeSearch, isSearching } = useProductSearch();
+  const { summary, fetchCartSummary } = useCartService();
   const locationName = useHomeStore((state) => state.locationName);
   const [mounted, setMounted] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -19,6 +21,12 @@ export const useNavbar = () => {
       fetchUser();
     }
   }, [fetchUser]);
+
+  useEffect(() => {
+    if (isAuthenticated() && isVerified()) {
+      fetchCartSummary();
+    }
+  }, [isAuthenticated, isVerified, fetchCartSummary]);
 
   const onSearchSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,7 +65,7 @@ export const useNavbar = () => {
 
   return {
     user,
-    cartItems,
+    cartItems: summary?.totalItems || 0,
     searchTerm,
     setSearchTerm,
     onSearchSubmit,

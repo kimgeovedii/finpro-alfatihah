@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { BranchData, ProductCard, PaginationMeta } from "@/features/home/types/home.types";
+import { BranchData, ProductCard, PaginationMeta, UserAddress } from "@/features/home/types/home.types";
 import { HomeRepository } from "@/features/home/repository/home.repository";
 import { regionService } from "@/services/region.service";
 import { locationSchema } from "@/features/home/validations/home.schema";
@@ -7,6 +7,10 @@ import { locationSchema } from "@/features/home/validations/home.schema";
 interface HomeState {
   userCoords: { lat: number; lng: number } | null;
   searchCoords: { lat: number; lng: number } | null;
+  productLocationCoords: { lat: number; lng: number } | null;
+  selectedLocationType: "current" | "address";
+  selectedAddressId: string | null;
+  addresses: UserAddress[];
   locationStatus: "idle" | "requesting" | "granted" | "denied";
   nearestBranch: BranchData | null;
   distance: number | null;
@@ -26,6 +30,9 @@ interface HomeState {
   fetchNearestBranch: (lat?: number, lng?: number, page?: number) => Promise<void>;
   fetchAllBranches: (page?: number) => Promise<void>;
   requestLocation: () => Promise<void>;
+  setAddresses: (addresses: UserAddress[]) => void;
+  selectAddress: (addressId: string) => Promise<void>;
+  selectCurrentLocation: () => Promise<void>;
 }
 
 const repository = new HomeRepository();
@@ -33,6 +40,10 @@ const repository = new HomeRepository();
 export const useHomeStore = create<HomeState>((set, get) => ({
   userCoords: null,
   searchCoords: null,
+  productLocationCoords: null,
+  selectedLocationType: "current",
+  selectedAddressId: null,
+  addresses: [],
   locationStatus: "idle",
   nearestBranch: null,
   distance: null,
@@ -46,29 +57,63 @@ export const useHomeStore = create<HomeState>((set, get) => ({
   allBranches: [],
   allBranchesMeta: null,
 
+  setAddresses: (addresses) => {
+    set({ addresses });
+    // If we have a primary address and no location is set, default to it
+    const primary = addresses.find(a => a.isPrimary);
+    if (primary && get().selectedLocationType === "address" && !get().selectedAddressId) {
+      get().selectAddress(primary.id);
+    }
+  },
+
+  selectAddress: async (addressId) => {
+    const address = get().addresses.find(a => a.id === addressId);
+    if (address) {
+      const coords = { 
+        lat: typeof address.latitude === "string" ? parseFloat(address.latitude) : address.latitude, 
+        lng: typeof address.longitude === "string" ? parseFloat(address.longitude) : address.longitude 
+      };
+      set({ 
+        selectedLocationType: "address", 
+        selectedAddressId: addressId,
+        productLocationCoords: coords,
+        locationName: address.address.length > 25 ? address.address.substring(0, 25) + "..." : address.address
+      });
+      get().fetchNearestBranch(coords.lat, coords.lng);
+    }
+  },
+
+  selectCurrentLocation: async () => {
+    set({ selectedLocationType: "current", selectedAddressId: null, productLocationCoords: null });
+    const coords = get().userCoords;
+    if (coords) {
+      get().fetchNearestBranch(coords.lat, coords.lng);
+      try {
+        const data = await regionService.reverseGeocode(coords.lat, coords.lng);
+        const city = data.address.city || data.address.town || data.address.village || "";
+        const province = data.address.state || "";
+        set({ locationName: city && province ? `${city}, ${province}` : city || province || "Lokasi Saat Ini" });
+      } catch (e) { set({ locationName: "Lokasi Saat Ini" }); }
+    } else {
+      get().requestLocation();
+    }
+  },
+
   setLocationStatus: (status) => set({ locationStatus: status }),
   setUserCoords: async (coords) => {
     set({ userCoords: coords });
-    if (coords && !get().searchCoords) {
+    if (coords && !get().productLocationCoords && get().selectedLocationType === "current") {
       try {
         const data = await regionService.reverseGeocode(coords.lat, coords.lng);
-        const city = data.address.city || data.address.town || data.address.village || data.address.city_district || data.address.county || "";
+        const city = data.address.city || data.address.town || data.address.village || "";
         const province = data.address.state || "";
-        if (city && province) set({ locationName: city && province ? `${city}, ${province}` : city || province });
+        set({ locationName: city && province ? `${city}, ${province}` : city || province || "Lokasi Saat Ini" });
       } catch (error) { console.error(error); }
     }
   },
 
   setSearchCoords: async (coords) => {
     set({ searchCoords: coords });
-    if (coords) {
-      try {
-        const data = await regionService.reverseGeocode(coords.lat, coords.lng);
-        const city = data.address.city || data.address.town || data.address.village || data.address.city_district || data.address.county || "";
-        const province = data.address.state || "";
-        if (city && province) set({ locationName: city && province ? `${city}, ${province}` : city || province });
-      } catch (error) { console.error(error); }
-    }
   },
 
   fetchNearestBranch: async (lat, lng, page = 1) => {
@@ -124,7 +169,9 @@ export const useHomeStore = create<HomeState>((set, get) => ({
           await locationSchema.validate(coords);
           await get().setUserCoords(coords);
           set({ locationStatus: "granted" });
-          get().fetchNearestBranch(coords.lat, coords.lng);
+          if (get().selectedLocationType === "current") {
+            get().fetchNearestBranch(coords.lat, coords.lng);
+          }
         } catch (err) {
           console.error("Coords validation failed:", err);
           set({ locationStatus: "denied" });

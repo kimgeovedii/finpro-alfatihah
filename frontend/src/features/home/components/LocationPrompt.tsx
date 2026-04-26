@@ -1,11 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { MapPin, Loader2, Navigation, AlertTriangle } from "lucide-react";
+import { MapPin, Loader2, Navigation } from "lucide-react";
 import { useNearestStore } from "../hooks/useNearestStore";
 
 export const LocationPrompt = () => {
-  const { locationStatus, nearestBranch, distance, isInRange, requestLocation } = useNearestStore();
+  const { locationStatus, requestLocation } = useNearestStore();
 
   if (locationStatus === "granted") {
     return null;

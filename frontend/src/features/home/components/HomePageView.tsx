@@ -10,10 +10,11 @@ import { NotificationHandler } from "@/components/common/NotificationHandler";
 import { useHomeStore } from "@/features/home/service/home.service";
 
 export const HomePageView = () => {
-  const { products, nearestBranch, userCoords, isLoading, requestLocation, allBranches, fetchAllBranches } = useHomeStore();
+  const { products, nearestBranch, userCoords, isLoading, requestLocation, allBranches, fetchAllBranches, fetchNearestBranch } = useHomeStore();
 
   useEffect(() => {
     fetchAllBranches(1);
+    fetchNearestBranch(); // Fetch default products immediately
   }, []);
 
   return (

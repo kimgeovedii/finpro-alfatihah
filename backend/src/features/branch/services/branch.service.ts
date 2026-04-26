@@ -115,4 +115,28 @@ export class BranchService {
       throw error;
     }
   };
+  public getBranchWithProducts = async (branchId: string, page: number = 1, limit: number = 12) => {
+    const branch = await this.branchRepository.findById(branchId);
+    if (!branch) throw new Error("Branch not found");
+
+    const skip = (page - 1) * limit;
+    const { data: productsData, total } = await this.branchRepository.findProductsByBranch(
+      branchId,
+      skip,
+      limit
+    );
+
+    return {
+      branch,
+      products: {
+        data: productsData,
+        meta: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        },
+      },
+    };
+  };
 }
