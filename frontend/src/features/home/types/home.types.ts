@@ -7,6 +7,11 @@ export interface BranchData {
   latitude: number;
   longitude: number;
   maxDeliveryDistance: number;
+  schedules?: {
+    dayName: string;
+    startTime: string;
+    endTime: string;
+  }[];
 }
 
 export interface ProductCard {

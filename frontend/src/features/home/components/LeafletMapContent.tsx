@@ -5,7 +5,7 @@ import { useLeafletMap } from "../hooks/useLeafletMap";
 import "leaflet/dist/leaflet.css";
 
 interface LeafletMapContentProps {
-    onSelectStore: (name: string, address: string, distance: string, maxDelivery: number) => void;
+    onSelectStore: (name: string, address: string, distance: string, maxDelivery: number, lat: number, lng: number) => void;
     branches: BranchData[];
     userCoords?: [number, number];
     searchCoords?: [number, number];

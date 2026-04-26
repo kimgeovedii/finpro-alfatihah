@@ -3,6 +3,13 @@
 import { MapPinIcon } from "@heroicons/react/24/outline";
 import { Region } from "@/services/region.service";
 import toast from "react-hot-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface MapLocationFilterProps {
   provinces: Region[];
@@ -29,45 +36,66 @@ export const MapLocationFilter = ({
   handleLocationSearch, isSearchingLocation,
   searchCoords, userCoords, setSearchCoords, fetchNearestBranch
 }: MapLocationFilterProps) => (
-  <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3 md:gap-2 shadow-2xl bg-white/90 backdrop-blur-md overflow-hidden">
+  <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3 md:gap-2">
     <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 flex-1">
-      <select 
-        className="bg-slate-50 md:bg-transparent text-xs font-bold text-slate-700 outline-none p-2 md:p-1 rounded-xl md:rounded-none min-w-[120px] md:border-r border-slate-200"
+      <Select
         value={selectedProvince?.code || ""}
-        onChange={(e) => {
-          const p = provinces.find((x) => x.code === e.target.value);
-          setSelectedProvince(p ? {code: p.code, name: p.name} : null);
+        onValueChange={(value) => {
+          const p = provinces.find((x) => x.code === value);
+          setSelectedProvince(p ? { code: p.code, name: p.name } : null);
         }}
       >
-        <option value="">Pilih Provinsi</option>
-        {provinces.map((p) => <option key={p.code} value={p.code}>{p.name}</option>)}
-      </select>
+        <SelectTrigger className="bg-transparent border-none shadow-none text-xs font-bold text-slate-700 h-9 min-w-[130px] md:border-r md:border-slate-200 md:rounded-none focus:ring-0">
+          <SelectValue placeholder="Province" />
+        </SelectTrigger>
+        <SelectContent className="z-[2000]">
+          {provinces.map((p) => (
+            <SelectItem key={p.code} value={p.code} className="text-xs font-medium">
+              {p.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
-      <select 
-        className="bg-slate-50 md:bg-transparent text-xs font-bold text-slate-700 outline-none p-2 md:p-1 rounded-xl md:rounded-none min-w-[120px] md:border-r border-slate-200 disabled:opacity-50"
+      <Select
         value={selectedCity?.code || ""}
+        onValueChange={(value) => {
+          const c = regencies.find((x) => x.code === value);
+          setSelectedCity(c ? { code: c.code, name: c.name } : null);
+        }}
         disabled={!selectedProvince}
-        onChange={(e) => {
-          const c = regencies.find((x) => x.code === e.target.value);
-          setSelectedCity(c ? {code: c.code, name: c.name} : null);
-        }}
       >
-        <option value="">Pilih Kota</option>
-        {regencies.map((c) => <option key={c.code} value={c.code}>{c.name}</option>)}
-      </select>
+        <SelectTrigger className="bg-transparent border-none shadow-none text-xs font-bold text-slate-700 h-9 min-w-[130px] md:border-r md:border-slate-200 md:rounded-none focus:ring-0 disabled:opacity-40">
+          <SelectValue placeholder="City" />
+        </SelectTrigger>
+        <SelectContent className="z-[2000]">
+          {regencies.map((c) => (
+            <SelectItem key={c.code} value={c.code} className="text-xs font-medium">
+              {c.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
-      <select 
-        className="bg-slate-50 md:bg-transparent text-xs font-bold text-slate-700 outline-none p-2 md:p-1 rounded-xl md:rounded-none min-w-[120px] disabled:opacity-50"
+      <Select
         value={selectedDistrict?.code || ""}
-        disabled={!selectedCity}
-        onChange={(e) => {
-          const d = districts.find((x) => x.code === e.target.value);
-          setSelectedDistrict(d ? {code: d.code, name: d.name} : null);
+        onValueChange={(value) => {
+          const d = districts.find((x) => x.code === value);
+          setSelectedDistrict(d ? { code: d.code, name: d.name } : null);
         }}
+        disabled={!selectedCity}
       >
-        <option value="">Pilih Kecamatan</option>
-        {districts.map((d) => <option key={d.code} value={d.code}>{d.name}</option>)}
-      </select>
+        <SelectTrigger className="bg-transparent border-none shadow-none text-xs font-bold text-slate-700 h-9 min-w-[130px] focus:ring-0 disabled:opacity-40">
+          <SelectValue placeholder="District" />
+        </SelectTrigger>
+        <SelectContent className="z-[2000]">
+          {districts.map((d) => (
+            <SelectItem key={d.code} value={d.code} className="text-xs font-medium">
+              {d.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
 
     <div className="flex items-center gap-2">
@@ -87,10 +115,10 @@ export const MapLocationFilter = ({
             setSelectedCity(null);
             setSelectedDistrict(null);
             if (userCoords) fetchNearestBranch(userCoords.lat, userCoords.lng);
-            toast.success("Kembali ke lokasi Anda");
+            toast.success("Back to your location");
           }}
           className="hidden md:flex bg-blue-500 text-white p-2 rounded-xl hover:bg-blue-600 transition-all active:scale-95 items-center justify-center"
-          title="Kembali ke lokasi saya"
+          title="Back to my location"
         >
           <MapPinIcon className="h-4 w-4" />
         </button>

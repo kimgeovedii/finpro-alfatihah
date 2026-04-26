@@ -74,12 +74,14 @@ export const StoreInfoModal = ({ selectedStore, onClose }: StoreInfoModalProps) 
         </div>
       </div>
 
-      <button 
-        onClick={onClose}
-        className="mt-auto w-full py-4 bg-slate-900 text-white rounded-2xl font-bold text-sm hover:bg-black transition-all active:scale-[0.98] shadow-xl shadow-black/10 shrink-0"
+      <a 
+        href={`https://www.google.com/maps/search/?api=1&query=${selectedStore.lat},${selectedStore.lng}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="w-full py-3 bg-primary text-white rounded-2xl font-bold text-sm text-center hover:bg-primary/90 transition-all active:scale-[0.98] shadow-xl shadow-primary/10 shrink-0 block"
       >
-        Dismiss
-      </button>
+        Open in Google Maps
+      </a>
     </div>
   </motion.div>
 );

@@ -44,7 +44,7 @@ const createUserIcon = () => new L.DivIcon({
 });
 
 interface UseLeafletMapProps {
-    onSelectStore: (name: string, address: string, distance: string, maxDelivery: number) => void;
+    onSelectStore: (name: string, address: string, distance: string, maxDelivery: number, lat: number, lng: number) => void;
     branches: BranchData[];
     userCoords?: [number, number];
     searchCoords?: [number, number];
@@ -152,7 +152,7 @@ export const useLeafletMap = ({
                     const distanceMeters = userLatLng.distanceTo(branchLatLng);
                     distanceStr = (distanceMeters / 1000).toFixed(1) + " km";
                 }
-                onSelectStore(branch.storeName, branch.address, distanceStr, branch.maxDeliveryDistance);
+                onSelectStore(branch.storeName, branch.address, distanceStr, branch.maxDeliveryDistance, latlng[0], latlng[1]);
             });
         });
 
