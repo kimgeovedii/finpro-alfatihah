@@ -114,7 +114,7 @@ export class ProductRepository {
           },
         },
         select: {
-          quantity: true,
+          id: true, quantity: true,
           cart: {
             select: {
               branchId: true,

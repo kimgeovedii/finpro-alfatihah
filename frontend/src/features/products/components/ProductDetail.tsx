@@ -8,16 +8,19 @@ import { ProductDetailInfoContent } from "./ProductDetailInfoContent";
 import { ProductDetailCartAction } from "./ProductDetailCartAction";
 import { ProductBreadcrumb } from "./ProductBreadCrumb";
 import { ProductBranchInfoCard } from "./ProductBranchInfo";
-import { useCreateCart } from "@/features/cart/hooks/useCart";
 import Swal from "sweetalert2";
+import { useCreateCart } from "../hooks/useCart";
+import { useDeleteCartItem } from "../hooks/useCartItem";
 
 export const ProductDetail = ({ slugName, storeName }: { slugName: string, storeName: string }) => {
   const { product, isLoading, error, fetchProduct } = useProductDetail(slugName, storeName);
-  const [qty, setQty] = useState(1);
+  const [ qty, setQty ] = useState(1);
+  const [ currentCartQty, setCurrentCartQty ] = useState(0)
   const { createCart, isCreating } = useCreateCart()
+  const { deleteCartItem, isDeletingItem } = useDeleteCartItem()
 
   useEffect(() => {
-    if (product?.branchInventories?.[0]?.cartItems?.[0]?.quantity) setQty(product.branchInventories[0].cartItems[0].quantity)
+    setCurrentCartQty(product?.branchInventories?.[0]?.cartItems?.[0]?.quantity ?? 0)
   }, [product])
 
   // Handle action
@@ -32,6 +35,33 @@ export const ProductDetail = ({ slugName, storeName }: { slugName: string, store
         confirmButtonColor: "#10b981",
       })
 
+      setQty(1)
+      fetchProduct()
+    }
+  }
+
+  const handleRemoveCartItem = async (cartItemId: string, productName: string) => {
+    const confirm = await Swal.fire({
+      title: "Remove product?",
+      html: `<b>${productName}</b> will be remove from your cart.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, remove it",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#ef4444",
+    })
+    if (!confirm.isConfirmed) return
+
+    const success = await deleteCartItem(cartItemId)
+    if (success) {
+      await Swal.fire({
+        title: "Item deleted",
+        html: `<b>${productName}</b> has been removed.`,
+        icon: "success",
+        confirmButtonColor: "#10b981",
+      })
+
+      setQty(1)
       fetchProduct()
     }
   }
@@ -68,6 +98,11 @@ export const ProductDetail = ({ slugName, storeName }: { slugName: string, store
         product.id,
         qty 
       ),
+    currentCartQty,
+    onRemoveFromCart: () => handleRemoveCartItem(
+      product?.branchInventories?.[0]?.cartItems?.[0]?.id,
+      product.productName
+      )
   };
 
   return (

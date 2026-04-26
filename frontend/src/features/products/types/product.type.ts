@@ -27,6 +27,7 @@ export type BranchDetail = {
 };
 
 export type CartItem = {
+  id: string;
   quantity: number;
   cart: {
     branchId: string;
@@ -75,6 +76,8 @@ export type ProductDetailCartActionProps = {
   price: number;
   totalPrice: number;
   variant: "mobile" | "desktop";
-  isCreating: boolean;         
+  isCreating: boolean;
+  currentCartQty: number;         
   onAddToCart: () => void;
+  onRemoveFromCart: () => void;
 };
