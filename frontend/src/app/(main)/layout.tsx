@@ -2,7 +2,11 @@ import React from 'react'
 import { MainNavbar } from '@/components/layout/MainNavbar'
 import { MainFooter } from '@/components/layout/MainFooter'
 
-export default function MainLayout({ children }: { children: React.ReactNode }) {
+export default function MainLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <div className="min-h-screen">
       <MainNavbar />
@@ -11,5 +15,5 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         </main>
       <MainFooter />
     </div>
-  )
+  );
 }
