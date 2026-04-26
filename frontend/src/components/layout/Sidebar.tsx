@@ -76,11 +76,6 @@ const NAV_ITEMS = [
     icon: <ChartBarIcon className="w-5 h-5" />,
   },
   {
-    title: "Manage Project",
-    href: "/manage-project",
-    icon: <BriefcaseIcon className="w-5 h-5" />,
-  },
-  {
     title: "Tracking Document",
     href: "/tracking",
     icon: <ClipboardDocumentCheckIcon className="w-5 h-5" />,
@@ -108,7 +103,7 @@ export const Sidebar = () => {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-tr from-emerald-500 to-green-400 text-white shadow-sm">
             <GlobeAmericasIcon className="h-5 w-5" />
           </div>
-          <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-700 to-teal-600">
+          <span className="text-xl font-bold bg-clip-text text-transparent bg-linear-to-r from-emerald-700 to-teal-600">
             Alfatihah
           </span>
         </div>
