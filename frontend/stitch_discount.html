@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Marketplace Editorial - Discount Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary": "#006666",
+                    "on-background": "#2c2f30",
+                    "on-surface-variant": "#595c5d",
+                    "primary-dim": "#005959",
+                    "on-tertiary-fixed": "#3d2b00",
+                    "tertiary-fixed-dim": "#ecb200",
+                    "on-error": "#ffefee",
+                    "on-primary-fixed": "#004343",
+                    "surface-container-highest": "#dadddf",
+                    "error-dim": "#9f0519",
+                    "background": "#f5f6f7",
+                    "on-tertiary-fixed-variant": "#604700",
+                    "error-container": "#fb5151",
+                    "on-tertiary-container": "#553e00",
+                    "secondary-fixed-dim": "#ffb467",
+                    "on-secondary-fixed-variant": "#774400",
+                    "surface": "#f5f6f7",
+                    "surface-variant": "#dadddf",
+                    "primary-container": "#87eded",
+                    "error": "#b31b25",
+                    "surface-container-lowest": "#ffffff",
+                    "outline-variant": "#abadae",
+                    "outline": "#757778",
+                    "primary-fixed": "#87eded",
+                    "surface-container-high": "#e0e3e4",
+                    "secondary-dim": "#764400",
+                    "surface-bright": "#f5f6f7",
+                    "primary-fixed-dim": "#78dfdf",
+                    "on-secondary-container": "#6a3c00",
+                    "inverse-on-surface": "#9b9d9e",
+                    "surface-container": "#e6e8ea",
+                    "on-secondary-fixed": "#4f2c00",
+                    "on-surface": "#2c2f30",
+                    "tertiary-fixed": "#fdc003",
+                    "surface-tint": "#006666",
+                    "surface-container-low": "#eff1f2",
+                    "secondary": "#874e00",
+                    "on-tertiary": "#fff1db",
+                    "on-primary-fixed-variant": "#006262",
+                    "on-error-container": "#570008",
+                    "tertiary-dim": "#664b00",
+                    "surface-dim": "#d1d5d7",
+                    "tertiary": "#755700",
+                    "secondary-fixed": "#ffc791",
+                    "secondary-container": "#ffc791",
+                    "on-primary": "#bbfffe",
+                    "on-primary-container": "#005858",
+                    "inverse-primary": "#98fffe",
+                    "inverse-surface": "#0c0f10",
+                    "tertiary-container": "#fdc003",
+                    "on-secondary": "#fff0e5"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "display": ["Plus Jakarta Sans"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .tonal-layering-no-borders {
+            border: none !important;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #dadddf; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body antialiased overflow-hidden">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-white/70 dark:bg-slate-900/70 backdrop-blur-lg flex items-center justify-between px-6 py-3 w-full no-border shadow-sm shadow-teal-900/5 shadow-[0_4px_30px_rgba(0,0,0,0.05)]">
+<div class="flex items-center gap-8">
+<div class="text-lg font-black text-teal-800 dark:text-teal-300 uppercase tracking-widest font-headline">
+            Marketplace Editorial
+        </div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center overflow-hidden">
+<img alt="Manager Profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDO7yC1ultlAStc7uUMxM50fBNkKDh_DHzQ9Hk-De1_GzHt9_hdnRkZEtYCRDRTE-vTX9T4k3wdsYjTZavTrTmdIsdvN6UsdttON12x3Bku1-PYY7TjUUOULZWP81wA6b5KkCTDeI6zs78zM8A6hy6YYSCKJlRDDy7F6XQ0dRZ0EwUZsbZI0gEo2tx5Hmgv9y2EAtYP1OJj-qCHQsapLLizByvVMPKJFAmww5x9cagIdrL5Y-eVqcZoMaHxYiZOQ9nuOar2hZmmICw"/>
+</div>
+</div>
+</header>
+<div class="flex h-screen pt-16">
+<!-- SideNavBar -->
+<aside class="h-screen w-72 flex flex-col fixed left-0 top-0 pt-16 bg-slate-50 dark:bg-slate-950 p-4 space-y-2 tonal-layering-no-borders bg-slate-100/50 font-body text-sm font-medium">
+<div class="px-4 py-6 flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard_customize</span>
+</div>
+<div>
+<h3 class="text-teal-900 dark:text-teal-100 font-bold">Editorial Admin</h3>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">Premium Tier</p>
+</div>
+</div>
+<div class="flex-1 space-y-1">
+<a class="flex items-center gap-3 p-3 text-slate-600 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 rounded-xl hover:translate-x-1 transition-transform duration-300 group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary" data-icon="dashboard">dashboard</span>
+<span>Overview</span>
+</a>
+<a class="flex items-center gap-3 p-3 bg-teal-50 dark:bg-teal-900/20 text-teal-800 dark:text-teal-200 rounded-xl font-bold hover:translate-x-1 transition-transform duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="sell" style="font-variation-settings: 'FILL' 1;">sell</span>
+<span>Discounts</span>
+</a>
+<a class="flex items-center gap-3 p-3 text-slate-600 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 rounded-xl hover:translate-x-1 transition-transform duration-300 group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary" data-icon="inventory_2">inventory_2</span>
+<span>Inventory</span>
+</a>
+<a class="flex items-center gap-3 p-3 text-slate-600 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 rounded-xl hover:translate-x-1 transition-transform duration-300 group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary" data-icon="auto_awesome">auto_awesome</span>
+<span>Campaigns</span>
+</a>
+<a class="flex items-center gap-3 p-3 text-slate-600 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 rounded-xl hover:translate-x-1 transition-transform duration-300 group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-72 flex-1 p-8 overflow-y-auto">
+<div class="max-w-[1400px] mx-auto">
+<header class="mb-10 flex flex-col gap-6">
+<div>
+<h1 class="text-3xl font-headline font-extrabold text-on-background tracking-tight">Promotions &amp; Discounts</h1>
+<p class="text-on-surface-variant mt-1">Manage all editorial price reductions, vouchers, and BOGO campaigns across the platform.</p>
+</div>
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+<div class="flex items-center gap-2 p-1 bg-surface-container-low rounded-full w-fit">
+<button class="px-6 py-2 rounded-full text-sm font-semibold bg-white shadow-sm text-primary">All</button>
+<button class="px-6 py-2 rounded-full text-sm font-semibold text-on-surface-variant hover:text-primary transition-colors">Direct Discounts</button>
+<button class="px-6 py-2 rounded-full text-sm font-semibold text-on-surface-variant hover:text-primary transition-colors">Vouchers</button>
+<button class="px-6 py-2 rounded-full text-sm font-semibold text-on-surface-variant hover:text-primary transition-colors">BOGO</button>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2 bg-surface-container-high text-on-surface font-semibold rounded-xl text-sm hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="filter_list">filter_list</span>
+                            Advanced Filter
+                        </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-primary text-white font-semibold rounded-xl text-sm hover:bg-primary-dim transition-all shadow-md shadow-primary/10">
+<span class="material-symbols-outlined text-[18px]" data-icon="add_circle">add_circle</span>
+                            Create New Discount
+                        </button>
+</div>
+</div>
+</header>
+<!-- Data Table Container -->
+<section class="bg-surface-container-lowest rounded-3xl p-2 shadow-[0_4px_30px_rgba(0,0,0,0.02)] overflow-x-auto">
+<table class="w-full text-left border-collapse min-w-[1100px]">
+<thead>
+<tr class="text-on-surface-variant/70 border-b border-surface-container">
+<th class="px-4 py-4 font-label text-[11px] uppercase tracking-[0.1em]">Name &amp; Type</th>
+<th class="px-4 py-4 font-label text-[11px] uppercase tracking-[0.1em]">Status</th>
+<th class="px-4 py-4 font-label text-[11px] uppercase tracking-[0.1em]">Value</th>
+<th class="px-4 py-4 font-label text-[11px] uppercase tracking-[0.1em]">Quota</th>
+<th class="px-4 py-4 font-label text-[11px] uppercase tracking-[0.1em]">Validity</th>
+<th class="px-4 py-4 font-label text-[11px] uppercase tracking-[0.1em]">Branches</th>
+<th class="px-4 py-4 font-label text-[11px] uppercase tracking-[0.1em]">Applied Products</th>
+<th class="px-4 py-4 font-label text-[11px] uppercase tracking-[0.1em] text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-low">
+<!-- Row 1: Fresh Bananas -->
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="px-4 py-6">
+<div>
+<p class="font-bold text-on-surface text-sm">Fresh Bananas</p>
+<p class="text-[11px] text-on-surface-variant">Direct Markdown</p>
+</div>
+</td>
+<td class="px-4 py-6">
+<div class="flex items-center gap-2">
+<div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+<span class="text-[10px] font-bold text-emerald-600 uppercase">Active</span>
+</div>
+</td>
+<td class="px-4 py-6">
+<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container rounded-full text-[10px] font-black">10% OFF</span>
+</td>
+<td class="px-4 py-6">
+<span class="text-xs font-medium text-on-surface">500 / 1000</span>
+</td>
+<td class="px-4 py-6">
+<div class="text-[11px] leading-tight">
+<p class="text-on-surface font-semibold">20 Oct 2023</p>
+<p class="text-on-surface-variant">20 Nov 2023</p>
+</div>
+</td>
+<td class="px-4 py-6">
+<span class="text-xs text-on-surface">Central, North Wing</span>
+</td>
+<td class="px-4 py-6">
+<div class="flex flex-wrap gap-1">
+<span class="px-2 py-0.5 bg-surface-container-high rounded-full text-[10px] font-medium">Bananas</span>
+<span class="px-2 py-0.5 bg-surface-container-high rounded-full text-[10px] font-medium">+2 more</span>
+</div>
+</td>
+<td class="px-4 py-6 text-right">
+<div class="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 text-on-surface-variant hover:text-primary bg-surface-container-high rounded-lg"><span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span></button>
+<button class="p-1.5 text-on-surface-variant hover:text-error bg-surface-container-high rounded-lg"><span class="material-symbols-outlined text-[18px]" data-icon="delete">delete</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 2: Welcome Voucher -->
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="px-4 py-6">
+<div>
+<p class="font-bold text-on-surface text-sm">Welcome Voucher</p>
+<p class="text-[11px] text-on-surface-variant">New User Signup</p>
+</div>
+</td>
+<td class="px-4 py-6">
+<div class="flex items-center gap-2">
+<div class="w-1.5 h-1.5 rounded-full bg-amber-500"></div>
+<span class="text-[10px] font-bold text-amber-600 uppercase">Scheduled</span>
+</div>
+</td>
+<td class="px-4 py-6">
+<span class="px-2 py-0.5 bg-tertiary-container text-on-tertiary-container rounded-full text-[10px] font-black">$5.00</span>
+</td>
+<td class="px-4 py-6">
+<span class="text-xs font-medium text-on-surface">Unlimited</span>
+</td>
+<td class="px-4 py-6">
+<div class="text-[11px] leading-tight">
+<p class="text-on-surface font-semibold">01 Nov 2023</p>
+<p class="text-on-surface-variant">31 Dec 2023</p>
+</div>
+</td>
+<td class="px-4 py-6">
+<span class="text-xs text-on-surface">All Branches</span>
+</td>
+<td class="px-4 py-6">
+<span class="text-xs italic text-on-surface-variant">Storewide</span>
+</td>
+<td class="px-4 py-6 text-right">
+<div class="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 text-on-surface-variant hover:text-primary bg-surface-container-high rounded-lg"><span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span></button>
+<button class="p-1.5 text-on-surface-variant hover:text-error bg-surface-container-high rounded-lg"><span class="material-symbols-outlined text-[18px]" data-icon="delete">delete</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 3: Organic Milk -->
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="px-4 py-6">
+<div>
+<p class="font-bold text-on-surface text-sm">Organic Milk</p>
+<p class="text-[11px] text-on-surface-variant">BOGO Promotion</p>
+</div>
+</td>
+<td class="px-4 py-6">
+<div class="flex items-center gap-2">
+<div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+<span class="text-[10px] font-bold text-emerald-600 uppercase">Active</span>
+</div>
+</td>
+<td class="px-4 py-6">
+<span class="px-2 py-0.5 bg-primary text-white rounded-full text-[10px] font-black uppercase">BOGO</span>
+</td>
+<td class="px-4 py-6">
+<span class="text-xs font-medium text-on-surface">200 / 200</span>
+</td>
+<td class="px-4 py-6">
+<div class="text-[11px] leading-tight">
+<p class="text-on-surface font-semibold">15 Oct 2023</p>
+<p class="text-on-surface-variant">15 Nov 2023</p>
+</div>
+</td>
+<td class="px-4 py-6">
+<span class="text-xs text-on-surface">Downtown, East Bay</span>
+</td>
+<td class="px-4 py-6">
+<div class="flex flex-wrap gap-1">
+<span class="px-2 py-0.5 bg-surface-container-high rounded-full text-[10px] font-medium">Whole Milk</span>
+<span class="px-2 py-0.5 bg-surface-container-high rounded-full text-[10px] font-medium">Skim Milk</span>
+</div>
+</td>
+<td class="px-4 py-6 text-right">
+<div class="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 text-on-surface-variant hover:text-primary bg-surface-container-high rounded-lg"><span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span></button>
+<button class="p-1.5 text-on-surface-variant hover:text-error bg-surface-container-high rounded-lg"><span class="material-symbols-outlined text-[18px]" data-icon="delete">delete</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 4: Seasonal Berries -->
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="px-4 py-6">
+<div>
+<p class="font-bold text-on-surface text-sm">Seasonal Berries</p>
+<p class="text-[11px] text-on-surface-variant">Flash Sale</p>
+</div>
+</td>
+<td class="px-4 py-6">
+<div class="flex items-center gap-2">
+<div class="w-1.5 h-1.5 rounded-full bg-error-dim"></div>
+<span class="text-[10px] font-bold text-error-dim uppercase">Expired</span>
+</div>
+</td>
+<td class="px-4 py-6">
+<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container rounded-full text-[10px] font-black">25% OFF</span>
+</td>
+<td class="px-4 py-6">
+<span class="text-xs font-medium text-on-surface">1200 / 1200</span>
+</td>
+<td class="px-4 py-6">
+<div class="text-[11px] leading-tight">
+<p class="text-on-surface font-semibold">01 Sep 2023</p>
+<p class="text-on-surface-variant">30 Sep 2023</p>
+</div>
+</td>
+<td class="px-4 py-6">
+<span class="text-xs text-on-surface">North Wing</span>
+</td>
+<td class="px-4 py-6">
+<div class="flex flex-wrap gap-1">
+<span class="px-2 py-0.5 bg-surface-container-high rounded-full text-[10px] font-medium">Strawberries</span>
+<span class="px-2 py-0.5 bg-surface-container-high rounded-full text-[10px] font-medium">Blueberries</span>
+</div>
+</td>
+<td class="px-4 py-6 text-right">
+<div class="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 text-on-surface-variant hover:text-primary bg-surface-container-high rounded-lg"><span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span></button>
+<button class="p-1.5 text-on-surface-variant hover:text-error bg-surface-container-high rounded-lg"><span class="material-symbols-outlined text-[18px]" data-icon="delete">delete</span></button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="p-6 flex items-center justify-between">
+<p class="text-xs text-on-surface-variant">Showing 4 of 24 promotions</p>
+<div class="flex gap-2">
+<button class="w-10 h-10 rounded-xl flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-10 h-10 rounded-xl flex items-center justify-center bg-primary text-white font-bold">1</button>
+<button class="w-10 h-10 rounded-xl flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high">2</button>
+<button class="w-10 h-10 rounded-xl flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high">3</button>
+<button class="w-10 h-10 rounded-xl flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</section>
+</div>
+</main>
+</div>
+</body></html>
