@@ -13,6 +13,7 @@ export interface StoreDetail {
   maxDelivery: number;
   lat: number;
   lng: number;
+  branchId: string;
 }
 
 export const useNearestStoreMap = (isExpanded: boolean, userCoords: { lat: number; lng: number } | null) => {
@@ -102,8 +103,8 @@ export const useNearestStoreMap = (isExpanded: boolean, userCoords: { lat: numbe
     }
   };
 
-  const handleShowStore = useCallback((name: string, address: string, distance: string, maxDelivery: number, lat: number, lng: number) => {
-    setSelectedStore({ name, address, distance, maxDelivery, lat, lng });
+  const handleShowStore = useCallback((name: string, address: string, distance: string, maxDelivery: number, lat: number, lng: number, branchId: string) => {
+    setSelectedStore({ name, address, distance, maxDelivery, lat, lng, branchId });
   }, []);
 
   return {

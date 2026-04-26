@@ -12,7 +12,7 @@ export const BranchProductGrid = ({ products, meta, onPageChange }: BranchProduc
   return (
     <div className="lg:col-span-3">
       <div className="flex items-center justify-between mb-10">
-        <h2 className="text-3xl font-black text-slate-900 tracking-tight">Semua Produk ({products.length})</h2>
+        <h2 className="text-2xl font-black text-slate-900 tracking-tight">Semua Produk ({products.length})</h2>
         <div className="h-px bg-slate-200 flex-1 mx-8 hidden sm:block" />
       </div>
 
