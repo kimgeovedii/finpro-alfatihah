@@ -22,13 +22,16 @@ const TABS = [
   { id: "personal", label: "Personal Info", icon: UserIcon },
   { id: "security", label: "Security", icon: LockClosedIcon },
   { id: "email", label: "Email Settings", icon: EnvelopeIcon },
-  { id: "address", label: "Daftar Alamat", icon: MapPinIcon },
+  { id: "address", label: "Daftar Alamat", icon: MapPinIcon, customerOnly: true },
 ];
 
 export const ProfileView = () => {
   const [activeTab, setActiveTab] = useState("personal");
   const { user } = useAuthService();
   const { updateAvatar, updateProfile, changePassword, changeEmail, isLoading } = useProfile();
+
+  const isEmployee = user?.role === 'EMPLOYEE' || user?.role === 'SUPER_ADMIN' || user?.role === 'STORE_ADMIN';
+  const filteredTabs = TABS.filter(tab => !tab.customerOnly || !isEmployee);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12 md:py-20">
@@ -43,24 +46,29 @@ export const ProfileView = () => {
             <h2 className="mt-6 text-2xl font-bold text-slate-800">{user?.username || "Username"}</h2>
             <p className="text-slate-400 font-medium text-sm mt-1">{user?.email}</p>
             
-            <div className="mt-6 flex items-center gap-2 px-4 py-1.5 bg-emerald-50 text-emerald-600 rounded-full text-xs font-bold uppercase tracking-wider">
-              {user?.emailVerifiedAt ? (
-                <>
-                  <CheckCircleIcon className="h-4 w-4" />
-                  <span>Verified Account</span>
-                </>
-              ) : (
-                <>
-                  <ExclamationCircleIcon className="h-4 w-4 text-amber-500" />
-                  <span className="text-amber-600">Pending Verification</span>
-                </>
-              )}
+            <div className="mt-6 flex flex-col gap-2 w-full">
+              <div className="flex items-center justify-center gap-2 px-4 py-1.5 bg-emerald-50 text-emerald-600 rounded-full text-xs font-bold uppercase tracking-wider">
+                {user?.emailVerifiedAt ? (
+                  <>
+                    <CheckCircleIcon className="h-4 w-4" />
+                    <span>Verified Account</span>
+                  </>
+                ) : (
+                  <>
+                    <ExclamationCircleIcon className="h-4 w-4 text-amber-500" />
+                    <span className="text-amber-600">Pending Verification</span>
+                  </>
+                )}
+              </div>
+              <div className="flex items-center justify-center gap-2 px-4 py-1.5 bg-slate-100 text-slate-600 rounded-full text-[10px] font-extrabold uppercase tracking-widest">
+                Role: {user?.role?.replace('_', ' ') || 'Customer'}
+              </div>
             </div>
           </div>
 
           {/* Tab Navigation */}
           <nav className="flex flex-col gap-2">
-            {TABS.map((tab) => {
+            {filteredTabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
               return (

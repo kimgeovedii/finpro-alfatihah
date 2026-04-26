@@ -26,7 +26,7 @@ export const authService = {
   },
 
   employeeLogin: async (data: any) => {
-    const result: any = await apiFetch<any>("/auth/employee/login", "post", data);
+    const result: any = await apiFetch<any>("/auth/login/employee", "post", data);
     const { user, accessToken, refreshToken } = result;
     
     // Set cookies for middleware
@@ -46,7 +46,7 @@ export const authService = {
     return { user, accessToken, refreshToken };
   },
 
-  logout: async () => {
+  logout: async (isEmployee?: boolean) => {
     const refreshToken = Cookies.get("refreshToken");
     try {
       if (refreshToken) {
@@ -58,7 +58,7 @@ export const authService = {
       Cookies.remove("accessToken");
       Cookies.remove("refreshToken");
       if (typeof window !== "undefined") {
-        window.location.href = "/login";
+        window.location.href = isEmployee ? "/login/employee" : "/login";
       }
     }
   },

@@ -6,7 +6,6 @@ import "leaflet/dist/leaflet.css";
 import { regionService } from "@/services/region.service";
 import { Input } from "@/components/ui/input";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import axios from "axios";
 
 // Fix Leaflet marker icon issue
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -42,27 +41,31 @@ export const BranchMapPicker = ({ lat, lng, onChange, onAddressChange, storeName
 
   const reverseGeocode = async (lat: number, lng: number) => {
     try {
-      const res = await axios.get(`https://nominatim.openstreetmap.org/reverse`, {
-        params: {
-          lat,
-          lon: lng,
-          format: "json",
-        },
-      });
-      if (res.data && res.data.display_name && onAddressChange) {
-        onAddressChange(res.data.display_name);
+      const data = await regionService.reverseGeocode(lat, lng);
+      if (data && data.display_name && onAddressChange) {
+        onAddressChange(data.display_name);
       }
     } catch (error) {
       console.error("Reverse geocoding error:", error);
     }
   };
 
-  const handleSearch = async (query: string) => {
-    setSearchQuery(query);
-    if (query.length < 3) {
-      setSuggestions([]);
-      return;
-    }
+  // Debounced Search Logic
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (debouncedSearchQuery.length >= 3) {
+        performSearch(debouncedSearchQuery);
+      } else {
+        setSuggestions([]);
+      }
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timer);
+  }, [debouncedSearchQuery]);
+
+  const performSearch = async (query: string) => {
     setIsSearching(true);
     try {
       const results = await regionService.searchAddress(query);
@@ -72,6 +75,11 @@ export const BranchMapPicker = ({ lat, lng, onChange, onAddressChange, storeName
     } finally {
       setIsSearching(false);
     }
+  };
+
+  const handleSearchInputChange = (query: string) => {
+    setSearchQuery(query);
+    setDebouncedSearchQuery(query);
   };
 
   const handleSelectSuggestion = (s: any) => {
@@ -176,7 +184,7 @@ export const BranchMapPicker = ({ lat, lng, onChange, onAddressChange, storeName
           </div>
           <Input 
             value={searchQuery}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={(e) => handleSearchInputChange(e.target.value)}
             placeholder="Search address or location..."
             className="h-12 w-full pl-12 pr-10 bg-white/90 backdrop-blur-md border-none rounded-2xl shadow-xl shadow-slate-200/50 focus:ring-2 focus:ring-emerald-500 font-medium text-slate-700"
           />
