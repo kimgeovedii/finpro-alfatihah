@@ -81,7 +81,7 @@ export const ProductList = ({ products, isLoading }: ProductListProps) => {
 
   const isLocationSet = !!(productLocationCoords || userCoords);
 
-  if (isLoading && products.length === 0) {
+  if (isLoading) {
     return (
       <section className="py-2">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
@@ -97,7 +97,7 @@ export const ProductList = ({ products, isLoading }: ProductListProps) => {
     );
   }
 
-  if (!products || (products.length === 0 && !isLoading)) {
+  if (!products || products.length === 0) {
     return <EmptyProducts />;
   }
 
