@@ -12,7 +12,7 @@ import { apiFetch } from "@/utils/api";
 import { BranchData } from "@/features/home/types/home.types";
 
 export const HomePageView = () => {
-  const { products, nearestBranch, userCoords, isLoading } = useNearestStore();
+  const { products, nearestBranch, userCoords, isLoading, requestLocation } = useNearestStore();
   const [allBranches, setAllBranches] = useState<BranchData[]>([]);
 
   useEffect(() => {
@@ -33,6 +33,7 @@ export const HomePageView = () => {
         branches={allBranches} 
         userCoords={userCoords} 
         nearestBranch={nearestBranch} 
+        onRequestLocation={requestLocation}
       />
       <ProductList products={products} isLoading={isLoading} />
       <ExclusiveVoucher />

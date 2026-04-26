@@ -1,5 +1,4 @@
 import React from 'react'
-import { Navbar } from '@/components/layout/NavbarDashboard'
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -18,8 +17,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-h-screen transition-all duration-300">
-        <Navbar />
-        
         <main className="flex-1 p-6 lg:p-10 relative overflow-y-auto w-full">
           <div className="max-w-7xl mx-auto w-full h-full">
             {children}

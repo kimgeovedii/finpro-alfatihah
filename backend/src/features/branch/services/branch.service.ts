@@ -63,13 +63,29 @@ export class BranchService {
         }
       }
 
-      // Fetch products for the nearest (or default) branch
+      // Fetch products for the nearest branch
       const skip = (page - 1) * limit;
-      const { data: productsData, total } = await this.branchRepository.findProductsByBranch(
+      let { data: productsData, total } = await this.branchRepository.findProductsByBranch(
         nearestBranch.id,
         skip,
         limit
       );
+
+      // Fallback: If nearest branch has no products, fetch from the default (first) branch
+      if (productsData.length === 0 && branches.length > 1) {
+        const defaultBranch = branches[0];
+        if (defaultBranch.id !== nearestBranch.id) {
+          const fallback = await this.branchRepository.findProductsByBranch(
+            defaultBranch.id,
+            skip,
+            limit
+          );
+          if (fallback.data.length > 0) {
+            productsData = fallback.data;
+            total = fallback.total;
+          }
+        }
+      }
 
       return {
         branch: nearestBranch,

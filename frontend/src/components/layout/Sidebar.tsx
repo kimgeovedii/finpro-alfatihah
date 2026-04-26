@@ -13,9 +13,8 @@ import {
   UsersIcon,
   ChevronRightIcon
 } from '@heroicons/react/24/outline'
-import { useAuthService } from '@/features/auth/hooks/useAuthService'
 import { cn } from '@/lib/utils'
-import { useSidebarStore } from '@/hooks/useSidebarStore'
+import { useSidebar } from '@/hooks/useSidebar'
 
 const NAV_ITEMS = [
   { title: "Dashboard", href: "/dashboard", icon: HomeIcon },
@@ -29,18 +28,16 @@ const NAV_ITEMS = [
 ];
 
 export const Sidebar = () => {
-  const pathname = usePathname()
-  const [isExpanded, setIsExpanded] = useState(false)
-  const [isPinned, setIsPinned] = useState(false)
-  const { isMobileMenuOpen, closeMobileMenu } = useSidebarStore()
-
-  const handleMouseEnter = () => {
-    if (!isPinned) setIsExpanded(true)
-  }
-
-  const handleMouseLeave = () => {
-    if (!isPinned) setIsExpanded(false)
-  }
+  const {
+    pathname,
+    isExpanded,
+    isPinned,
+    isMobileMenuOpen,
+    closeMobileMenu,
+    handleMouseEnter,
+    handleMouseLeave,
+    togglePinned,
+  } = useSidebar()
 
   return (
     <>
@@ -108,10 +105,7 @@ export const Sidebar = () => {
         >
           {/* Toggle Button */}
           <button 
-            onClick={() => {
-              setIsPinned(!isPinned)
-              setIsExpanded(!isPinned)
-            }}
+            onClick={togglePinned}
             className={cn(
               "absolute top-6 h-7 w-7 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-lg transition-transform duration-300 z-50 hover:scale-110",
               "-right-3.5"

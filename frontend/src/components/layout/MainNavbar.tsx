@@ -6,55 +6,28 @@ import {
   ShoppingCartIcon,
   UserIcon,
   ArrowRightStartOnRectangleIcon,
+  MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
-import { useAuthService } from "@/features/auth/hooks/useAuthService";
-import { useEffect, useState, useRef } from "react";
-import toast from "react-hot-toast";
+import { useNavbar } from "@/hooks/useNavbar";
 
 export const MainNavbar = () => {
-  const { user, fetchUser, cartItems, isVerified, isAuthenticated, logout } = useAuthService();
-  const [mounted, setMounted] = useState(false);
-
-  const fetchRef = useRef(false);
-
-  useEffect(() => {
-    setMounted(true);
-    if (!fetchRef.current) {
-      fetchRef.current = true;
-      fetchUser();
-    }
-  }, [fetchUser]);
-
-  const handleProtectedAction = (action: string) => {
-    if (!isAuthenticated()) {
-      toast.error("Silakan login atau daftar terlebih dahulu untuk " + action, {
-        duration: 4000,
-        icon: "🔒",
-      });
-      return false;
-    }
-    if (!isVerified()) {
-      toast.error("Silakan verifikasi email Anda terlebih dahulu untuk " + action, {
-        duration: 4000,
-        icon: "📧",
-      });
-      return false;
-    }
-    return true;
-  };
-
-  const handleCartClick = () => {
-    if (!handleProtectedAction("mengakses keranjang")) return;
-    window.location.href = "/cart";
-  };
-
-  const handleLogout = async () => {
-    await logout();
-    toast.success("Berhasil logout");
-    window.location.href = "/";
-  };
+  const {
+    user,
+    cartItems,
+    searchTerm,
+    setSearchTerm,
+    onSearchSubmit,
+    handleCartClick,
+    handleLogout,
+    isSearching,
+    mounted,
+    isAuthenticated,
+    isVerified,
+    locationName
+  } = useNavbar();
 
   return (
+
     <nav className="sticky top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-[0px_12px_32px_rgba(23,29,27,0.06)]">
       <div className="flex justify-between items-center w-full px-8 py-4 max-w-7xl mx-auto">
         <div className="flex items-center gap-8">
@@ -65,32 +38,28 @@ export const MainNavbar = () => {
               src="https://res.cloudinary.com/dvfywdxnt/image/upload/v1777146483/logo-apps_opuem6.png"
             />
           </Link>
-          <div className="hidden md:flex items-center gap-6">
-            <Link
-              href="/"
-              className="text-primary border-b-2 border-primary pb-1 font-heading font-semibold tracking-tight active:scale-95 transition-transform"
+          <form onSubmit={onSearchSubmit} className="hidden md:flex relative w-64 lg:w-96 ml-8">
+            <input
+              type="text"
+              placeholder="Cari produk..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full bg-slate-100 dark:bg-slate-800 text-sm rounded-full pl-5 pr-10 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all border border-transparent focus:border-primary/50"
+            />
+            <button 
+              type="submit" 
+              disabled={isSearching}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors p-1 disabled:opacity-50"
             >
-              Home
-            </Link>
-            <Link
-              href="/products"
-              className="text-slate-600 dark:text-slate-400 font-medium hover:text-primary-container transition-colors duration-300"
-            >
-              Shop
-            </Link>
-            <Link
-              href="#"
-              className="text-slate-600 dark:text-slate-400 font-medium hover:text-primary-container transition-colors duration-300"
-            >
-              Categories
-            </Link>
-          </div>
+              <MagnifyingGlassIcon className="h-4 w-4" />
+            </button>
+          </form>
         </div>
         <div className="flex items-center gap-4">
           <div className="hidden lg:flex items-center gap-2 px-4 py-2 bg-surface-container-low rounded-full">
             <MapPinIcon className="h-4 w-4 text-primary" />
             <span className="text-xs font-semibold text-primary">
-              Awakmu ng kene...
+              {locationName || "Lokasi Dereng Aktif Lurd..."}
             </span>
           </div>
           
