@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { BranchController } from "../controllers/branch.controller";
+import { validate } from "../../../middleware/validate";
+import { NearestBranchQuerySchema } from "../validation/branch.validation";
 
 export class BranchRouter {
   private router: Router;
@@ -12,6 +14,11 @@ export class BranchRouter {
   }
 
   private initializeRoutes() {
+    this.router.get(
+      "/nearest",
+      validate(NearestBranchQuerySchema, "query"),
+      this.branchController.getNearestBranch
+    );
     this.router.get("/", this.branchController.getAllBranches);
   }
 

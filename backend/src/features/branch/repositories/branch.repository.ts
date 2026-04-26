@@ -86,4 +86,73 @@ export class BranchRepository {
       select: { id: true },
     });
   }
+
+  async findAllActive() {
+    return prisma.branch.findMany({
+      where: { isActive: true },
+      select: {
+        id: true,
+        storeName: true,
+        address: true,
+        city: true,
+        province: true,
+        latitude: true,
+        longitude: true,
+        maxDeliveryDistance: true,
+      },
+      orderBy: { createdAt: "asc" },
+    });
+  }
+
+  async findProductsByBranch(branchId: string, skip: number, take: number) {
+    const where = { branchId };
+    console.log(`Fetching products for branch: ${branchId}, skip: ${skip}, take: ${take}`);
+
+    const [data, total] = await Promise.all([
+      prisma.branch_inventories.findMany({
+        where,
+        skip,
+        take,
+        select: {
+          id: true,
+          currentStock: true,
+          product: {
+            select: {
+              id: true,
+              productName: true,
+              slugName: true,
+              basePrice: true,
+              description: true,
+              category: {
+                select: { id: true, name: true }
+              },
+              productImages: {
+                select: { id: true, imageUrl: true }
+              }
+            }
+          }
+        },
+      }),
+      prisma.branch_inventories.count({ where }),
+    ]);
+
+    // Map the result to match the product structure
+    try {
+      const products = data.map((inv) => {
+        if (!inv.product) {
+          console.warn(`Inventory record ${inv.id} has no linked product`);
+          return null;
+        }
+        return {
+          ...inv.product,
+          currentStock: inv.currentStock,
+        };
+      }).filter(p => p !== null);
+
+      return { data: products, total };
+    } catch (err) {
+      console.error("Error mapping products in BranchRepository:", err);
+      throw err;
+    }
+  }
 }

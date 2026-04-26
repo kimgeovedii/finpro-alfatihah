@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
-import { storeGeoJSON, USER_LOCATION } from "../../data/storeData";
 import "leaflet/dist/leaflet.css";
+import { BranchData } from "@/features/home/types/home.types";
 
 // Fix Leaflet marker icon issue
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -38,12 +38,17 @@ const userIcon = new L.DivIcon({
 
 interface LeafletMapContentProps {
     onSelectStore: (name: string, address: string, distance: string) => void;
+    branches: BranchData[];
+    userCoords?: [number, number];
 }
 
-export const LeafletMapContent = ({ onSelectStore }: LeafletMapContentProps) => {
+export const LeafletMapContent = ({ onSelectStore, branches, userCoords }: LeafletMapContentProps) => {
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const mapRef = useRef<L.Map | null>(null);
     const [isMounted, setIsMounted] = useState(false);
+
+    // Default center to Indonesia if no user coords
+    const defaultCenter: [number, number] = userCoords || [-0.789275, 113.921327];
 
     useEffect(() => {
         setIsMounted(true);
@@ -61,13 +66,12 @@ export const LeafletMapContent = ({ onSelectStore }: LeafletMapContentProps) => 
 
         // Initialize Map
         const map = L.map(mapContainerRef.current, {
-            center: USER_LOCATION,
-            zoom: 13,
+            center: defaultCenter,
+            zoom: userCoords ? 13 : 5,
             zoomControl: false,
             scrollWheelZoom: true,
             dragging: true,
         });
-
 
         // Add Tile Layer
         L.tileLayer("https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", {
@@ -79,50 +83,52 @@ export const LeafletMapContent = ({ onSelectStore }: LeafletMapContentProps) => 
         // Zoom Control
         L.control.zoom({ position: "bottomright" }).addTo(map);
 
-        // User Location Marker
-        L.marker(USER_LOCATION, { icon: userIcon })
-            .addTo(map)
-            .bindPopup("<span style='font-weight: 700; color: #2563eb'>📍 Lokasi Anda</span>");
+        if (userCoords) {
+            // User Location Marker
+            L.marker(userCoords, { icon: userIcon })
+                .addTo(map)
+                .bindPopup("<span style='font-weight: 700; color: #2563eb'>📍 Your Location</span>");
 
-        // Store Radius Circle
-        L.circle(USER_LOCATION, {
-            radius: 5000,
-            color: "#00685d",
-            fillColor: "#00685d",
-            fillOpacity: 0.05,
-            weight: 2,
-            dashArray: "8 4",
-        }).addTo(map);
+            // Assuming max distance from the nearest branch, we can't draw this circle easily without knowing the nearest branch's distance. We'll skip the circle or draw a default 5km one.
+            L.circle(userCoords, {
+                radius: 5000,
+                color: "#00685d",
+                fillColor: "#00685d",
+                fillOpacity: 0.05,
+                weight: 2,
+                dashArray: "8 4",
+            }).addTo(map);
+        }
 
-        // Store GeoJSON Layer
-        const geoJsonLayer = L.geoJSON(storeGeoJSON as any, {
-            pointToLayer: (feature, latlng) => L.marker(latlng, { icon: storeIcon }),
-            onEachFeature: (feature, layer) => {
-                const { name, address, distance, hours } = feature.properties;
-                layer.bindPopup(`
-                    <div style="font-family:Satoshi,sans-serif;min-width:180px;">
-                        <h4 style="margin:0 0 4px;font-weight:800;color:#00685d;font-size:14px;">${name}</h4>
-                        <p style="margin:0 0 4px;font-size:12px;color:#475569;">${address}</p>
-                        <p style="margin:0 0 8px;font-size:11px;color:#64748b;">🕐 ${hours}</p>
-                        <div style="display:flex;align-items:center;gap:4px;background:rgba(0,104,93,0.1);border-radius:999px;padding:3px 8px;width:fit-content;">
-                            <span style="font-size:11px;font-weight:700;color:#00685d;">${distance}</span>
-                        </div>
-                    </div>
-                `);
-                layer.on("click", () => {
-                    onSelectStore(name, address, distance);
-                });
-            }
-        }).addTo(map);
+        // Store Markers
+        const allCoords: [number, number][] = [];
+        if (userCoords) allCoords.push(userCoords);
+
+        branches.forEach((branch) => {
+            if (!branch.latitude || !branch.longitude) return;
+            const latlng: [number, number] = [branch.latitude, branch.longitude];
+            allCoords.push(latlng);
+
+            const marker = L.marker(latlng, { icon: storeIcon }).addTo(map);
+            
+            marker.bindPopup(`
+                <div style="font-family:Satoshi,sans-serif;min-width:180px;">
+                    <h4 style="margin:0 0 4px;font-weight:800;color:#00685d;font-size:14px;">${branch.storeName}</h4>
+                    <p style="margin:0 0 4px;font-size:12px;color:#475569;">${branch.address}</p>
+                    <p style="margin:0 0 8px;font-size:11px;color:#64748b;">${branch.city}</p>
+                </div>
+            `);
+
+            marker.on("click", () => {
+                onSelectStore(branch.storeName, branch.address, "");
+            });
+        });
 
         // Fit Bounds
-        const allCoords = storeGeoJSON.features.map((f) => [
-            f.geometry.coordinates[1],
-            f.geometry.coordinates[0],
-        ] as [number, number]);
-        allCoords.push(USER_LOCATION);
-        const bounds = L.latLngBounds(allCoords);
-        map.fitBounds(bounds, { padding: [50, 50] });
+        if (allCoords.length > 0) {
+            const bounds = L.latLngBounds(allCoords);
+            map.fitBounds(bounds, { padding: [50, 50] });
+        }
 
         mapRef.current = map;
 
@@ -131,7 +137,7 @@ export const LeafletMapContent = ({ onSelectStore }: LeafletMapContentProps) => 
             map.invalidateSize();
         }, 300);
 
-    }, [isMounted]);
+    }, [isMounted, branches, userCoords, defaultCenter, onSelectStore]);
 
     return (
         <div 
