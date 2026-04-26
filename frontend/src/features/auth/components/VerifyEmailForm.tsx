@@ -25,8 +25,9 @@ export const VerifyEmailForm = () => {
   const router = useRouter();
   const token = searchParams.get("token");
   const email = searchParams.get("email");
+  const type = searchParams.get("type");
 
-  const { verifyAndSetPassword, resendVerification, isLoading } = useAuthService();
+  const { verifyAndSetPassword, verifyEmailOnly, resendVerification, isLoading } = useAuthService();
   
   const [status, setStatus] = useState<VerifyStatus>("loading");
   const [message, setMessage] = useState("");
@@ -44,12 +45,31 @@ export const VerifyEmailForm = () => {
     return () => clearInterval(timer);
   }, [cooldown]);
 
+  // Handle Automatic Verification for Email Change
+  const handleVerifyEmailOnly = async (token: string) => {
+    try {
+      const result: any = await verifyEmailOnly(token);
+      setStatus("success");
+      setMessage(result.message || "Email berhasil diverifikasi!");
+      setTimeout(() => {
+        router.push("/login");
+      }, 3000);
+    } catch (err: any) {
+      setStatus("error");
+      setMessage(err.message || "Verifikasi email gagal.");
+    }
+  };
+
   // Determine initial state
   useEffect(() => {
     if (token) {
-      // Token provided: show password form for combined verify + set password
-      setStatus("set-password");
-      setMessage("");
+      if (type === "email-change") {
+        handleVerifyEmailOnly(token);
+      } else {
+        // Token provided for registration: show password form
+        setStatus("set-password");
+        setMessage("");
+      }
     } else if (email) {
       // Email provided: show resend verification UI
       setStatus("resend-ui");
@@ -58,9 +78,9 @@ export const VerifyEmailForm = () => {
       setStatus("error");
       setMessage("Tautan tidak valid. Token atau email tidak ditemukan.");
     }
-  }, [token, email]);
+  }, [token, email, type]);
 
-  // Password form
+  // Password form (for registration only)
   const formik = useFormik({
     initialValues: {
       password: "",
@@ -120,7 +140,9 @@ export const VerifyEmailForm = () => {
         <p className="text-md font-medium opacity-80">
           {status === "set-password" 
             ? "Verifikasi email dan buat password untuk akun Anda."
-            : "Satu langkah terakhir untuk menjaga keamanan akun Anda."}
+            : status === "success" 
+              ? "Email Anda telah berhasil diverifikasi."
+              : "Satu langkah terakhir untuk menjaga keamanan akun Anda."}
         </p>
       </div>
 
@@ -134,7 +156,7 @@ export const VerifyEmailForm = () => {
               <ShieldCheckIcon className="h-8 w-8 text-primary-teal absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
             </div>
             <p className="text-gray-600 font-semibold text-lg">
-              Mempersiapkan...
+              Memproses verifikasi...
             </p>
           </div>
         )}
@@ -267,7 +289,7 @@ export const VerifyEmailForm = () => {
         {status === "success" && (
           <div className="flex flex-col items-center gap-5 animate-in slide-in-from-bottom-4 duration-500">
             <div className="h-20 w-20 bg-emerald-50 flex items-center justify-center rounded-full shadow-inner">
-              <EnvelopeIcon className="h-10 w-10 text-emerald-600" />
+              <ShieldCheckIcon className="h-10 w-10 text-emerald-600" />
             </div>
             <div className="space-y-1">
               <p className="text-emerald-800 font-bold text-xl">{message}</p>

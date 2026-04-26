@@ -44,6 +44,17 @@ export class AuthController {
     }
   }
 
+  verifyEmailOnly = async (req: AuthRequest, res: Response) => {
+    try {
+      const { token } = req.body;
+      if (!token) return sendError(res, "Token is required", 400);
+      const data = await this.authService.verifyEmailOnly(token);
+      return sendSuccess(res, data, "Email verified successfully");
+    } catch (error: any) {
+      return sendError(res, error.message, 400);
+    }
+  }
+
   resendVerification = async (req: AuthRequest, res: Response) => {
     try {
       const { email } = req.body;
@@ -169,8 +180,8 @@ export class AuthController {
 
   me = async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.user || !req.user.email) return sendError(res, "Unauthorized", 401);
-      const user = await this.authService.me(req.user.email);
+      if (!req.user || !req.user.userId) return sendError(res, "Unauthorized", 401);
+      const user = await this.authService.me(req.user.userId);
       if (!user) return sendError(res, "User not found", 404);
       return sendSuccess(res, user);
     } catch (error) {

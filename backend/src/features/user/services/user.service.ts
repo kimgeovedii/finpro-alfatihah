@@ -106,26 +106,22 @@ export class UserService {
     const emailTaken = await this.userRepository.findUserByEmail(data.newEmail);
     if (emailTaken) throw new Error("Email baru sudah terdaftar");
 
-    // Perform update
-    await this.userRepository.updateEmail(userId, data.newEmail);
-
-    // Send verification for new email
+    // Store new email and verification token
     const verificationToken = crypto.randomBytes(32).toString('hex');
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 1);
 
-    // Reuse auth repository update token (but here we just use prisma directly or add to user repo)
-    // For simplicity, let's assume we update verification token here
     await prisma.user.update({
       where: { id: userId },
       data: {
+        newEmail: data.newEmail,
         verificationToken,
         verificationExpires: expiresAt
       }
     });
 
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-    const verificationUrl = `${frontendUrl}/verify-email?token=${verificationToken}`;
+    const verificationUrl = `${frontendUrl}/verify-email?token=${verificationToken}&type=email-change`;
     const htmlContent = getEmailChangeVerificationHtml(verificationUrl);
 
     await Mailer.client.sendMail({

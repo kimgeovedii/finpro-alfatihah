@@ -18,6 +18,7 @@ export const loginValidationSchema = Yup.object({
 
 export const registerValidationSchema = Yup.object({
   email: Yup.string().email("Format email tidak valid").required("Email wajib diisi"),
+  referralCode: Yup.string().optional(),
 });
 
 export const resetPasswordValidationSchema = Yup.object({

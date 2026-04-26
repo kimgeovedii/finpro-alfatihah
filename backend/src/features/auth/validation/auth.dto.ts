@@ -11,6 +11,7 @@ export type LoginDto = z.infer<typeof LoginSchema>;
 // Registration is email-only at first
 export const RegisterSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
+  referralCode: z.string().optional(),
 });
 
 export type RegisterDto = z.infer<typeof RegisterSchema>;

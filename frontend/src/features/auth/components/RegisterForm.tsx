@@ -12,7 +12,8 @@ import {
   EnvelopeIcon, 
   ArrowRightIcon,
   ArrowPathIcon,
-  SparklesIcon
+  SparklesIcon,
+  TagIcon
 } from "@heroicons/react/24/outline";
 import { useAuthService } from "../hooks/useAuthService";
 import { toast } from "sonner";
@@ -25,6 +26,7 @@ export const RegisterForm = () => {
   const formik = useFormik({
     initialValues: {
       email: "",
+      referralCode: "",
     },
     validationSchema: registerValidationSchema,
     onSubmit: async (values) => {
@@ -52,7 +54,7 @@ export const RegisterForm = () => {
         className="absolute top-6 left-6 md:top-10 md:left-10 z-30 flex items-center gap-4 transition-all hover:scale-105"
       >
         <img
-          src="/assets/logo-apps.png"
+          src="https://res.cloudinary.com/dvfywdxnt/image/upload/v1777146483/logo-apps_opuem6.png"
           alt="Alfatihah Logo"
           className="h-8 md:h-12 w-auto object-contain"
         />
@@ -105,6 +107,22 @@ export const RegisterForm = () => {
               {formik.touched.email && formik.errors.email && (
                 <p className="text-red-500 text-xs ml-2 font-medium">{formik.errors.email}</p>
               )}
+            </div>
+
+            <div className="space-y-3">
+              <Label htmlFor="referralCode" className="text-sm font-semibold text-gray-700 ml-1">Referral Code (Opsional)</Label>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-primary-teal">
+                  <TagIcon className="h-5 w-5 text-gray-400" />
+                </div>
+                <Input
+                  id="referralCode"
+                  type="text"
+                  placeholder="Contoh: REF-123456"
+                  className="h-14 pl-12 bg-gray-50/50 border-gray-100 rounded-2xl focus:bg-white focus:ring-2 focus:ring-primary-teal/20 focus:border-primary-teal transition-all duration-300"
+                  {...formik.getFieldProps("referralCode")}
+                />
+              </div>
             </div>
 
             <div className="bg-emerald-50/50 rounded-2xl p-4 border border-emerald-100/50">

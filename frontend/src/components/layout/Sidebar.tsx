@@ -41,6 +41,11 @@ const NAV_ITEMS = [
     icon: <UsersIcon className="w-5 h-5" />,
   },
   {
+    title: "Branches",
+    href: "/dashboard/branches",
+    icon: <GlobeAmericasIcon className="w-5 h-5" />,
+  },
+  {
     title: "Cart",
     href: "/cart",
     icon: <ShoppingCartIcon className="w-5 h-5" />,
