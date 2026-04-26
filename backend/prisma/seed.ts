@@ -15,6 +15,8 @@ import VoucherUsedFactory from './factories/voucher_used.factory';
 import VoucherReferralFactory from './factories/voucher_referral.factory';
 import StockJournalsFactory from './factories/stock_journals.factory';
 import MutationJournalsFactory from './factories/mutation_journals.factory';
+import UsersFactory from './factories/user.factory';
+import { userSeedData } from '../src/constants/seed.const';
 
 const connectionString = process.env.DATABASE_URL;
 const pool = new Pool({ connectionString });
@@ -23,9 +25,6 @@ const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log('🌱 Start seeding...\n');
-
-  // --- Hash password ---
-  const defaultPassword = await bcrypt.hash('password123', 10);
 
   // Cleanup existing data
   console.log('🧹 Cleaning up existing data...');
@@ -47,72 +46,8 @@ async function main() {
   await prisma.employee.deleteMany()
   await prisma.address.deleteMany()
   await prisma.branchSchedule.deleteMany()
+  await prisma.user.deleteMany()
   console.log('  ✅ Cleanup completed.\n');
-
-  // Users Seeders
-  console.log('👤 Seeding Users...');
-
-  const adminUser = await prisma.user.upsert({
-    where: { email: 'kimgeovedi@gmail.com' },
-    update: {},
-    create: {
-      email: 'kimgeovedi@gmail.com',
-      username: 'kimgeovedi',
-      password: defaultPassword,
-      role: UserRole.ADMIN,
-      emailVerifiedAt: new Date(),
-    },
-  });
-
-  const customerUser1 = await prisma.user.upsert({
-    where: { email: 'akimmustofa18@gmail.com' },
-    update: {},
-    create: {
-      email: 'akimmustofa18@gmail.com',
-      username: 'akimmustofa',
-      password: defaultPassword,
-      role: UserRole.CUSTOMER,
-      emailVerifiedAt: new Date(),
-    },
-  });
-
-  const customerUser2 = await prisma.user.upsert({
-    where: { email: 'flazen.edu@gmail.com' },
-    update: {},
-    create: {
-      email: 'flazen.edu@gmail.com',
-      username: 'flazen.edu',
-      password: defaultPassword,
-      role: UserRole.CUSTOMER,
-      emailVerifiedAt: new Date(),
-    },
-  });
-
-  const storeAdminUser = await prisma.user.upsert({
-    where: { email: 'storeadmin@example.com' },
-    update: {},
-    create: {
-      email: 'storeadmin@example.com',
-      username: 'storeadmin',
-      password: defaultPassword,
-      role: UserRole.ADMIN,
-      emailVerifiedAt: new Date(),
-    },
-  });
-
-  const superAdminUser = await prisma.user.upsert({
-    where: { email: 'superadmin@example.com' },
-    update: {},
-    create: {
-      email: 'superadmin@example.com',
-      username: 'superadmin',
-      password: defaultPassword,
-      role: UserRole.ADMIN,
-      emailVerifiedAt: new Date(),
-    },
-  });
-
-  console.log('  ✅ Users seeded.\n');
 
   // Branches seeders
   console.log('🏪 Seeding Branches...');
@@ -151,12 +86,21 @@ async function main() {
       longitude: 112.7521,
       maxDeliveryDistance: 12.0,
       isActive: true,
-      city: 'Surabaya',
+      city: 'Yogyakarta',
       province: 'Jawa Timur',
     },
   });
 
   console.log('  ✅ Branches seeded.\n');
+
+  console.log('👤 Seeding Users, Addresses & Employees...')
+
+  // User seeders (Include Employee & Address)
+  const usersFactory = new UsersFactory()
+  const seededUsers = await usersFactory.createAll()
+  console.log(` Users seeded: ${seededUsers.length}`)
+  console.log(` Addresses seeded: ${seededUsers.length * 3}`)
+  console.log(` Employees seeded: ${userSeedData.filter(u => u.role === 'ADMIN').length}\n`)
 
   // Branch Schedules Seeders
   console.log('📅 Seeding Branch Schedules...');
@@ -220,97 +164,6 @@ async function main() {
   }
 
   console.log('  ✅ Branch Schedules seeded.\n');
-
-  // Employees Seeders
-  console.log('👷 Seeding Employees...');
-
-  await prisma.employee.create({
-    data: {
-      fullName: 'Super Admin',
-      role: EmployeeRole.SUPER_ADMIN,
-      branchId: branchJakarta.id,
-      userId: superAdminUser.id,
-    },
-  });
-
-  await prisma.employee.create({
-    data: {
-      fullName: 'Store Admin Jakarta',
-      role: EmployeeRole.STORE_ADMIN,
-      branchId: branchJakarta.id,
-      userId: storeAdminUser.id,
-    },
-  });
-
-  await prisma.employee.create({
-    data: {
-      fullName: 'Store Admin Bandung',
-      role: EmployeeRole.STORE_ADMIN,
-      branchId: branchBandung.id,
-      userId: null,
-    },
-  });
-
-  await prisma.employee.create({
-    data: {
-      fullName: 'Store Admin Surabaya',
-      role: EmployeeRole.STORE_ADMIN,
-      branchId: branchSurabaya.id,
-      userId: null,
-    },
-  });
-
-  console.log('  ✅ Employees seeded.\n');
-
-  // Addresses Seeders
-  console.log('📍 Seeding Addresses...');
-
-  await prisma.address.create({
-    data: {
-      userId: customerUser1.id,
-      label: 'Rumah',
-      type: 'Rumah',
-      receiptName: 'Akim Mustofa',
-      notes: 'Pagar warna hitam',
-      phone: '081234567890',
-      address: 'Jl. Merdeka No. 10, Bandung',
-      lat: -6.9175,
-      long: 107.6191,
-      isPrimary: true,
-    },
-  });
-
-  await prisma.address.create({
-    data: {
-      userId: customerUser1.id,
-      label: 'Kantor',
-      type: 'Kantor',
-      receiptName: 'Akim Mustofa',
-      notes: 'Lantai 5',
-      phone: '081234567891',
-      address: 'Jl. Asia Afrika No. 1, Bandung',
-      lat: -6.9211,
-      long: 107.6108,
-      isPrimary: false,
-    },
-  });
-
-  await prisma.address.create({
-    data: {
-      userId: customerUser2.id,
-      label: 'Apartemen',
-      type: 'Rumah',
-      receiptName: 'Customer 2',
-      notes: 'Unit 12A',
-      phone: '089876543210',
-      address: 'Apartemen Mediterania, Jakarta',
-      lat: -6.1751,
-      long: 106.8650,
-      isPrimary: true,
-    },
-  });
-
-  console.log('  ✅ Addresses seeded.\n');
 
   // Product Categories Seeders
   console.log('📦 Seeding Product Categories...');
