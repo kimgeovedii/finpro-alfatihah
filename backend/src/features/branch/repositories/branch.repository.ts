@@ -104,6 +104,30 @@ export class BranchRepository {
     });
   }
 
+  async findAllActivePaginated(skip: number, take: number) {
+    const where = { isActive: true };
+    const [data, total] = await Promise.all([
+      prisma.branch.findMany({
+        where,
+        skip,
+        take,
+        select: {
+          id: true,
+          storeName: true,
+          address: true,
+          city: true,
+          province: true,
+          latitude: true,
+          longitude: true,
+          maxDeliveryDistance: true,
+        },
+        orderBy: { createdAt: "asc" },
+      }),
+      prisma.branch.count({ where }),
+    ]);
+    return { data, total };
+  }
+
   async findProductsByBranch(branchId: string, skip: number, take: number) {
     const where = { branchId };
     console.log(`Fetching products for branch: ${branchId}, skip: ${skip}, take: ${take}`);

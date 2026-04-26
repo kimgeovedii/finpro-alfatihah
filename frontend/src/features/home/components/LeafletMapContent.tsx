@@ -40,7 +40,7 @@ const userIcon = new L.DivIcon({
 });
 
 interface LeafletMapContentProps {
-    onSelectStore: (name: string, address: string, distance: string) => void;
+    onSelectStore: (name: string, address: string, distance: string, maxDelivery: number) => void;
     branches: BranchData[];
     userCoords?: [number, number];
     searchCoords?: [number, number];
@@ -153,7 +153,14 @@ export const LeafletMapContent = ({ onSelectStore, branches, userCoords, searchC
             `);
 
             marker.on("click", () => {
-                onSelectStore(branch.storeName, branch.address, "");
+                let distanceStr = "";
+                if (userCoords) {
+                    const userLatLng = L.latLng(userCoords);
+                    const branchLatLng = L.latLng(latlng);
+                    const distanceMeters = userLatLng.distanceTo(branchLatLng);
+                    distanceStr = (distanceMeters / 1000).toFixed(1) + " km";
+                }
+                onSelectStore(branch.storeName, branch.address, distanceStr, branch.maxDeliveryDistance);
             });
         });
 

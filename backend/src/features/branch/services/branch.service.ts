@@ -8,9 +8,18 @@ export class BranchService {
     this.branchRepository = new BranchRepository();
   }
 
-  public getAllBranches = async () => {
-    const branches = await this.branchRepository.findAllActive();
-    return branches; // findAllActive already returns all necessary fields
+  public getAllBranches = async (page: number = 1, limit: number = 10) => {
+    const skip = (page - 1) * limit;
+    const { data, total } = await this.branchRepository.findAllActivePaginated(skip, limit);
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   };
 
   public findNearestBranch = async (

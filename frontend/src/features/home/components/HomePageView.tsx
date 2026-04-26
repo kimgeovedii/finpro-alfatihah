@@ -7,19 +7,13 @@ import { LocationPrompt } from "./LocationPrompt";
 import { ProductList } from "./ProductList";
 import { ExclusiveVoucher } from "./ExclusiveVoucher";
 import { NotificationHandler } from "@/components/common/NotificationHandler";
-import { useNearestStore } from "../hooks/useNearestStore";
-import { apiFetch } from "@/utils/api";
-import { BranchData } from "@/features/home/types/home.types";
+import { useHomeStore } from "@/features/home/service/home.service";
 
 export const HomePageView = () => {
-  const { products, nearestBranch, userCoords, isLoading, requestLocation } = useNearestStore();
-  const [allBranches, setAllBranches] = useState<BranchData[]>([]);
+  const { products, nearestBranch, userCoords, isLoading, requestLocation, allBranches, fetchAllBranches } = useHomeStore();
 
   useEffect(() => {
-    // Fetch all active branches for the map
-    apiFetch<BranchData[]>("/branches").then((data) => {
-      setAllBranches(data);
-    }).catch(console.error);
+    fetchAllBranches(1);
   }, []);
 
   return (
@@ -28,6 +22,7 @@ export const HomePageView = () => {
         <NotificationHandler />
       </Suspense>
       <HeroCarousel />
+      <ExclusiveVoucher />
       <LocationPrompt />
       <NearestStoreMap 
         branches={allBranches} 
@@ -36,7 +31,7 @@ export const HomePageView = () => {
         onRequestLocation={requestLocation}
       />
       <ProductList products={products} isLoading={isLoading} />
-      <ExclusiveVoucher />
     </>
   );
+  
 };

@@ -15,7 +15,8 @@ export class BranchController {
     next: NextFunction
   ) => {
     try {
-      const branches = await this.branchService.getAllBranches();
+      const { page = 1, limit = 10 } = req.query as any;
+      const branches = await this.branchService.getAllBranches(Number(page), Number(limit));
       return sendSuccess(res, branches, "Get all branches successfully");
     } catch (error) {
       next(error);

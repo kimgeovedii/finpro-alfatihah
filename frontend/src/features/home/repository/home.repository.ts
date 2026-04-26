@@ -1,5 +1,5 @@
 import { apiFetch } from "@/utils/api";
-import { NearestBranchResponse } from "@/features/home/types/home.types";
+import { NearestBranchResponse, BranchData, PaginationMeta } from "@/features/home/types/home.types";
 
 export class HomeRepository {
   async getNearestBranch(params: {
@@ -14,5 +14,12 @@ export class HomeRepository {
     query.set("page", String(params.page ?? 1));
     query.set("limit", String(params.limit ?? 8));
     return apiFetch<NearestBranchResponse>(`/branches/nearest?${query.toString()}`);
+  }
+
+  async getAllBranches(params: { page?: number; limit?: number }) {
+    const query = new URLSearchParams();
+    query.set("page", String(params.page ?? 1));
+    query.set("limit", String(params.limit ?? 50)); // Map can handle more
+    return apiFetch<{ data: BranchData[]; meta: PaginationMeta }>(`/branches?${query.toString()}`);
   }
 }
