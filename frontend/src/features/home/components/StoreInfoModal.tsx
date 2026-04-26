@@ -74,14 +74,22 @@ export const StoreInfoModal = ({ selectedStore, onClose }: StoreInfoModalProps) 
         </div>
       </div>
 
-      <a 
-        href={`https://www.google.com/maps/search/?api=1&query=${selectedStore.lat},${selectedStore.lng}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="w-full py-3 bg-primary text-white rounded-2xl font-bold text-sm text-center hover:bg-primary/90 transition-all active:scale-[0.98] shadow-xl shadow-primary/10 shrink-0 block"
-      >
-        Open in Google Maps
-      </a>
+      <div className="flex flex-col gap-2 shrink-0">
+        <a 
+          href={`/branches/${selectedStore.branchId}`}
+          className="w-full py-3 bg-slate-900 text-white rounded-2xl font-bold text-sm text-center hover:bg-slate-800 transition-all active:scale-[0.98] shadow-xl shadow-slate-900/10 block"
+        >
+          View Branch Detail
+        </a>
+        <a 
+          href={`https://www.google.com/maps/search/?api=1&query=${selectedStore.lat},${selectedStore.lng}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full py-3 bg-primary text-white rounded-2xl font-bold text-sm text-center hover:bg-primary/90 transition-all active:scale-[0.98] shadow-xl shadow-primary/10 block"
+        >
+          Open in Google Maps
+        </a>
+      </div>
     </div>
   </motion.div>
 );

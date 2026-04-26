@@ -14,7 +14,7 @@ const repository = new BranchRepository();
 
 export const useBranchStore = create<BranchState>((set) => ({
   detail: null,
-  isLoading: false,
+  isLoading: true,
   error: null,
 
   fetchBranchDetail: async (id, page = 1) => {
@@ -27,5 +27,5 @@ export const useBranchStore = create<BranchState>((set) => ({
     }
   },
 
-  reset: () => set({ detail: null, isLoading: false, error: null }),
+  reset: () => set({ detail: null, isLoading: true, error: null }),
 }));
