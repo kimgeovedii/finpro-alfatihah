@@ -138,7 +138,10 @@ export const useAuthService = () => {
     // Don't fetch if no token exists in cookies
     if (typeof window !== "undefined") {
       const Cookies = (await import("js-cookie")).default;
-      if (!Cookies.get("accessToken")) return null;
+      if (!Cookies.get("accessToken")) {
+        clearAuth();
+        return null;
+      }
     }
 
     setIsLoading(true);
@@ -147,13 +150,20 @@ export const useAuthService = () => {
       setUser(data);
       return data;
     } catch (err: any) {
+      if (err.message?.includes("token") || err.status === 401) {
+        clearAuth();
+      }
       return null;
     } finally {
       setIsLoading(false);
     }
-  }, [setUser]);
+  }, [setUser, clearAuth]);
 
-  const isAuthenticated = useCallback(() => !!user, [user]);
+  const isAuthenticated = useCallback(() => {
+    if (typeof window === "undefined") return !!user;
+    const Cookies = require("js-cookie");
+    return !!user && !!Cookies.get("accessToken");
+  }, [user]);
   const isVerified = useCallback(() => !!user?.emailVerifiedAt, [user]);
 
   return useMemo(() => ({
