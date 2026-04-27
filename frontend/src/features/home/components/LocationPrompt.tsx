@@ -7,7 +7,7 @@ import { useNearestStore } from "../hooks/useNearestStore";
 export const LocationPrompt = () => {
   const { locationStatus, requestLocation } = useNearestStore();
 
-  if (locationStatus === "granted") {
+  if (locationStatus === "granted" || locationStatus === "requesting") {
     return null;
   }
 
@@ -20,10 +20,10 @@ export const LocationPrompt = () => {
         <div className="max-w-xl">
           <h2 className="text-xl md:text-2xl font-heading font-black mb-2 text-primary flex items-center gap-2">
             <MapPin className="w-5 h-5" />
-            Find Your Nearest Store
+            Cari Toko Terdekat
           </h2>
-          <p className="text-sm text-muted-foreground">
-            Allow location access to see products from the branch nearest to you.
+          <p className="text-sm text-muted-foreground font-medium">
+            Izinkan akses lokasi untuk melihat produk dari cabang terdekat dari posisi Anda saat ini.
           </p>
         </div>
         
@@ -32,25 +32,15 @@ export const LocationPrompt = () => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={requestLocation}
-            disabled={locationStatus === "requesting"}
-            className="bg-primary hover:bg-primary-hover text-white px-6 py-2.5 rounded-xl font-bold shadow-md flex items-center justify-center gap-2 transition-colors disabled:opacity-70 text-sm whitespace-nowrap"
+            className="bg-primary hover:bg-primary-hover text-white px-6 py-2.5 rounded-xl font-bold shadow-md flex items-center justify-center gap-2 transition-colors text-sm whitespace-nowrap"
           >
-            {locationStatus === "requesting" ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Locating...
-              </>
-            ) : (
-              <>
-                <Navigation className="w-4 h-4" />
-                Allow Location Access
-              </>
-            )}
+            <Navigation className="w-4 h-4" />
+            Izinkan Akses Lokasi
           </motion.button>
           
           {locationStatus === "denied" && (
-            <p className="text-[10px] text-red-500 font-medium text-center md:text-left">
-              Location access denied. Using default branch.
+            <p className="text-[10px] text-red-500 font-bold text-center md:text-left animate-pulse">
+              Akses lokasi ditolak. Menggunakan cabang default.
             </p>
           )}
         </div>
