@@ -104,4 +104,50 @@ export class AddressController {
       return sendError(res, error.message || "Gagal mengubah alamat utama", 500);
     }
   };
+
+  searchAddress = async (req: Request, res: Response) => {
+    try {
+      const { q } = req.query;
+      if (!q) return sendError(res, "Query is required", 400);
+
+      const response = await axios.get(`https://nominatim.openstreetmap.org/search`, {
+        params: {
+          q,
+          format: "json",
+          addressdetails: 1,
+          countrycodes: "id",
+          limit: 5,
+        },
+        headers: {
+          "User-Agent": "Alfatihah-Grocery-App/1.0",
+        }
+      });
+      return res.json(response.data);
+    } catch (error: any) {
+      console.error("Geocoding proxy error:", error.message);
+      return sendError(res, "Gagal mencari alamat", 502);
+    }
+  };
+
+  reverseGeocode = async (req: Request, res: Response) => {
+    try {
+      const { lat, lon } = req.query;
+      if (!lat || !lon) return sendError(res, "Lat and Lon are required", 400);
+
+      const response = await axios.get(`https://nominatim.openstreetmap.org/reverse`, {
+        params: {
+          lat,
+          lon,
+          format: "json",
+        },
+        headers: {
+          "User-Agent": "Alfatihah-Grocery-App/1.0",
+        }
+      });
+      return res.json(response.data);
+    } catch (error: any) {
+      console.error("Reverse geocoding proxy error:", error.message);
+      return sendError(res, "Gagal mendapatkan alamat dari koordinat", 502);
+    }
+  };
 }

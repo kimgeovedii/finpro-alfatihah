@@ -4,6 +4,7 @@ import { useState, useCallback, useMemo } from "react";
 import { authService } from "../service/auth.service";
 import { useAuthStore } from "../store/useAuthStore";
 import { User } from "../types";
+import { getDeviceId } from "@/utils/deviceId";
 
 export const useAuthService = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -55,7 +56,8 @@ export const useAuthService = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const result: any = await authService.login(data);
+      const deviceId = getDeviceId();
+      const result: any = await authService.login({ ...data, deviceId });
       setAuth(result.user, result.accessToken, result.refreshToken);
       return result;
     } catch (err: any) {
@@ -70,7 +72,8 @@ export const useAuthService = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const result: any = await authService.employeeLogin(data);
+      const deviceId = getDeviceId();
+      const result: any = await authService.employeeLogin({ ...data, deviceId });
       setAuth(result.user, result.accessToken, result.refreshToken);
       return result;
     } catch (err: any) {
@@ -85,7 +88,8 @@ export const useAuthService = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const result: any = await authService.googleLogin(credential);
+      const deviceId = getDeviceId();
+      const result: any = await authService.googleLogin({ credential, deviceId });
       setAuth(result.user, result.accessToken, result.refreshToken);
       return result;
     } catch (err: any) {
@@ -99,12 +103,13 @@ export const useAuthService = () => {
   const logout = useCallback(async () => {
     setIsLoading(true);
     try {
-      await authService.logout();
+      const isEmployee = user?.role === 'EMPLOYEE' || user?.role === 'SUPER_ADMIN' || user?.role === 'STORE_ADMIN';
+      await authService.logout(isEmployee);
       clearAuth();
     } finally {
       setIsLoading(false);
     }
-  }, [clearAuth]);
+  }, [clearAuth, user]);
 
   const requestResetPassword = useCallback(async (email: string) => {
     setIsLoading(true);
@@ -137,7 +142,10 @@ export const useAuthService = () => {
     // Don't fetch if no token exists in cookies
     if (typeof window !== "undefined") {
       const Cookies = (await import("js-cookie")).default;
-      if (!Cookies.get("accessToken")) return null;
+      if (!Cookies.get("accessToken")) {
+        clearAuth();
+        return null;
+      }
     }
 
     setIsLoading(true);
@@ -146,13 +154,20 @@ export const useAuthService = () => {
       setUser(data);
       return data;
     } catch (err: any) {
+      if (err.message?.includes("token") || err.status === 401) {
+        clearAuth();
+      }
       return null;
     } finally {
       setIsLoading(false);
     }
-  }, [setUser]);
+  }, [setUser, clearAuth]);
 
-  const isAuthenticated = useCallback(() => !!user, [user]);
+  const isAuthenticated = useCallback(() => {
+    if (typeof window === "undefined") return !!user;
+    const Cookies = require("js-cookie");
+    return !!user && !!Cookies.get("accessToken");
+  }, [user]);
   const isVerified = useCallback(() => !!user?.emailVerifiedAt, [user]);
 
   return useMemo(() => ({

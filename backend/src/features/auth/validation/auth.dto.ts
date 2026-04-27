@@ -4,6 +4,7 @@ export const LoginSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
   password: z.string().min(6, { message: "Password must be at least 6 characters" }),
   rememberMe: z.boolean().optional().default(false),
+  deviceId: z.string().optional(),
 });
 
 export type LoginDto = z.infer<typeof LoginSchema>;
@@ -50,6 +51,7 @@ export type ConfirmResetPasswordDto = z.infer<typeof ConfirmResetPasswordSchema>
 // Google OAuth login/register
 export const GoogleLoginSchema = z.object({
   credential: z.string().min(1, "Credential is required"),
+  deviceId: z.string().optional(),
 });
 
 export type GoogleLoginDto = z.infer<typeof GoogleLoginSchema>;

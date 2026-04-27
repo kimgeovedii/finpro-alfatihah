@@ -91,7 +91,10 @@ class App {
       const statusCode = err.status || err.code || 500
       
       // Audit server error
-      if (statusCode === 500) return sendError(res, "Something went wrong", 500)
+      if (statusCode === 500) {
+        console.error("Internal Server Error:", err);
+        return sendError(res, "Something went wrong", 500);
+      }
 
       return sendError(res, err.message, statusCode)
     })

@@ -1,7 +1,8 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
-import { REFRESH_TOKEN_SECRET } from "../../../config";
+import { v4 as uuidv4 } from "uuid";
+import { JWT_SECRET, REFRESH_TOKEN_SECRET } from "../../../config";
 import { 
   LoginDto, 
   RegisterDto, 
@@ -187,12 +188,17 @@ export class AuthService {
     }
 
     const { password, ...userWithoutPassword } = user;
-    const tokens = generateTokens(user, dto.rememberMe);
+    const sessionId = uuidv4();
+    const tokens = generateTokens(user, sessionId, dto.rememberMe);
 
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + (dto.rememberMe ? 30 : 1));
 
-    await this.authRepository.createRefreshToken(user.id, tokens.refreshToken, expiresAt, device, ip);
+    if (dto.deviceId) {
+      await this.authRepository.deleteExistingSessionByDevice(user.id, dto.deviceId);
+    }
+
+    await this.authRepository.createRefreshToken(user.id, tokens.refreshToken, expiresAt, device, ip, sessionId, dto.deviceId);
     await this.authRepository.updateLastLogin(user.id);
 
     const cartItems = await this.cartRepository.getCartSummary(user.id);
@@ -217,12 +223,17 @@ export class AuthService {
     }
 
     const { password, ...userWithoutPassword } = user;
-    const tokens = generateTokens(user, dto.rememberMe);
+    const sessionId = uuidv4();
+    const tokens = generateTokens(user, sessionId, dto.rememberMe);
 
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + (dto.rememberMe ? 30 : 1));
 
-    await this.authRepository.createRefreshToken(user.id, tokens.refreshToken, expiresAt, device, ip);
+    if (dto.deviceId) {
+      await this.authRepository.deleteExistingSessionByDevice(user.id, dto.deviceId);
+    }
+
+    await this.authRepository.createRefreshToken(user.id, tokens.refreshToken, expiresAt, device, ip, sessionId, dto.deviceId);
     await this.authRepository.updateLastLogin(user.id);
 
     return { user: userWithoutPassword, ...tokens };
@@ -254,11 +265,16 @@ export class AuthService {
       throw new Error("Akses ditolak. Login Google hanya untuk akun Customer.");
     }
 
-    const tokens = generateTokens(user, true);
+    const sessionId = uuidv4();
+    const tokens = generateTokens(user, sessionId, true);
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 30);
 
-    await this.authRepository.createRefreshToken(user.id, tokens.refreshToken, expiresAt, device, ip);
+    if (dto.deviceId) {
+      await this.authRepository.deleteExistingSessionByDevice(user.id, dto.deviceId);
+    }
+
+    await this.authRepository.createRefreshToken(user.id, tokens.refreshToken, expiresAt, device, ip, sessionId, dto.deviceId);
     await this.authRepository.updateLastLogin(user.id);
 
     const { password, ...userWithoutPassword } = user;
@@ -330,11 +346,12 @@ export class AuthService {
 
       await this.authRepository.deleteRefreshToken(token);
 
-      const tokens = generateTokens(user);
+      const sessionId = uuidv4();
+      const tokens = generateTokens(user, sessionId);
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 7);
       
-      await this.authRepository.createRefreshToken(user.id, tokens.refreshToken, expiresAt, device, ip);
+      await this.authRepository.createRefreshToken(user.id, tokens.refreshToken, expiresAt, device, ip, sessionId, dbToken.deviceId as string);
 
       return tokens;
     } catch (error) {
@@ -355,7 +372,14 @@ export class AuthService {
   }
 
   async logout(accessToken: string, refreshToken?: string) {
-    await blacklistToken(accessToken, 15 * 60);
+    try {
+      const decoded: any = jwt.verify(accessToken, JWT_SECRET);
+      if (decoded.sessionId) {
+        await blacklistToken(decoded.sessionId, 15 * 60);
+      }
+    } catch (error) {
+      // If token is already invalid, we just continue to delete refresh token if any
+    }
 
     if (refreshToken) {
       await this.authRepository.deleteRefreshToken(refreshToken).catch(() => {});
