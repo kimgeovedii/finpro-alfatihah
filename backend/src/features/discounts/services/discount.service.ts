@@ -21,8 +21,22 @@ export class DiscountService {
       take,
     );
 
+    const now = new Date();
+    const dataWithStatus = data.map((discount: any) => {
+      let status = "EXPIRED";
+      if (now < new Date(discount.startDate)) {
+        status = "SCHEDULED";
+      } else if (now >= new Date(discount.startDate) && now <= new Date(discount.endDate)) {
+        status = "ACTIVE";
+      }
+      return {
+        ...discount,
+        status,
+      };
+    });
+
     return {
-      data,
+      data: dataWithStatus,
       meta: {
         total,
         page,

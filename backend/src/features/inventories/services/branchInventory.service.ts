@@ -9,12 +9,23 @@ export class BranchInventoryService {
   }
 
   public findAllBranchInventories = async (
-    filters: any,
+    query: any,
     page: number,
     limit: number,
   ) => {
     const skip = (page - 1) * limit;
     const take = limit;
+
+    const filters: any = {};
+    if (query.branchId) filters.branchId = query.branchId;
+    if (query.productName) {
+      filters.product = {
+        productName: {
+          contains: query.productName,
+          mode: "insensitive",
+        },
+      };
+    }
 
     const { data, total } =
       await this.branchInventoryRepository.findAllBranchInventories(

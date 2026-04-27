@@ -1,4 +1,5 @@
 "use client"
+import React, { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { HomeIcon, BriefcaseIcon, ClipboardDocumentCheckIcon, ServerStackIcon, Cog6ToothIcon, GlobeAmericasIcon, ShoppingCartIcon, ArrowsRightLeftIcon, CubeIcon, TagIcon, UsersIcon } from '@heroicons/react/24/outline'
@@ -63,46 +64,141 @@ const NAV_ITEMS = [
 ];
 
 export const Sidebar = () => {
-  const cartItems = useAuthService((state) => state.cartItems)
-  const pathname = usePathname()
+  const {
+    pathname,
+    isExpanded,
+    isPinned,
+    isMobileMenuOpen,
+    closeMobileMenu,
+    handleMouseEnter,
+    handleMouseLeave,
+    togglePinned,
+  } = useSidebar()
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-50 w-64 bg-white/70 backdrop-blur-3xl border-r border-white/60 shadow-[4px_0_24px_rgba(0,0,0,0.02)] transition-transform duration-300 md:translate-x-0 hidden md:block">
-      <div className="flex h-16 items-center px-6 border-b border-emirald-100/50">
-        <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-tr from-emerald-500 to-green-400 text-white shadow-sm">
-            <GlobeAmericasIcon className="h-5 w-5" />
-          </div>
-          <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-700 to-teal-600">Alfatihah</span>
-        </div>
-      </div>
-      <div className="flex flex-col gap-1 px-4 py-8 overflow-y-auto h-[calc(100vh-4rem)]">
-        <p className="px-2 text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Main Menu</p>
-        {
-          NAV_ITEMS.map(dt => {
-            const isActive = dt.href === '/dashboard' ? pathname === '/dashboard' : pathname === dt.href || pathname.startsWith(`${dt.href}/`)
-            const isCart = dt.href === '/cart'
-            const totalItems = cartItems || 0
+    <>
+      {/* Mobile Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 md:hidden transition-opacity"
+          onClick={closeMobileMenu}
+        />
+      )}
+
+      {/* Mobile Drawer */}
+      <aside 
+        className={cn(
+          "fixed top-0 bottom-0 left-0 bg-[#122e2c] transition-all duration-300 ease-in-out flex flex-col z-50 shadow-2xl overflow-visible w-64 md:hidden rounded-tr-[40px] rounded-br-[40px]",
+          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        {/* Navigation for Mobile */}
+        <div className="flex-1 flex flex-col gap-3 px-3 py-10 overflow-y-auto custom-scrollbar overflow-x-hidden mt-16">
+          {NAV_ITEMS.map((item) => {
+            const isActive = item.href === '/dashboard' ? pathname === '/dashboard' : pathname.startsWith(item.href)
+            const Icon = item.icon
 
             return (
-              <Link key={dt.href} href={dt.href} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${
-                  isActive ? 'bg-emerald-50 text-emerald-700 shadow-sm border border-emerald-100/50' : 'text-slate-600 hover:bg-slate-50 hover:text-emerald-600'
-                }`}
+              <Link 
+                key={item.href} 
+                href={item.href} 
+                onClick={closeMobileMenu}
+                className={cn(
+                  "flex items-center gap-4 py-3 rounded-xl text-sm font-semibold transition-all duration-300 px-4",
+                  isActive 
+                    ? "bg-[#183d3a] text-emerald-400" 
+                    : "text-slate-300 hover:text-white hover:bg-white/5"
+                )}
               >
-                <div className={`${isActive ? 'text-emerald-600' : 'text-slate-400 group-hover:text-emerald-500'} transition-colors duration-200`}>{dt.icon}</div>
-                <span className="tracking-wide">{dt.title}</span>
-                {
-                  isCart && totalItems > 0 && 
-                    <span className="ml-auto text-xs font-semibold bg-emerald-500 text-white px-2 py-0.5 rounded-full shadow-sm">
-                      {totalItems}
-                    </span>
-                }
-                { isActive && !isCart && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-sm"></div> }
+                {isActive && (
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-400 rounded-r-md shadow-[0_0_8px_rgba(52,211,153,0.5)]"></div>
+                )}
+                <Icon className="h-5 w-5 shrink-0" />
+                <span className="tracking-wide whitespace-nowrap overflow-hidden text-ellipsis">
+                  {item.title}
+                </span>
               </Link>
             )
-          })
-        }
-      </div>
-    </aside>
+          })}
+        </div>
+      </aside>
+
+      {/* Desktop Spacer & Container */}
+      <div 
+        className={cn(
+          "hidden md:block  relative transition-all duration-300 ease-in-out shrink-0 self-stretch",
+          isPinned ? "w-64" : "w-20"
+        )}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        <aside 
+          className={cn(
+            "absolute top-20 md:top-0 inset-y-0 left-0 bg-[#122e2c] transition-all duration-300 ease-in-out flex flex-col z-50 shadow-2xl overflow-visible",
+            "rounded-tr-[40px] rounded-br-[40px]",
+            isExpanded || isPinned ? "w-64" : "w-20"
+          )}
+        >
+          {/* Toggle Button */}
+          <button 
+            onClick={togglePinned}
+            className={cn(
+              "absolute top-6 h-7 w-7 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-lg transition-transform duration-300 z-50 hover:scale-110",
+              "-right-3.5"
+            )}
+          >
+          <ChevronRightIcon className={cn(
+              "h-4 w-4 stroke-[3px] transition-transform duration-300",
+              (isExpanded || isPinned) ? "rotate-180" : "rotate-0"
+            )} />
+          </button>
+
+        {/* Navigation */}
+        <div className="flex-1 flex flex-col gap-3 px-3 py-10 overflow-y-auto custom-scrollbar overflow-x-hidden">
+          {NAV_ITEMS.map((item) => {
+            const isActive = item.href === '/dashboard' ? pathname === '/dashboard' : pathname.startsWith(item.href)
+            const Icon = item.icon
+
+            return (
+              <Link 
+                key={item.href} 
+                href={item.href} 
+                onClick={() => {
+                  if (window.innerWidth < 768) closeMobileMenu();
+                }}
+                className={cn(
+                  "flex items-center gap-4 py-3 rounded-xl text-sm font-semibold transition-all duration-300 group relative",
+                  isActive 
+                    ? "bg-[#183d3a] text-emerald-400" 
+                    : "text-slate-300 hover:text-white hover:bg-white/5",
+                  isExpanded || isPinned || isMobileMenuOpen ? "px-4" : "px-0 justify-center"
+                )}
+                title={!isExpanded && !isPinned && !isMobileMenuOpen ? item.title : undefined}
+              >
+                {/* Active Indicator Bar */}
+                {isActive && (
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-400 rounded-r-md shadow-[0_0_8px_rgba(52,211,153,0.5)]"></div>
+                )}
+
+                <div className={cn(
+                  "transition-transform duration-300 shrink-0 flex items-center justify-center",
+                  isActive ? "text-emerald-400" : "text-slate-300 group-hover:text-emerald-400",
+                  (!isExpanded && !isPinned && !isMobileMenuOpen) && "w-full"
+                )}>
+                  <Icon className="h-5 w-5" />
+                </div>
+                
+                {(isExpanded || isPinned || isMobileMenuOpen) && (
+                  <span className="tracking-wide whitespace-nowrap overflow-hidden text-ellipsis">
+                    {item.title}
+                  </span>
+                )}
+              </Link>
+            )
+          })}
+        </div>
+      </aside>
+    </div>
+    </>
   );
 };

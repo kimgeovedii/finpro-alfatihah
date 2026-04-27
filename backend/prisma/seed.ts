@@ -173,7 +173,7 @@ async function main() {
   console.log(`  Users:            5`);
   console.log(`  Branches:         3`);
   console.log(`  Branch Schedules: ${5 + 2 + 5 + 1 + 7}`);
-  console.log(`  Employees:        4`);
+  console.log(`  Employees:        5`);
   console.log(`  Addresses:        3`);
   console.log(`  Product Categories: ${totalProductCategories}`);
   console.log(`  Products:         ${totalProducts}`);
