@@ -143,7 +143,7 @@ export class OrderRepository {
                 select: {
                   currentStock: true, product: {
                     select: {
-                      productName: true, description: true, basePrice: true, weight: true,
+                      productName: true, description: true, basePrice: true, weight: true, slugName: true,
                       category: {
                         select: { name: true }
                       },

@@ -14,6 +14,8 @@ import { OrderStatus, PaymentStatus, UserRole } from "@prisma/client"
 import { getOrderMailTemplate } from "../../../utils/template"
 import { EmployeeRepository } from "../repositories/employee.repository"
 import { snap } from "../../../config/midtrans"
+import { VoucherUsedRepository } from "../repositories/voucher_used.repository"
+import { VoucherRepository } from "../repositories/voucher.repository"
 
 export class OrderService {
     private orderRepo = new OrderRepository()
@@ -24,6 +26,8 @@ export class OrderService {
     private branchInventoryRepo = new BranchInventoryRepository()
     private paymentRepo = new PaymentRepository()
     private userRepo = new UserRepository()
+    private voucherRepo = new VoucherRepository()
+    private voucherUsedRepo = new VoucherUsedRepository()
     private employeeRepo = new EmployeeRepository()
 
     async getAllOrders(page: number, limit: number, userId: string, branchId: string | null, orderNumber: string | null, dateStart: string | null, dateEnd: string | null) {
@@ -47,7 +51,7 @@ export class OrderService {
     }
 
     async addCartToOrder(userId: string, payload: { cartId: string, voucherId?: string, addressId: string, paymentMethod: 'MANUAL' | 'GATEWAY' }) {
-        const { cartId, addressId, paymentMethod } = payload
+        const { cartId, addressId, paymentMethod, voucherId } = payload
 
         // Repo : get cart with its items based on cartId
         const cart = await this.cartRepo.findCartWithItemsById(cartId)
@@ -93,11 +97,49 @@ export class OrderService {
             return sum + (basePrice * item.quantity)
         }, 0)
 
-        // Soon LOL..
-        const finalPrice = totalPrice
+        // Repo : get voucher by id
+        let voucher = null
+        if (voucherId) {
+            voucher = await this.voucherRepo.findById(voucherId)
+            if (!voucher) throw { code: 404, message: "Voucher not found" }
+
+            // Check if voucher not expired
+            if (new Date() > voucher.expiredDate) throw { code: 422, message: "Voucher expired" }
+            
+            // Check if quota still available
+            if (voucher.quota <= 0) throw { code: 422, message: "Voucher quota exceeded" }
+        }
+
+        let discountAmount = 0
+        if (voucher) {
+            // Must apply with minimum purchase
+            if (voucher.minPurchaseAmount && totalPrice < voucher.minPurchaseAmount) throw { code: 422, message: "Minimum purchase not reached for voucher" }
+
+            // Count discount based on type
+            discountAmount = voucher.discountValueType === "PERCENTAGE" ? ((totalPrice * voucher.discountValue) / 100) : voucher.discountValue
+
+            // If discount more than max amount, just take the max
+            if (discountAmount > voucher.maxDiscountAmount) discountAmount = voucher.maxDiscountAmount
+        }
+
+        // Apply voucher
+        let finalPrice = totalPrice
+        let finalShippingCost = shippingCost
+        if (voucher) {
+            if (voucher.type === "ORDER") finalPrice = totalPrice - discountAmount
+            if (voucher.type === "SHIPPING_COST") finalShippingCost = Math.max(0, shippingCost - discountAmount)
+        }
 
         // Repo : create order
         const order = await this.orderRepo.createOrder(userId, cart.branchId, addressId, totalPrice, finalPrice, shippingCost, cart.items)
+
+        if (voucher && voucherId) {
+            // Repo : reduce quota of the voucher
+            await this.voucherRepo.decrementQuota(voucherId)
+
+            // Repo : create used voucher history
+            await this.voucherUsedRepo.create(voucherId, order.id)
+        }
 
         // Repo : create payment based on order id
         let payment
@@ -113,7 +155,7 @@ export class OrderService {
             const midtransPayload = {
                 transaction_details: {
                     order_id: order.orderNumber,
-                    gross_amount: Math.round(finalPrice + shippingCost),
+                    gross_amount: Math.round(finalPrice + finalShippingCost)
                 },
                 customer_details: {
                     first_name: user?.username ?? "",

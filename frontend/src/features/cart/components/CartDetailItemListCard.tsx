@@ -4,13 +4,15 @@ import React from "react"
 
 type Props = {
     cartId: string
+    branchName: string
     items: ProductOrderCartItem[]
+
     onIncrease: (itemId: string, qty: number, stock: number) => void
     onDecrease: (cartItemId: string, qty: number, productName: string) => void
     onRemove: (cartItemId: string, productName: string) => void
 }
 
-export const CartDetailItemListCard: React.FC<Props> = ({ items, onIncrease, onDecrease, onRemove }) => {
+export const CartDetailItemListCard: React.FC<Props> = ({ items, branchName, onIncrease, onDecrease, onRemove }) => {
     return (
         <div className="bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
             <div className="flex items-center justify-between mb-4">
@@ -26,7 +28,8 @@ export const CartDetailItemListCard: React.FC<Props> = ({ items, onIncrease, onD
                             key={idx}
                             item={dt}
                             variant="cart"
-                            onIncrease={() => onIncrease(dt.id, dt.quantity, dt.currentStock)}
+                            branchName={branchName}
+                            onIncrease={() => onIncrease(dt.id, dt.quantity, dt.currentStock ?? 0)}
                             onDecrease={() => onDecrease(dt.id, dt.quantity, dt.productName)}
                             onRemove={() => onRemove(dt.id, `(${dt.quantity}) ${dt.productName}`)}
                         />

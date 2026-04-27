@@ -3,11 +3,12 @@ import { Input } from "@/components/ui/input"
 import { TicketIcon, TruckIcon } from "@heroicons/react/24/outline"
 import React, { useRef, useState } from "react"
 import { useAllVoucherData } from "../hooks/useVoucher"
+import { VoucherData } from "../repositories/voucher.type"
 
 interface Props {
     appliedVoucher?: string | null
-    onApply: (code: string) => void
-    onRemove?: (code: string) => void
+    onApply: (voucher: VoucherData) => void
+    onRemove?: () => void
 }
 
 export const VouchersSelectionCard: React.FC<Props> = ({ appliedVoucher, onApply, onRemove }) => {
@@ -63,11 +64,11 @@ export const VouchersSelectionCard: React.FC<Props> = ({ appliedVoucher, onApply
                                     </div>
                                     {
                                         isApplied ? 
-                                            <Button onClick={() => onRemove?.(dt.voucherCode)} className="bg-red-100 text-red-500 text-sm font-semibold px-4 py-2 rounded-xl hover:bg-red-200 transition-colors whitespace-nowrap">
+                                            <Button onClick={() => onRemove?.()} className="bg-red-100 text-red-500 text-sm font-semibold px-4 py-2 rounded-xl hover:bg-red-200 transition-colors whitespace-nowrap">
                                                 Remove
                                             </Button>
                                         : 
-                                            <Button onClick={() => onApply(dt.voucherCode)} className="bg-emerald-800 text-white text-sm font-semibold px-4 py-2 rounded-xl hover:bg-emerald-700 transition-colors whitespace-nowrap">
+                                            <Button onClick={() => onApply(dt)} className="bg-emerald-800 text-white text-sm font-semibold px-4 py-2 rounded-xl hover:bg-emerald-700 transition-colors whitespace-nowrap">
                                                 Apply
                                             </Button>
                                     }

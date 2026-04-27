@@ -13,12 +13,12 @@ export type ProductItem = {
 export type ProductOrderCartItem = {
     id: string
     branchInventoriesId?: string
-    currentStock: number
+    currentStock?: number
     productName: string
+    slugName: string
     description: string
     category: ProductCategory
     productImages: ProductImage[]
-    imageUrl?: string
     quantity: number
     weight: number
     basePrice: number

@@ -29,17 +29,28 @@ export const CartPaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCos
                 <p>Shipping Weight</p>
                 <h6 className="font-bold">{(shippingWeight / 1000).toFixed(2)} Kg</h6>
             </div>
-            <div className="bg-green-200 rounded-lg p-3 my-2">
-                <h6 className="font-bold">Discount</h6>
-                <div className="flex justify-between">
-                    <p>From Product</p>
-                    <h6 className="font-bold">{totalDiscountProduct > 0 ? <>-</>:<></>}Rp. {totalDiscountProduct.toLocaleString()}</h6>
-                </div>
-                <div className="flex justify-between">
-                    <p>From Voucher</p>
-                    <h6 className="font-bold">{totalDiscountVoucher > 0 ? <>-</>:<></>}Rp. {totalDiscountVoucher.toLocaleString()}</h6>
-                </div>
-            </div>
+            {
+                (totalDiscountProduct > 0 || totalDiscountVoucher > 0) && 
+                    <div className="bg-green-200 rounded-lg p-3 my-2">
+                        <h6 className="font-bold">Discount</h6>
+                        {
+                            totalDiscountProduct > 0 && (
+                                <div className="flex justify-between">
+                                    <p>From Product</p>
+                                    <h6 className="font-bold">-Rp. {totalDiscountProduct.toLocaleString()}</h6>
+                                </div>
+                            )
+                        }
+                        {
+                            totalDiscountVoucher > 0 && (
+                                <div className="flex justify-between">
+                                    <p>From Voucher</p>
+                                    <h6 className="font-bold">-Rp. {totalDiscountVoucher.toLocaleString()}</h6>
+                                </div>
+                            )
+                        }
+                    </div>
+            }
             <hr className="my-3"/>
             <div className="flex justify-between">
                 <h6 className="font-bold">Final Price</h6>

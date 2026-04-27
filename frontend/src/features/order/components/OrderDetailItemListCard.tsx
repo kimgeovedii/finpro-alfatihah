@@ -3,10 +3,11 @@ import { ProductOrderCartItem } from "@/types/product.type"
 import React from "react"
 
 type Props = {
+    branchName: string
     items: ProductOrderCartItem[]
 }
 
-export const OrderDetailItemListCard: React.FC<Props> = ({ items }) => {
+export const OrderDetailItemListCard: React.FC<Props> = ({ items, branchName }) => {
     return (
         <div className="bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
             <div className="flex items-center justify-between mb-4">
@@ -16,7 +17,7 @@ export const OrderDetailItemListCard: React.FC<Props> = ({ items }) => {
                 </span>
             </div>
             <div className="flex flex-col divide-y divide-slate-100 max-h-[70vh] overflow-y-auto pr-3">
-                { items.map((dt, idx) => <ProductOrderCartItemCard key={idx} item={dt} variant="order"/> ) }
+                { items.map((dt, idx) => <ProductOrderCartItemCard key={idx} branchName={branchName} item={dt} variant="order"/> ) }
             </div>
         </div>
     )

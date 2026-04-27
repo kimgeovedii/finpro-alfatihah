@@ -41,11 +41,11 @@ export type CartDetailCategory = {
 }
 
 export type CartDetailProduct = {
+    slugName: string
     productName: string
     description: string
     basePrice: number
     weight: number
-    currentStock: number
     category: CartDetailCategory
     productImages: ProductImage[]
 }
@@ -55,6 +55,7 @@ export type CartDetailItem = {
     quantity: number
     product: {
         product: CartDetailProduct
+        currentStock: number
     }
 }
 

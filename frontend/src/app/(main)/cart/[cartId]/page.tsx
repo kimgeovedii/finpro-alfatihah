@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import { formatListSchedule } from '@/utils/converter.util';
 import { SkeletonBox } from '@/components/layout/SkeletonBox';
+import { VoucherData } from '@/features/cart/repositories/voucher.type';
 
 export default function CartDetailPage() {
   // Handle param
@@ -24,7 +25,7 @@ export default function CartDetailPage() {
   const router = useRouter()
   const { cart, isLoading, error, fetchCartDetail } = useCartDetailData(cartId)
   const { checkoutCartItem, isCheckoutItem } = useCheckoutCartItem()
-  const [ appliedVoucher, setAppliedVoucher ] = useState<string | null>(null)
+  const [ selectedVoucher, setSelectedVoucher ] = useState<VoucherData | null>(null)  
   const [ selectedAddressId, setSelectedAddressId ] = useState<string | null>(null)
   const [ paymentMethod, setPaymentMethod ] = useState<"MANUAL" | "GATEWAY">("MANUAL")
   const { deleteCartItem, isDeletingItem } = useDeleteCartItem()
@@ -51,10 +52,44 @@ export default function CartDetailPage() {
     }
   }, [cart, isLoading, error, router])
 
-  // Handle action
-  const handleApply = (code: string) => setAppliedVoucher(code)
+  // Render loading element
+  if (isLoading || !cart) {
+    return (
+      <div className="flex flex-col space-y-2">
+        <div className='flex w-full gap-3'>
+          <div className='flex-1 flex flex-col space-y-2'>
+            <SkeletonBox extraClass={'min-h-[400px]'}/>
+            <SkeletonBox extraClass={'min-h-[360px]'}/>
+          </div>
+          <div className='flex-1 flex flex-col space-y-2'>
+            <SkeletonBox extraClass={'min-h-[190px]'}/>
+            <SkeletonBox extraClass={'min-h-[190px]'}/>
+            <SkeletonBox extraClass={'min-h-[360px]'}/>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
-  const handleRemove = () => setAppliedVoucher(null)
+  // Calculate price
+  const shippingCost = cart.shipping?.shippingCost ?? 0
+  const totalBasePrice = cart.totalBasePrice
+
+  const voucherDiscount = (() => {
+    if (!selectedVoucher) return 0
+    if (selectedVoucher.discountValueType === "PERCENTAGE") return (totalBasePrice * selectedVoucher.discountValue) / 100
+  
+    return selectedVoucher.discountValue
+  })()
+
+  const finalPrice = shippingCost + totalBasePrice - voucherDiscount
+  
+  // Format shop's schedule
+  const scheduleText = cart?.branch?.schedules ? formatListSchedule(cart?.branch?.schedules) : '-'
+
+  // Handle action
+  const handleApply = (voucher: VoucherData) => setSelectedVoucher(voucher)
+  const handleRemove = () => setSelectedVoucher(null)
 
   const handleRemoveCartItem = async (cartItemId: string, productName: string) => {
     const confirm = await Swal.fire({
@@ -81,7 +116,7 @@ export default function CartDetailPage() {
     }
   }
 
-  const handleIncrease = async (itemId: string, qty: number, stock: number) => {
+  const handleIncrease = async (cartItemId: string, qty: number, stock: number) => {
     if (qty >= stock) {
       Swal.fire({
         icon: "info",
@@ -92,7 +127,7 @@ export default function CartDetailPage() {
       return
     }
   
-    await updateCartItem(itemId, qty + 1)
+    await updateCartItem(cartItemId, qty + 1)
     fetchCartDetail(cartId)
   }
   
@@ -148,7 +183,7 @@ export default function CartDetailPage() {
     })
     if (!confirmResult.isConfirmed) return
 
-    const { success, redirectUrl } = await checkoutCartItem(cartId, selectedAddressId, paymentMethod, appliedVoucher ?? undefined)
+    const { success, redirectUrl } = await checkoutCartItem(cartId, selectedAddressId, paymentMethod, selectedVoucher?.id)
     if (!success) {
       Swal.fire({
         icon: "error",
@@ -171,32 +206,6 @@ export default function CartDetailPage() {
       confirmButtonColor: "#10b981",
     }).then(() => router.push("/transaction"))
   }  
-
-  // Render loading element
-  if (isLoading || !cart) {
-    return (
-      <div className="flex flex-col space-y-2">
-        <div className='flex w-full gap-3'>
-          <div className='flex-1 flex flex-col space-y-2'>
-            <SkeletonBox extraClass={'min-h-[400px]'}/>
-            <SkeletonBox extraClass={'min-h-[360px]'}/>
-          </div>
-          <div className='flex-1 flex flex-col space-y-2'>
-            <SkeletonBox extraClass={'min-h-[190px]'}/>
-            <SkeletonBox extraClass={'min-h-[190px]'}/>
-            <SkeletonBox extraClass={'min-h-[360px]'}/>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // Calculate price
-  const shippingCost = cart.shipping?.shippingCost ?? 0
-  const totalBasePrice = cart.totalBasePrice
-  
-  // Format shop's schedule
-  const scheduleText = cart?.branch?.schedules ? formatListSchedule(cart?.branch?.schedules) : '-'
   
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto">
@@ -231,7 +240,7 @@ export default function CartDetailPage() {
             }
           />
           <VouchersSelectionCard
-            appliedVoucher={appliedVoucher}
+            appliedVoucher={selectedVoucher?.voucherCode}
             onApply={handleApply}
             onRemove={handleRemove}
           />
@@ -239,16 +248,18 @@ export default function CartDetailPage() {
         <div className='w-full lg:flex-1 flex flex-col space-y-5'>
             <CartDetailItemListCard
               cartId={cartId}
+              branchName={cart.branch.storeName}
               items={
                 cart.items.map(dt => ({
                   id: dt.id,
                   cartId: cartId,
+                  slugName: dt.product.product.slugName,
                   productName: dt.product.product.productName,
                   description: dt.product.product.description,
                   category: dt.product.product.category,
                   productImages: dt.product.product.productImages,
                   quantity: dt.quantity,
-                  currentStock: dt.product.product.currentStock,
+                  currentStock: dt.product.currentStock,
                   weight: dt.product.product.weight * dt.quantity,
                   basePrice: dt.product.product.basePrice,
                   totalPrice: dt.product.product.basePrice * dt.quantity
@@ -262,11 +273,11 @@ export default function CartDetailPage() {
           <CartPaymentSummaryCard
             totalItem={cart.totalQty}
             shippingWeight={cart.totalWeight}
-            shippingCost={cart.shipping?.shippingCost ?? 0}
-            totalPrice={cart.totalBasePrice}
+            shippingCost={shippingCost}
+            totalPrice={totalBasePrice}
             totalDiscountProduct={0}
-            totalDiscountVoucher={0}
-            finalPrice={shippingCost + totalBasePrice}
+            totalDiscountVoucher={voucherDiscount}
+            finalPrice={finalPrice}
             onCheckout={handleCheckout}
           />
         </div>

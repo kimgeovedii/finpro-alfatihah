@@ -158,8 +158,11 @@ export default function TransactionDetailPage() {
                 :
                   <>
                     <OrderDetailItemListCard
+                      branchName={order?.branch.storeName ?? '-'}
                       items={order?.items?.map(dt => ({
                         branchInventoriesId: dt.id,
+                        id: dt.id,
+                        slugName: dt.product.product.slugName,
                         weight: dt.product.product.weight * dt.quantity,
                         productName: dt.product.product.productName,
                         description: dt.product.product.description,

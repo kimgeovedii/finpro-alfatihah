@@ -561,6 +561,9 @@
  *                                   weight:
  *                                     type: number
  *                                     example: 120
+ *                                   slugName:
+ *                                     type: string
+ *                                     example: coca-cola
  *                                   productImages:
  *                                     type: array
  *                                     items:

@@ -49,9 +49,9 @@ export class CartRepository {
             quantity: true,
             product: {
               select: {
-                product: {
+                currentStock: true, product: {
                   select: {
-                    productName: true, description: true, basePrice: true, weight: true, productImages: {
+                    productName: true, description: true, basePrice: true, weight: true, slugName: true, productImages: {
                       select: { imageUrl: true },
                       where: { isPrimary: true },
                       take: 1
