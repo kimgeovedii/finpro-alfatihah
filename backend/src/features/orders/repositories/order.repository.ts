@@ -119,7 +119,7 @@ export class OrderRepository {
 
   async findOrderDetailByOrderNumber(role: UserRole, userId: string, orderNumber: string) {
     if (role === "CUSTOMER") {
-      return await prisma.orders.findFirst({
+      const order = await prisma.orders.findFirst({
         where: { orderNumber, userId },
         select: {
           id: true, orderNumber: true, status: true, totalPrice: true, finalPrice: true, shippingCost: true, paymentDeadline: true, shippedAt: true, confirmedAt: true, rejectedAt: true, createdAt: true,
@@ -141,9 +141,9 @@ export class OrderRepository {
             select: {
               id: true, quantity: true, product: {
                 select: {
-                  product: {
+                  currentStock: true, product: {
                     select: {
-                      productName: true, description: true, basePrice: true, 
+                      productName: true, description: true, basePrice: true, weight: true,
                       category: {
                         select: { name: true }
                       },
@@ -164,6 +164,20 @@ export class OrderRepository {
           }
         }
       })
+
+      if (!order) return null
+
+      // Count summary for total price & qty
+      const { totalWeight } = order.items.reduce((ord, item) => {
+        const weight = item.product.product.weight || 0
+        const qty = item.quantity || 0
+
+        ord.totalWeight += weight * qty
+        
+        return ord
+      }, { totalBasePrice: 0, totalQty: 0, totalWeight: 0 })
+
+      return { ...order, totalWeight }
     } else {
       const order = await prisma.orders.findFirst({
         where: { orderNumber },
@@ -183,7 +197,7 @@ export class OrderRepository {
                 select: {
                   currentStock: true, product: {
                     select: {
-                      productName: true, description: true, basePrice: true, productImages: {
+                      productName: true, description: true, basePrice: true, weight: true, productImages: {
                         select: { imageUrl: true },
                         where: { isPrimary: true }
                       }

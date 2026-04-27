@@ -5,7 +5,7 @@ import { CartDetailItemListCard } from '@/features/cart/components/CartDetailIte
 import { CartPaymentSummaryCard } from '@/features/cart/components/CartPaymentSummaryCard';
 import { PaymentMethodSelect } from '@/features/cart/components/PaymentMethodSelect';
 import { VouchersSelectionCard } from '@/features/cart/components/VouchersSelectionCard';
-import { useCartDetailData, useCheckoutCartItem } from '@/features/cart/hooks/useCart';
+import { useCartDetailData, useCheckoutCartItem, useDeleteCart, useDeleteCartItem, useUpdateCartItem } from '@/features/cart/hooks/useCart';
 import { useRouter } from 'next/navigation'
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
@@ -28,11 +28,13 @@ export default function CartDetailPage() {
 
   // Handle hook
   const router = useRouter()
-  const { cart, isLoading, error } = useCartDetailData(cartId)
+  const { cart, isLoading, error, fetchCartDetail } = useCartDetailData(cartId)
   const { checkoutCartItem, isCheckoutItem } = useCheckoutCartItem()
   const [ appliedVoucher, setAppliedVoucher ] = useState<string | null>(null)
   const [ selectedAddressId, setSelectedAddressId ] = useState<string | null>(null)
   const [ paymentMethod, setPaymentMethod ] = useState<"MANUAL" | "GATEWAY">("MANUAL")
+  const { deleteCartItem, isDeletingItem } = useDeleteCartItem()
+  const { updateCartItem, isUpdatingItem } = useUpdateCartItem()
 
   // Handle hook fetching
   useEffect(() => {
@@ -59,6 +61,76 @@ export default function CartDetailPage() {
   const handleApply = (code: string) => setAppliedVoucher(code)
 
   const handleRemove = () => setAppliedVoucher(null)
+
+  const handleRemoveCartItem = async (cartItemId: string, productName: string) => {
+    const confirm = await Swal.fire({
+      title: "Remove cart item?",
+      html: `<b>${productName}</b> items in this cart will be deleted.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, remove it",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#ef4444",
+    })
+    if (!confirm.isConfirmed) return
+
+    const success = await deleteCartItem(cartItemId)
+    if (success) {
+      await Swal.fire({
+        title: "Item deleted",
+        html: `<b>${productName}</b> has been removed.`,
+        icon: "success",
+        confirmButtonColor: "#10b981",
+      })
+
+      fetchCartDetail(cartId)
+    }
+  }
+
+  const handleIncrease = async (itemId: string, qty: number, stock: number) => {
+    if (qty >= stock) {
+      Swal.fire({
+        icon: "info",
+        title: "Stock limit reached",
+        text: "You already selected all available items.",
+        confirmButtonColor: "#10b981",
+      })
+      return
+    }
+  
+    await updateCartItem(itemId, qty + 1)
+    fetchCartDetail(cartId)
+  }
+  
+  const handleDecrease = async (cartItemId: string, qty: number, productName: string) => {
+    if (qty <= 1) {
+      const confirm = await Swal.fire({
+        title: "Remove item?",
+        html: `<b>${productName}</b> will be removed from cart.`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, remove",
+        confirmButtonColor: "#ef4444",
+      })
+      if (!confirm.isConfirmed) return
+  
+      const success = await deleteCartItem(cartItemId)
+      if (success) {
+        await Swal.fire({
+          title: "Item deleted",
+          html: `<b>${productName}</b> has been removed.`,
+          icon: "success",
+          confirmButtonColor: "#10b981",
+        })
+
+        fetchCartDetail(cartId)
+      }
+    } else {
+      await updateCartItem(cartItemId, qty - 1)
+    }
+  
+    fetchCartDetail(cartId)
+  }
 
   const handleCheckout = async () => {
     if (!selectedAddressId) {
@@ -172,23 +244,31 @@ export default function CartDetailPage() {
           />
         </div>
         <div className='flex-1 flex flex-col space-y-5'>
-          <CartDetailItemListCard
-            items={
-              cart.items.map(dt => ({
-                id: dt.id,
-                productName: dt.product.product.productName,
-                description: dt.product.product.description,
-                category: dt.product.product.category.name,
-                imageUrl: dt.product.product.productImages?.[0]?.imageUrl,
-                quantity: dt.quantity,
-                basePrice: dt.product.product.basePrice,
-                totalPrice: dt.product.product.basePrice * dt.quantity
-              }))
-            }
+            <CartDetailItemListCard
+              cartId={cartId}
+              items={
+                cart.items.map(dt => ({
+                  id: dt.id,
+                  cartId: cartId,
+                  productName: dt.product.product.productName,
+                  description: dt.product.product.description,
+                  category: dt.product.product.category.name,
+                  imageUrl: dt.product.product.productImages?.[0]?.imageUrl,
+                  quantity: dt.quantity,
+                  currentStock: dt.product.product.currentStock,
+                  weight: dt.product.product.weight * dt.quantity,
+                  basePrice: dt.product.product.basePrice,
+                  totalPrice: dt.product.product.basePrice * dt.quantity,
+                }))
+              }
+              onIncrease={handleIncrease}
+              onDecrease={handleDecrease}
+              onRemove={handleRemoveCartItem}
           />
           <PaymentMethodSelect selectedMethod={paymentMethod} onSelectMethod={setPaymentMethod}/>
           <CartPaymentSummaryCard
             totalItem={cart.totalQty}
+            shippingWeight={cart.totalWeight}
             shippingCost={cart.shipping?.shippingCost ?? 0}
             totalPrice={cart.totalBasePrice}
             totalDiscountProduct={0}

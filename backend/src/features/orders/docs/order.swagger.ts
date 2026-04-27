@@ -448,6 +448,9 @@
  *                     totalPrice:
  *                       type: number
  *                       example: 224322
+ *                     totalWeight:
+ *                       type: number
+ *                       example: 1400
  *                     finalPrice:
  *                       type: number
  *                       example: 248580
@@ -555,6 +558,9 @@
  *                                   basePrice:
  *                                     type: number
  *                                     example: 14328
+ *                                   weight:
+ *                                     type: number
+ *                                     example: 120
  *                                   productImages:
  *                                     type: array
  *                                     items:

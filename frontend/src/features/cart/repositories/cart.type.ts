@@ -44,6 +44,8 @@ export type CartDetailProduct = {
     productName: string
     description: string
     basePrice: number
+    weight: number
+    currentStock: number
     category: CartDetailCategory
     productImages: ProductImage[]
 }
@@ -78,6 +80,7 @@ export type CartData = {
         addresses: AddressData[]
     }
     totalBasePrice: number
+    totalWeight: number
     totalQty: number
     shipping: CartDetailShipping | null
     openStatus: string

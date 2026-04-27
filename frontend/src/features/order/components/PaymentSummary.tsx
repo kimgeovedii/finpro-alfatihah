@@ -11,6 +11,7 @@ type Props = {
     paymentDeadline: string
     paymentEvidence?: string | null
     totalItem: number
+    shippingWeight: number
     shippingCost: number
     totalPrice: number
     totalSaving: number
@@ -19,7 +20,7 @@ type Props = {
     onCancel: (orderNumber: string) => void
 }
 
-export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, totalPrice, totalSaving, finalPrice, orderId, status, paymentDeadline, paymentEvidence, orderNumber, onCancel, paymentMethod }) => {
+export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, totalPrice, totalSaving, finalPrice, orderId, status, paymentDeadline, paymentEvidence, orderNumber, onCancel, paymentMethod, shippingWeight }) => {
     return (
         <div className="bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 mb-4">
             <h5 className="font-bold mb-3">Payment Summary</h5>
@@ -30,6 +31,10 @@ export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, t
             <div className="flex justify-between">
                 <p>Shipping Cost</p>
                 <h6 className="font-bold">Rp. {shippingCost.toLocaleString()}</h6>
+            </div>
+            <div className="flex justify-between">
+                <p>Shipping Weight</p>
+                <h6 className="font-bold">{(shippingWeight / 1000).toFixed(2)} Kg</h6>
             </div>
             <div className="flex justify-between">
                 <p>Total Saving</p>

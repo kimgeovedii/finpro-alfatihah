@@ -80,9 +80,12 @@ export class OrderService {
             getCityIdFromCoords(branch.latitude, branch.longitude),
             getCityIdFromCoords(address.lat, address.long)
         ])
+
+        // Total weight (g)
+        const totalWeight = cart.items.reduce((sum, dt) => sum + dt.product.product.weight, 0)
     
         // Helper : get shipping cost from Raja Ongkir + Opencage
-        const shippingCost = await getShippingCost(originId, destinationId)
+        const shippingCost = await getShippingCost(originId, destinationId, totalWeight)
 
         // Calculate total price from cart items
         const totalPrice = cart.items.reduce((sum, item) => {

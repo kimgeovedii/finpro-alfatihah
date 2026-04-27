@@ -51,9 +51,14 @@ export class CartRepository {
               select: {
                 product: {
                   select: {
-                    productName: true, description: true, category: true, basePrice: true, productImages: {
+                    productName: true, description: true, basePrice: true, weight: true, productImages: {
                       select: { imageUrl: true },
                       where: { isPrimary: true }
+                    },
+                    category: {
+                      select: {
+                        slugName: true, name: true
+                      }
                     }
                   }
                 }
@@ -76,17 +81,19 @@ export class CartRepository {
     if (!cart) return null
 
     // Count summary for total price & qty
-    const { totalBasePrice, totalQty  } = cart.items.reduce((acc, item) => {
+    const { totalBasePrice, totalQty, totalWeight } = cart.items.reduce((acc, item) => {
       const price = item.product.product.basePrice || 0
+      const weight = item.product.product.weight || 0
       const qty = item.quantity || 0
 
       acc.totalBasePrice += price * qty
+      acc.totalWeight += weight * qty
       acc.totalQty += qty
       
       return acc
-    }, { totalBasePrice: 0, totalQty: 0 })
+    }, { totalBasePrice: 0, totalQty: 0, totalWeight: 0 })
 
-    return { ...cart, totalBasePrice, totalQty }
+    return { ...cart, totalBasePrice, totalQty, totalWeight }
   }
 
   async findAllCarts(page: number, limit: number, userId: string, branchId: string | null) {

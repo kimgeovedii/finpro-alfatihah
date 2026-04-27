@@ -160,6 +160,7 @@ export default function TransactionDetailPage() {
                     <OrderDetailItemListCard
                       items={order?.items?.map(dt => ({
                         branchInventoriesId: dt.id,
+                        weight: dt.product.product.weight * dt.quantity,
                         productName: dt.product.product.productName,
                         description: dt.product.product.description,
                         category: dt.product.product.category.name,
@@ -172,6 +173,7 @@ export default function TransactionDetailPage() {
                     <PaymentSummaryCard
                       orderNumber={orderNumber}
                       totalItem={order?.items?.reduce((acc, item) => acc + item.quantity, 0) ?? 0}
+                      shippingWeight={order?.totalWeight ?? 0}
                       shippingCost={order?.shippingCost ?? 0}
                       totalPrice={order?.totalPrice ?? 0}
                       totalSaving={0}

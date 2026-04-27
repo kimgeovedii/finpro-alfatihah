@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Headset, Receipt } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import React from "react"
 
 type Props = {
     totalItem: number
     shippingCost: number
+    shippingWeight: number
     totalPrice: number
     totalDiscountProduct: number
     totalDiscountVoucher: number
@@ -12,7 +13,7 @@ type Props = {
     onCheckout: () => void
 }
 
-export const CartPaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, totalPrice, totalDiscountProduct, totalDiscountVoucher, finalPrice, onCheckout }) => {
+export const CartPaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, totalPrice, totalDiscountProduct, totalDiscountVoucher, finalPrice, shippingWeight, onCheckout }) => {
     return (
         <div className="bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 mb-4">
             <h5 className="font-bold mb-3">Payment Summary</h5>
@@ -23,6 +24,10 @@ export const CartPaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCos
             <div className="flex justify-between">
                 <p>Shipping Cost</p>
                 <h6 className="font-bold">Rp. {shippingCost.toLocaleString()}</h6>
+            </div>
+            <div className="flex justify-between">
+                <p>Shipping Weight</p>
+                <h6 className="font-bold">{(shippingWeight / 1000).toFixed(2)} Kg</h6>
             </div>
             <div className="bg-green-200 rounded-lg p-3 my-2">
                 <h6 className="font-bold">Discount</h6>

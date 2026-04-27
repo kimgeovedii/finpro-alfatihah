@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { courierShippingDefault, isShipmentTesting, mockShipmentCity, mockShipmentPricePerGram, weightGramsShippingDefault } from '../constants/business.const'
+import { courierShippingDefault, isShipmentTesting, mockShipmentCity, mockShipmentPricePerKG, weightGramsShippingDefault } from '../constants/business.const'
 
 const RAJA_ONGKIR_BASE_URL = 'https://rajaongkir.komerce.id/api/v1'
 const OPENCAGE_BASE_URL = 'https://api.opencagedata.com/geocode/v1/json'
@@ -58,7 +58,7 @@ export const getCityIdFromCoords = async (lat: number, long: number): Promise<nu
 
 // Calculate the shipping cost by origin, dest id, courier, and weight
 export const getShippingCost = async (originId: number, destinationId: number, weightGrams: number = weightGramsShippingDefault, courier: string = courierShippingDefault): Promise<number> => {
-    if (isShipmentTesting) return mockShipmentPricePerGram * weightGrams
+    if (isShipmentTesting) return mockShipmentPricePerKG * Math.ceil(weightGrams / 1000)
 
     const params = new URLSearchParams()
     params.append('origin', String(originId))

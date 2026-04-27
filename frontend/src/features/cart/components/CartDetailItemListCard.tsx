@@ -1,24 +1,16 @@
-import { MiniTagBox } from "@/components/layout/MiniTagBox"
-import { Button } from "@/components/ui/button"
-import { TrashIcon } from "@heroicons/react/24/outline"
+import { ProductOrderCartItemCard } from "@/components/layout/ProductOrderCartItemCard"
+import { ProductOrderCartItem } from "@/types/product.type"
 import React from "react"
 
-type CartItem = {
-    id: string
-    productName: string
-    description: string
-    category: string
-    imageUrl?: string
-    quantity: number
-    basePrice: number
-    totalPrice: number
-}
-
 type Props = {
-    items: CartItem[]
+    cartId: string
+    items: ProductOrderCartItem[]
+    onIncrease: (itemId: string, qty: number, stock: number) => void
+    onDecrease: (cartItemId: string, qty: number, productName: string) => void
+    onRemove: (cartItemId: string, productName: string) => void
 }
 
-export const CartDetailItemListCard: React.FC<Props> = ({ items }) => {
+export const CartDetailItemListCard: React.FC<Props> = ({ items, onIncrease, onDecrease, onRemove }) => {
     return (
         <div className="bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
             <div className="flex items-center justify-between mb-4">
@@ -30,29 +22,14 @@ export const CartDetailItemListCard: React.FC<Props> = ({ items }) => {
             <div className="flex flex-col divide-y divide-slate-100 max-h-[70vh] overflow-y-auto pr-3">
                 {
                     items.map((dt, idx) => (
-                        <div key={idx} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
-                            <div className="w-14 h-14 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                                { dt.imageUrl ? <img src={dt.imageUrl} alt={dt.productName} className="w-full h-full object-cover"/> : <span className="text-2xl">🛒</span> }
-                            </div>
-                            <div className="flex-1 min-w-0">
-                                <p className="text-[10px] font-semibold text-emerald-600 uppercase tracking-wider">{dt.category}</p>
-                                <p className="text-sm font-semibold text-slate-800">{dt.productName}</p>
-                                <p className="text-xs text-slate-400 line-clamp-3">{dt.description}</p>
-                                <MiniTagBox context="Qty" val={dt.quantity.toString()}/>
-                            </div>
-                            <div className="text-right flex-shrink-0">
-                                <p className="text-sm font-bold text-slate-800">Rp. {(dt.basePrice * dt.quantity).toLocaleString()}</p>
-                                <p className="text-xs text-slate-400 font-semibold">Rp. {dt.basePrice.toLocaleString()} / item</p>
-                                <div className="flex items-center gap-2 justify-end">
-                                    <Button className="bg-transparent text-slate-400 hover:text-red-500 transition cursor-pointer"><TrashIcon className="w-5 h-5"/></Button>
-                                    <div className="flex items-center bg-slate-100/70 rounded-full p-1 shadow-inner mt-2 gap-1">
-                                        <Button className="bg-transparent w-5 h-5 flex items-center justify-center rounded-full text-slate-600 hover:bg-white transition">-</Button>
-                                        <span className="w-5 text-center font-semibold text-slate-800 text-sm">{dt.quantity}</span>
-                                        <Button className="w-5 h-5 flex items-center justify-center rounded-full bg-emerald-600 text-white shadow hover:bg-emerald-700 transition">+</Button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <ProductOrderCartItemCard
+                            key={idx}
+                            item={dt}
+                            variant="cart"
+                            onIncrease={() => onIncrease(dt.id, dt.quantity, dt.currentStock)}
+                            onDecrease={() => onDecrease(dt.id, dt.quantity, dt.productName)}
+                            onRemove={() => onRemove(dt.id, `(${dt.quantity}) ${dt.productName}`)}
+                        />
                     ))
                 }
             </div>

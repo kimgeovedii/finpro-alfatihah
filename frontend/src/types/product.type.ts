@@ -10,6 +10,20 @@ export type ProductItem = {
     productImages: ProductImage[]
 }
 
+export type ProductOrderCartItem = {
+    id: string
+    branchInventoriesId?: string
+    currentStock: number
+    productName: string
+    description: string
+    category: string
+    imageUrl?: string
+    quantity: number
+    weight: number
+    basePrice: number
+    totalPrice: number
+}
+
 export type ProductCategory = {
     name: string
 }

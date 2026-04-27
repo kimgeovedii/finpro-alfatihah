@@ -510,6 +510,7 @@
  *                                       slugName: { type: string, example: canned-goods }
  *                                       description: { type: string, example: Canned goods for long-term storage }
  *                                   basePrice: { type: number, example: 16023 }
+ *                                   weight: { type: number, example: 1200 }
  *                                   productImages:
  *                                     type: array
  *                                     items:
@@ -534,6 +535,7 @@
  *                               isPrimary: { type: boolean, example: true }
  *                     totalBasePrice: { type: number, example: 24241893 }
  *                     totalQty: { type: number, example: 641 }
+ *                     totalWeight: { type: number, example: 1200 }
  *                     shipping:
  *                       type: object
  *                       properties:

@@ -85,7 +85,7 @@ export default function CartPage() {
     fetchAllCarts(1)
   }
   
-  const handleDecrease = async (cartItemId: string, cartId: string, qty: number, productName: string) => {
+  const handleDecrease = async (cartItemId: string, qty: number, productName: string) => {
     if (qty <= 1) {
       const confirm = await Swal.fire({
         title: "Remove item?",
@@ -97,7 +97,7 @@ export default function CartPage() {
       })
       if (!confirm.isConfirmed) return
   
-      const success = await deleteCart(cartId)
+      const success = await deleteCartItem(cartItemId)
       if (success) {
         await Swal.fire({
           title: "Item deleted",
@@ -153,7 +153,7 @@ export default function CartPage() {
                         <CartItemCard key={dt.id}
                           slugName={dt.product.product.slugName} storeName={ct.branch.storeName} productName={dt.product.product.productName} description={dt.product.product.description} 
                           basePrice={dt.product.product.basePrice} mainImage={dt.product.product.productImages[0].imageUrl} qty={dt.quantity} currentStock={dt.product.currentStock}
-                          onDecrease={() => handleDecrease(dt.id, ct.id, dt.quantity,dt.product.product.productName)}
+                          onDecrease={() => handleDecrease(dt.id, dt.quantity,dt.product.product.productName)}
                           onIncrease={() => handleIncrease(dt.id, dt.quantity, dt.product.currentStock)}                        
                           onRemove={() => handleRemoveCartItem(dt.id, `(${dt.quantity}) ${dt.product.product.productName}`)}
                         />
