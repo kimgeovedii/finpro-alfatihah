@@ -18,6 +18,7 @@ import { MutationJournalRouter } from "../features/inventories/routers/mutationJ
 import paymentRouter from "../features/payments/routers/payment.router";
 import addressRouter from "../features/address/routers/address.router";
 import sessionRouter from "../features/session/routers/session.router";
+import { ReportRouter } from "../features/reports/routers/report.router";
 
 class GlobalRouter {
   public router: Router;
