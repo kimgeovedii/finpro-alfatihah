@@ -163,7 +163,7 @@ export default function CartPage() {
                 ))
             }
             {/* Pagination */}
-            { meta && meta.page < meta.total_page && <Button className="mt-4 px-4 py-2 bg-slate-800 text-white rounded-lg" onClick={() => fetchAllCarts(meta.page + 1)}>See More</Button> }
+            { meta && meta.page < meta.totalPages && <Button className="mt-4 px-4 py-2 bg-slate-800 text-white rounded-lg" onClick={() => fetchAllCarts(meta.page + 1)}>See More</Button> }
           </div>
         </div>
       </div>

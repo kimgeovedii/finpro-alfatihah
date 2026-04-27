@@ -64,7 +64,7 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
 
     // Pagination 
     const currentPage = meta?.page ?? 1
-    const totalPages = meta?.total_page ?? 1
+    const totalPages = meta?.totalPages ?? 1
     const totalOrders = meta?.total ?? 0
     const limit = meta?.limit ?? 10
     const startItem = (currentPage - 1) * limit + 1

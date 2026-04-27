@@ -53,7 +53,8 @@ export class CartRepository {
                   select: {
                     productName: true, description: true, basePrice: true, weight: true, productImages: {
                       select: { imageUrl: true },
-                      where: { isPrimary: true }
+                      where: { isPrimary: true },
+                      take: 1
                     },
                     category: {
                       select: {

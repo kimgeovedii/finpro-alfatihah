@@ -46,11 +46,6 @@ const NAV_ITEMS = [
     icon: <ArrowsRightLeftIcon className="w-5 h-5" />,
   },
   {
-    title: "Manage Project",
-    href: "/manage-project",
-    icon: <BriefcaseIcon className="w-5 h-5" />,
-  },
-  {
     title: "Tracking Document",
     href: "/tracking",
     icon: <ClipboardDocumentCheckIcon className="w-5 h-5" />,

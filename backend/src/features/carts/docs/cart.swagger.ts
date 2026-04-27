@@ -255,7 +255,7 @@
  *                         page: { type: integer, example: 1 }
  *                         limit: { type: integer, example: 14 }
  *                         total: { type: integer, example: 1 }
- *                         total_page: { type: integer, example: 1 }
+ *                         totalPages: { type: integer, example: 1 }
  *
  *       400:
  *         description: Validation error

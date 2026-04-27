@@ -15,12 +15,6 @@ import Swal from 'sweetalert2';
 import { formatListSchedule } from '@/utils/converter.util';
 import { SkeletonBox } from '@/components/layout/SkeletonBox';
 
-const vouchersData = [
-  { code: "DISC10", description: "Discount 10%" },
-  { code: "FREESHIP", description: "Free Shipping" },
-  { code: "WELCOME", description: "Welcome Bonus" },
-]
-
 export default function CartDetailPage() {
   // Handle param
   const params = useParams()
@@ -213,8 +207,8 @@ export default function CartDetailPage() {
           </Button>
         </Link>
       </div>
-      <div className='flex w-full gap-5'>
-        <div className='flex-1 flex flex-col space-y-5'>
+      <div className='flex flex-col lg:flex-row w-full gap-5'>
+        <div className='w-full lg:flex-1 flex flex-col space-y-5'>
           <AddressSelectionCard
             branch={{
               name: cart?.branch.storeName,
@@ -237,13 +231,12 @@ export default function CartDetailPage() {
             }
           />
           <VouchersSelectionCard
-            vouchers={vouchersData}
             appliedVoucher={appliedVoucher}
             onApply={handleApply}
             onRemove={handleRemove}
           />
         </div>
-        <div className='flex-1 flex flex-col space-y-5'>
+        <div className='w-full lg:flex-1 flex flex-col space-y-5'>
             <CartDetailItemListCard
               cartId={cartId}
               items={
@@ -252,13 +245,13 @@ export default function CartDetailPage() {
                   cartId: cartId,
                   productName: dt.product.product.productName,
                   description: dt.product.product.description,
-                  category: dt.product.product.category.name,
-                  imageUrl: dt.product.product.productImages?.[0]?.imageUrl,
+                  category: dt.product.product.category,
+                  productImages: dt.product.product.productImages,
                   quantity: dt.quantity,
                   currentStock: dt.product.product.currentStock,
                   weight: dt.product.product.weight * dt.quantity,
                   basePrice: dt.product.product.basePrice,
-                  totalPrice: dt.product.product.basePrice * dt.quantity,
+                  totalPrice: dt.product.product.basePrice * dt.quantity
                 }))
               }
               onIncrease={handleIncrease}

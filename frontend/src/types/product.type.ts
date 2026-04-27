@@ -16,7 +16,8 @@ export type ProductOrderCartItem = {
     currentStock: number
     productName: string
     description: string
-    category: string
+    category: ProductCategory
+    productImages: ProductImage[]
     imageUrl?: string
     quantity: number
     weight: number
