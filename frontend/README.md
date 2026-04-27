@@ -1,19 +1,19 @@
-# AgroTrack Frontend
+# alfatihah Frontend
 
 Next.js 16 + TypeScript frontend template with production-ready authentication, Zustand state management, and Tailwind CSS 4 + shadcn/ui.
 
 ## Tech Stack
 
-| Category  | Library                       |
-| --------- | ----------------------------- |
-| Framework | Next.js 16 (App Router)       |
-| Language  | TypeScript                    |
-| Styling   | Tailwind CSS 4                |
+| Category  | Library                        |
+| --------- | ------------------------------ |
+| Framework | Next.js 16 (App Router)        |
+| Language  | TypeScript                     |
+| Styling   | Tailwind CSS 4                 |
 | UI Lib    | **shadcn/ui** (Radix + Lucide) |
-| Animation | Framer Motion                 |
-| State     | Zustand                       |
-| Forms     | Formik + Yup                  |
-| Auth      | Cookie-based JWT (js-cookie)  |
+| Animation | Framer Motion                  |
+| State     | Zustand                        |
+| Forms     | Formik + Yup                   |
+| Auth      | Cookie-based JWT (js-cookie)   |
 
 ## Setup
 
@@ -62,21 +62,25 @@ src/
 Strictly adhere to these conventions to maintain codebase integrity.
 
 ### 1. Naming Conventions
+
 - **Components**: PascalCase (e.g., `LoginForm.tsx`).
 - **Hooks**: camelCase with `use` prefix (e.g., `useLogin.ts`).
 - **Layers**: `feature.layer.ts` (e.g., `auth.service.ts`, `auth.repository.ts`).
 - **Folders**: Lowercase (e.g., `service`, `repository`).
 
 ### 2. Architectural Flow
+
 **Always follow this unidirectional data flow:**
 `Component` -> `Hook` -> `Service (Zustand)` -> `Repository` -> `apiFetch` -> `Backend API`
 
 ### 3. UI & Styling
+
 - **Primitives**: Use components from `src/components/ui`. If missing, add via `npx shadcn@latest add [component]`.
 - **Styling**: Use Tailwind CSS 4 utility classes. Avoid inline styles or CSS modules.
 - **Animations**: Use `framer-motion` for transitions and micro-interactions.
 
 ### 4. Forms & Validation
+
 - **Form Handling**: Use `Formik`.
 - **Schema Validation**: Use `Yup`.
 
@@ -89,8 +93,8 @@ Strictly adhere to these conventions to maintain codebase integrity.
 
 ## Scripts
 
-| Script          | Description                    |
-| --------------- | ------------------------------ |
-| `npm run dev`   | Start Next.js dev server       |
-| `npm run build` | Production build               |
-| `npx shadcn add`| Add new shadcn/ui components   |
+| Script           | Description                  |
+| ---------------- | ---------------------------- |
+| `npm run dev`    | Start Next.js dev server     |
+| `npm run build`  | Production build             |
+| `npx shadcn add` | Add new shadcn/ui components |

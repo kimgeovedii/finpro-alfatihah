@@ -4,6 +4,7 @@ import { useState, useCallback, useMemo } from "react";
 import { authService } from "../service/auth.service";
 import { useAuthStore } from "../store/useAuthStore";
 import { User } from "../types";
+import { getDeviceId } from "@/utils/deviceId";
 
 export const useAuthService = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -55,7 +56,8 @@ export const useAuthService = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const result: any = await authService.login(data);
+      const deviceId = getDeviceId();
+      const result: any = await authService.login({ ...data, deviceId });
       setAuth(result.user, result.accessToken, result.refreshToken);
       return result;
     } catch (err: any) {
@@ -70,7 +72,8 @@ export const useAuthService = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const result: any = await authService.employeeLogin(data);
+      const deviceId = getDeviceId();
+      const result: any = await authService.employeeLogin({ ...data, deviceId });
       setAuth(result.user, result.accessToken, result.refreshToken);
       return result;
     } catch (err: any) {
@@ -85,7 +88,8 @@ export const useAuthService = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const result: any = await authService.googleLogin(credential);
+      const deviceId = getDeviceId();
+      const result: any = await authService.googleLogin({ credential, deviceId });
       setAuth(result.user, result.accessToken, result.refreshToken);
       return result;
     } catch (err: any) {
