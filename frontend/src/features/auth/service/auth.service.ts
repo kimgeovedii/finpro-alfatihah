@@ -1,21 +1,29 @@
 import { apiFetch } from "@/utils/api";
 import Cookies from "js-cookie";
+import { 
+  AuthResponse, 
+  LoginPayload, 
+  RegisterPayload, 
+  VerifyPayload, 
+  MessageResponse,
+  User
+} from "../types";
 
 export const authService = {
-  register: async (data: any) => {
-    return apiFetch<any>("/auth/register", "post", data);
+  register: async (data: RegisterPayload) => {
+    return apiFetch<MessageResponse>("/auth/register", "post", data);
   },
 
-  verifyAndSetPassword: async (data: any) => {
-    return apiFetch<any>("/auth/verify-set-password", "post", data);
+  verifyAndSetPassword: async (data: VerifyPayload) => {
+    return apiFetch<MessageResponse>("/auth/verify-set-password", "post", data);
   },
 
   verifyEmailOnly: async (token: string) => {
-    return apiFetch<any>("/auth/verify-email-only", "post", { token });
+    return apiFetch<MessageResponse>("/auth/verify-email-only", "post", { token });
   },
 
-  login: async (data: any) => {
-    const result: any = await apiFetch<any>("/auth/login", "post", data);
+  login: async (data: LoginPayload) => {
+    const result = await apiFetch<AuthResponse>("/auth/login", "post", data);
     const { user, accessToken, refreshToken } = result;
     
     // Set cookies for middleware
@@ -25,8 +33,8 @@ export const authService = {
     return { user, accessToken, refreshToken };
   },
 
-  employeeLogin: async (data: any) => {
-    const result: any = await apiFetch<any>("/auth/login/employee", "post", data);
+  employeeLogin: async (data: LoginPayload) => {
+    const result = await apiFetch<AuthResponse>("/auth/login/employee", "post", data);
     const { user, accessToken, refreshToken } = result;
     
     // Set cookies for middleware
@@ -36,8 +44,8 @@ export const authService = {
     return { user, accessToken, refreshToken };
   },
 
-  googleLogin: async (credential: string) => {
-    const result: any = await apiFetch<any>("/auth/google", "post", { credential });
+  googleLogin: async (data: { credential: string; deviceId?: string }) => {
+    const result = await apiFetch<AuthResponse>("/auth/google", "post", data);
     const { user, accessToken, refreshToken } = result;
     
     Cookies.set("accessToken", accessToken, { expires: 30 });
@@ -50,7 +58,7 @@ export const authService = {
     const refreshToken = Cookies.get("refreshToken");
     try {
       if (refreshToken) {
-        await apiFetch<any>("/auth/logout", "post", { refreshToken });
+        await apiFetch<MessageResponse>("/auth/logout", "post", { refreshToken });
       }
     } catch (err) {
       console.warn("Logout request failed, but clearing local session anyway.", err);
@@ -64,18 +72,18 @@ export const authService = {
   },
 
   requestResetPassword: async (email: string) => {
-    return apiFetch<any>("/auth/reset-password", "post", { email });
+    return apiFetch<MessageResponse>("/auth/reset-password", "post", { email });
   },
 
-  confirmResetPassword: async (data: any) => {
-    return apiFetch<any>("/auth/confirm-reset-password", "post", data);
+  confirmResetPassword: async (data: VerifyPayload) => {
+    return apiFetch<MessageResponse>("/auth/confirm-reset-password", "post", data);
   },
 
   resendVerification: async (email: string) => {
-    return apiFetch<any>("/auth/resend-verification", "post", { email });
+    return apiFetch<MessageResponse>("/auth/resend-verification", "post", { email });
   },
 
   me: async () => {
-    return apiFetch<any>("/auth/me", "get");
+    return apiFetch<User>("/auth/me", "get");
   }
 };
