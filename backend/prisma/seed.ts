@@ -15,6 +15,9 @@ import VoucherUsedFactory from './factories/voucher_used.factory';
 import VoucherReferralFactory from './factories/voucher_referral.factory';
 import StockJournalsFactory from './factories/stock_journals.factory';
 import MutationJournalsFactory from './factories/mutation_journals.factory';
+import UsersFactory from './factories/user.factory';
+import { userSeedData } from '../src/constants/seed.const';
+import BranchFactory from './factories/branch.factory';
 
 const connectionString = process.env.DATABASE_URL;
 const pool = new Pool({ connectionString });
@@ -23,9 +26,6 @@ const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log('🌱 Start seeding...\n');
-
-  // --- Hash password ---
-  const defaultPassword = await bcrypt.hash('password123', 10);
 
   // Cleanup existing data
   console.log('🧹 Cleaning up existing data...');
@@ -47,298 +47,24 @@ async function main() {
   await prisma.employee.deleteMany()
   await prisma.address.deleteMany()
   await prisma.branchSchedule.deleteMany()
+  await prisma.user.deleteMany()
+  await prisma.branch.deleteMany()
   console.log('  ✅ Cleanup completed.\n');
 
-  // Users Seeders
-  console.log('👤 Seeding Users...');
+  // Branch seeders (Include Branch Schedule)
+  console.log(' Seeding Branches & Branch Schedules...');
+  const branchFactory = new BranchFactory()
+  const seededBranches = await branchFactory.createAll()
+  console.log(`  Branches seeded: ${seededBranches.length}`)
+  console.log(`  Branch Schedules seeded: ${seededBranches.length * 6}\n`)
 
-  const adminUser = await prisma.user.upsert({
-    where: { email: 'kimgeovedi@gmail.com' },
-    update: {},
-    create: {
-      email: 'kimgeovedi@gmail.com',
-      username: 'kimgeovedi',
-      password: defaultPassword,
-      role: UserRole.EMPLOYEE,
-      emailVerifiedAt: new Date(),
-    },
-  });
-
-  const customerUser1 = await prisma.user.upsert({
-    where: { email: 'akimmustofa18@gmail.com' },
-    update: {},
-    create: {
-      email: 'akimmustofa18@gmail.com',
-      username: 'akimmustofa',
-      password: defaultPassword,
-      role: UserRole.CUSTOMER,
-      emailVerifiedAt: new Date(),
-    },
-  });
-
-  const customerUser2 = await prisma.user.upsert({
-    where: { email: 'customer2@example.com' },
-    update: {},
-    create: {
-      email: 'customer2@example.com',
-      username: 'customer2',
-      password: defaultPassword,
-      role: UserRole.CUSTOMER,
-      emailVerifiedAt: new Date(),
-    },
-  });
-
-  const storeAdminUser = await prisma.user.upsert({
-    where: { email: 'storeadmin@example.com' },
-    update: {},
-    create: {
-      email: 'storeadmin@example.com',
-      username: 'storeadmin',
-      password: defaultPassword,
-      role: UserRole.EMPLOYEE,
-      emailVerifiedAt: new Date(),
-    },
-  });
-
-  const superAdminUser = await prisma.user.upsert({
-    where: { email: 'superadmin@example.com' },
-    update: {},
-    create: {
-      email: 'superadmin@example.com',
-      username: 'superadmin',
-      password: defaultPassword,
-      role: UserRole.EMPLOYEE,
-      emailVerifiedAt: new Date(),
-    },
-  });
-
-  console.log('  ✅ Users seeded.\n');
-
-  // Branches seeders
-  console.log('🏪 Seeding Branches...');
-
-  const branchJakarta = await prisma.branch.create({
-    data: {
-      storeName: 'Toko Pusat Jakarta',
-      address: 'Jl. Sudirman No. 1, Senayan',
-      latitude: -6.2088,
-      longitude: 106.8456,
-      maxDeliveryDistance: 15.0,
-      isActive: true,
-      city: 'Jakarta Selatan',
-      province: 'DKI Jakarta',
-      district: 'Kebayoran Baru',
-      village: 'Senayan',
-    },
-  });
-
-  const branchBandung = await prisma.branch.create({
-    data: {
-      storeName: 'Toko Cabang Bandung',
-      address: 'Jl. Braga No. 45, Sumur Bandung',
-      latitude: -6.9175,
-      longitude: 107.6191,
-      maxDeliveryDistance: 10.0,
-      isActive: true,
-      city: 'Kota Bandung',
-      province: 'Jawa Barat',
-      district: 'Sumur Bandung',
-      village: 'Braga',
-    },
-  });
-
-  const branchSurabaya = await prisma.branch.create({
-    data: {
-      storeName: 'Toko Cabang Surabaya',
-      address: 'Jl. Tunjungan No. 88, Genteng',
-      latitude: -7.2575,
-      longitude: 112.7521,
-      maxDeliveryDistance: 12.0,
-      isActive: true,
-      city: 'Kota Surabaya',
-      province: 'Jawa Timur',
-      district: 'Genteng',
-      village: 'Genteng',
-    },
-  });
-
-  console.log('  ✅ Branches seeded.\n');
-
-  // Branch Schedules Seeders
-  console.log('📅 Seeding Branch Schedules...');
-
-  const weekdays: DayName[] = [DayName.MON, DayName.TUE, DayName.WED, DayName.THU, DayName.FRI];
-  const weekends: DayName[] = [DayName.SAT, DayName.SUN];
-
-  // Jakarta: Full week (weekdays 08:00-21:00, weekends 09:00-18:00)
-  for (const day of weekdays) {
-    await prisma.branchSchedule.create({
-      data: {
-        branchId: branchJakarta.id,
-        startTime: '08:00',
-        endTime: '21:00',
-        dayName: day,
-      },
-    });
-  }
-  for (const day of weekends) {
-    await prisma.branchSchedule.create({
-      data: {
-        branchId: branchJakarta.id,
-        startTime: '09:00',
-        endTime: '18:00',
-        dayName: day,
-      },
-    });
-  }
-
-  // Bandung: Weekdays only (09:00-20:00)
-  for (const day of weekdays) {
-    await prisma.branchSchedule.create({
-      data: {
-        branchId: branchBandung.id,
-        startTime: '09:00',
-        endTime: '20:00',
-        dayName: day,
-      },
-    });
-  }
-  // Bandung: Saturday only
-  await prisma.branchSchedule.create({
-    data: {
-      branchId: branchBandung.id,
-      startTime: '10:00',
-      endTime: '17:00',
-      dayName: DayName.SAT,
-    },
-  });
-
-  // Surabaya: Full week (08:30-21:30)
-  for (const day of [...weekdays, ...weekends]) {
-    await prisma.branchSchedule.create({
-      data: {
-        branchId: branchSurabaya.id,
-        startTime: '08:30',
-        endTime: '21:30',
-        dayName: day,
-      },
-    });
-  }
-
-  console.log('  ✅ Branch Schedules seeded.\n');
-
-  // Employees Seeders
-  console.log('👷 Seeding Employees...');
-
-  await prisma.employee.create({
-    data: {
-      fullName: 'Main Super Admin',
-      role: EmployeeRole.SUPER_ADMIN,
-      branchId: null, // No branch for super admin
-      userId: superAdminUser.id,
-    },
-  });
-
-  await prisma.employee.create({
-    data: {
-      fullName: 'Store Admin Jakarta',
-      role: EmployeeRole.STORE_ADMIN,
-      branchId: branchJakarta.id,
-      userId: storeAdminUser.id,
-    },
-  });
-
-  await prisma.employee.create({
-    data: {
-      fullName: 'Unassigned Store Admin',
-      role: EmployeeRole.STORE_ADMIN,
-      branchId: null,
-      userId: null,
-    },
-  });
-
-  await prisma.employee.create({
-    data: {
-      fullName: 'Store Admin Bandung',
-      role: EmployeeRole.STORE_ADMIN,
-      branchId: branchBandung.id,
-      userId: null,
-    },
-  });
-
-  await prisma.employee.create({
-    data: {
-      fullName: 'Store Admin Surabaya',
-      role: EmployeeRole.STORE_ADMIN,
-      branchId: branchSurabaya.id,
-      userId: null,
-    },
-  });
-
-  console.log('  ✅ Employees seeded.\n');
-
-  // Addresses Seeders
-  console.log('📍 Seeding Addresses...');
-
-  await prisma.address.create({
-    data: {
-      userId: customerUser1.id,
-      label: 'Rumah',
-      type: 'Rumah',
-      receiptName: 'Akim Mustofa',
-      notes: 'Pagar warna hitam',
-      phone: '081234567890',
-      address: 'Jl. Merdeka No. 10',
-      province: 'JAWA BARAT',
-      city: 'KOTA BANDUNG',
-      district: 'SUMUR BANDUNG',
-      village: 'BRAGA',
-      lat: -6.9175,
-      long: 107.6191,
-      isPrimary: true,
-    },
-  });
-
-  await prisma.address.create({
-    data: {
-      userId: customerUser1.id,
-      label: 'Kantor',
-      type: 'Kantor',
-      receiptName: 'Akim Mustofa',
-      notes: 'Lantai 5',
-      phone: '081234567891',
-      address: 'Jl. Asia Afrika No. 1',
-      province: 'JAWA BARAT',
-      city: 'KOTA BANDUNG',
-      district: 'REGOL',
-      village: 'BALONGGEDE',
-      lat: -6.9211,
-      long: 107.6108,
-      isPrimary: false,
-    },
-  });
-
-  await prisma.address.create({
-    data: {
-      userId: customerUser2.id,
-      label: 'Apartemen',
-      type: 'Rumah',
-      receiptName: 'Customer 2',
-      notes: 'Unit 12A',
-      phone: '089876543210',
-      address: 'Apartemen Mediterania',
-      province: 'DKI JAKARTA',
-      city: 'KOTA JAKARTA PUSAT',
-      district: 'KEMAYORAN',
-      village: 'KEBON KOSONG',
-      lat: -6.1751,
-      long: 106.8650,
-      isPrimary: true,
-    },
-  });
-
-
-  console.log('  ✅ Addresses seeded.\n');
+  // User seeders (Include Employee & Address)
+  console.log(' Seeding Users, Addresses & Employees...')
+  const usersFactory = new UsersFactory()
+  const seededUsers = await usersFactory.createAll()
+  console.log(` Users seeded: ${seededUsers.length}`)
+  console.log(` Addresses seeded: ${seededUsers.length * 3}`)
+  console.log(` Employees seeded: ${userSeedData.filter(u => u.role === 'ADMIN').length}\n`)
 
   // Product Categories Seeders
   console.log('📦 Seeding Product Categories...');

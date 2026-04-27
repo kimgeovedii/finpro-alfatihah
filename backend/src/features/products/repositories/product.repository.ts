@@ -55,24 +55,78 @@ export class ProductRepository {
     });
   };
 
-  public getProductBySlug = async (slugName: string) => {
-    return prisma.products.findUnique({
-      where: { slugName },
-      include: {
-        category: {
-          select: {
-            id: true,
-            name: true,
+  public getProductBySlug = async (
+    slugName: string,
+    userId: string | null,
+    branchName: string
+  ) => {
+    const include: any = {
+      category: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      productImages: {
+        select: {
+          id: true,
+          imageUrl: true,
+          isPrimary: true,
+        },
+      },
+      branchInventories: {
+        where: {
+          branch: {
+            storeName: branchName,
+            schedules: {
+              some: {},
+            },
           },
         },
-        productImages: {
-          select: {
-            id: true,
-            imageUrl: true,
-            isPrimary: true,
+        select: {
+          branchId: true,
+          currentStock: true,
+          branch: {
+            select: {
+              storeName: true,
+              address: true,
+              schedules: {
+                select: {
+                  startTime: true,
+                  endTime: true,
+                  dayName: true,
+                },
+              },
+            },
           },
         },
       },
+    };
+  
+    if (userId) {
+      include.branchInventories.select.cartItems = {
+        where: {
+          cart: {
+            userId,
+            branch: {
+              storeName: branchName,
+            },
+          },
+        },
+        select: {
+          id: true, quantity: true,
+          cart: {
+            select: {
+              branchId: true,
+            },
+          },
+        },
+      };
+    }
+  
+    return prisma.products.findUnique({
+      where: { slugName },
+      include,
     });
   };
 

@@ -64,7 +64,7 @@ export class OrderController {
             return sendSuccess(res, {
                 data: result.data,
                 meta: {
-                    page, limit, total: result.total, total_page: Math.ceil(result.total / limit),
+                    page, limit, total: result.total, totalPages: Math.ceil(result.total / limit),
                 },
             }, "Order fetched")
         } catch (error: any) {
@@ -98,7 +98,7 @@ export class OrderController {
             return sendSuccess(res, {
                 data: result.data,
                 meta: {
-                    page, limit, total: result.total, total_page: Math.ceil(result.total / limit),
+                    page, limit, total: result.total, totalPages: Math.ceil(result.total / limit),
                 },
             }, "Order fetched")
         } catch (error: any) {

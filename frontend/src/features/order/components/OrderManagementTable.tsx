@@ -47,6 +47,7 @@ const STATUS_FILTERS: { label: string; value: OrderStatus | "ALL" }[] = [
 ]
 
 export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading, onPageChange, onSearch, activeStatus, onStatusChange, onValidatePaymentEvidence }) => {
+    // Handle hook
     const [search, setSearch] = useState("")
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearch(e.target.value)
@@ -63,7 +64,7 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
 
     // Pagination 
     const currentPage = meta?.page ?? 1
-    const totalPages = meta?.total_page ?? 1
+    const totalPages = meta?.totalPages ?? 1
     const totalOrders = meta?.total ?? 0
     const limit = meta?.limit ?? 10
     const startItem = (currentPage - 1) * limit + 1
@@ -71,119 +72,121 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
     const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1).slice(Math.max(0, currentPage - 2), Math.min(totalPages, currentPage + 1))
 
     return (
-        <div className="bg-white border border-slate-200 rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-5">
+        <div className="bg-white border border-slate-200 rounded-2xl p-4 md:p-6 w-full">
+            <div className="flex flex-col lg:flex-row space-y-2 text-start justify-between mb-5">
                 <h2 className="text-lg font-semibold text-slate-800">Recent Transaction Flow</h2>
-                <Input placeholder="Quick search..." value={search} onChange={handleSearchChange} className="w-52 h-9 text-sm"/>
+                <Input placeholder="Quick search..." value={search} onChange={handleSearchChange} className="w-52 h-9 text-sm w-full md:w-[300px]"/>
             </div>
             <div className="flex gap-2 mb-5 flex-wrap">
                 {
-                    STATUS_FILTERS.map((f) => (
-                        <Button key={f.value} onClick={() => onStatusChange(f.value)} className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
-                            activeStatus === f.value ? "bg-teal-700 text-white" : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"}`}>
-                            {f.label}
+                    STATUS_FILTERS.map((dt) => (
+                        <Button key={dt.value} onClick={() => onStatusChange(dt.value)} className={`px-3 py-2 rounded-full text-xs font-medium transition-all ${
+                            activeStatus === dt.value ? "bg-teal-700 text-white" : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"}`}>
+                            {dt.label}
                         </Button>
                     ))
                 }
             </div>
-            <Table className="table-center">
-                <TableHeader>
-                    <TableRow className="uppercase text-xs tracking-wider text-slate-400">
-                        <TableHead className="font-semibold">Order ID</TableHead>
-                        <TableHead className="font-semibold">Customer</TableHead>
-                        <TableHead className="font-semibold">Date</TableHead>
-                        <TableHead className="font-semibold">Total Price</TableHead>
-                        <TableHead className="font-semibold">Status</TableHead>
-                        <TableHead className="font-semibold">Payment</TableHead>
-                        <TableHead className="font-semibold">Actions</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {
-                        isLoading ? (
-                            // Render loading element
-                            <TableRow>
-                                <TableCell colSpan={7} className="text-slate-400 py-10">Loading...</TableCell>
-                            </TableRow>
-                        ) : filteredOrders.length === 0 ? (
-                            // Render failed fetching condition
-                            <TableRow>
-                                <TableCell colSpan={7} className="text-slate-400 py-10">
-                                    <MessageBox context={'No orders found'} image={"/assets/empty.png"} description={`No <b>${activeStatus}</b> order / transaction found`}/>
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-                            filteredOrders.map(dt => {
-                                // Color mapping
-                                const statusClass = statusColorMap[dt.status] || "bg-slate-400"
-                                const finalStatus = dt.status.replaceAll('_',' ')
-                                
-                                return (
-                                    <TableRow key={dt.id} className="hover:bg-slate-50">
-                                        <TableCell className="font-semibold text-slate-800">
-                                            <CopyFieldButton label="Order number" value={dt.orderNumber} customClass="text-sm font-semibold"/>
-                                        </TableCell>
-                                        <TableCell>
-                                            <p className="font-medium text-slate-800">{dt.customerName}</p>
-                                            <p className="text-xs text-slate-400">{dt.customerEmail}</p>
-                                        </TableCell>
-                                        <TableCell className="text-slate-600">{formatDate(dt.createdAt,true)}</TableCell>
-                                        <TableCell className="text-slate-800 font-medium">Rp {dt.finalPrice.toLocaleString("id-ID")}</TableCell>
-                                        <TableCell>
-                                            <Badge className={`capitalize font-semibold ${statusClass}`}>{finalStatus}</Badge>
-                                        </TableCell>
-                                        <TableCell>
-                                            {
-                                                dt.status !== "WAITING_PAYMENT" && dt.payments.length > 0 && dt.payments[0].method === "MANUAL" && dt.payments[0].evidence !== null ?        
-                                                    <Dialog>
-                                                        <DialogTrigger asChild>
-                                                            <Button className="bg-transparent text-teal-700 font-semibold text-sm hover:underline border-teal-700 border-1 rounded-lg p-2 hover:bg-teal-700 hover:text-white cursor-pointer">
-                                                                <BanknotesIcon className="w-5 h-5"/>
-                                                            </Button>
-                                                        </DialogTrigger>
-                                                        <DialogContent className="w-full max-w-[700px] rounded-2xl">
-                                                            <DialogHeader>
-                                                                <DialogTitle className="font-bold mb-3">Payment Evidence</DialogTitle>
-                                                            </DialogHeader>
-                                                            <div className="flex flex-col mt-2 text-center">
-                                                                <Image src={dt.payments[0].evidence ?? ""} className="w-full mx-auto h-full mb-2 rounded-lg" alt={dt.payments[0].evidence ?? ""} width={100} height={100}/>
-                                                                <p className="mb-0">Transaction Amount</p>
-                                                                <p className="font-bold mb-4">Rp {dt.finalPrice.toLocaleString("id-ID")}</p>
-                                                                {
-                                                                    dt.status === "WAITING_PAYMENT_CONFIRMATION" && 
-                                                                        <>
-                                                                            <Button className="w-full bg-green-100 text-green-500 border-1 border-green-500 hover:bg-green-500 hover:text-white cursor-pointer mb-2" onClick={(e) => onValidatePaymentEvidence(dt.payments[0].id, true)}>Confirm</Button>
-                                                                            <Button className="w-full bg-red-100 text-red-500 border-1 border-red-500 hover:bg-red-500 hover:text-white cursor-pointer" onClick={(e) => onValidatePaymentEvidence(dt.payments[0].id, false)}>Reject</Button>
-                                                                        </>
-                                                                }
-                                                            </div>
-                                                        </DialogContent>
-                                                    </Dialog>
-                                                : dt.status === "CANCELLED" || dt.status === "WAITING_PAYMENT" ? 
-                                                    <>-</> 
-                                                : 
-                                                    <div className="bg-green-100 text-green-600 rounded-lg w-8 h-8 p-[5px] mx-auto">
-                                                        <CheckIcon className="w-5 h-5"/>
-                                                    </div>
-                                            }
-                                        </TableCell>
-                                        <TableCell>
-                                            {
-                                                dt.status !== "WAITING_PAYMENT" && dt.status !== "WAITING_PAYMENT_CONFIRMATION" ?
-                                                    <Link href={`/manage-order/${dt.orderNumber}`}>
-                                                        <Button className="bg-transparent text-teal-700 font-semibold text-sm hover:underline">Manage</Button>
-                                                    </Link>
-                                                :
-                                                    <>-</>
-                                            }
-                                        </TableCell>
-                                    </TableRow>
-                                )
-                            })
-                        )
-                    }
-                </TableBody>
-            </Table>
+            <div className="w-full overflow-x-auto max-w-[80vw] md:max-w-[57.5vw] lg:max-w-full">
+                <Table className="min-w-[700px]">
+                    <TableHeader>
+                        <TableRow className="uppercase text-xs tracking-wider text-slate-400">
+                            <TableHead className="font-semibold">Order ID</TableHead>
+                            <TableHead className="font-semibold">Customer</TableHead>
+                            <TableHead className="font-semibold">Date</TableHead>
+                            <TableHead className="font-semibold">Total Price</TableHead>
+                            <TableHead className="font-semibold">Status</TableHead>
+                            <TableHead className="font-semibold">Payment</TableHead>
+                            <TableHead className="font-semibold">Actions</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {
+                            isLoading ? (
+                                // Render loading element
+                                <TableRow>
+                                    <TableCell colSpan={7} className="text-slate-400 py-10">Loading...</TableCell>
+                                </TableRow>
+                            ) : filteredOrders.length === 0 ? (
+                                // Render failed fetching condition
+                                <TableRow>
+                                    <TableCell colSpan={7} className="text-slate-400 py-10">
+                                        <MessageBox context={'No orders found'} image={"/assets/empty.png"} description={`No <b>${activeStatus}</b> order / transaction found`}/>
+                                    </TableCell>
+                                </TableRow>
+                            ) : (
+                                filteredOrders.map(dt => {
+                                    // Color mapping
+                                    const statusClass = statusColorMap[dt.status] || "bg-slate-400"
+                                    const finalStatus = dt.status.replaceAll('_',' ')
+                                    
+                                    return (
+                                        <TableRow key={dt.id} className="hover:bg-slate-50">
+                                            <TableCell className="font-semibold text-slate-800">
+                                                <CopyFieldButton label="Order number" value={dt.orderNumber} customClass="text-sm font-semibold"/>
+                                            </TableCell>
+                                            <TableCell>
+                                                <p className="font-medium text-slate-800">{dt.customerName}</p>
+                                                <p className="text-xs text-slate-400">{dt.customerEmail}</p>
+                                            </TableCell>
+                                            <TableCell className="text-slate-600">{formatDate(dt.createdAt,true)}</TableCell>
+                                            <TableCell className="text-slate-800 font-medium">Rp {dt.finalPrice.toLocaleString("id-ID")}</TableCell>
+                                            <TableCell className="max-w-[140px]">
+                                                <Badge className={`capitalize px-2 font-semibold whitespace-normal break-words text-center h-auto mx-auto block rounded-lg ${statusClass}`}>{finalStatus}</Badge>
+                                            </TableCell>
+                                            <TableCell>
+                                                {
+                                                    dt.status !== "WAITING_PAYMENT" && dt.payments.length > 0 && dt.payments[0].method === "MANUAL" && dt.payments[0].evidence !== null ?        
+                                                        <Dialog>
+                                                            <DialogTrigger asChild>
+                                                                <Button className="bg-transparent text-teal-700 font-semibold text-sm hover:underline border-teal-700 border-1 rounded-lg p-2 hover:bg-teal-700 hover:text-white cursor-pointer mx-auto block">
+                                                                    <BanknotesIcon className="w-5 h-5"/>
+                                                                </Button>
+                                                            </DialogTrigger>
+                                                            <DialogContent className="w-full max-w-[700px] rounded-2xl">
+                                                                <DialogHeader>
+                                                                    <DialogTitle className="font-bold mb-3">Payment Evidence</DialogTitle>
+                                                                </DialogHeader>
+                                                                <div className="flex flex-col mt-2 text-center">
+                                                                    <Image src={dt.payments[0].evidence ?? ""} className="w-full mx-auto h-full mb-2 rounded-lg" alt={dt.payments[0].evidence ?? ""} width={100} height={100}/>
+                                                                    <p className="mb-0">Transaction Amount</p>
+                                                                    <p className="font-bold mb-4">Rp {dt.finalPrice.toLocaleString("id-ID")}</p>
+                                                                    {
+                                                                        dt.status === "WAITING_PAYMENT_CONFIRMATION" && 
+                                                                            <>
+                                                                                <Button className="w-full bg-green-100 text-green-500 border-1 border-green-500 hover:bg-green-500 hover:text-white cursor-pointer mb-2" onClick={(e) => onValidatePaymentEvidence(dt.payments[0].id, true)}>Confirm</Button>
+                                                                                <Button className="w-full bg-red-100 text-red-500 border-1 border-red-500 hover:bg-red-500 hover:text-white cursor-pointer" onClick={(e) => onValidatePaymentEvidence(dt.payments[0].id, false)}>Reject</Button>
+                                                                            </>
+                                                                    }
+                                                                </div>
+                                                            </DialogContent>
+                                                        </Dialog>
+                                                    : dt.status === "CANCELLED" || dt.status === "WAITING_PAYMENT" ? 
+                                                        <>-</> 
+                                                    : 
+                                                        <div className="bg-green-100 text-green-600 rounded-lg w-8 h-8 p-[5px] mx-auto">
+                                                            <CheckIcon className="w-5 h-5"/>
+                                                        </div>
+                                                }
+                                            </TableCell>
+                                            <TableCell>
+                                                {
+                                                    dt.status !== "WAITING_PAYMENT" && dt.status !== "WAITING_PAYMENT_CONFIRMATION" ?
+                                                        <Link href={`/manage-order/${dt.orderNumber}`}>
+                                                            <Button className="bg-transparent text-teal-700 font-semibold text-sm hover:underline">Manage</Button>
+                                                        </Link>
+                                                    :
+                                                        <>-</>
+                                                }
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                })
+                            )
+                        }
+                    </TableBody>
+                </Table>
+            </div>
             {
                 meta && 
                     <div className="flex items-center justify-between mt-5 pt-4 border-t border-slate-100">

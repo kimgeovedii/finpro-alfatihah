@@ -1,8 +1,9 @@
 "use client";
-
 import { motion } from "framer-motion";
-import { PlusIcon, MinusIcon, ShoppingBagIcon } from "@heroicons/react/24/outline";
+import { PlusIcon, MinusIcon, ShoppingBagIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { ProductDetailCartActionProps } from "@/features/products/types/product.type";
+import { ProductAddedInfoCard } from "./ProductAddedInfoCard";
+import { ProductRemoveButton } from "./ProductRemoveButton";
 
 const formatMoney = (value: number) =>
   new Intl.NumberFormat("id-ID", {
@@ -18,11 +19,16 @@ export const ProductDetailCartAction = ({
   price,
   totalPrice,
   variant,
+  onAddToCart, 
+  onRemoveFromCart,
+  isCreating,
+  currentCartQty
 }: ProductDetailCartActionProps) => {
   if (variant === "mobile") {
     // Mobile layout
     return (
       <>
+        { currentCartQty ? <ProductAddedInfoCard currentCartQty={currentCartQty}/> : <></> }
         <div className="flex items-center justify-between gap-4 bg-slate-100 p-4 rounded-3xl">
           <div className="flex items-center gap-4">
             <button
@@ -47,15 +53,22 @@ export const ProductDetailCartAction = ({
           </div>
         </div>
 
-        <div className="fixed bottom-0 left-0 w-full px-6 pb-8 pt-4 bg-linear-to-t from-slate-50 via-slate-50 to-transparent pointer-events-none z-40">
+        <div className="fixed bottom-0 left-0 w-full px-6 py-4 bg-linear-to-t from-slate-50 via-slate-50 to-transparent pointer-events-none z-40">
           <div className="pointer-events-auto bg-white/80 backdrop-blur-xl p-2 rounded-[2rem] shadow-[0_-8px_40px_-12px_rgba(0,0,0,0.1)]">
-            <motion.button
-              whileTap={{ scale: 0.96 }}
-              className="w-full bg-linear-to-r from-emerald-800 to-emerald-600 text-white py-4 rounded-[1.5rem] font-bold text-lg flex items-center justify-center gap-3 shadow-lg shadow-emerald-700/20"
-            >
-              <ShoppingBagIcon className="w-6 h-6" />
-              Add to Cart
-            </motion.button>
+            <div className={`flex ${currentCartQty ? "flex-row gap-2" : "flex-col"}`}>
+              <motion.button whileTap={{ scale: 0.96 }} onClick={onAddToCart} disabled={isCreating}
+                className="w-full bg-linear-to-r from-emerald-800 to-emerald-600 text-white py-4 rounded-[1.5rem] font-bold text-lg flex items-center justify-center gap-3 shadow-lg shadow-emerald-700/20"
+              >
+                {
+                  isCreating ? 
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  : 
+                    <ShoppingBagIcon className="w-6 h-6"/>
+                }
+                { isCreating ? "Adding..." : currentCartQty ? "Add More?" :"Add to Cart" }
+              </motion.button>
+              { currentCartQty ? <ProductRemoveButton onRemoveFromCart={onRemoveFromCart} isLoading={isCreating}/> : <></> }
+            </div>
           </div>
         </div>
       </>
@@ -70,6 +83,7 @@ export const ProductDetailCartAction = ({
       transition={{ duration: 0.5, delay: 0.3 }}
       className="bg-slate-100/50 rounded-3xl p-8 shadow-[0px_32px_64px_rgba(0,0,0,0.04)] border border-slate-200/60"
     >
+      { currentCartQty ? <ProductAddedInfoCard currentCartQty={currentCartQty}/> : <></> }
       <div className="mb-8">
         <span className="text-4xl font-extrabold text-slate-900 tracking-tight">
           {formatMoney(price)}
@@ -107,14 +121,20 @@ export const ProductDetailCartAction = ({
             </span>
           </div>
 
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="w-full py-3 px-6 mb-3 bg-emerald-800 text-white rounded-2xl font-bold text-lg flex justify-between items-center group shadow-lg shadow-emerald-800/10"
-          >
-            <span>Add to Cart</span>
-            <ShoppingBagIcon className="w-6 h-6 transition-transform duration-300 group-hover:scale-110" />
-          </motion.button>
+          <div className="flex flex-col space-y-4">
+            <motion.button onClick={onAddToCart} disabled={isCreating} whileTap={{ scale: 0.96 }}
+              className="w-full bg-linear-to-r from-emerald-800 to-emerald-600 text-white py-4 rounded-[1.5rem] font-bold text-lg flex items-center justify-center gap-3 shadow-lg shadow-emerald-700/20 disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {
+                isCreating ? 
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                : 
+                  <ShoppingBagIcon className="w-6 h-6"/>
+              }
+              { isCreating ? "Adding..." : currentCartQty ? "Add More?" :"Add to Cart" }
+            </motion.button>
+            { currentCartQty ? <ProductRemoveButton onRemoveFromCart={onRemoveFromCart} isLoading={isCreating}/> : <></> }
+          </div>
         </div>
       </div>
     </motion.div>

@@ -110,8 +110,8 @@ export default function TransactionDetailPage() {
           // Render failed fetching condition
           <MessageBox context={'No order found'} image={"/assets/empty.png"} urlButton={'/transaction'} titleButton='Back to Order' description={`We're sorry, we cannot find <b>${orderNumber}</b> order. Double check your order number or contact our call center for more information`}/>
         :
-          <div className='flex w-full gap-5'>
-            <div className='flex-1 flex flex-col space-y-5'>
+          <div className='flex flex-col lg:flex-row w-full gap-5'>
+            <div className='w-full lg:flex-1 flex flex-col space-y-5'>
               {
                 isLoading ?
                   // Render loading element
@@ -147,7 +147,7 @@ export default function TransactionDetailPage() {
                   </>
               }
             </div>
-            <div className='flex-1 flex flex-col space-y-5'>
+            <div className='w-full lg:flex-1 flex flex-col space-y-5'>
               {
                 isLoading ?
                   // Render loading element
@@ -158,20 +158,25 @@ export default function TransactionDetailPage() {
                 :
                   <>
                     <OrderDetailItemListCard
+                      branchName={order?.branch.storeName ?? '-'}
                       items={order?.items?.map(dt => ({
                         branchInventoriesId: dt.id,
+                        id: dt.id,
+                        slugName: dt.product.product.slugName,
+                        weight: dt.product.product.weight * dt.quantity,
                         productName: dt.product.product.productName,
                         description: dt.product.product.description,
-                        category: dt.product.product.category.name,
-                        imageUrl: dt.product.product.productImages?.[0]?.imageUrl ?? "",
+                        category: dt.product.product.category,
                         quantity: dt.quantity,
                         basePrice: dt.product.product.basePrice,
                         totalPrice: dt.product.product.basePrice * dt.quantity,
+                        productImages: dt.product.product.productImages
                       })) ?? []}
                     />
                     <PaymentSummaryCard
                       orderNumber={orderNumber}
                       totalItem={order?.items?.reduce((acc, item) => acc + item.quantity, 0) ?? 0}
+                      shippingWeight={order?.totalWeight ?? 0}
                       shippingCost={order?.shippingCost ?? 0}
                       totalPrice={order?.totalPrice ?? 0}
                       totalSaving={0}
@@ -180,6 +185,7 @@ export default function TransactionDetailPage() {
                       status={order?.status ?? '-'} 
                       paymentDeadline={order?.paymentDeadline ?? '-'} 
                       paymentEvidence={order?.payments[0].evidence}
+                      paymentMethod={order?.payments[0].method}
                       onCancel={handleCancelOrder}         
                     />
                   </>

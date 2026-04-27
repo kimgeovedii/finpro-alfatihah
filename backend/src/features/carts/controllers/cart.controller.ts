@@ -45,7 +45,7 @@ export class CartController {
             return sendSuccess(res, {
                 data: result.data,
                 meta: {
-                    page, limit, total: result.total, total_page: Math.ceil(result.total / limit),
+                    page, limit, total: result.total, totalPages: Math.ceil(result.total / limit),
                 },
             }, "Cart fetched")
         } catch (error: any) {
