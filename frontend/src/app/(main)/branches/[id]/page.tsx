@@ -2,8 +2,8 @@ import { BranchDetailPage } from "@/features/branches/components/BranchDetailPag
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Detail Toko | Agrotrack",
-  description: "Lihat daftar produk lengkap dari toko terdekat Anda di Agrotrack.",
+  title: "Detail Toko | alfatihah",
+  description: "Lihat daftar produk lengkap dari toko terdekat Anda di alfatihah.",
 };
 
 export default function Page() {

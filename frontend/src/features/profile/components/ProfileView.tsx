@@ -8,8 +8,10 @@ import {
   EnvelopeIcon, 
   CheckCircleIcon,
   ExclamationCircleIcon,
-  MapPinIcon
+  MapPinIcon,
+  DevicePhoneMobileIcon
 } from "@heroicons/react/24/outline";
+import { ActiveSessions } from "./ActiveSessions";
 import { useAuthService } from "@/features/auth/hooks/useAuthService";
 import { useProfile } from "@/features/profile/hooks/useProfile";
 import { AddressTab } from "@/features/profile/components/AddressTab";
@@ -23,6 +25,7 @@ const TABS = [
   { id: "security", label: "Security", icon: LockClosedIcon },
   { id: "email", label: "Email Settings", icon: EnvelopeIcon },
   { id: "address", label: "Daftar Alamat", icon: MapPinIcon, customerOnly: true },
+  { id: "sessions", label: "Perangkat Aktif", icon: DevicePhoneMobileIcon },
 ];
 
 export const ProfileView = () => {
@@ -110,6 +113,7 @@ export const ProfileView = () => {
               {activeTab === "security" && <ChangePasswordForm changePassword={changePassword} isLoading={isLoading} />}
               {activeTab === "email" && <ChangeEmailForm user={user} changeEmail={changeEmail} isLoading={isLoading} />}
               {activeTab === "address" && <AddressTab />}
+              {activeTab === "sessions" && <ActiveSessions />}
 
             </motion.div>
           </AnimatePresence>

@@ -25,14 +25,25 @@ export class AuthRepository {
     });
   }
 
-  async createRefreshToken(userId: string, token: string, expiresAt: Date, device?: string, ip?: string) {
+  async createRefreshToken(userId: string, token: string, expiresAt: Date, device?: string, ip?: string, sessionId?: string, deviceId?: string) {
     return prisma.token.create({
       data: {
+        id: sessionId,
         userId,
         token,
         expiredAt: expiresAt,
         device,
         ip,
+        deviceId,
+      },
+    });
+  }
+
+  async deleteExistingSessionByDevice(userId: string, deviceId: string) {
+    return prisma.token.deleteMany({
+      where: {
+        userId,
+        deviceId,
       },
     });
   }
