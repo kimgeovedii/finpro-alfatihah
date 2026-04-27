@@ -335,7 +335,7 @@ export class OrderRepository {
   async findAllOrdersByBranchId(page: number, limit: number, branchId: string, status: OrderStatus | null) {
     const skip = (page - 1) * limit
     const where: Prisma.ordersWhereInput = { 
-      branchId,
+      // branchId,
       ...(status && { status })
     }
 

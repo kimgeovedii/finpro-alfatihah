@@ -179,7 +179,7 @@ export default function TransactionDetailPage() {
                       shippingWeight={order?.totalWeight ?? 0}
                       shippingCost={order?.shippingCost ?? 0}
                       totalPrice={order?.totalPrice ?? 0}
-                      totalSaving={0}
+                      totalSaving={(order?.totalPrice ?? 0) - (order?.finalPrice ?? 0)}
                       finalPrice={order?.finalPrice ?? 0} 
                       orderId={order?.id ?? '-'} 
                       status={order?.status ?? '-'} 

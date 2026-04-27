@@ -1,6 +1,6 @@
 import React from 'react'
-import { Navbar } from '@/components/layout/Navbar'
 import { Metadata } from "next";
+import { Navbar } from '@/components/layout/NavbarDashboard';
 
 export const metadata: Metadata = {
   title: "Alfatihah - Product",

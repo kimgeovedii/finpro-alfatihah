@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button"
+import { InformationCircleIcon } from "@heroicons/react/24/outline"
 import { ArrowRight } from "lucide-react"
 import React from "react"
 
@@ -10,6 +11,7 @@ type Props = {
     totalDiscountProduct: number
     totalDiscountVoucher: number
     finalPrice: number
+    
     onCheckout: () => void
 }
 
@@ -27,7 +29,13 @@ export const CartPaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCos
             </div>
             <div className="flex justify-between">
                 <p>Shipping Weight</p>
-                <h6 className="font-bold">{(shippingWeight / 1000).toFixed(2)} Kg</h6>
+                <div className="flex items-center gap-2 relative group">
+                    <h6 className="font-bold">{(shippingWeight / 1000).toFixed(2)} Kg</h6>
+                    <InformationCircleIcon className="w-4 h-4 cursor-pointer"/>
+                    <div className="absolute bg-teal-700 shadow-md shadow-primary right-0 top-full mt-2 w-64 rounded-lg bg-slate-800 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                        This is your <b>cart's total weight</b>. For shipping and payment, carriers may round it up to <b>{Math.ceil(shippingWeight / 1000)} kg</b>.
+                    </div>
+                </div>
             </div>
             {
                 (totalDiscountProduct > 0 || totalDiscountVoucher > 0) && 
@@ -58,7 +66,7 @@ export const CartPaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCos
             </div>
             <hr className="mt-3 mb-5"/>
             <div className="flex gap-5 w-full">
-                <Button className="flex-1 h-10 bg-primary-teal hover:bg-[#00767a] text-white font-bold rounded-[8px] shadow-lg shadow-primary-teal/20 transition-all duration-300 active:scale-[0.97] disabled:opacity-70" onClick={onCheckout}>
+                <Button className="flex-1 h-10 bg-teal-700 hover:bg-[#00767a] text-white font-bold rounded-[8px] shadow-lg shadow-primary-teal/20 transition-all duration-300 active:scale-[0.97] disabled:opacity-70" onClick={onCheckout}>
                     <ArrowRight/> Continue Payment
                 </Button>
             </div>

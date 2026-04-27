@@ -51,7 +51,7 @@ class ProductDiscountsFactory {
         }
 
         // The service automatically handles avoiding duplicate assignments natively thanks to its generic repository skipDuplicates strategy
-        await this.productDiscountService.assignProducts(targetDiscountId, [targetProductId]);
+        await this.productDiscountService.assignProducts(targetDiscountId!, [targetProductId]); // check this again
 
         return { productId: targetProductId, discountId: targetDiscountId };
     }

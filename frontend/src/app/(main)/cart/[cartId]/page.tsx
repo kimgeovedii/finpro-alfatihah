@@ -5,7 +5,7 @@ import { CartDetailItemListCard } from '@/features/cart/components/CartDetailIte
 import { CartPaymentSummaryCard } from '@/features/cart/components/CartPaymentSummaryCard';
 import { PaymentMethodSelect } from '@/features/cart/components/PaymentMethodSelect';
 import { VouchersSelectionCard } from '@/features/cart/components/VouchersSelectionCard';
-import { useCartDetailData, useCheckoutCartItem, useDeleteCart, useDeleteCartItem, useUpdateCartItem } from '@/features/cart/hooks/useCart';
+import { useCartDetailData, useCheckoutCartItem, useDeleteCartItem, useUpdateCartItem } from '@/features/cart/hooks/useCart';
 import { useRouter } from 'next/navigation'
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
@@ -74,15 +74,39 @@ export default function CartDetailPage() {
   // Calculate price
   const shippingCost = cart.shipping?.shippingCost ?? 0
   const totalBasePrice = cart.totalBasePrice
-
   const voucherDiscount = (() => {
     if (!selectedVoucher) return 0
-    if (selectedVoucher.discountValueType === "PERCENTAGE") return (totalBasePrice * selectedVoucher.discountValue) / 100
   
-    return selectedVoucher.discountValue
+    // min purchase validation
+    if (
+      selectedVoucher.minPurchaseAmount &&
+      totalBasePrice < selectedVoucher.minPurchaseAmount
+    ) {
+      return 0
+    }
+  
+    let discount = 0
+    if (selectedVoucher.discountValueType === "PERCENTAGE") {
+      const percentage = Math.min(Math.max(selectedVoucher.discountValue, 0), 100)
+      discount = (totalBasePrice * percentage) / 100
+    } else {
+      discount = Math.max(selectedVoucher.discountValue, 0)
+    }
+  
+    // max discount cap
+    if (selectedVoucher.maxDiscountAmount) discount = Math.min(discount, selectedVoucher.maxDiscountAmount)
+  
+    return discount
   })()
 
-  const finalPrice = shippingCost + totalBasePrice - voucherDiscount
+  let finalProductPrice = totalBasePrice
+  let finalShipping = shippingCost
+  if (selectedVoucher) {
+    if (selectedVoucher.type === "ORDER") finalProductPrice = totalBasePrice - voucherDiscount
+    if (selectedVoucher.type === "SHIPPING_COST") finalShipping = Math.max(0, shippingCost - voucherDiscount)
+  }
+
+  const finalPrice = Math.round(finalProductPrice + finalShipping)
   
   // Format shop's schedule
   const scheduleText = cart?.branch?.schedules ? formatListSchedule(cart?.branch?.schedules) : '-'
@@ -243,6 +267,7 @@ export default function CartDetailPage() {
             appliedVoucher={selectedVoucher?.voucherCode}
             onApply={handleApply}
             onRemove={handleRemove}
+            totalBasePrice={totalBasePrice}
           />
         </div>
         <div className='w-full lg:flex-1 flex flex-col space-y-5'>

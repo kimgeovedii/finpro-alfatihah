@@ -87,9 +87,13 @@ export class OrderController {
 
             // Validate status 
             let status: OrderStatus | null = null
-            if (rawStatus && rawStatus !== "ALL") {
-                if (!Object.values(OrderStatus).includes(rawStatus as OrderStatus)) throw { code: 400, message: 'status is not valid' }
-                status = rawStatus as OrderStatus
+            if (rawStatus) {
+                if (rawStatus === "ALL") {
+                    status = null
+                } else {
+                    if (!Object.values(OrderStatus).includes(rawStatus as OrderStatus)) throw { code: 400, message: 'status is not valid' }
+                    status = rawStatus as OrderStatus
+                }
             }
 
             // Service

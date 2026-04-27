@@ -1,16 +1,9 @@
-import { BuildingOfficeIcon, HomeIcon, MapIcon, PhoneIcon, UserIcon } from "@heroicons/react/24/outline"
+import { BuildingOfficeIcon } from "@heroicons/react/24/outline"
 import { CalendarDays, MapPin } from "lucide-react"
-import React, { useState } from "react"
+import React from "react"
 import { AddressSelectionModal } from "./AddressSelectionModal"
 import { AddressAdditionalInfoSection } from "./AddressAdditionalInfoSection"
-
-type BranchInfo = {
-    name: string
-    address: string
-    schedule: string
-    imageUrl?: string
-    statusOpen: string
-}
+import { BranchInfoData } from "@/types/branch.type"
 
 interface DeliveryAddress {
     id: string
@@ -23,9 +16,10 @@ interface DeliveryAddress {
 }
 
 type Props = {
-    branch: BranchInfo
+    branch: BranchInfoData
     addressList: DeliveryAddress[]
     selectedAddressId: string | null
+    
     onSelect: (addressId: string) => void
 }
 
@@ -42,7 +36,7 @@ export const AddressSelectionCard: React.FC<Props> = ({ branch, addressList, sel
                     </div>
                     <div>
                         <p className="text-white text-lg font-bold mb-0">{branch.name}</p>
-                        <div className="inline-block text-[11px] font-semibold bg-green-600 px-2 py-0.5 rounded-md">
+                        <div className={`inline-block font-semibold ${branch.statusOpen === "Closed" ? "bg-red-400" : "bg-green-400"} px-2 py-0.5 rounded-md`}>
                             <p className="text-white text-xs">{branch.statusOpen}</p>
                         </div>
                     </div>
