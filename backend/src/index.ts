@@ -30,8 +30,9 @@ class App {
     this.app.use(cors());
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
-    this.app.use(helmet());
+    this.app.use(helmet({ crossOriginResourcePolicy: false }));
     this.app.use(morgan("dev"));
+    this.app.use(express.static("public"));
   }
 
   private configureRoutes() {
@@ -90,7 +91,10 @@ class App {
       const statusCode = err.status || err.code || 500
       
       // Audit server error
-      if (statusCode === 500) return sendError(res, "Something went wrong", 500)
+      if (statusCode === 500) {
+        console.error("Internal Server Error:", err);
+        return sendError(res, "Something went wrong", 500);
+      }
 
       return sendError(res, err.message, statusCode)
     })

@@ -59,7 +59,7 @@ async function main() {
       email: 'kimgeovedi@gmail.com',
       username: 'kimgeovedi',
       password: defaultPassword,
-      role: UserRole.ADMIN,
+      role: UserRole.EMPLOYEE,
       emailVerifiedAt: new Date(),
     },
   });
@@ -95,7 +95,7 @@ async function main() {
       email: 'storeadmin@example.com',
       username: 'storeadmin',
       password: defaultPassword,
-      role: UserRole.ADMIN,
+      role: UserRole.EMPLOYEE,
       emailVerifiedAt: new Date(),
     },
   });
@@ -107,7 +107,7 @@ async function main() {
       email: 'superadmin@example.com',
       username: 'superadmin',
       password: defaultPassword,
-      role: UserRole.ADMIN,
+      role: UserRole.EMPLOYEE,
       emailVerifiedAt: new Date(),
     },
   });
@@ -127,6 +127,8 @@ async function main() {
       isActive: true,
       city: 'Jakarta Selatan',
       province: 'DKI Jakarta',
+      district: 'Kebayoran Baru',
+      village: 'Senayan',
     },
   });
 
@@ -138,8 +140,10 @@ async function main() {
       longitude: 107.6191,
       maxDeliveryDistance: 10.0,
       isActive: true,
-      city: 'Bandung',
+      city: 'Kota Bandung',
       province: 'Jawa Barat',
+      district: 'Sumur Bandung',
+      village: 'Braga',
     },
   });
 
@@ -151,8 +155,10 @@ async function main() {
       longitude: 112.7521,
       maxDeliveryDistance: 12.0,
       isActive: true,
-      city: 'Surabaya',
+      city: 'Kota Surabaya',
       province: 'Jawa Timur',
+      district: 'Genteng',
+      village: 'Genteng',
     },
   });
 
@@ -226,9 +232,9 @@ async function main() {
 
   await prisma.employee.create({
     data: {
-      fullName: 'Super Admin',
+      fullName: 'Main Super Admin',
       role: EmployeeRole.SUPER_ADMIN,
-      branchId: branchJakarta.id,
+      branchId: null, // No branch for super admin
       userId: superAdminUser.id,
     },
   });
@@ -239,6 +245,15 @@ async function main() {
       role: EmployeeRole.STORE_ADMIN,
       branchId: branchJakarta.id,
       userId: storeAdminUser.id,
+    },
+  });
+
+  await prisma.employee.create({
+    data: {
+      fullName: 'Unassigned Store Admin',
+      role: EmployeeRole.STORE_ADMIN,
+      branchId: null,
+      userId: null,
     },
   });
 
@@ -273,7 +288,11 @@ async function main() {
       receiptName: 'Akim Mustofa',
       notes: 'Pagar warna hitam',
       phone: '081234567890',
-      address: 'Jl. Merdeka No. 10, Bandung',
+      address: 'Jl. Merdeka No. 10',
+      province: 'JAWA BARAT',
+      city: 'KOTA BANDUNG',
+      district: 'SUMUR BANDUNG',
+      village: 'BRAGA',
       lat: -6.9175,
       long: 107.6191,
       isPrimary: true,
@@ -288,7 +307,11 @@ async function main() {
       receiptName: 'Akim Mustofa',
       notes: 'Lantai 5',
       phone: '081234567891',
-      address: 'Jl. Asia Afrika No. 1, Bandung',
+      address: 'Jl. Asia Afrika No. 1',
+      province: 'JAWA BARAT',
+      city: 'KOTA BANDUNG',
+      district: 'REGOL',
+      village: 'BALONGGEDE',
       lat: -6.9211,
       long: 107.6108,
       isPrimary: false,
@@ -303,12 +326,17 @@ async function main() {
       receiptName: 'Customer 2',
       notes: 'Unit 12A',
       phone: '089876543210',
-      address: 'Apartemen Mediterania, Jakarta',
+      address: 'Apartemen Mediterania',
+      province: 'DKI JAKARTA',
+      city: 'KOTA JAKARTA PUSAT',
+      district: 'KEMAYORAN',
+      village: 'KEBON KOSONG',
       lat: -6.1751,
       long: 106.8650,
       isPrimary: true,
     },
   });
+
 
   console.log('  ✅ Addresses seeded.\n');
 
@@ -419,7 +447,7 @@ async function main() {
   console.log(`  Users:            5`);
   console.log(`  Branches:         3`);
   console.log(`  Branch Schedules: ${5 + 2 + 5 + 1 + 7}`);
-  console.log(`  Employees:        4`);
+  console.log(`  Employees:        5`);
   console.log(`  Addresses:        3`);
   console.log(`  Product Categories: ${totalProductCategories}`);
   console.log(`  Products:         ${totalProducts}`);

@@ -18,3 +18,4 @@ prisma_migrate.log
 # IDE
 .vscode/
 .idea/
+requirement.md
