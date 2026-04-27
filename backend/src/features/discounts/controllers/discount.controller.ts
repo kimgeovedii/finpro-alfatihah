@@ -15,7 +15,12 @@ export class DiscountController {
     next: NextFunction,
   ) => {
     try {
-      const { page = 1, limit = 10, ...filters } = req.query;
+      const { page = 1, limit = 10, search, ...restQuery } = req.query;
+      const filters: any = { ...restQuery };
+
+      if (search) {
+        filters.name = { contains: search as string, mode: "insensitive" };
+      }
       const { data, meta } = await this.discountService.findAllDiscounts(
         filters,
         Number(page),

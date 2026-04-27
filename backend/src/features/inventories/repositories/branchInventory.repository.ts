@@ -12,6 +12,20 @@ export class BranchInventoryRepository {
         where: filters,
         skip,
         take,
+        include: {
+          product: {
+            select: {
+              productName: true,
+              sku: true,
+            },
+          },
+          branch: {
+            select: {
+              storeName: true,
+              city: true,
+            },
+          },
+        },
       }),
       prisma.branch_inventories.count({
         where: filters,
@@ -21,7 +35,16 @@ export class BranchInventoryRepository {
     return { data, total };
   };
 
-  public createBranchInventory = async (data: { branchId: string, productId: string, currentStock: number, notes?: string, employeeId: string, referenceType?: ReferenceType, orderId?: string, mutationId?: string }) => {
+  public createBranchInventory = async (data: {
+    branchId: string;
+    productId: string;
+    currentStock: number;
+    notes?: string;
+    employeeId: string;
+    referenceType?: ReferenceType;
+    orderId?: string;
+    mutationId?: string;
+  }) => {
     return prisma.$transaction(async (tx) => {
       const inventory = await tx.branch_inventories.create({
         data: {
@@ -51,7 +74,17 @@ export class BranchInventoryRepository {
     });
   };
 
-  public updateBranchInventory = async (id: string, data: { actualStock: number, notes?: string, employeeId: string, referenceType?: ReferenceType, orderId?: string, mutationId?: string }) => {
+  public updateBranchInventory = async (
+    id: string,
+    data: {
+      actualStock: number;
+      notes?: string;
+      employeeId: string;
+      referenceType?: ReferenceType;
+      orderId?: string;
+      mutationId?: string;
+    },
+  ) => {
     return prisma.$transaction(async (tx) => {
       const currentInventory = await tx.branch_inventories.findUnique({
         where: { id },
@@ -62,12 +95,13 @@ export class BranchInventoryRepository {
       }
 
       const difference = data.actualStock - currentInventory.currentStock;
-      
+
       if (difference === 0) {
-          return currentInventory; // No change
+        return currentInventory;
       }
 
-      const transactionType = difference > 0 ? TransactionType.IN : TransactionType.OUT;
+      const transactionType =
+        difference > 0 ? TransactionType.IN : TransactionType.OUT;
 
       const updatedInventory = await tx.branch_inventories.update({
         where: { id },
@@ -98,36 +132,33 @@ export class BranchInventoryRepository {
 
   public deleteBranchInventory = async (id: string, employeeId: string) => {
     return prisma.$transaction(async (tx) => {
-        const currentInventory = await tx.branch_inventories.findUnique({
-            where: { id },
+      const currentInventory = await tx.branch_inventories.findUnique({
+        where: { id },
+      });
+
+      if (!currentInventory) {
+        throw new Error("Inventory not found");
+      }
+
+      if (currentInventory.currentStock > 0) {
+        await tx.stock_journals.create({
+          data: {
+            branchInventoryId: currentInventory.id,
+            productId: currentInventory.productId,
+            transactionType: TransactionType.OUT,
+            quantityChange: currentInventory.currentStock,
+            stockBefore: currentInventory.currentStock,
+            stockAfter: 0,
+            referenceType: ReferenceType.MANUAL,
+            notes: "Inventory deleted",
+            createdBy: employeeId,
+          },
         });
+      }
 
-        if (!currentInventory) {
-            throw new Error("Inventory not found");
-        }
-
-        // Optional: you can create a journal to indicate wiping stock before deletion
-        if (currentInventory.currentStock > 0) {
-            await tx.stock_journals.create({
-              data: {
-                branchInventoryId: currentInventory.id, // Need a relation, might break if inventory is hard-deleted.
-                productId: currentInventory.productId,
-                transactionType: TransactionType.OUT,
-                quantityChange: currentInventory.currentStock,
-                stockBefore: currentInventory.currentStock,
-                stockAfter: 0,
-                referenceType: ReferenceType.MANUAL,
-                notes: "Inventory deleted",
-                createdBy: employeeId,
-              },
-            });
-            // Note: If you hard delete `branch_inventories`, the related `stock_journals` will 
-            // also be deleted automatically due to `onDelete: Cascade` in schema!
-        }
-
-        return tx.branch_inventories.delete({
-            where: { id },
-        });
+      return tx.branch_inventories.delete({
+        where: { id },
+      });
     });
   };
 }
