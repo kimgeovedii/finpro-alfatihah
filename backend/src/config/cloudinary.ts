@@ -7,15 +7,18 @@ cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUDNAME || "",
 })
 
-export const cloudinaryUpload = (file : Express.Multer.File) : Promise<UploadApiResponse> => {
+export const cloudinaryUpload = (file : Express.Multer.File, folder?: string) : Promise<UploadApiResponse> => {
     return new Promise((resolve, reject) => {
-        const uploadStream = cloudinary.uploader.upload_stream((err, result: UploadApiResponse) => {
-            if(err){
-                reject(err)
-            } else {
-                resolve(result)
+        const uploadStream = cloudinary.uploader.upload_stream(
+            { folder: `grocery-alfatihah-assets/${folder}` },
+            (err, result) => {
+                if(err){
+                    reject(err)
+                } else {
+                    resolve(result!)
+                }
             }
-        })
+        )
         streamifier.createReadStream(file.buffer).pipe(uploadStream)
     })
 }
