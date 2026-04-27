@@ -21,6 +21,9 @@ export const useManageProducts = () => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   const [categories, setCategories] = useState<ProductCategory[]>([]);
 
@@ -55,6 +58,9 @@ export const useManageProducts = () => {
           page,
           meta.limit,
           debouncedSearch || undefined,
+          selectedCategory || undefined,
+          sortBy,
+          sortOrder,
         );
 
         if (Array.isArray(response)) {
@@ -78,7 +84,7 @@ export const useManageProducts = () => {
         setIsLoading(false);
       }
     },
-    [meta.limit, debouncedSearch],
+    [meta.limit, debouncedSearch, selectedCategory, sortBy, sortOrder],
   );
 
   const fetchCategories = useCallback(async () => {
@@ -96,7 +102,7 @@ export const useManageProducts = () => {
 
   useEffect(() => {
     fetchProducts(1);
-  }, [debouncedSearch]);
+  }, [debouncedSearch, selectedCategory, sortBy, sortOrder]);
 
   useEffect(() => {
     fetchCategories();
@@ -186,6 +192,9 @@ export const useManageProducts = () => {
     categories,
     isLoading,
     searchQuery,
+    selectedCategory,
+    sortBy,
+    sortOrder,
 
     addDialogOpen,
     setAddDialogOpen,
@@ -200,6 +209,15 @@ export const useManageProducts = () => {
     isUpdating,
 
     handleSearchChange,
+    handleCategoryChange: setSelectedCategory,
+    handleSort: (field: string) => {
+      if (sortBy === field) {
+        setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+      } else {
+        setSortBy(field);
+        setSortOrder("asc");
+      }
+    },
     handlePageChange,
     handleAddClick,
     handleCreate,

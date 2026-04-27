@@ -5,12 +5,17 @@ export class ProductRepository {
     filters: any,
     skip?: number,
     take?: number,
+    orderBy: string = "createdAt",
+    orderDir: "asc" | "desc" = "desc",
   ) => {
     const [data, total] = await prisma.$transaction([
       prisma.products.findMany({
         where: filters,
         skip,
         take,
+        orderBy: {
+          [orderBy]: orderDir,
+        },
         include: {
           category: {
             select: {

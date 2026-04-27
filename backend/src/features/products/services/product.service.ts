@@ -16,7 +16,10 @@ export class ProductService {
     const skip = (page - 1) * limit;
     const take = limit;
 
-    const where: any = { ...filters };
+    const { sortBy = "createdAt", sortOrder = "desc", ...restFilters } = filters;
+    const orderDir = (sortOrder === "asc" || sortOrder === "desc") ? sortOrder : "desc";
+
+    const where: any = { ...restFilters };
     if (where.search) {
       where.productName = { contains: where.search, mode: "insensitive" };
       delete where.search;
@@ -26,6 +29,8 @@ export class ProductService {
       where,
       skip,
       take,
+      sortBy,
+      orderDir,
     );
 
     return {

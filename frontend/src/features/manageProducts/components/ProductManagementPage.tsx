@@ -3,6 +3,8 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useManageProducts } from "@/features/manageProducts/hooks/useManageProducts";
+import { useUser } from "@/features/auth/hooks/useUser";
+import { AuthenticatedUser } from "@/features/manageProducts/types/manageProduct.type";
 import { ProductHeader } from "./ProductHeader";
 import { ProductTable } from "./ProductTable";
 import { ProductTablePagination } from "./ProductTablePagination";
@@ -18,6 +20,9 @@ export const ProductManagementPage: React.FC = () => {
     categories,
     isLoading,
     searchQuery,
+    selectedCategory,
+    sortBy,
+    sortOrder,
     addDialogOpen,
     setAddDialogOpen,
     deleteDialogOpen,
@@ -30,6 +35,8 @@ export const ProductManagementPage: React.FC = () => {
     isDeleting,
     isUpdating,
     handleSearchChange,
+    handleCategoryChange,
+    handleSort,
     handlePageChange,
     handleAddClick,
     handleCreate,
@@ -38,6 +45,10 @@ export const ProductManagementPage: React.FC = () => {
     handleDeleteClick,
     handleDeleteConfirm,
   } = useManageProducts();
+
+  const { user } = useUser();
+  const authUser = user as AuthenticatedUser;
+  const canManage = authUser?.employee?.role === "SUPER_ADMIN";
 
   return (
     <motion.div
@@ -50,6 +61,10 @@ export const ProductManagementPage: React.FC = () => {
         searchQuery={searchQuery}
         onSearchChange={handleSearchChange}
         onAddClick={handleAddClick}
+        categories={categories}
+        selectedCategory={selectedCategory}
+        onCategoryChange={handleCategoryChange}
+        canManage={canManage}
       />
 
       <div className="hidden md:block">
@@ -58,6 +73,10 @@ export const ProductManagementPage: React.FC = () => {
           isLoading={isLoading}
           onEdit={handleEditClick}
           onDelete={handleDeleteClick}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
+          onSort={handleSort}
+          canManage={canManage}
         />
         <ProductTablePagination meta={meta} onPageChange={handlePageChange} />
       </div>
@@ -97,6 +116,7 @@ export const ProductManagementPage: React.FC = () => {
                 index={index}
                 onEdit={handleEditClick}
                 onDelete={handleDeleteClick}
+                canManage={canManage}
               />
             ))}
           </AnimatePresence>
