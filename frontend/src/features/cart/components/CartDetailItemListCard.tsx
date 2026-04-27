@@ -1,3 +1,4 @@
+import { MiniTagBox } from "@/components/layout/MiniTagBox"
 import { Button } from "@/components/ui/button"
 import { TrashIcon } from "@heroicons/react/24/outline"
 import React from "react"
@@ -37,7 +38,7 @@ export const CartDetailItemListCard: React.FC<Props> = ({ items }) => {
                                 <p className="text-[10px] font-semibold text-emerald-600 uppercase tracking-wider">{dt.category}</p>
                                 <p className="text-sm font-semibold text-slate-800">{dt.productName}</p>
                                 <p className="text-xs text-slate-400 line-clamp-3">{dt.description}</p>
-                                <span className="inline-block mt-1 text-[11px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">Qty: {dt.quantity}</span>
+                                <MiniTagBox context="Qty" val={dt.quantity.toString()}/>
                             </div>
                             <div className="text-right flex-shrink-0">
                                 <p className="text-sm font-bold text-slate-800">Rp. {(dt.basePrice * dt.quantity).toLocaleString()}</p>

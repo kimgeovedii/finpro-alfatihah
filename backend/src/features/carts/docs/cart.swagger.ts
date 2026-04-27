@@ -246,6 +246,9 @@
  *                               storeName:
  *                                 type: string
  *                                 example: Toko Pusat Jakarta
+ *                               city:
+ *                                 type: string
+ *                                 example: Jakarta
  *                     meta:
  *                       type: object
  *                       properties:

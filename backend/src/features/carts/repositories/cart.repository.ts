@@ -131,7 +131,7 @@ export class CartRepository {
           },
           branch: {
             select: {
-              id: true, storeName: true
+              id: true, storeName: true, city: true
             }
           }
         }

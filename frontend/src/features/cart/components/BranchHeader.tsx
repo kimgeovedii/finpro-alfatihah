@@ -1,3 +1,4 @@
+import { MiniTagBox } from "@/components/layout/MiniTagBox"
 import { Button } from "@/components/ui/button"
 import { BuildingOfficeIcon, ShoppingCartIcon, TrashIcon } from "@heroicons/react/24/outline"
 import Link from "next/link"
@@ -6,11 +7,12 @@ import React from "react"
 type Props = {
     cartId: string
     storeName: string
+    city: string
 
     onRemove: () => void
 }
 
-export const BranchHeader: React.FC<Props> = ({ storeName, cartId, onRemove }) => {
+export const BranchHeader: React.FC<Props> = ({ storeName, cartId, city, onRemove }) => {
     return (
         <div className="flex flex-col md:flex-row md:items-center gap-3 mb-4 mt-10">
             <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -19,6 +21,7 @@ export const BranchHeader: React.FC<Props> = ({ storeName, cartId, onRemove }) =
                 </div>
                 <Link href={`/${storeName}`}>
                     <h3 className="text-xl font-bold text-slate-800 tracking-tight cursor-pointer line-clamp-1">{storeName}</h3>
+                    <MiniTagBox context="City" val={city}/>
                 </Link>
                 <div className="flex-1 h-px bg-slate-200 ml-4"></div>
             </div>

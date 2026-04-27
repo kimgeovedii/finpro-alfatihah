@@ -142,7 +142,12 @@ export default function CartPage() {
               : 
                 carts.map(ct => (
                   <div key={ct.id} className="mb-6">
-                    <BranchHeader storeName={ct.branch.storeName} onRemove={() => handleRemoveCart(ct.id)} cartId={ct.id}/>
+                    <BranchHeader 
+                      storeName={ct.branch.storeName} 
+                      city={ct.branch.city}
+                      onRemove={() => handleRemoveCart(ct.id)} 
+                      cartId={ct.id}
+                    />
                     {
                       ct.items.map(dt => (
                         <CartItemCard key={dt.id}

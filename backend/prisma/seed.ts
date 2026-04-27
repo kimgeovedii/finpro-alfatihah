@@ -17,6 +17,7 @@ import StockJournalsFactory from './factories/stock_journals.factory';
 import MutationJournalsFactory from './factories/mutation_journals.factory';
 import UsersFactory from './factories/user.factory';
 import { userSeedData } from '../src/constants/seed.const';
+import BranchFactory from './factories/branch.factory';
 
 const connectionString = process.env.DATABASE_URL;
 const pool = new Pool({ connectionString });
@@ -47,123 +48,23 @@ async function main() {
   await prisma.address.deleteMany()
   await prisma.branchSchedule.deleteMany()
   await prisma.user.deleteMany()
+  await prisma.branch.deleteMany()
   console.log('  ✅ Cleanup completed.\n');
 
-  // Branches seeders
-  console.log('🏪 Seeding Branches...');
-
-  const branchJakarta = await prisma.branch.create({
-    data: {
-      storeName: 'Toko Pusat Jakarta',
-      address: 'Jl. Sudirman No. 1, Senayan',
-      latitude: -6.2088,
-      longitude: 106.8456,
-      maxDeliveryDistance: 15.0,
-      isActive: true,
-      city: 'Jakarta Selatan',
-      province: 'DKI Jakarta',
-    },
-  });
-
-  const branchBandung = await prisma.branch.create({
-    data: {
-      storeName: 'Toko Cabang Bandung',
-      address: 'Jl. Braga No. 45, Sumur Bandung',
-      latitude: -6.9175,
-      longitude: 107.6191,
-      maxDeliveryDistance: 10.0,
-      isActive: true,
-      city: 'Bandung',
-      province: 'Jawa Barat',
-    },
-  });
-
-  const branchSurabaya = await prisma.branch.create({
-    data: {
-      storeName: 'Toko Cabang Surabaya',
-      address: 'Jl. Tunjungan No. 88, Genteng',
-      latitude: -7.2575,
-      longitude: 112.7521,
-      maxDeliveryDistance: 12.0,
-      isActive: true,
-      city: 'Yogyakarta',
-      province: 'Jawa Timur',
-    },
-  });
-
-  console.log('  ✅ Branches seeded.\n');
-
-  console.log('👤 Seeding Users, Addresses & Employees...')
+  // Branch seeders (Include Branch Schedule)
+  console.log(' Seeding Branches & Branch Schedules...');
+  const branchFactory = new BranchFactory()
+  const seededBranches = await branchFactory.createAll()
+  console.log(`  Branches seeded: ${seededBranches.length}`)
+  console.log(`  Branch Schedules seeded: ${seededBranches.length * 6}\n`)
 
   // User seeders (Include Employee & Address)
+  console.log(' Seeding Users, Addresses & Employees...')
   const usersFactory = new UsersFactory()
   const seededUsers = await usersFactory.createAll()
   console.log(` Users seeded: ${seededUsers.length}`)
   console.log(` Addresses seeded: ${seededUsers.length * 3}`)
   console.log(` Employees seeded: ${userSeedData.filter(u => u.role === 'ADMIN').length}\n`)
-
-  // Branch Schedules Seeders
-  console.log('📅 Seeding Branch Schedules...');
-
-  const weekdays: DayName[] = [DayName.MON, DayName.TUE, DayName.WED, DayName.THU, DayName.FRI];
-  const weekends: DayName[] = [DayName.SAT, DayName.SUN];
-
-  // Jakarta: Full week (weekdays 08:00-21:00, weekends 09:00-18:00)
-  for (const day of weekdays) {
-    await prisma.branchSchedule.create({
-      data: {
-        branchId: branchJakarta.id,
-        startTime: '08:00',
-        endTime: '21:00',
-        dayName: day,
-      },
-    });
-  }
-  for (const day of weekends) {
-    await prisma.branchSchedule.create({
-      data: {
-        branchId: branchJakarta.id,
-        startTime: '09:00',
-        endTime: '18:00',
-        dayName: day,
-      },
-    });
-  }
-
-  // Bandung: Weekdays only (09:00-20:00)
-  for (const day of weekdays) {
-    await prisma.branchSchedule.create({
-      data: {
-        branchId: branchBandung.id,
-        startTime: '09:00',
-        endTime: '20:00',
-        dayName: day,
-      },
-    });
-  }
-  // Bandung: Saturday only
-  await prisma.branchSchedule.create({
-    data: {
-      branchId: branchBandung.id,
-      startTime: '10:00',
-      endTime: '17:00',
-      dayName: DayName.SAT,
-    },
-  });
-
-  // Surabaya: Full week (08:30-21:30)
-  for (const day of [...weekdays, ...weekends]) {
-    await prisma.branchSchedule.create({
-      data: {
-        branchId: branchSurabaya.id,
-        startTime: '08:30',
-        endTime: '21:30',
-        dayName: day,
-      },
-    });
-  }
-
-  console.log('  ✅ Branch Schedules seeded.\n');
 
   // Product Categories Seeders
   console.log('📦 Seeding Product Categories...');
