@@ -9,8 +9,8 @@ import { PaymentRepository } from "../repositories/payment.repository"
 import { StockJournalRepository } from "../repositories/stok_journal.repository"
 import { UserRepository } from "../repositories/user.repository"
 import { Mailer } from "../../../config/mailer";
-import { getBranchOrderBroadcastTemplate, getOrderCreatedPaymentTemplate } from "../views/order.view"
-import { OrderStatus, PaymentStatus, UserRole } from "@prisma/client"
+import { getOrderCreatedPaymentTemplate } from "../views/order.view"
+import { OrderStatus, UserRole } from "@prisma/client"
 import { getOrderMailTemplate } from "../../../utils/template"
 import { EmployeeRepository } from "../repositories/employee.repository"
 import { snap } from "../../../config/midtrans"
@@ -347,68 +347,5 @@ export class OrderService {
                 })
             }
         }
-    }
-
-    // For Task Scheduling / Cron
-    async getUnprocessedOrdersToRemind() {
-        // Repo : get processing branch order
-        const branchs = await this.branchRepo.findBranchsOrders()
-    
-        for (const dt of branchs) {
-            if (!dt.orders.length) continue
-    
-            // Remind every employee
-            for (const emp of dt.employees) {
-                if (!emp.user?.username) continue
-    
-                const emailHtml = getBranchOrderBroadcastTemplate({
-                    username: emp.user.username,
-                    storeName: dt.storeName,
-                    schedules: dt.schedules,
-                    orders: dt.orders
-                })
-    
-                await Mailer.client.sendMail({
-                    from: `"Alfatihah Online Grocery" <${process.env.SMTP_USER}>`,
-                    to: emp.user.email,
-                    subject: `Branch Orders - ${dt.storeName}`,
-                    html: emailHtml,
-                })
-            }
-        }
-    }
-
-    // Webhook
-    async handleMidtransWebhook(notification: any) {
-        const { orderNumber, transaction_status, fraud_status } = notification
-    
-        let paymentStatus: PaymentStatus
-    
-        if (transaction_status === 'capture' && fraud_status === 'accept') {
-            paymentStatus = 'SUCCESS'
-        } else if (transaction_status === 'settlement') {
-            paymentStatus = 'SUCCESS'
-        } else if (['cancel', 'deny', 'expire'].includes(transaction_status)) {
-            paymentStatus = 'REJECTED'
-        } else {
-            paymentStatus = 'PENDING'
-        }
-    
-        await this.paymentRepo.updatePaymentStatusByGatewayRef(orderNumber, paymentStatus)
-    
-        if (paymentStatus === 'SUCCESS') {
-            const order = await this.orderRepo.findOrderById(orderNumber, "orderNumber")
-            if (order) await this.orderRepo.updateOrderStatusById(order.id, 'PROCESSING')
-        }
-    }
-
-    async getExpiredOrder() {
-        // Repo : get expired order
-        await this.orderRepo.cancelExpiredUnpaidOrders()
-    }
-
-    async getOldShippedOrder() {
-        // Repo : get order that has been shipped for more than n hours
-        await this.orderRepo.confirmOldShippedOrder()
     }
 }

@@ -481,4 +481,39 @@ export class OrderRepository {
       },
     })
   }
+
+  async getTransactionHistory(userId: string) {
+    return await prisma.orders.findMany({
+      orderBy: [
+        { createdAt: "desc" },
+      ],
+      where: {
+        userId,
+        status: {
+          in: ["CONFIRMED","SHIPPED"]
+        }
+      },
+      select: {
+        createdAt: true, orderNumber: true,
+        branch: {
+          select: { storeName: true }
+        },
+        items: {
+          select: {
+            quantity: true, product: {
+              select: {
+                product: {
+                  select: {
+                    productName: true, basePrice: true, category: {
+                      select: { name: true }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    })
+  }
 }
