@@ -2,29 +2,65 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { 
-  HomeIcon, 
-  TagIcon, 
-  ClipboardDocumentCheckIcon, 
-  Cog6ToothIcon, 
-  GlobeAmericasIcon, 
-  ArrowsRightLeftIcon, 
-  CubeIcon, 
-  UsersIcon,
-  ChevronRightIcon
-} from '@heroicons/react/24/outline'
-import { cn } from '@/lib/utils'
-import { useSidebar } from '@/hooks/useSidebar'
+import { HomeIcon, BriefcaseIcon, ClipboardDocumentCheckIcon, ServerStackIcon, Cog6ToothIcon, GlobeAmericasIcon, ShoppingCartIcon, ArrowsRightLeftIcon, CubeIcon, TagIcon, UsersIcon } from '@heroicons/react/24/outline'
+import { useAuthService } from '@/features/auth/service/auth.service'
 
 const NAV_ITEMS = [
-  { title: "Dashboard", href: "/dashboard", icon: HomeIcon },
-  { title: "Products", href: "/dashboard/products", icon: CubeIcon },
-  { title: "Categories", href: "/dashboard/categories", icon: TagIcon },
-  { title: "Accounts", href: "/dashboard/accounts", icon: UsersIcon },
-  { title: "Branches", href: "/dashboard/branches", icon: GlobeAmericasIcon },
-  { title: "Transactions", href: "/transaction", icon: ArrowsRightLeftIcon },
-  { title: "Orders", href: "/manage-order", icon: ClipboardDocumentCheckIcon },
-  { title: "Settings", href: "/settings", icon: Cog6ToothIcon },
+  {
+    title: "Dashboard",
+    href: "/dashboard",
+    icon: <HomeIcon className="w-5 h-5" />,
+  },
+  {
+    title: "Products",
+    href: "/dashboard/products",
+    icon: <CubeIcon className="w-5 h-5" />,
+  },
+  {
+    title: "Categories",
+    href: "/dashboard/categories",
+    icon: <TagIcon className="w-5 h-5" />,
+  },
+  {
+    title: "Accounts",
+    href: "/dashboard/accounts",
+    icon: <UsersIcon className="w-5 h-5" />,
+  },
+  {
+    title: "Cart",
+    href: "/cart",
+    icon: <ShoppingCartIcon className="w-5 h-5" />,
+  },
+  {
+    title: 'Manage Order',
+    href: '/manage-order',
+    icon: <ClipboardDocumentCheckIcon className="w-5 h-5" />
+  },
+  {
+    title: 'Manage Project',
+    href: '/manage-project',
+    icon: <BriefcaseIcon className="w-5 h-5" />
+  },
+  {
+    title: "My Transaction",
+    href: "/transaction",
+    icon: <ArrowsRightLeftIcon className="w-5 h-5" />,
+  },
+  {
+    title: "Tracking Document",
+    href: "/tracking",
+    icon: <ClipboardDocumentCheckIcon className="w-5 h-5" />,
+  },
+  {
+    title: "Master Data",
+    href: "/master-data",
+    icon: <ServerStackIcon className="w-5 h-5" />,
+  },
+  {
+    title: "Settings",
+    href: "/settings",
+    icon: <Cog6ToothIcon className="w-5 h-5" />,
+  },
 ];
 
 export const Sidebar = () => {

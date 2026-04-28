@@ -59,7 +59,7 @@ export const OrderItemCard: React.FC<Props> = ({ orderId, orderNumber, status, t
                 <CopyFieldButton label="Order number" value={orderNumber} />
                 <p className="text-slate-500 text-sm mb-1"><span>({totalItems})</span> Purchased Item</p>
                 <p className="text-slate-500 text-sm font-semibold mb-0">{productList}</p>
-                { status === 'WAITING_PAYMENT' && paymentEvidence === null && <PaymentEvidenceUploadButton orderId={orderId} paymentDeadline={paymentDeadline}/> }
+                { status === 'WAITING_PAYMENT' && paymentEvidence === null && paymentMethod === "MANUAL" && <PaymentEvidenceUploadButton orderId={orderId} paymentDeadline={paymentDeadline}/> }
                 {
                     status === 'WAITING_PAYMENT' && paymentEvidence !== null && 
                         <>

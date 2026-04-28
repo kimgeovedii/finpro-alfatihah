@@ -12,7 +12,7 @@ export class CartRepository {
                             select: {
                                 id: true, product: {              
                                     select: {
-                                        basePrice: true
+                                        basePrice: true, weight: true
                                     }
                                 }
                             }

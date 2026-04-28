@@ -1,41 +1,39 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ProductDetailData } from "@/features/products/types/product.type";
 import { ProductRepository } from "@/features/products/repositories/product.repository";
 
 const productRepository = new ProductRepository();
 
-export function useProductDetail(slugName: string) {
-  const [product, setProduct] = useState<ProductDetailData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export function useProductDetail(slugName: string, storeName: string) {
+  const [product, setProduct] = useState<ProductDetailData | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchProduct = useCallback(async () => {
+    try {
+      setIsLoading(true)
+      const data = await productRepository.getProductBySlug(slugName, storeName)
+      setProduct(data)
+      setError(null)
+    } catch (err) {
+      setError((err as Error).message || "Failed to load product")
+      setProduct(null)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [slugName, storeName])
 
   useEffect(() => {
-    let isMounted = true;
+    let isMounted = true
 
-    async function fetchProduct() {
-      try {
-        setIsLoading(true);
-        const data = await productRepository.getProductBySlug(slugName);
-        if (isMounted) {
-          setProduct(data);
-          setError(null);
-        }
-      } catch (err) {
-        if (isMounted) {
-          setError((err as Error).message || "Failed to load product");
-          setProduct(null);
-        }
-      } finally {
-        if (isMounted) setIsLoading(false);
-      }
-    }
-
-    fetchProduct();
+    fetchProduct().then(() => {
+      if (!isMounted) setProduct(null)
+    })
 
     return () => {
-      isMounted = false;
-    };
-  }, [slugName]);
+      isMounted = false
+    }
+  }, [fetchProduct])
 
-  return { product, isLoading, error };
+  return { product, isLoading, error, fetchProduct }
 }

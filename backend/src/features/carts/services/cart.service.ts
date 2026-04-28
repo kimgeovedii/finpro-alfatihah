@@ -38,7 +38,8 @@ export class CartService {
             let selectedAddress = null
             const branchLat = cart.branch.latitude
             const branchLong = cart.branch.longitude
-            const weight = weightGramsShippingDefault // for now
+            // Total weight (g)
+            const totalWeight = cart.items.reduce((sum, dt) => sum + dt.product.product.weight, 0)
     
             // If address provided just take it 
             if (addressId) selectedAddress = cart.user.addresses.find(a => a.id === addressId)
@@ -99,7 +100,7 @@ export class CartService {
                 ])
             
                 // Helper : get shipping cost from Raja Ongkir + Opencage
-                const shippingCost = await getShippingCost(originId, destinationId)
+                const shippingCost = await getShippingCost(originId, destinationId, totalWeight)
     
                 shipping.shippingCost = shippingCost
                 shipping.distance = rangeValidate.distance

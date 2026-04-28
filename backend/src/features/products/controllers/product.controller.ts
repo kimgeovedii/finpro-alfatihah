@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { ProductService } from "../services/product.service";
 import { sendSuccess } from "../../../utils/apiResponse";
+import { AuthRequest } from "../../../middleware/auth.middleware";
 
 export class ProductController {
   private productService: ProductService;
@@ -44,14 +45,16 @@ export class ProductController {
   };
 
   public getProductBySlug = async (
-    req: Request,
+    req: AuthRequest,
     res: Response,
     next: NextFunction,
   ) => {
     try {
-      const data = await this.productService.getProductBySlug(
-        req.params.slugName as string,
-      );
+      const userId = req.user?.userId 
+      const slugName = req.params.slugName as string
+      const storeName = decodeURIComponent(req.params.storeName as string)
+
+      const data = await this.productService.getProductBySlug(slugName, userId, storeName);
       sendSuccess(res, data, "Get product successfully");
     } catch (error) {
       next(error);

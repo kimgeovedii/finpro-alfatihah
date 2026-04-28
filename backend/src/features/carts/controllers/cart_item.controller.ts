@@ -54,9 +54,9 @@ export class CartItemController {
             const cartItemId = req.params.cartItemId as string
 
             // Service
-            await this.cartItemService.deleteCartItemById(userId, cartItemId)
+            const data = await this.cartItemService.deleteCartItemById(userId, cartItemId)
 
-            return sendSuccess(res, "Product item deleted!")
+            return sendSuccess(res, data, "Product item deleted!")
         } catch (error: any) {
             next(error)
         }
