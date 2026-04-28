@@ -39,10 +39,10 @@ export const orderRepository = {
     async postConfirmOrderStatusById(orderNumber: string): Promise<{ message: string }> {
         return await apiFetch<{ message: string }>(`/orders/confirming/${orderNumber}`, "post")
     },
-    async downloadInvoice(orderNumber: string): Promise<Blob> {
+    async downloadInvoiceOrder(orderNumber: string): Promise<Blob> {
         const token = Cookies.get("accessToken")
 
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/invoice/${orderNumber}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/export/invoice/${orderNumber}`, {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${token}`
@@ -50,5 +50,17 @@ export const orderRepository = {
         })
     
         return await res.blob()
-    }
+    },
+    async downloadTransactionHistoryDataset(): Promise<Blob> {
+        const token = Cookies.get("accessToken")
+
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/export/history`, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+    
+        return await res.blob()
+    },
 }

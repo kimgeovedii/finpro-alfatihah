@@ -27,4 +27,27 @@ export class OrderExportController {
             next(error)
         }
     }
+
+    getTransactionHistoryExcel = async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user?.userId
+            const role = req.user?.role
+
+            const buffer = await this.orderExportService.generateTransactionHistoryExcel(userId)
+    
+            res.setHeader(
+                "Content-Type",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
+    
+            res.setHeader(
+                "Content-Disposition",
+                "attachment; filename=orders-report.xlsx"
+            )
+    
+            return res.send(buffer)
+        } catch (error) {
+            next(error)
+        }
+    }
 }

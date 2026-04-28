@@ -23,16 +23,16 @@ class OrderRouter {
         // Webhook
         this.router.post("/webhook/midtrans", this.orderWebhookController.postMidtransWebhook)
 
-        this.router.use(authMiddleware)
+        this.router.use(authMiddleware)        
 
-        // Export
-        this.router.get("/invoice/:orderNumber", this.orderExportController.getInvoicePdf)
-
-        // Normal API
         const transactionRouter = Router()
+        // Normal API
         transactionRouter.get("/", this.orderController.getAllTransaction)
         transactionRouter.get("/:orderNumber", this.orderController.getOrderDetailByOrderNumber)
         transactionRouter.get("/management/:branchId", this.orderController.getAllTransactionManagementByBranchId)
+        // Export
+        this.router.get("/export/invoice/:orderNumber", this.orderExportController.getInvoicePdf)
+        this.router.get("/export/history", this.orderExportController.getTransactionHistoryExcel)
         this.router.use("/transaction", transactionRouter)
 
         const summaryRouter = Router()

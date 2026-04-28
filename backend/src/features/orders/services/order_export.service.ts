@@ -1,11 +1,13 @@
 import { OrderRepository } from "../repositories/order.repository"
 import { UserRole } from "@prisma/client"
 import PDFDocument from "pdfkit"
+import ExcelJS from "exceljs"
 
 export class OrderExportService {
     private orderRepo = new OrderRepository()
 
     async generateInvoicePdf(role: UserRole, userId: string, orderNumber: string) {
+        // Repo : get detail order invoice by order number
         const order = await this.orderRepo.findOrderDetailByOrderNumber(role, userId, orderNumber)
     
         if (!order) throw { code: 404, message: "Order not found" }
@@ -144,5 +146,76 @@ export class OrderExportService {
         
             doc.end()
         })
+    }
+
+
+    async generateTransactionHistoryExcel(userId: string): Promise<Buffer> {
+        // Repo : get all transaction by user id
+        const raw = await this.orderRepo.getTransactionHistory(userId)
+
+        // Flatten data
+        const rows = raw.flatMap(order =>
+            order.items.map(dt => {
+                const product = dt.product.product
+
+                return {
+                    createdAt: order.createdAt,
+                    orderNumber: order.orderNumber,
+                    category: product.category.name,
+                    productName: product.productName,
+                    qty: dt.quantity,
+                    total: product.basePrice * dt.quantity,
+                    storeName: order.branch.storeName
+                }
+            })
+        )
+
+        // Sort 
+        rows.sort((a, b) => {
+            if (b.createdAt.getTime() !== a.createdAt.getTime()) return b.createdAt.getTime() - a.createdAt.getTime()
+            return a.productName.localeCompare(b.productName)
+        })
+
+        // Create workbook
+        const workbook = new ExcelJS.Workbook()
+        const sheet = workbook.addWorksheet("Orders Report")
+
+        // Header
+        sheet.columns = [
+            { header: "Created At", key: "createdAt", width: 20 },
+            { header: "Order Number", key: "orderNumber", width: 25 },
+            { header: "Category", key: "category", width: 20 },
+            { header: "Product Name", key: "productName", width: 30 },
+            { header: "Qty", key: "qty", width: 10 },
+            { header: "Total Price", key: "total", width: 20 },
+            { header: "Store Name", key: "storeName", width: 25 },
+        ]
+
+        // Insert rows
+        rows.forEach(row => {
+            sheet.addRow({
+                ...row,
+                createdAt: new Date(row.createdAt).toLocaleString()
+            })
+        })
+
+        // Currency format
+        sheet.getColumn("total").numFmt = '"Rp" #,##0'
+
+        // Border 
+        sheet.eachRow((row) => {
+            row.eachCell((cell) => {
+                cell.border = {
+                    top: { style: "thin" },
+                    left: { style: "thin" },
+                    bottom: { style: "thin" },
+                    right: { style: "thin" }
+                }
+            })
+        })
+
+        // Export buffer
+        const buffer = await workbook.xlsx.writeBuffer()
+        return Buffer.from(buffer)
     }
 }
