@@ -1,24 +1,34 @@
 import { Router } from "express"
 import { OrderController } from "../controllers/order.controller"
 import { authMiddleware } from "../../../middleware/auth.middleware"
+import { OrderWebhookController } from "../controllers/order_webhook.controller"
+import { OrderExportController } from "../controllers/order_export.controller"
 
 class OrderRouter {
     public router: Router
     private orderController: OrderController
+    private orderWebhookController: OrderWebhookController
+    private orderExportController: OrderExportController
 
     constructor() {
         this.router = Router()
         this.orderController = new OrderController()
+        this.orderWebhookController = new OrderWebhookController()
+        this.orderExportController = new OrderExportController()
 
         this.initializeRoutes()
     }
 
     private initializeRoutes() {
         // Webhook
-        this.router.post("/webhook/midtrans", this.orderController.postMidtransWebhook)
+        this.router.post("/webhook/midtrans", this.orderWebhookController.postMidtransWebhook)
 
         this.router.use(authMiddleware)
 
+        // Export
+        this.router.get("/invoice/:orderNumber", this.orderExportController.getInvoicePdf)
+
+        // Normal API
         const transactionRouter = Router()
         transactionRouter.get("/", this.orderController.getAllTransaction)
         transactionRouter.get("/:orderNumber", this.orderController.getOrderDetailByOrderNumber)

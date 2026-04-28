@@ -6,9 +6,11 @@ import { OrderService } from "../services/order.service"
 import { paginationDefault, uuidRegex } from "../../../constants/feature.const"
 import { orderCode } from "../../../constants/business.const"
 import { OrderStatus } from "@prisma/client"
+import { OrderWebhookService } from "../services/order_webhook.service"
 
 export class OrderController {
     private orderService = new OrderService()
+    private orderWebhookService = new OrderWebhookService()
 
     getTransactionSummary = async (req: AuthRequest, res: Response, next: NextFunction) => {
         try {
@@ -204,16 +206,6 @@ export class OrderController {
 
             return sendSuccess(res, data, "Order is confirmed!")
         } catch (error: any) {
-            next(error)
-        }
-    }
-
-    // Webhook
-    postMidtransWebhook = async (req: AuthRequest, res: Response, next: NextFunction) => {
-        try {
-            await this.orderService.handleMidtransWebhook(req.body)
-            return sendSuccess(res, null, "Webhook processed")
-        } catch (error) {
             next(error)
         }
     }

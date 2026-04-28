@@ -1,5 +1,6 @@
 import { apiFetch } from "@/utils/api"
 import { ManagementOrderResponse, OrderData, OrderResponse, OrderSummaryByBranchIdData, OrderSummaryData } from "./order.type"
+import Cookies from "js-cookie";
 
 export const orderRepository = {
     async getOrderSummary(): Promise<OrderSummaryData> {
@@ -37,5 +38,17 @@ export const orderRepository = {
     },
     async postConfirmOrderStatusById(orderNumber: string): Promise<{ message: string }> {
         return await apiFetch<{ message: string }>(`/orders/confirming/${orderNumber}`, "post")
+    },
+    async downloadInvoice(orderNumber: string): Promise<Blob> {
+        const token = Cookies.get("accessToken")
+
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/invoice/${orderNumber}`, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+    
+        return await res.blob()
     }
 }
