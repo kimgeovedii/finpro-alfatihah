@@ -1,4 +1,5 @@
 import { ProductRepository } from "../repositories/product.repository";
+import { cloudinaryUpload } from "../../../config/cloudinary";
 
 export class ProductService {
   private productRepository: ProductRepository;
@@ -42,16 +43,52 @@ export class ProductService {
     return await this.productRepository.getProductById(id);
   };
 
-  public getProductBySlug = async (slugName: string) => {
-    return await this.productRepository.getProductBySlug(slugName);
+  public getProductBySlug = async (slugName: string, userId: string | null, branchName: string) => {
+    return await this.productRepository.getProductBySlug(slugName, userId, branchName);
   };
 
-  public createProduct = async (data: any) => {
-    return await this.productRepository.createProduct(data);
+  public createProduct = async (data: any, files?: Express.Multer.File[]) => {
+    const payload = { ...data };
+
+    // Handle file uploads if files are provided
+    if (files && Array.isArray(files) && files.length > 0) {
+      const imageUrls: string[] = [];
+      for (const file of files) {
+        try {
+          const result = await cloudinaryUpload(file, "products");
+          imageUrls.push(result.secure_url);
+        } catch (cloudinaryError: any) {
+          throw new Error(`Image upload failed: ${cloudinaryError.message}`);
+        }
+      }
+      payload.imageUrls = imageUrls;
+    }
+
+    return await this.productRepository.createProduct(payload);
   };
 
-  public updateProduct = async (id: string, data: any) => {
-    return await this.productRepository.updateProduct(id, data);
+  public updateProduct = async (
+    id: string,
+    data: any,
+    files?: Express.Multer.File[],
+  ) => {
+    const payload = { ...data };
+
+    // Handle file uploads if files are provided
+    if (files && Array.isArray(files) && files.length > 0) {
+      const imageUrls: string[] = [];
+      for (const file of files) {
+        try {
+          const result = await cloudinaryUpload(file, "products");
+          imageUrls.push(result.secure_url);
+        } catch (cloudinaryError: any) {
+          throw new Error(`Image upload failed: ${cloudinaryError.message}`);
+        }
+      }
+      payload.imageUrls = imageUrls;
+    }
+
+    return await this.productRepository.updateProduct(id, payload);
   };
 
   public deleteProduct = async (id: string) => {

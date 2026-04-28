@@ -55,9 +55,137 @@ export class ProductRepository {
     });
   };
 
-  public getProductBySlug = async (slugName: string) => {
+  public getProductBySlug = async (
+    slugName: string,
+    userId: string | null,
+    branchName: string
+  ) => {
+    const include: any = {
+      category: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      productImages: {
+        select: {
+          id: true,
+          imageUrl: true,
+          isPrimary: true,
+        },
+      },
+      branchInventories: {
+        where: {
+          branch: {
+            storeName: branchName,
+            schedules: {
+              some: {},
+            },
+          },
+        },
+        select: {
+          branchId: true,
+          currentStock: true,
+          branch: {
+            select: {
+              storeName: true,
+              address: true,
+              schedules: {
+                select: {
+                  startTime: true,
+                  endTime: true,
+                  dayName: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    };
+  
+    if (userId) {
+      include.branchInventories.select.cartItems = {
+        where: {
+          cart: {
+            userId,
+            branch: {
+              storeName: branchName,
+            },
+          },
+        },
+        select: {
+          id: true, quantity: true,
+          cart: {
+            select: {
+              branchId: true,
+            },
+          },
+        },
+      };
+    }
+  
     return prisma.products.findUnique({
       where: { slugName },
+      include,
+    });
+  };
+
+  public createProduct = async (data: any) => {
+    const { imageUrls, ...productData } = data;
+    return prisma.products.create({
+      data: {
+        ...productData,
+        productImages:
+          imageUrls && Array.isArray(imageUrls) && imageUrls.length > 0
+            ? {
+                create: imageUrls.map((imageUrl, index) => ({
+                  imageUrl,
+                  isPrimary: index === 0,
+                })),
+              }
+            : undefined,
+      },
+    });
+  };
+
+
+  public updateProduct = async (id: string, data: any) => {
+    const { imageUrls, ...updateData } = data;
+
+    // If imageUrls are provided, delete old images and create new ones
+    if (imageUrls && Array.isArray(imageUrls) && imageUrls.length > 0) {
+      return prisma.products.update({
+        where: { id },
+        data: {
+          ...updateData,
+          productImages: {
+            deleteMany: {},
+            create: imageUrls.map((imageUrl, index) => ({
+              imageUrl,
+              isPrimary: index === 0,
+            })),
+          },
+        },
+        include: {
+          category: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          productImages: {
+            select: {
+              id: true,
+              imageUrl: true,
+            },
+          },
+        },
+      });
+    }
+
+    return prisma.products.update({
+      where: { id },
+      data: updateData,
       include: {
         category: {
           select: {
@@ -69,23 +197,9 @@ export class ProductRepository {
           select: {
             id: true,
             imageUrl: true,
-            isPrimary: true,
           },
         },
       },
-    });
-  };
-
-  public createProduct = async (data: any) => {
-    return prisma.products.create({
-      data,
-    });
-  };
-
-  public updateProduct = async (id: string, data: any) => {
-    return prisma.products.update({
-      where: { id },
-      data,
     });
   };
 

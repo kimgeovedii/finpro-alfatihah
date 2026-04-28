@@ -218,6 +218,9 @@
  *                                         productName:
  *                                           type: string
  *                                           example: Coca Cola
+ *                                         slugName:
+ *                                           type: string
+ *                                           example: coca-cola
  *                                         description:
  *                                           type: string
  *                                           example: Soft drink that make u diabetes
@@ -243,13 +246,16 @@
  *                               storeName:
  *                                 type: string
  *                                 example: Toko Pusat Jakarta
+ *                               city:
+ *                                 type: string
+ *                                 example: Jakarta
  *                     meta:
  *                       type: object
  *                       properties:
  *                         page: { type: integer, example: 1 }
  *                         limit: { type: integer, example: 14 }
  *                         total: { type: integer, example: 1 }
- *                         total_page: { type: integer, example: 1 }
+ *                         totalPages: { type: integer, example: 1 }
  *
  *       400:
  *         description: Validation error
@@ -504,6 +510,7 @@
  *                                       slugName: { type: string, example: canned-goods }
  *                                       description: { type: string, example: Canned goods for long-term storage }
  *                                   basePrice: { type: number, example: 16023 }
+ *                                   weight: { type: number, example: 1200 }
  *                                   productImages:
  *                                     type: array
  *                                     items:
@@ -528,6 +535,7 @@
  *                               isPrimary: { type: boolean, example: true }
  *                     totalBasePrice: { type: number, example: 24241893 }
  *                     totalQty: { type: number, example: 641 }
+ *                     totalWeight: { type: number, example: 1200 }
  *                     shipping:
  *                       type: object
  *                       properties:

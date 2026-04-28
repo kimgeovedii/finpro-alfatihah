@@ -1,8 +1,9 @@
+// For navigation
 export type PaginationMeta = {
     page: number
     limit: number
     total: number
-    total_page: number
+    totalPages: number
 }
 
 export type StatusInfo = {
@@ -13,7 +14,11 @@ export type StatusInfo = {
     isLast?: boolean
 }
 
+// For response handling
 export type CommandResult = {
     success: boolean
     message: string
 }
+
+// For handling enum
+export type PaymentMethodType = "MANUAL" | "GATEWAY"

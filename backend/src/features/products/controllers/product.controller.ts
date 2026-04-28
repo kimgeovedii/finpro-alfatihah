@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { ProductService } from "../services/product.service";
 import { sendSuccess } from "../../../utils/apiResponse";
+import { AuthRequest } from "../../../middleware/auth.middleware";
 
 export class ProductController {
   private productService: ProductService;
@@ -44,14 +45,16 @@ export class ProductController {
   };
 
   public getProductBySlug = async (
-    req: Request,
+    req: AuthRequest,
     res: Response,
     next: NextFunction,
   ) => {
     try {
-      const data = await this.productService.getProductBySlug(
-        req.params.slugName as string,
-      );
+      const userId = req.user?.userId 
+      const slugName = req.params.slugName as string
+      const storeName = decodeURIComponent(req.params.storeName as string)
+
+      const data = await this.productService.getProductBySlug(slugName, userId, storeName);
       sendSuccess(res, data, "Get product successfully");
     } catch (error) {
       next(error);
@@ -64,9 +67,10 @@ export class ProductController {
     next: NextFunction,
   ) => {
     try {
-      const data = await this.productService.createProduct(req.body);
+      const files = req.files as Express.Multer.File[] | undefined;
+      const data = await this.productService.createProduct(req.body, files);
       sendSuccess(res, data, "Create product successfully");
-    } catch (error) {
+    } catch (error: any) {
       next(error);
     }
   };
@@ -77,9 +81,11 @@ export class ProductController {
     next: NextFunction,
   ) => {
     try {
+      const files = req.files as Express.Multer.File[] | undefined;
       const data = await this.productService.updateProduct(
         req.params.id as string,
         req.body,
+        files,
       );
       sendSuccess(res, data, "Update product successfully");
     } catch (error) {

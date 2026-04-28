@@ -20,7 +20,7 @@ export const useOrderSummaryByBranchId = (branchId: string) => {
 
     useEffect(() => {
         fetchOrderSummaryByBranchId(branchId)
-    }, [])
+    }, [branchId])
 
     return { summaryByBranchId, isLoadingSummaryByBranchId, error }
 }
@@ -61,17 +61,19 @@ export const useAllOrderData = () => {
     return { orders, meta, isLoading, fetchAllOrders }
 }
 
-export const useOrderManagement = (branchId: string) => {
+export const useOrderManagement = () => {
     const [orders, setOrders] = useState<ManagementOrderItem[]>([])
     const [meta, setMeta] = useState<ManagementOrderResponse["meta"] | null>(null)
     const [isLoading, setIsLoading] = useState(false)
     const [status, setStatus] = useState<OrderStatus | "ALL">("ALL")
     const [page, setPage] = useState(1)
+    const [branchId, setBranchId] = useState<string>("ALL")
+    const [search, setSearch] = useState<string>("")
 
-    const fetchOrders = async (nextPage: number, nextStatus: OrderStatus | "ALL") => {
+    const fetchOrders = async (nextPage: number, nextStatus: OrderStatus | "ALL", nextBranchId: string, nextSearch: string) => {
         setIsLoading(true)
         try {
-            const res = await orderRepository.getAllOrdersByBranchId(nextPage, branchId, nextStatus)
+            const res = await orderRepository.getAllOrdersByBranchId(nextPage, nextBranchId, nextStatus, nextSearch)
             setOrders(res.data)
             setMeta(res.meta)
         } catch (err) {
@@ -82,16 +84,24 @@ export const useOrderManagement = (branchId: string) => {
     }
 
     useEffect(() => {
-        fetchOrders(page, status)
-    }, [page, status])
+        fetchOrders(page, status, branchId, search)
+    }, [page, status, branchId, search])
 
     const handlePageChange = (nextPage: number) => setPage(nextPage)
     const handleStatusChange = (nextStatus: OrderStatus | "ALL") => {
         setPage(1)
         setStatus(nextStatus)
     }
+    const handleBranchChange = (nextBranchId: string) => {
+        setPage(1)
+        setBranchId(nextBranchId)
+    }
+    const handleSearch = (nextSearch: string) => {
+        setPage(1)
+        setSearch(nextSearch)
+    }
 
-    return { orders, meta, isLoading, status, page, handlePageChange, handleStatusChange }
+    return { orders, meta, isLoading, status, page, handlePageChange, handleStatusChange, handleBranchChange, handleSearch }
 }
 
 export const useOrderDetailData = (orderNumber: string) => {

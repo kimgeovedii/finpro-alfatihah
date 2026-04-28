@@ -49,11 +49,17 @@ export class CartRepository {
             quantity: true,
             product: {
               select: {
-                product: {
+                currentStock: true, product: {
                   select: {
-                    productName: true, description: true, category: true, basePrice: true, productImages: {
+                    productName: true, description: true, basePrice: true, weight: true, slugName: true, productImages: {
                       select: { imageUrl: true },
-                      where: { isPrimary: true }
+                      where: { isPrimary: true },
+                      take: 1
+                    },
+                    category: {
+                      select: {
+                        slugName: true, name: true
+                      }
                     }
                   }
                 }
@@ -76,17 +82,19 @@ export class CartRepository {
     if (!cart) return null
 
     // Count summary for total price & qty
-    const { totalBasePrice, totalQty  } = cart.items.reduce((acc, item) => {
+    const { totalBasePrice, totalQty, totalWeight } = cart.items.reduce((acc, item) => {
       const price = item.product.product.basePrice || 0
+      const weight = item.product.product.weight || 0
       const qty = item.quantity || 0
 
       acc.totalBasePrice += price * qty
+      acc.totalWeight += weight * qty
       acc.totalQty += qty
       
       return acc
-    }, { totalBasePrice: 0, totalQty: 0 })
+    }, { totalBasePrice: 0, totalQty: 0, totalWeight: 0 })
 
-    return { ...cart, totalBasePrice, totalQty }
+    return { ...cart, totalBasePrice, totalQty, totalWeight }
   }
 
   async findAllCarts(page: number, limit: number, userId: string, branchId: string | null) {
@@ -113,10 +121,15 @@ export class CartRepository {
                 select: {
                   id: true, currentStock: true, product: {                 
                     select: {
-                      productName: true, basePrice: true, description: true, category: {
+                      productName: true, slugName: true, basePrice: true, description: true, category: {
                         select: {
                           name: true, slugName: true,
                         }
+                      },
+                      productImages: {
+                        select: { imageUrl: true },
+                        where: { isPrimary: true },
+                        take: 1
                       }
                     }
                   }
@@ -126,7 +139,7 @@ export class CartRepository {
           },
           branch: {
             select: {
-              id: true, storeName: true
+              id: true, storeName: true, city: true
             }
           }
         }

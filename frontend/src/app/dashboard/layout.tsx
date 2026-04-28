@@ -1,8 +1,12 @@
-import React from 'react'
-import { Sidebar } from '@/components/layout/Sidebar'
-import { Navbar } from '@/components/layout/NavbarDashboard'
+import React from "react";
+import { Sidebar } from "@/components/layout/Sidebar";
+import { Navbar } from "@/components/layout/NavbarDashboard";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <div className="min-h-screen bg-slate-50/50 flex flex-col">
       {/* Decorative ambient background */}

@@ -2,18 +2,10 @@ import { OrderStatus } from "@/constants/business.const"
 import { AddressData, BranchData } from "@/types/address.type"
 import { PaginationMeta } from "@/types/global.type"
 import { PaymentData } from "@/types/payment.type"
-import { ProductCategory, ProductImage } from "@/types/product.type"
-
-export type ProductDetail = {
-    productName: string
-    description: string
-    basePrice: number
-    category: ProductCategory
-    productImages: ProductImage[]
-}
+import { ProductOrderCartItem } from "@/types/product.type"
 
 export type OrderItemProduct = {
-    product: ProductDetail
+    product: ProductOrderCartItem
     currentStock: number
 }
 
@@ -29,6 +21,7 @@ export type OrderData = {
     createdAt: string
     status: string
     totalPrice: number
+    totalWeight: number
     finalPrice: number
     shippingCost: number
     paymentDeadline: string
@@ -71,6 +64,7 @@ export type ManagementOrderUser = {
 
 export type ManagementOrderItem = {
     id: string
+    branch: BranchData
     orderNumber: string
     createdAt: string
     status: string

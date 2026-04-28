@@ -246,6 +246,10 @@ input[type=number] {
   -moz-appearance: textfield;
 }
 
+button {
+  cursor: pointer !important;
+}
+
 .swal2-popup {
   border-radius: 30px;
 }

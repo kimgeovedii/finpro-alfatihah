@@ -15,8 +15,14 @@ export class VoucherService {
     const skip = (page - 1) * limit;
     const take = limit;
 
+    const where: any = { ...filters };
+    if (where.search) {
+      where.name = { contains: where.search, mode: "insensitive" };
+      delete where.search;
+    }
+
     const { data, total } = await this.voucherRepository.findAllVouchers(
-      filters,
+      where,
       skip,
       take,
     );

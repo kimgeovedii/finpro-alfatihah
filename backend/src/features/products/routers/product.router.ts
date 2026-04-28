@@ -6,6 +6,8 @@ import {
 } from "../validations/product.schema";
 import { validate } from "../../../middleware/validate";
 import { ProductImageRouter } from "./productImage.router";
+import { optionalAuthMiddleware } from "../../../middleware/auth.middleware";
+import { memoryUploader } from "../../../middleware/uploader.middleware";
 
 export class ProductRouter {
   private router: Router;
@@ -19,15 +21,19 @@ export class ProductRouter {
 
   private routes() {
     this.router.get("/", this.productController.findAllProducts);
-    this.router.get("/slug/:slugName", this.productController.getProductBySlug);
+    this.router.get("/branch/:storeName/:slugName", optionalAuthMiddleware, this.productController.getProductBySlug);
     this.router.get("/:id", this.productController.getProductById);
+    
     this.router.post(
       "/",
+      memoryUploader().array("images", 10),
       validate(createProductSchema),
       this.productController.createProduct,
     );
+
     this.router.put(
       "/:id",
+      memoryUploader().array("images", 10),
       validate(updateProductSchema),
       this.productController.updateProduct,
     );
