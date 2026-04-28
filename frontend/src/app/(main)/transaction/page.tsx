@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { OrderItemCard } from "@/features/order/components/OrderItemCard";
 import { OrderSummaryCard } from "@/features/order/components/OrderSummaryCard";
+import { useDownloadTransactionHistory } from "@/features/order/hooks/useExport";
 import { useAllOrderData, useOrderSummary } from "@/features/order/hooks/useOrder";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { CloudArrowDownIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import Swal from "sweetalert2";
 
@@ -14,6 +15,7 @@ export default function TransactionPage() {
   // Handle hook
   const { summary, isLoadingSummary } = useOrderSummary()
   const { orders, meta, isLoading, fetchAllOrders } = useAllOrderData()
+  const { downloadTransactionHistory } = useDownloadTransactionHistory()
   // For filtering
   const [orderNumber, setOrderNumber] = useState("")
   const [dateStart, setDateStart] = useState("")
@@ -83,6 +85,7 @@ export default function TransactionPage() {
               <Input type="date" value={dateEnd} onChange={(e) => setDateEnd(e.target.value)} className="h-9 text-sm"/>
             </div>
             <Button onClick={handleSearch} className="h-9"><MagnifyingGlassIcon/> Search</Button>
+            <Button onClick={downloadTransactionHistory} className="h-9"><CloudArrowDownIcon/> Transaction History</Button>
           </div>
           <div>
             { isLoading && 

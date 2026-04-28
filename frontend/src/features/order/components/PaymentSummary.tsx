@@ -3,6 +3,7 @@ import { Headset, Receipt } from "lucide-react"
 import React from "react"
 import { PaymentEvidenceUploadButton } from "./PaymentEvidenceUploadButton"
 import { OrderCancelButton } from "./OrderCancelButton"
+import { useDownloadInvoice } from "../hooks/useExport"
 
 type Props = {
     orderId: string
@@ -21,6 +22,8 @@ type Props = {
 }
 
 export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, totalPrice, totalSaving, finalPrice, orderId, status, paymentDeadline, paymentEvidence, orderNumber, onCancel, paymentMethod, shippingWeight }) => {
+    const { downloadInvoiceOrder } = useDownloadInvoice()
+    
     return (
         <div className="bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 mb-4">
             <h5 className="font-bold mb-3">Payment Summary</h5>
@@ -54,7 +57,12 @@ export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, t
                 { status === 'WAITING_PAYMENT' && <OrderCancelButton orderNumber={orderNumber} onCancel={onCancel}/> }
             </div>
             <div className="flex gap-5 w-full mt-3">
-                { status && ["SHIPPED","CONFIRMED"].includes(status) && <Button variant='outline' className="flex-1 h-10 bg-white hover:bg-[#00767a] text-teal-700 hover:text-white font-bold rounded-[8px] shadow-lg border-teal-700 border-1 transition-all duration-300 active:scale-[0.97] disabled:opacity-70"><Receipt/>Download Invoice</Button> }
+                { 
+                    status && ["SHIPPED","CONFIRMED"].includes(status) && 
+                        <Button variant='outline' onClick={() => downloadInvoiceOrder(orderNumber)} className="flex-1 h-10 bg-white hover:bg-[#00767a] text-teal-700 hover:text-white font-bold rounded-[8px] shadow-lg border-teal-700 border-1 transition-all duration-300 active:scale-[0.97] disabled:opacity-70">
+                            <Receipt/>Download Invoice
+                        </Button> 
+                }
                 <Button className="flex-1 h-10 bg-teal-700 hover:bg-[#00767a] text-white font-bold rounded-[8px] shadow-lg shadow-primary-teal/20 transition-all duration-300 active:scale-[0.97] disabled:opacity-70"><Headset/> Help Center</Button>
             </div>
         </div>
