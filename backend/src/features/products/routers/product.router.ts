@@ -24,8 +24,6 @@ export class ProductRouter {
   private routes() {
     this.router.get(
       "/",
-      authMiddleware,
-      roleMiddleware([EmployeeRole.STORE_ADMIN, EmployeeRole.SUPER_ADMIN]),
       this.productController.findAllProducts,
     );
     this.router.get(

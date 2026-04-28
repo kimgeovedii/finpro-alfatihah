@@ -28,11 +28,11 @@ export const useNavbar = () => {
     }
   }, [isAuthenticated, isVerified, fetchCartSummary]);
 
-  const onSearchSubmit = useCallback(async (e: React.FormEvent) => {
+  const onSearchSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     if (!searchTerm.trim()) return;
-    await executeSearch(searchTerm);
-  }, [searchTerm, executeSearch]);
+    window.location.href = `/search?q=${encodeURIComponent(searchTerm)}`;
+  }, [searchTerm]);
 
   const handleProtectedAction = useCallback((action: string) => {
     if (!isAuthenticated()) {

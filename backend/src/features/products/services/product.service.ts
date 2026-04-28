@@ -25,6 +25,18 @@ export class ProductService {
       delete where.search;
     }
 
+    if (where.minPrice || where.maxPrice) {
+      where.basePrice = {};
+      if (where.minPrice) {
+        where.basePrice.gte = parseFloat(where.minPrice);
+        delete where.minPrice;
+      }
+      if (where.maxPrice) {
+        where.basePrice.lte = parseFloat(where.maxPrice);
+        delete where.maxPrice;
+      }
+    }
+
     const { data, total } = await this.productRepository.findAllProducts(
       where,
       skip,
