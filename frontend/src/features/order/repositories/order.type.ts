@@ -64,6 +64,7 @@ export type ManagementOrderUser = {
 
 export type ManagementOrderItem = {
     id: string
+    branch: BranchData
     orderNumber: string
     createdAt: string
     status: string

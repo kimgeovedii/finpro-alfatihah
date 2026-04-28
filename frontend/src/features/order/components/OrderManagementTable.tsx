@@ -1,7 +1,5 @@
 'use client'
-import { useState } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { OrderStatus, statusColorMap } from "@/constants/business.const"
 import { Badge } from "@/components/ui/badge"
@@ -14,9 +12,11 @@ import Image from "next/image"
 import Link from "next/link"
 import { PaginationMeta } from "@/types/global.type"
 import { MessageBox } from "@/components/layout/MessageBox"
+import { MiniTagBox } from "@/components/layout/MiniTagBox"
 
 export type OrderTableItem = {
     id: string
+    storeName: string
     orderNumber: string
     customerName: string
     customerEmail: string
@@ -29,39 +29,14 @@ export type OrderTableItem = {
 type Props = {
     orders: OrderTableItem[]
     meta: PaginationMeta | null
+    activeStatus: string
     isLoading: boolean
-    activeStatus: OrderStatus | "ALL"
+
     onPageChange: (page: number) => void
-    onStatusChange: (status: OrderStatus | "ALL") => void
-    onSearch?: (query: string) => void
     onValidatePaymentEvidence: (paymentId: string, isConfirm: boolean) => void
 }
 
-const STATUS_FILTERS: { label: string; value: OrderStatus | "ALL" }[] = [
-    { label: "All Orders", value: "ALL" },
-    { label: "Waiting Payment", value: "WAITING_PAYMENT" },
-    { label: "Processing", value: "PROCESSING" },
-    { label: "Shipped", value: "SHIPPED" },
-    { label: "Confirmed", value: "CONFIRMED" },
-    { label: "Cancelled", value: "CANCELLED" },
-]
-
-export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading, onPageChange, onSearch, activeStatus, onStatusChange, onValidatePaymentEvidence }) => {
-    // Handle hook
-    const [search, setSearch] = useState("")
-    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearch(e.target.value)
-        onSearch?.(e.target.value)
-    }
-
-    // Filtering
-    const filteredOrders = orders.filter(dt => {
-        const matchStatus = activeStatus === "ALL" || dt.status === activeStatus
-        const matchSearch = search === "" || dt.orderNumber.toLowerCase().includes(search.toLowerCase()) || dt.customerName.toLowerCase().includes(search.toLowerCase())
-        
-        return matchStatus && matchSearch
-    })
-
+export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading, activeStatus, onPageChange, onValidatePaymentEvidence }) => {
     // Pagination 
     const currentPage = meta?.page ?? 1
     const totalPages = meta?.totalPages ?? 1
@@ -73,25 +48,11 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
 
     return (
         <div className="bg-white border border-slate-200 rounded-2xl p-4 md:p-6 w-full">
-            <div className="flex flex-col lg:flex-row space-y-2 text-start justify-between mb-5">
-                <h2 className="text-lg font-semibold text-slate-800">Recent Transaction Flow</h2>
-                <Input placeholder="Quick search..." value={search} onChange={handleSearchChange} className="w-52 h-9 text-sm w-full md:w-[300px]"/>
-            </div>
-            <div className="flex gap-2 mb-5 flex-wrap">
-                {
-                    STATUS_FILTERS.map((dt) => (
-                        <Button key={dt.value} onClick={() => onStatusChange(dt.value)} className={`px-3 py-2 rounded-full text-xs font-medium transition-all ${
-                            activeStatus === dt.value ? "bg-teal-700 text-white" : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"}`}>
-                            {dt.label}
-                        </Button>
-                    ))
-                }
-            </div>
             <div className="w-full overflow-x-auto max-w-[80vw] md:max-w-[57.5vw] lg:max-w-full">
                 <Table className="min-w-[700px]">
                     <TableHeader>
                         <TableRow className="uppercase text-xs tracking-wider text-slate-400">
-                            <TableHead className="font-semibold">Order ID</TableHead>
+                            <TableHead className="font-semibold">Order Detail</TableHead>
                             <TableHead className="font-semibold">Customer</TableHead>
                             <TableHead className="font-semibold">Date</TableHead>
                             <TableHead className="font-semibold">Total Price</TableHead>
@@ -107,7 +68,7 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
                                 <TableRow>
                                     <TableCell colSpan={7} className="text-slate-400 py-10">Loading...</TableCell>
                                 </TableRow>
-                            ) : filteredOrders.length === 0 ? (
+                            ) : orders.length === 0 ? (
                                 // Render failed fetching condition
                                 <TableRow>
                                     <TableCell colSpan={7} className="text-slate-400 py-10">
@@ -115,7 +76,7 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                filteredOrders.map(dt => {
+                                orders.map(dt => {
                                     // Color mapping
                                     const statusClass = statusColorMap[dt.status] || "bg-slate-400"
                                     const finalStatus = dt.status.replaceAll('_',' ')
@@ -123,6 +84,7 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
                                     return (
                                         <TableRow key={dt.id} className="hover:bg-slate-50">
                                             <TableCell className="font-semibold text-slate-800">
+                                                <MiniTagBox context={"Branch"} val={dt.storeName}/>
                                                 <CopyFieldButton label="Order number" value={dt.orderNumber} customClass="text-sm font-semibold"/>
                                             </TableCell>
                                             <TableCell>
@@ -201,3 +163,4 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
         </div>
     )
 }
+

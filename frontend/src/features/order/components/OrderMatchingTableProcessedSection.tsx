@@ -23,7 +23,7 @@ export const OrderMatchingProcessedSection: React.FC<Props> = ({ items, status, 
     return (
         <div className="pb-4 w-full">
             <div className="border-1 rounded-lg p-4 shadow-md">
-            <Input placeholder="Quick search..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-52 h-9 text-sm"/>
+            <Input placeholder="e.g. ORD-123" value={search} onChange={(e) => setSearch(e.target.value)} className="w-52 h-9 text-sm"/>
             <Table className="table-center">
                 <TableHeader>
                     <TableRow className="uppercase text-xs tracking-wider text-slate-400">
