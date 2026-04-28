@@ -9,7 +9,6 @@ export class OrderExportService {
     async generateInvoicePdf(role: UserRole, userId: string, orderNumber: string) {
         // Repo : get detail order invoice by order number
         const order = await this.orderRepo.findOrderDetailByOrderNumber(role, userId, orderNumber)
-    
         if (!order) throw { code: 404, message: "Order not found" }
     
         const doc = new PDFDocument({ margin: 40 })
@@ -151,10 +150,10 @@ export class OrderExportService {
 
     async generateTransactionHistoryExcel(userId: string): Promise<Buffer> {
         // Repo : get all transaction by user id
-        const raw = await this.orderRepo.getTransactionHistory(userId)
+        const data = await this.orderRepo.getTransactionHistory(userId)
 
         // Flatten data
-        const rows = raw.flatMap(order =>
+        const rows = data.flatMap(order =>
             order.items.map(dt => {
                 const product = dt.product.product
 
