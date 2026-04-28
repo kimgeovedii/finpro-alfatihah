@@ -29,13 +29,51 @@ export class ManageProductRepository {
   public createProduct = async (
     payload: CreateProductPayload,
   ): Promise<ManageProduct> => {
-    return await apiFetch<ManageProduct>("/products", "post", payload);
+    const formData = new FormData();
+    
+    // Add all non-file fields
+    Object.entries(payload).forEach(([key, value]) => {
+      if (key === "images") {
+        // Handle multiple images
+        if (payload.images && Array.isArray(payload.images)) {
+          payload.images.forEach((file) => {
+            formData.append("images", file);
+          });
+        }
+      } else if (value !== undefined && value !== null) {
+        formData.append(key, String(value));
+      }
+    });
+
+    return await apiFetch<ManageProduct>("/products", "post", formData);
   };
+
 
   public updateProduct = async (
     id: string,
     payload: UpdateProductPayload,
   ): Promise<ManageProduct> => {
+    // Check if there are images to upload
+    if (payload.images && Array.isArray(payload.images) && payload.images.length > 0) {
+      const formData = new FormData();
+
+      // Add all non-file fields
+      Object.entries(payload).forEach(([key, value]) => {
+        if (key === "images") {
+          // Handle multiple images
+          if (payload.images && Array.isArray(payload.images)) {
+            payload.images.forEach((file) => {
+              formData.append("images", file);
+            });
+          }
+        } else if (value !== undefined && value !== null) {
+          formData.append(key, String(value));
+        }
+      });
+
+      return await apiFetch<ManageProduct>(`/products/${id}`, "put", formData);
+    }
+
     return await apiFetch<ManageProduct>(`/products/${id}`, "put", payload);
   };
 

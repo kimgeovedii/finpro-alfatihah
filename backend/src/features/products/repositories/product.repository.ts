@@ -131,15 +131,75 @@ export class ProductRepository {
   };
 
   public createProduct = async (data: any) => {
+    const { imageUrls, ...productData } = data;
     return prisma.products.create({
-      data,
+      data: {
+        ...productData,
+        productImages:
+          imageUrls && Array.isArray(imageUrls) && imageUrls.length > 0
+            ? {
+                create: imageUrls.map((imageUrl, index) => ({
+                  imageUrl,
+                  isPrimary: index === 0,
+                })),
+              }
+            : undefined,
+      },
     });
   };
 
+
   public updateProduct = async (id: string, data: any) => {
+    const { imageUrls, ...updateData } = data;
+
+    // If imageUrls are provided, delete old images and create new ones
+    if (imageUrls && Array.isArray(imageUrls) && imageUrls.length > 0) {
+      return prisma.products.update({
+        where: { id },
+        data: {
+          ...updateData,
+          productImages: {
+            deleteMany: {},
+            create: imageUrls.map((imageUrl, index) => ({
+              imageUrl,
+              isPrimary: index === 0,
+            })),
+          },
+        },
+        include: {
+          category: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          productImages: {
+            select: {
+              id: true,
+              imageUrl: true,
+            },
+          },
+        },
+      });
+    }
+
     return prisma.products.update({
       where: { id },
-      data,
+      data: updateData,
+      include: {
+        category: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        productImages: {
+          select: {
+            id: true,
+            imageUrl: true,
+          },
+        },
+      },
     });
   };
 

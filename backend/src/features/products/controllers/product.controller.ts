@@ -67,9 +67,10 @@ export class ProductController {
     next: NextFunction,
   ) => {
     try {
-      const data = await this.productService.createProduct(req.body);
+      const files = req.files as Express.Multer.File[] | undefined;
+      const data = await this.productService.createProduct(req.body, files);
       sendSuccess(res, data, "Create product successfully");
-    } catch (error) {
+    } catch (error: any) {
       next(error);
     }
   };
@@ -80,9 +81,11 @@ export class ProductController {
     next: NextFunction,
   ) => {
     try {
+      const files = req.files as Express.Multer.File[] | undefined;
       const data = await this.productService.updateProduct(
         req.params.id as string,
         req.body,
+        files,
       );
       sendSuccess(res, data, "Update product successfully");
     } catch (error) {

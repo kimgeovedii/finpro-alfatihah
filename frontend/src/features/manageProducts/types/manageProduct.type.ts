@@ -41,7 +41,9 @@ export type CreateProductPayload = {
   basePrice: number;
   sku: string;
   weight: number;
+  images?: File[] | null;
 };
+
 
 export type UpdateProductPayload = Partial<CreateProductPayload>;
 
