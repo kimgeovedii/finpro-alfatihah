@@ -17,8 +17,14 @@ export const orderRepository = {
         
         return await apiFetch<OrderResponse>(`/orders/transaction?${params.toString()}`,"get")
     },
-    async getAllOrdersByBranchId(page: number = 1, branchId: string, status: string): Promise<ManagementOrderResponse> {
-        return await apiFetch<ManagementOrderResponse>(`/orders/transaction/management/${branchId}?page=${page}&status=${status}`, "get")
+    async getAllOrdersByBranchId(page: number = 1, branchId: string, status: string, search: string = ""): Promise<ManagementOrderResponse> {
+        const params = new URLSearchParams({ page: String(page) })
+    
+        if (branchId) params.append("branchId", branchId)
+        if (status && status !== "ALL") params.append("status", status)
+        if (search) params.append("search", search)
+    
+        return await apiFetch<ManagementOrderResponse>(`/orders/transaction/management/${branchId}?${params.toString()}`, "get")
     },
     async getOrderDetailByOrderNumber(orderNumber: string): Promise<OrderData> {
         return await apiFetch<OrderData>(`/orders/transaction/${orderNumber}`, "get")

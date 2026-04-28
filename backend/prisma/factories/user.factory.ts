@@ -45,7 +45,7 @@ class UsersFactory {
             }
 
             // Create employee record if admin
-            if (userData.role === 'ADMIN' && userData.employee) {
+            if (userData.role === 'EMPLOYEE' && userData.employee) {
                 const branch = await prisma.branch.findFirst({
                     where: {
                         city: { contains: userData.employee.branchCity, mode: 'insensitive' },

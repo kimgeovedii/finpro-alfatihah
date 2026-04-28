@@ -25,14 +25,15 @@ export class OrderController {
 
     getTransactionSummaryByBranchId = async (req: AuthRequest, res: Response, next: NextFunction) => {
         try {
-            const userId = req.user?.userId 
-            const branchId = req.params?.branchId as string
+            let rawBranchId = req.params?.branchId as string
 
+            let branchId: string | null = null
             // Validate the UUID format
-            if (!uuidRegex.test(branchId)) throw { code: 400, message: 'branchId is not valid UUID' }
+            if (rawBranchId !== "ALL" && !uuidRegex.test(rawBranchId)) throw { code: 400, message: 'branchId is not valid UUID' }
+            branchId = rawBranchId === "ALL" ? null : rawBranchId
             
             // Service
-            const result = await this.orderService.getOrderSummaryByBranchId(userId, branchId)
+            const result = await this.orderService.getOrderSummaryByBranchId(branchId)
 
             return sendSuccess(res, result, "Order fetched")
         } catch (error: any) {
@@ -47,13 +48,15 @@ export class OrderController {
             // Query param
             const page = Number(req.query.page) || 1
             const limit = Number(req.query.limit) || paginationDefault
-            const branchId = typeof req.query.branchId === 'string' ? req.query.branchId.trim() : null
+            const rawBranchId = typeof req.query.branchId === 'string' ? req.query.branchId.trim() : null
             const orderNumber = typeof req.query.orderNumber === 'string' ? req.query.orderNumber.trim() : null
             const dateStart = typeof req.query.dateStart === 'string' ? req.query.dateStart.trim() : null
             const dateEnd = typeof req.query.dateEnd === 'string' ? req.query.dateEnd.trim() : null
 
+            let branchId: string | null = null
             // Validate the UUID format
-            if (branchId && !uuidRegex.test(branchId)) throw { code: 400, message: 'branchId is not valid UUID' }
+            if (rawBranchId && rawBranchId !== "ALL" && !uuidRegex.test(rawBranchId)) throw { code: 400, message: 'branchId is not valid UUID' }
+            if (rawBranchId === "ALL") branchId = null
 
             // Validate date pair (must come together)
             if ((dateStart && !dateEnd) || (!dateStart && dateEnd)) throw { code: 400, message: 'dateStart and dateEnd must be provided together' }
@@ -75,25 +78,32 @@ export class OrderController {
     getAllTransactionManagementByBranchId = async (req: AuthRequest, res: Response, next: NextFunction) => {
         try {
             // Route param
-            const branchId = req.params.branchId as string
+            const rawBranchId = req.params.branchId as string
 
             // Query param
             const page = Number(req.query.page) || 1
             const limit = Number(req.query.limit) || paginationDefault
+            const search = typeof req.query.search === 'string' ? req.query.search.trim() : null
             const rawStatus = typeof req.query.status === 'string' ? req.query.status.trim() : null
 
+            let branchId: string | null = null
             // Validate the UUID format
-            if (!uuidRegex.test(branchId)) throw { code: 400, message: 'branchId is not valid UUID' }
+            if (rawBranchId && rawBranchId !== "ALL" && !uuidRegex.test(rawBranchId)) throw { code: 400, message: 'branchId is not valid UUID' }
+            branchId = rawBranchId === "ALL" ? null : rawBranchId
 
             // Validate status 
             let status: OrderStatus | null = null
-            if (rawStatus && rawStatus !== "ALL") {
-                if (!Object.values(OrderStatus).includes(rawStatus as OrderStatus)) throw { code: 400, message: 'status is not valid' }
-                status = rawStatus as OrderStatus
+            if (rawStatus) {
+                if (rawStatus === "ALL") {
+                    status = null
+                } else {
+                    if (!Object.values(OrderStatus).includes(rawStatus as OrderStatus)) throw { code: 400, message: 'status is not valid' }
+                    status = rawStatus as OrderStatus
+                }
             }
 
             // Service
-            const result = await this.orderService.getAllOrderByBranchId(page, limit, branchId, status)
+            const result = await this.orderService.getAllOrderByBranchId(page, limit, branchId, status, search)
 
             return sendSuccess(res, {
                 data: result.data,

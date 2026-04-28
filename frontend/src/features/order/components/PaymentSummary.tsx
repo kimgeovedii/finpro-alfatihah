@@ -36,14 +36,17 @@ export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, t
                 <p>Shipping Weight</p>
                 <h6 className="font-bold">{(shippingWeight / 1000).toFixed(2)} Kg</h6>
             </div>
-            <div className="flex justify-between">
-                <p>Total Saving</p>
-                <h6 className="font-bold">{totalSaving > 0 ? <>-</>:<></>}Rp. {totalSaving.toLocaleString()}</h6>
-            </div>
+            {
+                totalSaving > 0 && 
+                    <div className="flex justify-between">
+                        <p>Total Saving</p>
+                        <h6 className="font-bold">Rp. {totalSaving.toLocaleString()}</h6>
+                    </div>
+            }
             <hr className="my-3"/>
             <div className="flex justify-between">
                 <h6 className="font-bold">Final Price</h6>
-                <h4 className="font-bold text-xl">Rp. {finalPrice.toLocaleString()}</h4>
+                <h4 className="font-bold text-xl">Rp. {(finalPrice + shippingCost).toLocaleString()}</h4>
             </div>
             <hr className="mt-3 mb-5"/>
             <div className="flex flex-col gap-3">
@@ -52,7 +55,7 @@ export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, t
             </div>
             <div className="flex gap-5 w-full mt-3">
                 { status && ["SHIPPED","CONFIRMED"].includes(status) && <Button variant='outline' className="flex-1 h-10 bg-white hover:bg-[#00767a] text-teal-700 hover:text-white font-bold rounded-[8px] shadow-lg border-teal-700 border-1 transition-all duration-300 active:scale-[0.97] disabled:opacity-70"><Receipt/>Download Invoice</Button> }
-                <Button className="flex-1 h-10 bg-primary-teal hover:bg-[#00767a] text-white font-bold rounded-[8px] shadow-lg shadow-primary-teal/20 transition-all duration-300 active:scale-[0.97] disabled:opacity-70"><Headset/> Help Center</Button>
+                <Button className="flex-1 h-10 bg-teal-700 hover:bg-[#00767a] text-white font-bold rounded-[8px] shadow-lg shadow-primary-teal/20 transition-all duration-300 active:scale-[0.97] disabled:opacity-70"><Headset/> Help Center</Button>
             </div>
         </div>
     )

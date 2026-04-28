@@ -34,8 +34,8 @@ export class OrderService {
         return await this.orderRepo.findAllOrders(page, limit, userId, branchId, orderNumber, dateStart, dateEnd)
     }
 
-    async getAllOrderByBranchId(page: number, limit: number, branchId: string, status: OrderStatus | null) {
-        return await this.orderRepo.findAllOrdersByBranchId(page, limit, branchId, status)
+    async getAllOrderByBranchId(page: number, limit: number, branchId: string | null, status: OrderStatus | null, search: string | null) {
+        return await this.orderRepo.findAllOrdersByBranchId(page, limit, branchId, status, search)
     }
 
     async getOrderDetailByOrderNumber(role: UserRole, userId: string, orderNumber: string) {
@@ -46,8 +46,8 @@ export class OrderService {
         return await this.orderRepo.getOrderSummary(userId)
     }
 
-    async getOrderSummaryByBranchId(userId: string, branchId: string) {
-        return await this.orderRepo.getOrderSummarByBranchId(userId, branchId)
+    async getOrderSummaryByBranchId(branchId: string | null) {
+        return await this.orderRepo.getOrderSummarByBranchId(branchId)
     }
 
     async addCartToOrder(userId: string, payload: { cartId: string, voucherId?: string, addressId: string, paymentMethod: 'MANUAL' | 'GATEWAY' }) {

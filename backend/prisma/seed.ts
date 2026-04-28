@@ -64,7 +64,7 @@ async function main() {
   const seededUsers = await usersFactory.createAll()
   console.log(` Users seeded: ${seededUsers.length}`)
   console.log(` Addresses seeded: ${seededUsers.length * 3}`)
-  console.log(` Employees seeded: ${userSeedData.filter(u => u.role === 'ADMIN').length}\n`)
+  console.log(` Employees seeded: ${userSeedData.filter(u => u.role === 'EMPLOYEE').length}\n`)
 
   // Product Categories Seeders
   console.log('📦 Seeding Product Categories...');

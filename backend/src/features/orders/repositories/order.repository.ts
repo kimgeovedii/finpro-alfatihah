@@ -46,7 +46,7 @@ export class OrderRepository {
     }
   }
 
-  async getOrderSummarByBranchId(userId: string, branchId: string) {
+  async getOrderSummarByBranchId(branchId: string | null) {
     const now = new Date()
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
     const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
@@ -55,8 +55,7 @@ export class OrderRepository {
     const [ currentRevenueAgg, lastRevenueAgg, activeShipments, processingOrder, finishedOrder, finishedOrderLastMonth ] = await Promise.all([
       prisma.orders.aggregate({
         where: {
-          userId,
-          branchId,
+          ...(branchId && { branchId }),
           status: 'CONFIRMED',
           createdAt: { gte: startOfMonth }
         },
@@ -64,26 +63,24 @@ export class OrderRepository {
       }),
       prisma.orders.aggregate({
         where: {
-          userId,
-          branchId,
+          ...(branchId && { branchId }),
           status: 'CONFIRMED',
           createdAt: { gte: startOfLastMonth, lte: endOfLastMonth }
         },
         _sum: { finalPrice: true }
       }),
       prisma.orders.count({
-        where: { userId, status: 'SHIPPED', branchId } 
+        where: { status: 'SHIPPED', ...(branchId && { branchId }), } 
       }),
       prisma.orders.count({
-        where: { userId, status: 'PROCESSING', branchId }
+        where: { status: 'PROCESSING', ...(branchId && { branchId }), }
       }),
       prisma.orders.count({
-        where: { userId, status: 'CONFIRMED', branchId }
+        where: { status: 'CONFIRMED', ...(branchId && { branchId }), }
       }),
       prisma.orders.count({
         where: {
-          userId,
-          branchId,
+          ...(branchId && { branchId }),
           status: 'CONFIRMED',
           createdAt: { gte: startOfLastMonth, lte: endOfLastMonth }
         }
@@ -107,9 +104,7 @@ export class OrderRepository {
         items: {
           select: {
             productId: true, quantity: true, product: {
-              select: {
-                id: true
-              }
+              select: { id: true }
             }
           }
         }
@@ -332,11 +327,48 @@ export class OrderRepository {
     return { data, total }
   }
 
-  async findAllOrdersByBranchId(page: number, limit: number, branchId: string, status: OrderStatus | null) {
+  async findAllOrdersByBranchId(page: number, limit: number, branchId: string | null, status: OrderStatus | null, search: string | null) {
     const skip = (page - 1) * limit
-    const where: Prisma.ordersWhereInput = { 
-      branchId,
-      ...(status && { status })
+
+    // Filter by branch & status
+    const filters: Prisma.ordersWhereInput[] = []
+    if (branchId) filters.push({ branchId })
+    if (status) filters.push({ status })
+    if (search) {
+      filters.push({
+        OR: [
+          {
+            orderNumber: {
+              contains: search, mode: 'insensitive'
+            }
+          },
+          {
+            user: {
+              email: {
+                contains: search, mode: 'insensitive'
+              }
+            }
+          },
+          {
+            user: {
+              username: {
+                contains: search, mode: 'insensitive'
+              }
+            }
+          },
+          {
+            branch: {
+              storeName: {
+                contains: search, mode: 'insensitive'
+              }
+            }
+          }
+        ]
+      })
+    }
+
+    const where: Prisma.ordersWhereInput = {
+      AND: filters
     }
 
     const [data, total] = await Promise.all([
@@ -356,6 +388,9 @@ export class OrderRepository {
             select: {
               username: true, email: true
             }
+          },
+          branch: {
+            select: { storeName: true }
           }
         }
       }),

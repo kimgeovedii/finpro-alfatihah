@@ -15,6 +15,7 @@ interface Address {
 interface Props {
     address: Address[]
     appliedAddress?: string | null
+    
     onSelect: (id: string) => void
 }
 
@@ -28,7 +29,7 @@ export const AddressSelectionModal: React.FC<Props> = ({ address, appliedAddress
                 <DialogHeader>
                     <DialogTitle className="font-bold mb-3">My Address</DialogTitle>
                 </DialogHeader>
-                <div className="flex flex-col gap-3 mt-2">
+                <div className="flex flex-col gap-3 mt-2 overflow-y-auto max-h-[75vh]">
                     {
                         address.map(dt => <AddressAdditionalInfoSection key={dt.id} action={() => onSelect(dt.id)} receiptName={dt.receiptName} phone={dt.phone} distance={dt.distance} label={dt.label} address={dt.address} isSelected={appliedAddress === dt.id}/>)
                     }

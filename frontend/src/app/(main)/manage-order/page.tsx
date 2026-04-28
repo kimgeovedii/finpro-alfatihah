@@ -1,19 +1,32 @@
 'use client'
 import { SkeletonBox } from "@/components/layout/SkeletonBox"
 import { OrderStatus } from "@/constants/business.const"
+import { useAuthStore } from "@/features/auth/store/useAuthStore"
+import { OrderFiltersBar } from "@/features/order/components/OrderFiltersBar"
 import { OrderTableItem, OrderManagementTable } from "@/features/order/components/OrderManagementTable"
 import { OrderSummaryByBranchCard } from "@/features/order/components/OrderSummaryByBranchCard"
+import { useAllBranchData } from "@/features/order/hooks/useBranch"
 import { useOrderManagement, useOrderSummaryByBranchId } from "@/features/order/hooks/useOrder"
 import { useUpdatePaymentStatusById } from "@/features/order/hooks/usePayment"
+import { useEffect, useState } from "react"
 import Swal from "sweetalert2"
 
 export default function ManageOrdersPage() {
-    const branchId = "2474cec8-5a76-42c7-b5ed-dbd9e35d434c" // for now
+    const role = useAuthStore((state) => state.user?.role)
 
     // Handle hook
+    const [ branchId, setBranchId ] = useState<string>("ALL")
+    const [ search, setSearch ] = useState<string>("")
+
     const { summaryByBranchId, isLoadingSummaryByBranchId } = useOrderSummaryByBranchId(branchId)
-    const { orders, meta, isLoading, status, handlePageChange, handleStatusChange } = useOrderManagement(branchId)
+    const { orders, meta, isLoading, status, handlePageChange, handleStatusChange, handleBranchChange } = useOrderManagement()
     const { updatePayment, isUpdatingPayment } = useUpdatePaymentStatusById()
+    const { branchs, isBranchLoading } = useAllBranchData()
+
+    // Sync branch
+    useEffect(() => {
+        handleBranchChange(branchId)
+    }, [branchId])
 
     // Handle action
     const handleValidatePaymentEvidence = async (paymentId: string, isConfirm: boolean) => {
@@ -42,6 +55,7 @@ export default function ManageOrdersPage() {
     const tableOrders: OrderTableItem[] = orders.map(dt => ({
         id: dt.id,
         orderNumber: dt.orderNumber,
+        storeName: dt.branch.storeName,
         customerName: dt.user.username,
         customerEmail: dt.user.email,
         createdAt: dt.createdAt,
@@ -57,7 +71,6 @@ export default function ManageOrdersPage() {
                     <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight mb-4">Manage Order</h1>
                     {
                         isLoadingSummaryByBranchId ?
-                            // Render loading element
                             <>
                                 <div className="flex gap-4 w-full mb-4">
                                     <div className="flex-1">
@@ -82,9 +95,18 @@ export default function ManageOrdersPage() {
                             />
                     }
                     <hr className="my-4"/>
+                    <OrderFiltersBar
+                        branchId={branchId}
+                        onBranchChange={setBranchId}
+                        branches={branchs}
+                        isBranchLoading={isBranchLoading}
+                        activeStatus={status}
+                        onStatusChange={handleStatusChange}
+                        search={search}
+                        onSearchChange={setSearch}
+                    />
                     {
                         isLoading ? 
-                            // Render loading element
                             <SkeletonBox extraClass={'min-h-[480px]'}/>
                         :
                             <OrderManagementTable
@@ -93,7 +115,6 @@ export default function ManageOrdersPage() {
                                 isLoading={isLoading}
                                 activeStatus={status}
                                 onPageChange={handlePageChange}
-                                onStatusChange={handleStatusChange}
                                 onValidatePaymentEvidence={handleValidatePaymentEvidence}
                             />
                     }

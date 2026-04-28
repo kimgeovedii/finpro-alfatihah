@@ -1,3 +1,4 @@
+// For navigation
 export type PaginationMeta = {
     page: number
     limit: number
@@ -13,7 +14,11 @@ export type StatusInfo = {
     isLast?: boolean
 }
 
+// For response handling
 export type CommandResult = {
     success: boolean
     message: string
 }
+
+// For handling enum
+export type PaymentMethodType = "MANUAL" | "GATEWAY"
