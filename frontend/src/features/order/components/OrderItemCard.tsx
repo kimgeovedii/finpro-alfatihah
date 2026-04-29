@@ -5,7 +5,7 @@ import { formatDate } from "@/utils/converter.util"
 import React from "react"
 import Swal from "sweetalert2"
 import { statusColorMap } from "@/constants/business.const"
-import { PhotoIcon } from "@heroicons/react/24/outline"
+import { ArrowRightIcon, PhotoIcon } from "@heroicons/react/24/outline"
 import Link from "next/link"
 import { PaymentEvidenceUploadButton } from "./PaymentEvidenceUploadButton"
 
@@ -89,7 +89,7 @@ export const OrderItemCard: React.FC<Props> = ({ orderId, orderNumber, status, t
                         <p className="text-gray-500 font-normal text-sm mb-0">Checkout At</p>
                         <p className="text-gray-500 font-bold text-sm mb-2">{formatDate(createdAt,false)}</p>
                         <Link href={`/transaction/${orderNumber}`}>
-                            <Button className="bg-teal-700 text-white font-semibold text-sm px-5">Manage</Button>
+                            <Button className="bg-teal-700 text-white font-semibold text-sm px-3"><ArrowRightIcon/> Manage</Button>
                         </Link>
                     </div>
                     <div className="text-end">

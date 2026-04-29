@@ -1,5 +1,4 @@
 "use client";
-import { Button } from '@/components/ui/button';
 import { AddressSelectionCard } from '@/features/cart/components/AddressSelectionCard';
 import { CartDetailItemListCard } from '@/features/cart/components/CartDetailItemListCard';
 import { CartPaymentSummaryCard } from '@/features/cart/components/CartPaymentSummaryCard';
@@ -7,14 +6,13 @@ import { PaymentMethodSelect } from '@/features/cart/components/PaymentMethodSel
 import { VouchersSelectionCard } from '@/features/cart/components/VouchersSelectionCard';
 import { useCartDetailData, useCheckoutCartItem, useDeleteCartItem, useUpdateCartItem } from '@/features/cart/hooks/useCart';
 import { useRouter } from 'next/navigation'
-import { ArrowLeftIcon } from '@heroicons/react/24/outline';
-import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import { formatListSchedule } from '@/utils/converter.util';
 import { SkeletonBox } from '@/components/layout/SkeletonBox';
 import { VoucherData } from '@/features/cart/repositories/voucher.type';
+import { BackButton } from '@/components/button/BackButton';
 
 export default function CartDetailPage() {
   // Handle param
@@ -233,13 +231,7 @@ export default function CartDetailPage() {
   
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto">
-      <div className='flex items-center gap-3 mb-5'>
-        <Link href={'/cart'}>
-          <Button variant='destructive' className='text-md px-3 py-5'>
-            <ArrowLeftIcon className="w-4 h-4"/> Back
-          </Button>
-        </Link>
-      </div>
+      <BackButton url="cart"/>
       <div className='flex flex-col lg:flex-row w-full gap-5'>
         <div className='w-full lg:flex-1 flex flex-col space-y-5'>
           <AddressSelectionCard

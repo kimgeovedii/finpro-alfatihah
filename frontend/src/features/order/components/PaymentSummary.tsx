@@ -4,6 +4,9 @@ import React from "react"
 import { PaymentEvidenceUploadButton } from "./PaymentEvidenceUploadButton"
 import { OrderCancelButton } from "./OrderCancelButton"
 import { useDownloadInvoice } from "../hooks/useExport"
+import { InfoBoxShippingWeightToolTip } from "@/components/layout/InfoBoxShippingWeightToolTip"
+import { courierShippingDefault } from "@/constants/business.const"
+import { ShippingSummaryCard } from "@/components/layout/ShippingSummaryCard"
 
 type Props = {
     orderId: string
@@ -31,14 +34,6 @@ export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, t
                 <p>Total Items <b>({totalItem})</b></p>
                 <h6 className="font-bold">Rp. {totalPrice.toLocaleString()}</h6>
             </div>
-            <div className="flex justify-between">
-                <p>Shipping Cost</p>
-                <h6 className="font-bold">Rp. {shippingCost.toLocaleString()}</h6>
-            </div>
-            <div className="flex justify-between">
-                <p>Shipping Weight</p>
-                <h6 className="font-bold">{(shippingWeight / 1000).toFixed(2)} Kg</h6>
-            </div>
             {
                 totalSaving > 0 && 
                     <div className="flex justify-between">
@@ -46,6 +41,8 @@ export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, t
                         <h6 className="font-bold">Rp. {totalSaving.toLocaleString()}</h6>
                     </div>
             }
+            <hr className="my-3"/>
+            <ShippingSummaryCard shippingWeight={shippingWeight} shippingCost={shippingCost}/>
             <hr className="my-3"/>
             <div className="flex justify-between">
                 <h6 className="font-bold">Final Price</h6>

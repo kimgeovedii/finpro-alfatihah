@@ -1,3 +1,5 @@
+import { InfoBoxShippingWeightToolTip } from "@/components/layout/InfoBoxShippingWeightToolTip"
+import { ShippingSummaryCard } from "@/components/layout/ShippingSummaryCard"
 import { Button } from "@/components/ui/button"
 import { InformationCircleIcon } from "@heroicons/react/24/outline"
 import { ArrowRight } from "lucide-react"
@@ -23,20 +25,8 @@ export const CartPaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCos
                 <p>Total Items <b>({totalItem})</b></p>
                 <h6 className="font-bold">Rp. {totalPrice.toLocaleString()}</h6>
             </div>
-            <div className="flex justify-between">
-                <p>Shipping Cost</p>
-                <h6 className="font-bold">Rp. {shippingCost.toLocaleString()}</h6>
-            </div>
-            <div className="flex justify-between">
-                <p>Shipping Weight</p>
-                <div className="flex items-center gap-2 relative group">
-                    <h6 className="font-bold">{(shippingWeight / 1000).toFixed(2)} Kg</h6>
-                    <InformationCircleIcon className="w-4 h-4 cursor-pointer"/>
-                    <div className="absolute bg-teal-700 shadow-md shadow-primary right-0 top-full mt-2 w-64 rounded-lg bg-slate-800 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                        This is your <b>cart's total weight</b>. For shipping and payment, carriers may round it up to <b>{Math.ceil(shippingWeight / 1000)} kg</b>.
-                    </div>
-                </div>
-            </div>
+            <hr className="my-3"/>
+            <ShippingSummaryCard shippingWeight={shippingWeight} shippingCost={shippingCost}/>
             {
                 (totalDiscountProduct > 0 || totalDiscountVoucher > 0) && 
                     <div className="bg-green-200 rounded-lg p-3 my-2">
