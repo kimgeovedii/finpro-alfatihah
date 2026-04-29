@@ -8,7 +8,11 @@ interface UseInfiniteScrollProps {
   isLoading: boolean;
 }
 
-export const useInfiniteScroll = ({ loadMore, hasMore, isLoading }: UseInfiniteScrollProps) => {
+export const useInfiniteScroll = ({
+  loadMore,
+  hasMore,
+  isLoading,
+}: UseInfiniteScrollProps) => {
   const observerTarget = useRef<HTMLDivElement>(null);
 
   const handleObserver = useCallback(
@@ -18,14 +22,14 @@ export const useInfiniteScroll = ({ loadMore, hasMore, isLoading }: UseInfiniteS
         loadMore();
       }
     },
-    [loadMore, hasMore, isLoading]
+    [loadMore, hasMore, isLoading],
   );
 
   useEffect(() => {
     const observer = new IntersectionObserver(handleObserver, {
       root: null,
       rootMargin: "100px",
-      threshold: 0.1,
+      threshold: 0.7,
     });
 
     const currentTarget = observerTarget.current;

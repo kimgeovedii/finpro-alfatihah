@@ -28,7 +28,6 @@ import {
 export const SearchHeader = () => {
   const {
     query,
-    setFilters,
     sortBy,
     sortOrder,
     meta,
@@ -63,18 +62,29 @@ export const SearchHeader = () => {
                 updateFilters({ categoryId: value === "all" ? "" : value })
               }
             >
-              <SelectTrigger className="w-[105px] h-10 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl font-bold text-[10px]">
+              <SelectTrigger className="w-[130px] h-10 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl font-bold text-[10px]">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent className="rounded-xl border-slate-100 dark:border-slate-800">
-                <SelectItem value="all" className="text-xs font-bold py-3">
+                <SelectItem
+                  value="all"
+                  className={cn(
+                    "text-xs font-bold py-3 transition-colors hover:bg-[#f8fafc] focus:bg-[#f8fafc] cursor-pointer",
+                    !categoryId &&
+                      "text-[#006666] bg-[#f0fdfa] focus:bg-[#f0fdfa] focus:text-[#006666]",
+                  )}
+                >
                   All Categories
                 </SelectItem>
                 {categories.map((cat) => (
                   <SelectItem
                     key={cat.id}
                     value={cat.id}
-                    className="text-xs font-bold py-3"
+                    className={cn(
+                      "text-xs font-bold py-3 transition-colors hover:bg-[#f8fafc] focus:bg-[#f8fafc] cursor-pointer",
+                      categoryId === cat.id &&
+                        "text-[#006666] bg-[#f0fdfa] focus:bg-[#f0fdfa] focus:text-[#006666]",
+                    )}
                   >
                     {cat.name}
                   </SelectItem>
@@ -90,34 +100,43 @@ export const SearchHeader = () => {
                 <Button
                   variant="outline"
                   className={cn(
-                    "h-10 px-3 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl font-bold text-[10px]",
+                    "h-10 px-3 min-w-[120px] bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl font-bold text-[10px] transition-all",
                     (minPrice || maxPrice) &&
-                      "border-primary text-primary bg-primary/5",
+                      "border-[#006666]/50 ring-1 ring-[#006666]/10",
                   )}
                 >
-                  <FunnelIcon className="w-3.5 h-3.5 mr-1.5" />
+                  <FunnelIcon
+                    className={cn(
+                      "w-3.5 h-3.5 mr-1.5 transition-colors",
+                      minPrice || maxPrice
+                        ? "text-[#006666]"
+                        : "text-slate-400",
+                    )}
+                  />
                   Price
                   <ChevronDownIcon className="w-2.5 h-2.5 ml-1.5 opacity-50" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent
                 className="w-72 p-5 rounded-2xl border-slate-100 dark:border-slate-800 shadow-2xl"
-                align="end"
+                align="center"
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <p className="font-black text-sm">Price Range</p>
+                    <p className="font-black text-sm text-slate-800 dark:text-slate-200">
+                      Price Range
+                    </p>
                     {(minPrice || maxPrice) && (
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() =>
-                          setFilters({
+                          updateFilters({
                             minPrice: undefined,
                             maxPrice: undefined,
                           })
                         }
-                        className="h-7 px-2 text-[10px] font-bold text-red-500"
+                        className="h-7 px-2 text-[10px] font-bold text-red-500 hover:bg-red-50"
                       >
                         <XMarkIcon className="w-3 h-3 mr-1" />
                         Reset
@@ -136,7 +155,7 @@ export const SearchHeader = () => {
                           handlePriceChange("min", e.target.value)
                         }
                         placeholder="0"
-                        className="h-10 text-xs font-bold rounded-lg"
+                        className="h-10 text-xs font-bold rounded-lg border-slate-200 focus:border-[#006666] focus:ring-[#006666]/10"
                       />
                     </div>
                     <div className="space-y-1.5">
@@ -150,7 +169,7 @@ export const SearchHeader = () => {
                           handlePriceChange("max", e.target.value)
                         }
                         placeholder="Any"
-                        className="h-10 text-xs font-bold rounded-lg"
+                        className="h-10 text-xs font-bold rounded-lg border-slate-200 focus:border-[#006666] focus:ring-[#006666]/10"
                       />
                     </div>
                   </div>
@@ -165,34 +184,53 @@ export const SearchHeader = () => {
               value={`${sortBy}-${sortOrder}`}
               onValueChange={(value) => {
                 const [field, order] = value.split("-");
-                setFilters({ sortBy: field, sortOrder: order as "asc" | "desc" });
+                updateFilters({
+                  sortBy: field,
+                  sortOrder: order as "asc" | "desc",
+                });
               }}
             >
-              <SelectTrigger className="w-[105px] lg:w-[180px] h-10 lg:h-11 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl font-bold text-[10px] lg:text-xs">
+              <SelectTrigger className="w-[130px] lg:w-[180px] h-10 lg:h-11 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl font-bold text-[10px] lg:text-xs">
                 <SelectValue placeholder="Sort By" />
               </SelectTrigger>
               <SelectContent className="rounded-xl border-slate-100 dark:border-slate-800">
                 <SelectItem
                   value="createdAt-desc"
-                  className="text-xs font-bold py-3"
+                  className={cn(
+                    "text-xs font-bold py-3 transition-colors hover:bg-[#f8fafc] focus:bg-[#f8fafc] cursor-pointer",
+                    `${sortBy}-${sortOrder}` === "createdAt-desc" &&
+                      "text-[#006666] bg-[#f0fdfa] focus:bg-[#f0fdfa] focus:text-[#006666]",
+                  )}
                 >
                   Newest
                 </SelectItem>
                 <SelectItem
                   value="basePrice-asc"
-                  className="text-xs font-bold py-3"
+                  className={cn(
+                    "text-xs font-bold py-3 transition-colors hover:bg-[#f8fafc] focus:bg-[#f8fafc] cursor-pointer",
+                    `${sortBy}-${sortOrder}` === "basePrice-asc" &&
+                      "text-[#006666] bg-[#f0fdfa] focus:bg-[#f0fdfa] focus:text-[#006666]",
+                  )}
                 >
                   Lowest prices
                 </SelectItem>
                 <SelectItem
                   value="basePrice-desc"
-                  className="text-xs font-bold py-3"
+                  className={cn(
+                    "text-xs font-bold py-3 transition-colors hover:bg-[#f8fafc] focus:bg-[#f8fafc] cursor-pointer",
+                    `${sortBy}-${sortOrder}` === "basePrice-desc" &&
+                      "text-[#006666] bg-[#f0fdfa] focus:bg-[#f0fdfa] focus:text-[#006666]",
+                  )}
                 >
                   Highest prices
                 </SelectItem>
                 <SelectItem
                   value="productName-asc"
-                  className="text-xs font-bold py-3"
+                  className={cn(
+                    "text-xs font-bold py-3 transition-colors hover:bg-[#f8fafc] focus:bg-[#f8fafc] cursor-pointer",
+                    `${sortBy}-${sortOrder}` === "productName-asc" &&
+                      "text-[#006666] bg-[#f0fdfa] focus:bg-[#f0fdfa] focus:text-[#006666]",
+                  )}
                 >
                   Name (A - Z)
                 </SelectItem>

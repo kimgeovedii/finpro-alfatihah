@@ -17,14 +17,8 @@ import { usePriceFilter } from "../hooks/usePriceFilter";
 import { useCategoryList } from "../hooks/useCategoryList";
 
 export const SearchSidebar = () => {
-  const {
-    categories,
-    categoryId,
-    isCategoriesLoading,
-    minPrice,
-    maxPrice,
-    setFilters,
-  } = useSearchStore();
+  const { categories, categoryId, isCategoriesLoading, minPrice, maxPrice } =
+    useSearchStore();
   const { updateFilters } = useSearchFilters();
   const { localMin, localMax, handlePriceChange } = usePriceFilter();
   const { visibleCategories, hasMore, loadMore } = useCategoryList(categories);
@@ -172,7 +166,7 @@ export const SearchSidebar = () => {
               variant="ghost"
               size="sm"
               onClick={() =>
-                setFilters({ minPrice: undefined, maxPrice: undefined })
+                updateFilters({ minPrice: undefined, maxPrice: undefined })
               }
               className="w-full text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-red-500"
             >
