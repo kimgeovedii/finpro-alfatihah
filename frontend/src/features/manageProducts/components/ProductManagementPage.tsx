@@ -3,8 +3,6 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useManageProducts } from "@/features/manageProducts/hooks/useManageProducts";
-import { useUser } from "@/features/auth/hooks/useUser";
-import { AuthenticatedUser } from "@/features/manageProducts/types/manageProduct.type";
 import { ProductHeader } from "./ProductHeader";
 import { ProductTable } from "./ProductTable";
 import { ProductTablePagination } from "./ProductTablePagination";
@@ -44,11 +42,17 @@ export const ProductManagementPage: React.FC = () => {
     handleUpdate,
     handleDeleteClick,
     handleDeleteConfirm,
+    canManage,
+    userLoading,
   } = useManageProducts();
 
-  const { user } = useUser();
-  const authUser = user as AuthenticatedUser;
-  const canManage = authUser?.employee?.role === "SUPER_ADMIN";
+  if (userLoading && !canManage) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#006666]"></div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
