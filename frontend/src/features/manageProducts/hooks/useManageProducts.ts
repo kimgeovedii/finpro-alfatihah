@@ -5,13 +5,17 @@ import {
   CreateProductPayload,
   UpdateProductPayload,
   ProductCategory,
+  AuthenticatedUser,
 } from "@/features/manageProducts/types/manageProduct.type";
 import { ManageProductRepository } from "@/features/manageProducts/repositories/manageProduct.repository";
+import { useAuthService } from "@/features/auth/hooks/useAuthService";
 import toast from "react-hot-toast";
 
 const repo = new ManageProductRepository();
 
 export const useManageProducts = () => {
+  const { user, fetchUser, isLoading: userLoading } = useAuthService();
+  const authUser = user as AuthenticatedUser;
   const [products, setProducts] = useState<ManageProduct[]>([]);
   const [meta, setMeta] = useState<PaginationMeta>({
     total: 0,
@@ -24,6 +28,16 @@ export const useManageProducts = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [sortBy, setSortBy] = useState("createdAt");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+
+  useEffect(() => {
+    if (!userLoading && (!authUser || !authUser.employee)) {
+      fetchUser();
+    }
+  }, [fetchUser, userLoading, authUser]);
+
+  const canManage =
+    authUser?.employee?.role === "SUPER_ADMIN" ||
+    (authUser as any)?.role === "SUPER_ADMIN";
 
   const [categories, setCategories] = useState<ProductCategory[]>([]);
 
@@ -207,6 +221,9 @@ export const useManageProducts = () => {
     isSubmitting,
     isDeleting,
     isUpdating,
+    canManage,
+    userLoading,
+    user: authUser,
 
     handleSearchChange,
     handleCategoryChange: setSelectedCategory,

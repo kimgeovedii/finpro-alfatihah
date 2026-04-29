@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
-import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/react/24/outline";
+import { motion, AnimatePresence } from "framer-motion";
+import { MagnifyingGlassIcon, PlusIcon, FunnelIcon } from "@heroicons/react/24/outline";
 import { ProductHeaderProps } from "@/features/manageProducts/types/manageProduct.type";
 
 export const ProductHeader: React.FC<ProductHeaderProps> = ({
@@ -14,6 +14,20 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
   onCategoryChange,
   canManage,
 }) => {
+  const [isCategoryOpen, setIsCategoryOpen] = React.useState(false);
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsCategoryOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const selectedCategoryName = categories.find(c => c.id === selectedCategory)?.name || "All Categories";
   return (
     <motion.div
       initial={{ opacity: 0, y: -10 }}
@@ -45,25 +59,70 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
               />
             </div>
 
-            <select
-              id="category-filter"
-              value={selectedCategory}
-              onChange={(e) => onCategoryChange(e.target.value)}
-              className="w-full md:w-40 px-4 py-2.5 rounded-xl bg-[#ffffff] border shadow-xs text-sm focus:ring-2 focus:ring-[#006666]/20 text-[#2c2f30] outline-none transition-shadow h-11 cursor-pointer appearance-none"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23595c5d' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E")`,
-                backgroundRepeat: "no-repeat",
-                backgroundPosition: "right 1rem center",
-                backgroundSize: "1rem",
-              }}
-            >
-              <option value="">All Categories</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
+            <div className="relative flex-1" ref={dropdownRef}>
+              <button
+                type="button"
+                onClick={() => setIsCategoryOpen(!isCategoryOpen)}
+                className="w-full md:w-48 px-4 py-2.5 rounded-xl bg-white border border-[#e2e8f0] shadow-sm text-sm text-[#2c2f30] flex items-center justify-between gap-2 hover:border-[#cbd5e1] transition-all h-11 cursor-pointer focus:ring-2 focus:ring-[#006666]/10 outline-none"
+              >
+                <div className="flex items-center gap-2 truncate">
+                  <FunnelIcon className="w-4 h-4 text-[#64748b]" />
+                  <span className="truncate">{selectedCategoryName}</span>
+                </div>
+                <motion.svg
+                  animate={{ rotate: isCategoryOpen ? 180 : 0 }}
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="2"
+                  stroke="#64748b"
+                  className="w-4 h-4 shrink-0"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </motion.svg>
+              </button>
+
+              <AnimatePresence>
+                {isCategoryOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 4, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
+                    className="absolute z-50 left-0 right-0 md:left-auto md:w-64 mt-1 bg-white rounded-xl shadow-xl border border-[#e2e8f0] overflow-hidden py-1"
+                  >
+                    <button
+                      onClick={() => {
+                        onCategoryChange("");
+                        setIsCategoryOpen(false);
+                      }}
+                      className={`w-full text-left px-4 py-2.5 text-sm transition-colors hover:bg-[#f8fafc] ${
+                        selectedCategory === "" ? "text-[#006666] font-semibold bg-[#f0fdfa]" : "text-[#475569]"
+                      }`}
+                    >
+                      All Categories
+                    </button>
+                    <div className="h-px bg-[#f1f5f9] mx-2 my-1" />
+                    <div className="max-h-60 overflow-y-auto scrollbar-hide">
+                      {categories.map((cat) => (
+                        <button
+                          key={cat.id}
+                          onClick={() => {
+                            onCategoryChange(cat.id);
+                            setIsCategoryOpen(false);
+                          }}
+                          className={`w-full text-left px-4 py-2.5 text-sm transition-colors hover:bg-[#f8fafc] ${
+                            selectedCategory === cat.id ? "text-[#006666] font-semibold bg-[#f0fdfa]" : "text-[#475569]"
+                          }`}
+                        >
+                          {cat.name}
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
 
           {canManage && (
