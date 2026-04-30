@@ -1,4 +1,5 @@
 "use client";
+import { DividerLine } from "@/components/layout/DividerLine";
 import { MessageBox } from "@/components/layout/MessageBox";
 import { SkeletonBox } from "@/components/layout/SkeletonBox";
 import { Button } from "@/components/ui/button";
@@ -70,22 +71,26 @@ export default function TransactionPage() {
                 </div>
               </>
           }    
-          <hr className="my-5"/>
-          <div className="flex flex-wrap items-end gap-3 mb-5 bg-white p-3 rounded-xl">
-            <div>
-              <p className="text-xs text-slate-500 mb-1">Order Number</p>
-              <Input placeholder="e.g. ORD-123" value={orderNumber} onChange={(e) => setOrderNumber(e.target.value)} className="w-48 h-9 text-sm"/>
+          <DividerLine/>
+          <div className="flex flex-wrap items-end gap-3 mb-5 bg-white p-4 rounded-xl justify-between">
+            <div className="flex gap-2">
+              <div>
+                <p className="text-xs text-slate-500 mb-1">Order Number</p>
+                <Input placeholder="e.g. ORD-123" value={orderNumber} onChange={(e) => setOrderNumber(e.target.value)} className="w-48 h-9 text-sm"/>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500 mb-1">Start Date</p>
+                <Input type="date" value={dateStart} onChange={(e) => setDateStart(e.target.value)} className="h-9 text-sm"/>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500 mb-1">End Date</p>
+                <Input type="date" value={dateEnd} onChange={(e) => setDateEnd(e.target.value)} className="h-9 text-sm"/>
+              </div>
             </div>
-            <div>
-              <p className="text-xs text-slate-500 mb-1">Start Date</p>
-              <Input type="date" value={dateStart} onChange={(e) => setDateStart(e.target.value)} className="h-9 text-sm"/>
+            <div className="flex gap-2">
+              <Button onClick={handleSearch} className="h-9"><MagnifyingGlassIcon/> Search</Button>
+              <Button onClick={downloadTransactionHistory} className="h-9"><CloudArrowDownIcon/> Transaction History</Button>
             </div>
-            <div>
-              <p className="text-xs text-slate-500 mb-1">End Date</p>
-              <Input type="date" value={dateEnd} onChange={(e) => setDateEnd(e.target.value)} className="h-9 text-sm"/>
-            </div>
-            <Button onClick={handleSearch} className="h-9"><MagnifyingGlassIcon/> Search</Button>
-            <Button onClick={downloadTransactionHistory} className="h-9"><CloudArrowDownIcon/> Transaction History</Button>
           </div>
           <div>
             { isLoading && 

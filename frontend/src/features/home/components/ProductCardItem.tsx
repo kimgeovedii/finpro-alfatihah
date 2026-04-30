@@ -5,26 +5,37 @@ import { ShoppingCart, Store } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ProductCard } from "../types/home.types";
-import { toast } from "sonner";
+import { useCreateCart } from "@/features/products/hooks/useCart";
+import Swal from "sweetalert2";
+import { Button } from "@/components/ui/button";
 
 interface ProductCardItemProps {
   product: ProductCard;
   index: number;
   branchName?: string;
-  branchId?: string;
+  branchId: string;
   branchCity?: string;
 }
 
 export const ProductCardItem = ({ product, index, branchName, branchId, branchCity }: ProductCardItemProps) => {
   const router = useRouter();
+  const { createCart, isCreating } = useCreateCart()
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = async (e: React.MouseEvent, branchId: string, productId: string) => {
     e.preventDefault();
     e.stopPropagation();
-    toast.error("Pemberitahuan", {
-      description: "Fitur tambah ke keranjang sedang dalam pengembangan",
-    });
-  };
+
+    const success = await createCart(branchId, productId, 1)
+
+    if (success) {
+      await Swal.fire({
+        title: "Product Added!",
+        text: "Item has been added to your cart.",
+        icon: "success",
+        confirmButtonColor: "#10b981",
+      })
+    }
+  }
 
   const handleCardClick = () => {
     router.push(`/products/${product.slugName}`);
@@ -70,13 +81,13 @@ export const ProductCardItem = ({ product, index, branchName, branchId, branchCi
           )}
 
           {/* Hover Action Button */}
-          <button 
-            onClick={handleAddToCart}
+          <Button 
+            onClick={(e) => handleAddToCart(e, branchId, product.id)}
             disabled={product.currentStock === 0}
-            className="absolute bottom-3 right-3 bg-primary text-white p-3.5 rounded-2xl shadow-2xl opacity-0 translate-y-4 transition-all duration-300 group-hover/card:opacity-100 group-hover/card:translate-y-0 hover:bg-emerald-600 active:scale-90 z-20"
+            className="absolute bottom-3 right-3 bg-primary text-white w-12 h-12 rounded-2xl shadow-2xl opacity-0 translate-y-4 transition-all duration-300 group-hover/card:opacity-100 group-hover/card:translate-y-0 hover:bg-emerald-600 active:scale-90 z-20"
           >
-            <ShoppingCart className="w-5 h-5" />
-          </button>
+            <ShoppingCart className="w-5 h-5"/>
+          </Button>
         </div>
 
         {/* Content */}

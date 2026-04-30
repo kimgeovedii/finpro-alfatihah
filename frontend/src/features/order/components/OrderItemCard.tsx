@@ -8,6 +8,7 @@ import { statusColorMap } from "@/constants/business.const"
 import { ArrowRightIcon, PhotoIcon } from "@heroicons/react/24/outline"
 import Link from "next/link"
 import { PaymentEvidenceUploadButton } from "./PaymentEvidenceUploadButton"
+import { DividerLine } from "@/components/layout/DividerLine"
 
 type Props = {
     orderId: string
@@ -63,7 +64,7 @@ export const OrderItemCard: React.FC<Props> = ({ orderId, orderNumber, status, t
                 {
                     status === 'WAITING_PAYMENT' && paymentEvidence !== null && 
                         <>
-                            <hr className="my-3"/>
+                            <DividerLine/>
                             <div className="bg-green-100 p-2 rounded-lg flex justify-between w-full items-center">
                                 <p className="text-gray-700 font-bold text-sm">Now just wait until your payment validated</p>
                                 <div className="text-end">
@@ -76,14 +77,14 @@ export const OrderItemCard: React.FC<Props> = ({ orderId, orderNumber, status, t
                 {
                     status === 'REJECTED' && paymentEvidence !== null && 
                         <>
-                            <hr className="my-3"/>
+                            <DividerLine/>
                             <div className="bg-red-100 p-2 rounded-lg w-full">
                                 <p className="text-gray-700 font-bold text-sm">We're sorry. But your transaction is rejected by our shop</p>
                                 {evidenceElement(paymentEvidence??"")}
                             </div>
                         </>
                 }
-                <hr className="my-3"/>
+                <DividerLine/>
                 <div className="flex justify-between items-center w-full">
                     <div>
                         <p className="text-gray-500 font-normal text-sm mb-0">Checkout At</p>

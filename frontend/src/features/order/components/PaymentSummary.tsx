@@ -7,6 +7,7 @@ import { useDownloadInvoice } from "../hooks/useExport"
 import { InfoBoxShippingWeightToolTip } from "@/components/layout/InfoBoxShippingWeightToolTip"
 import { courierShippingDefault } from "@/constants/business.const"
 import { ShippingSummaryCard } from "@/components/layout/ShippingSummaryCard"
+import { DividerLine } from "@/components/layout/DividerLine"
 
 type Props = {
     orderId: string
@@ -30,6 +31,7 @@ export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, t
     return (
         <div className="bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 mb-4">
             <h5 className="font-bold mb-3">Payment Summary</h5>
+            <DividerLine/>
             <div className="flex justify-between">
                 <p>Total Items <b>({totalItem})</b></p>
                 <h6 className="font-bold">Rp. {totalPrice.toLocaleString()}</h6>
@@ -41,14 +43,14 @@ export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, t
                         <h6 className="font-bold">Rp. {totalSaving.toLocaleString()}</h6>
                     </div>
             }
-            <hr className="my-3"/>
+            <DividerLine/>
             <ShippingSummaryCard shippingWeight={shippingWeight} shippingCost={shippingCost}/>
-            <hr className="my-3"/>
+            <DividerLine/>
             <div className="flex justify-between">
                 <h6 className="font-bold">Final Price</h6>
                 <h4 className="font-bold text-xl">Rp. {(finalPrice + shippingCost).toLocaleString()}</h4>
             </div>
-            <hr className="mt-3 mb-5"/>
+            <DividerLine/>
             <div className="flex flex-col gap-3">
                 { status === 'WAITING_PAYMENT' && paymentEvidence === null && paymentMethod === "MANUAL" && <PaymentEvidenceUploadButton orderId={orderId} paymentDeadline={paymentDeadline}/> }
                 { status === 'WAITING_PAYMENT' && <OrderCancelButton orderNumber={orderNumber} onCancel={onCancel}/> }

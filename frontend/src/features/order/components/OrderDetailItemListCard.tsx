@@ -1,3 +1,4 @@
+import { DividerLine } from "@/components/layout/DividerLine"
 import { ProductOrderCartItemCard } from "@/components/layout/ProductOrderCartItemCard"
 import { ProductOrderCartItem } from "@/types/product.type"
 import React from "react"
@@ -16,6 +17,7 @@ export const OrderDetailItemListCard: React.FC<Props> = ({ items, branchName }) 
                     {items.length} Item{items.length !== 1 ? "s" : ""}
                 </span>
             </div>
+            <DividerLine/>
             <div className="flex flex-col divide-y divide-slate-100 max-h-[70vh] overflow-y-auto pr-3">
                 { items.map((dt, idx) => <ProductOrderCartItemCard key={idx} branchName={branchName} item={dt} variant="order"/> ) }
             </div>

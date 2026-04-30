@@ -1,4 +1,5 @@
 'use client'
+import { DividerLine } from "@/components/layout/DividerLine"
 import { SkeletonBox } from "@/components/layout/SkeletonBox"
 import { OrderStatus } from "@/constants/business.const"
 import { useAuthStore } from "@/features/auth/store/useAuthStore"
@@ -94,7 +95,7 @@ export default function ManageOrdersPage() {
                                 finishedOrderLastMonth={summaryByBranchId?.finishedOrderLastMonth ?? 0}
                             />
                     }
-                    <hr className="my-4"/>
+                    <DividerLine/>
                     <OrderFiltersBar
                         branchId={branchId}
                         onBranchChange={setBranchId}

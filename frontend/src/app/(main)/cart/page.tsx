@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import { Button } from "@/components/ui/button";
 import { MessageBox } from "@/components/layout/MessageBox";
 import { SkeletonBox } from "@/components/layout/SkeletonBox";
+import { DividerLine } from "@/components/layout/DividerLine";
 
 export default function CartPage() {
   // Handle hook
@@ -126,7 +127,7 @@ export default function CartPage() {
             // Render loading element
             isLoading ? <SkeletonBox extraClass={'min-h-[30px]'}/> : <CartSummary totalItems={summary?.totalItems ?? 0} totalQty={summary?.totalQty ?? 0}/>
           }
-          <hr className="my-5"/>
+          <DividerLine/>
           <div>
             {
               isLoadingAllCart ?

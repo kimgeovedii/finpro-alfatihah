@@ -1,3 +1,5 @@
+import { DividerLine } from "@/components/layout/DividerLine"
+
 type Props = {
     method: string
     status: string 
@@ -22,7 +24,7 @@ export const OrderManagementTableOrderPlacedSection: React.FC<Props> = ({ method
                     <p className="text-sm font-bold">Rp. {shippingCost.toLocaleString()}</p>
                 </div>
             </div>
-            <hr className="my-3"/>
+            <DividerLine/>
             <div className="flex justify-between">
                 <p className="font-bold text-lg">Final Price</p>
                 <p className="font-bold text-lg">Rp. {finalPrice.toLocaleString()}</p>
