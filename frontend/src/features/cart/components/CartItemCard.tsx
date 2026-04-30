@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button"
+import { currencyFormat } from "@/constants/business.const"
 import { TrashIcon } from "@heroicons/react/24/outline"
 import Image from "next/image"
 import Link from "next/link"
@@ -29,11 +30,11 @@ export const CartItemCard: React.FC<Props> = ({ slugName, storeName, productName
                         <h3 className="text-lg font-semibold text-slate-800 line-clamp-1">{productName}</h3>
                     </Link>
                     <p className="text-slate-500 text-sm line-clamp-2">{description}</p>
-                    <p className="text-emerald-700 font-bold text-lg mt-2 hidden lg:block">Rp {basePrice.toLocaleString("id-ID")}</p>
+                    <p className="text-emerald-700 font-bold text-lg mt-2 hidden lg:block">Rp {basePrice.toLocaleString(currencyFormat)}</p>
                 </div>
             </div>
             <div className="flex items-center w-full lg:w-auto justify-between gap-5 mt-2 lg:mt-0">
-                <p className="text-emerald-700 font-bold text-lg mt-2 block lg:hidden">Rp {basePrice.toLocaleString("id-ID")}</p>
+                <p className="text-emerald-700 font-bold text-lg mt-2 block lg:hidden">Rp {basePrice.toLocaleString(currencyFormat)}</p>
                 <div className="flex items-center gap-2">
                     <Button onClick={onRemove} className="bg-transparent text-slate-400 hover:text-red-500 transition cursor-pointer">
                         <TrashIcon className="w-5 h-5"/>

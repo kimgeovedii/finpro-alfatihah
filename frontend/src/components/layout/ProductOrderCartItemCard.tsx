@@ -3,6 +3,7 @@ import { MiniTagBox } from "./MiniTagBox"
 import { Button } from "../ui/button"
 import { TrashIcon } from "@heroicons/react/24/outline"
 import Link from "next/link"
+import { currencyFormat } from "@/constants/business.const"
 
 type ProductOrderCartCardProps = {
     item: ProductOrderCartItem
@@ -35,8 +36,8 @@ export const ProductOrderCartItemCard: React.FC<ProductOrderCartCardProps> = ({ 
             </div>
             <div className="text-right flex-shrink-0 flex flex-row md:flex-col justify-between w-full md:w-auto">
                 <div className="text-start md:text-end">
-                    <p className="text-sm font-bold text-slate-800">Rp. {(item.basePrice * item.quantity).toLocaleString()}</p>
-                    <p className="text-xs text-slate-400 font-semibold">Rp. {item.basePrice.toLocaleString()} / item</p>
+                    <p className="text-sm font-bold text-slate-800">Rp. {(item.basePrice * item.quantity).toLocaleString(currencyFormat)}</p>
+                    <p className="text-xs text-slate-400 font-semibold">Rp. {item.basePrice.toLocaleString(currencyFormat)} / item</p>
                 </div>
                 <div>
                     {

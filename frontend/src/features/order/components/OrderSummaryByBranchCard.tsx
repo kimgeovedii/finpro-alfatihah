@@ -1,4 +1,5 @@
 import { StatsTitleValueText } from "@/components/layout/StatsTitleValueText"
+import { currencyFormat } from "@/constants/business.const"
 
 type Props = {
     totalRevenue: number
@@ -13,7 +14,7 @@ export const OrderSummaryByBranchCard: React.FC<Props> = ({ totalRevenue, revenu
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full mb-4">
             <div className="sm:col-span-2 lg:col-span-1 bg-white border border-slate-200 rounded-2xl p-6 flex flex-col justify-between min-h-[140px]">
-                <StatsTitleValueText title="Total Revenue Today" val={<>Rp {totalRevenue.toLocaleString("id-ID")}</>}/>
+                <StatsTitleValueText title="Total Revenue Today" val={<>Rp {totalRevenue.toLocaleString(currencyFormat)}</>}/>
                 {
                     revenueChangePercent !== 0 && 
                         <div className="flex items-center gap-1 mt-2 text-teal-600 text-sm font-medium">

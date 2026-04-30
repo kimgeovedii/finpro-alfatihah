@@ -13,6 +13,8 @@ import { formatListSchedule } from '@/utils/converter.util';
 import { SkeletonBox } from '@/components/layout/SkeletonBox';
 import { VoucherData } from '@/features/cart/repositories/voucher.type';
 import { BackButton } from '@/components/button/BackButton';
+import { actionMessages } from '@/constants/message.const';
+import { showPopUp } from '@/utils/message.util';
 
 export default function CartDetailPage() {
   // Handle param
@@ -34,13 +36,13 @@ export default function CartDetailPage() {
     if (!isLoading && !cart && error) {
       Swal.fire({
         icon: "error",
-        title: "Cart not found",
+        title: actionMessages.cartFailedOpen,
         text: error,
-        confirmButtonText: "Back to Cart",
+        confirmButtonText: actionMessages.cartAskBack,
         allowOutsideClick: false,
         allowEscapeKey: false,
       }).then((result) => {
-        if (result.isConfirmed) router.push('/')
+        if (result.isConfirmed) router.push('/cart')
       })
     }
 
@@ -140,12 +142,7 @@ export default function CartDetailPage() {
 
   const handleIncrease = async (cartItemId: string, qty: number, stock: number) => {
     if (qty >= stock) {
-      Swal.fire({
-        icon: "info",
-        title: "Stock limit reached",
-        text: "You already selected all available items.",
-        confirmButtonColor: "#10b981",
-      })
+      await showPopUp(actionMessages.productCartFailedAddTitle, actionMessages.productCartFailedAddDesc, "info")
       return
     }
   
@@ -166,16 +163,7 @@ export default function CartDetailPage() {
       if (!confirm.isConfirmed) return
   
       const success = await deleteCartItem(cartItemId)
-      if (success) {
-        await Swal.fire({
-          title: "Item deleted",
-          html: `<b>${productName}</b> has been removed.`,
-          icon: "success",
-          confirmButtonColor: "#10b981",
-        })
-
-        fetchCartDetail(cartId)
-      }
+      if (success) await showPopUp(actionMessages.productRemoveSuccessTitle, `<b>${productName}</b> ${actionMessages.productRemoveSuccessDesc}`, "success")
     } else {
       await updateCartItem(cartItemId, qty - 1)
     }
@@ -185,11 +173,7 @@ export default function CartDetailPage() {
 
   const handleCheckout = async () => {
     if (!selectedAddressId) {
-      Swal.fire({
-        icon: "warning",
-        title: "Please select an address",
-        confirmButtonColor: "#10b981",
-      })
+      await showPopUp(actionMessages.orderCreateFailed, actionMessages.orderAskAddress, "warning")
       return
     }
 

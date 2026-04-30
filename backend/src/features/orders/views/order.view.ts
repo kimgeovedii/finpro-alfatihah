@@ -1,3 +1,4 @@
+import { currencyFormat } from "../../../constants/business.const"
 import { mailTemplateStyle } from "../../../utils/template"
 
 type Schedule = {
@@ -34,7 +35,7 @@ export const getBranchOrderBroadcastTemplate = (data: Payload) => {
             <tr>
                 <td>${dt.orderNumber}</td>
                 <td>${dt.status.replace("_"," ")}</td>
-                <td>${new Date(date).toLocaleString("id-ID")}</td>
+                <td>${new Date(date).toLocaleString(currencyFormat)}</td>
             </tr>
         `
     }).join("")
@@ -112,9 +113,9 @@ export const getOrderCreatedPaymentTemplate = (data: OrderCreated, isManual: boo
                     <p>Your order has been successfully created. Please complete your payment before the deadline to avoid cancellation.</p>
                     <div class="context-box" style="margin-top:16px;">
                         <p style="margin:0 0 6px 0;"><strong>Order ID:</strong> ${data.orderNumber}</p>
-                        <p style="margin:0 0 6px 0; color:#059669; font-weight:600;">Payment Amount: Rp ${data.amount.toLocaleString("id-ID")}</p>
+                        <p style="margin:0 0 6px 0; color:#059669; font-weight:600;">Payment Amount: Rp ${data.amount.toLocaleString(currencyFormat)}</p>
                         <p style="margin:0;">
-                            Payment Deadline: <strong>${new Date(data.paymentDeadline).toLocaleString("id-ID")}</strong>
+                            Payment Deadline: <strong>${new Date(data.paymentDeadline).toLocaleString(currencyFormat)}</strong>
                         </p>
                     </div>
                     ${

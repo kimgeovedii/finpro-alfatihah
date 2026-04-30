@@ -5,7 +5,7 @@ import { PaymentEvidenceUploadButton } from "./PaymentEvidenceUploadButton"
 import { OrderCancelButton } from "./OrderCancelButton"
 import { useDownloadInvoice } from "../hooks/useExport"
 import { InfoBoxShippingWeightToolTip } from "@/components/layout/InfoBoxShippingWeightToolTip"
-import { courierShippingDefault } from "@/constants/business.const"
+import { courierShippingDefault, currencyFormat } from "@/constants/business.const"
 import { ShippingSummaryCard } from "@/components/layout/ShippingSummaryCard"
 import { DividerLine } from "@/components/layout/DividerLine"
 
@@ -34,13 +34,13 @@ export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, t
             <DividerLine/>
             <div className="flex justify-between">
                 <p>Total Items <b>({totalItem})</b></p>
-                <h6 className="font-bold">Rp. {totalPrice.toLocaleString()}</h6>
+                <h6 className="font-bold">Rp. {totalPrice.toLocaleString(currencyFormat)}</h6>
             </div>
             {
                 totalSaving > 0 && 
                     <div className="flex justify-between">
                         <p>Total Saving</p>
-                        <h6 className="font-bold">Rp. {totalSaving.toLocaleString()}</h6>
+                        <h6 className="font-bold">Rp. {totalSaving.toLocaleString(currencyFormat)}</h6>
                     </div>
             }
             <DividerLine/>
@@ -48,7 +48,7 @@ export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, t
             <DividerLine/>
             <div className="flex justify-between">
                 <h6 className="font-bold">Final Price</h6>
-                <h4 className="font-bold text-xl">Rp. {(finalPrice + shippingCost).toLocaleString()}</h4>
+                <h4 className="font-bold text-xl">Rp. {(finalPrice + shippingCost).toLocaleString(currencyFormat)}</h4>
             </div>
             <DividerLine/>
             <div className="flex flex-col gap-3">

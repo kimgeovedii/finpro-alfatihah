@@ -2,6 +2,7 @@ import { OrderRepository } from "../repositories/order.repository"
 import { UserRole } from "@prisma/client"
 import PDFDocument from "pdfkit"
 import ExcelJS from "exceljs"
+import { currencyFormat } from "../../../constants/business.const"
 
 export class OrderExportService {
     private orderRepo = new OrderRepository()
@@ -40,7 +41,7 @@ export class OrderExportService {
             const leftSpace = 40 
             doc.text(`Order Number: ${order.orderNumber}`, leftSpace)
             doc.text(`Status: ${order.status}`, leftSpace)
-            doc.text(`Created At: ${new Date(order.createdAt).toLocaleString()}`, leftSpace)
+            doc.text(`Created At: ${new Date(order.createdAt).toLocaleString(currencyFormat)}`, leftSpace)
             doc.moveDown()
         
             // Customer section
@@ -106,8 +107,8 @@ export class OrderExportService {
 
                 doc.text(product.productName, col.name, y, { width: 250 })
                 doc.text(`${item.quantity}`, col.qty, y)
-                doc.text(`Rp ${product.basePrice.toLocaleString()}`, col.price, y)
-                doc.text(`Rp ${total.toLocaleString()}`, col.total, y)
+                doc.text(`Rp ${product.basePrice.toLocaleString(currencyFormat)}`, col.price, y)
+                doc.text(`Rp ${total.toLocaleString(currencyFormat)}`, col.total, y)
 
                 y += 20
             })
@@ -123,7 +124,7 @@ export class OrderExportService {
             doc.font("Helvetica-Bold").fontSize(11).text(`Total Items: ${totalItems}`, col.name, y)
             y += 18
         
-            doc.fillColor("#2d766f").fontSize(12).text(`Total Price: Rp ${order.finalPrice.toLocaleString()}`, col.name, y)
+            doc.fillColor("#2d766f").fontSize(12).text(`Total Price: Rp ${order.finalPrice.toLocaleString(currencyFormat)}`, col.name, y)
             doc.fillColor("black")
         
             // Payment
@@ -139,9 +140,9 @@ export class OrderExportService {
             doc.moveDown()
         
             // Footer
-            doc.text(`Total Price: Rp ${order.totalPrice.toLocaleString()}`)
-            doc.text(`Final Price: Rp ${order.finalPrice.toLocaleString()}`)
-            doc.text(`Shipping: Rp ${order.shippingCost.toLocaleString()}`)
+            doc.text(`Total Price: Rp ${order.totalPrice.toLocaleString(currencyFormat)}`)
+            doc.text(`Final Price: Rp ${order.finalPrice.toLocaleString(currencyFormat)}`)
+            doc.text(`Shipping: Rp ${order.shippingCost.toLocaleString(currencyFormat)}`)
         
             doc.end()
         })
@@ -194,7 +195,7 @@ export class OrderExportService {
         rows.forEach(row => {
             sheet.addRow({
                 ...row,
-                createdAt: new Date(row.createdAt).toLocaleString()
+                createdAt: new Date(row.createdAt).toLocaleString(currencyFormat)
             })
         })
 

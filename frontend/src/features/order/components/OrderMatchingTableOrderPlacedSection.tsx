@@ -1,4 +1,5 @@
 import { DividerLine } from "@/components/layout/DividerLine"
+import { currencyFormat } from "@/constants/business.const"
 
 type Props = {
     method: string
@@ -21,13 +22,13 @@ export const OrderManagementTableOrderPlacedSection: React.FC<Props> = ({ method
                 </div>
                 <div className="flex justify-between">
                     <p className="text-sm">Shipping Cost</p>
-                    <p className="text-sm font-bold">Rp. {shippingCost.toLocaleString()}</p>
+                    <p className="text-sm font-bold">Rp. {shippingCost.toLocaleString(currencyFormat)}</p>
                 </div>
             </div>
             <DividerLine/>
             <div className="flex justify-between">
                 <p className="font-bold text-lg">Final Price</p>
-                <p className="font-bold text-lg">Rp. {finalPrice.toLocaleString()}</p>
+                <p className="font-bold text-lg">Rp. {finalPrice.toLocaleString(currencyFormat)}</p>
             </div>
         </div>
     )

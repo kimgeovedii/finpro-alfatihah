@@ -13,3 +13,6 @@ export const statusColorMap: Record<string, string> = {
 export const allowedMimeTypesPaymentEvidence: string[] = ["image/jpeg", "image/png", "image/jpg"]
 export const maxSizePaymentEvidence: number = 2 * 1024 * 1024 // 2 mb
 export const courierShippingDefault: string = 'jne' 
+
+// Currency
+export const currencyFormat: string = "id-ID"

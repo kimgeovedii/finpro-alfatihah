@@ -1,6 +1,6 @@
 import React from "react"
 import { InfoBoxShippingWeightToolTip } from "./InfoBoxShippingWeightToolTip"
-import { courierShippingDefault } from "@/constants/business.const"
+import { courierShippingDefault, currencyFormat } from "@/constants/business.const"
 
 type Props = {
     shippingWeight: number
@@ -17,7 +17,7 @@ export const ShippingSummaryCard: React.FC<Props> = ({ shippingWeight, shippingC
             </div>
             <div className="flex justify-between">
                 <p>Total Cost</p>
-                <h6 className="font-bold">Rp. {shippingCost.toLocaleString()}</h6>
+                <h6 className="font-bold">Rp. {shippingCost.toLocaleString(currencyFormat)}</h6>
             </div>
             <div className="flex justify-between">
                 <p>Total Weight</p>

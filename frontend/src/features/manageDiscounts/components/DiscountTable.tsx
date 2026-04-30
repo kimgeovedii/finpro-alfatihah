@@ -1,3 +1,4 @@
+import { currencyFormat } from "@/constants/business.const";
 import { IDiscount } from "../types/discount.type";
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
@@ -75,7 +76,7 @@ export const DiscountTable = ({
     } else {
       return (
         <span className="px-2 py-0.5 bg-yellow-400 text-yellow-900 rounded-full text-[10px] font-black whitespace-nowrap">
-          Rp {discount.discountValue.toLocaleString()}
+          Rp {discount.discountValue.toLocaleString(currencyFormat)}
         </span>
       );
     }

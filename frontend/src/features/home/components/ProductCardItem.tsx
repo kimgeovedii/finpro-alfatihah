@@ -8,6 +8,10 @@ import { ProductCard } from "../types/home.types";
 import { useCreateCart } from "@/features/products/hooks/useCart";
 import Swal from "sweetalert2";
 import { Button } from "@/components/ui/button";
+import { useAuthStore } from "@/features/auth/store/useAuthStore";
+import { actionMessages } from "@/constants/message.const";
+import { showPopUp } from "@/utils/message.util";
+import { currencyFormat } from "@/constants/business.const";
 
 interface ProductCardItemProps {
   product: ProductCard;
@@ -19,27 +23,30 @@ interface ProductCardItemProps {
 
 export const ProductCardItem = ({ product, index, branchName, branchId, branchCity }: ProductCardItemProps) => {
   const router = useRouter();
+
+  // Handle hook
   const { createCart, isCreating } = useCreateCart()
+  const role = useAuthStore((state) => state.user?.role)
 
   const handleAddToCart = async (e: React.MouseEvent, branchId: string, productId: string) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const success = await createCart(branchId, productId, 1)
-
-    if (success) {
-      await Swal.fire({
-        title: "Product Added!",
-        text: "Item has been added to your cart.",
-        icon: "success",
-        confirmButtonColor: "#10b981",
-      })
+    e.preventDefault()
+    e.stopPropagation()
+    
+    // Customer guard
+    if (!role) {      
+      await showPopUp(actionMessages.productAddFailed, actionMessages.productSignInRequired, "error")
+      return
     }
+
+    // Call hook
+    const success = await createCart(branchId, productId)
+
+    if (success) await showPopUp(actionMessages.productAddSuccessTitle, actionMessages.productCartSuccessDesc, "success")
   }
 
   const handleCardClick = () => {
-    router.push(`/products/${product.slugName}`);
-  };
+    router.push(`/products/${product.slugName}`)
+  }
 
   return (
     <motion.div 
@@ -104,10 +111,10 @@ export const ProductCardItem = ({ product, index, branchName, branchId, branchCi
           <div className="mt-auto pt-3 flex flex-col gap-3">
             <div className="flex flex-col">
               <span className="text-lg md:text-xl font-black text-slate-900 dark:text-white tracking-tight">
-                Rp {product.basePrice.toLocaleString("id-ID")}
+                Rp {product.basePrice.toLocaleString(currencyFormat)}
               </span>
               <div className="flex items-center gap-2 mt-0.5">
-                <span className="text-[10px] text-slate-400 line-through">Rp {(product.basePrice * 1.2).toLocaleString("id-ID")}</span>
+                <span className="text-[10px] text-slate-400 line-through">Rp {(product.basePrice * 1.2).toLocaleString(currencyFormat)}</span>
                 <span className="text-[10px] font-black text-orange-500">20%</span>
               </div>
             </div>

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { formatDate } from "@/utils/converter.util"
 import React from "react"
 import Swal from "sweetalert2"
-import { statusColorMap } from "@/constants/business.const"
+import { currencyFormat, statusColorMap } from "@/constants/business.const"
 import { ArrowRightIcon, PhotoIcon } from "@heroicons/react/24/outline"
 import Link from "next/link"
 import { PaymentEvidenceUploadButton } from "./PaymentEvidenceUploadButton"
@@ -99,18 +99,18 @@ export const OrderItemCard: React.FC<Props> = ({ orderId, orderNumber, status, t
                                 <div className="flex gap-x-4 items-end">
                                     <div>
                                         <p className="text-emerald-600 font-semibold text-sm">shipping cost</p>
-                                        <p className="text-emerald-600 font-semibold text-sm">Rp. {shippingCost.toLocaleString("id-ID")}</p>
+                                        <p className="text-emerald-600 font-semibold text-sm">Rp. {shippingCost.toLocaleString(currencyFormat)}</p>
                                     </div>
                                     <div>
                                         <p className="text-gray-500 font-semibold text-sm mb-0">Total Spend</p>
-                                        <p className="text-emerald-800 font-bold text-xl">Rp {finalPrice.toLocaleString("id-ID")}</p>
+                                        <p className="text-emerald-800 font-bold text-xl">Rp {finalPrice.toLocaleString(currencyFormat)}</p>
                                     </div>
                                 </div>
                         }
                         {
                             totalPrice !== finalPrice && status !== 'CANCELLED' &&
                                 <div className="bg-red-100 p-1 text-center rounded-md mt-1">
-                                    <p className="text-gray-500 font-semibold text-sm mb-0">You saved <b className="text-red-400">Rp. {(totalPrice - finalPrice).toLocaleString("id-ID")}</b></p>
+                                    <p className="text-gray-500 font-semibold text-sm mb-0">You saved <b className="text-red-400">Rp. {(totalPrice - finalPrice).toLocaleString(currencyFormat)}</b></p>
                                 </div>
                         }
                     </div>

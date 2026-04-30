@@ -1,3 +1,4 @@
+import { currencyFormat } from "../../../constants/business.const"
 import { mailTemplateStyle } from "../../../utils/template"
 
 type CartItem = {
@@ -24,7 +25,7 @@ export const getCartReminderEmailTemplate = (username: string, carts: CartGroup[
                 <tr>
                     <td style="padding:6px 0;">${it.productName}</td>
                     <td style="padding:6px 0; text-align:center;">${it.quantity}</td>
-                    <td style="padding:6px 0; text-align:right;">Rp ${it.price.toLocaleString("id-ID")}</td>
+                    <td style="padding:6px 0; text-align:right;">Rp ${it.price.toLocaleString(currencyFormat)}</td>
                 </tr>
             `
         }).join("")
@@ -47,7 +48,7 @@ export const getCartReminderEmailTemplate = (username: string, carts: CartGroup[
                 <div style="margin-top:10px; padding-top:10px; border-top:1px dashed #ddd;">
                     <p style="margin:0; font-weight:600;">Total Items: ${totalQty}</p>
                     <p style="margin:0; font-weight:700; color:#059669;">
-                        Total Price: Rp ${totalPrice.toLocaleString("id-ID")}
+                        Total Price: Rp ${totalPrice.toLocaleString(currencyFormat)}
                     </p>
                 </div>
             </div>

@@ -2,6 +2,7 @@ import { DividerLine } from "@/components/layout/DividerLine"
 import { InfoBoxShippingWeightToolTip } from "@/components/layout/InfoBoxShippingWeightToolTip"
 import { ShippingSummaryCard } from "@/components/layout/ShippingSummaryCard"
 import { Button } from "@/components/ui/button"
+import { currencyFormat } from "@/constants/business.const"
 import { InformationCircleIcon } from "@heroicons/react/24/outline"
 import { ArrowRight } from "lucide-react"
 import React from "react"
@@ -25,7 +26,7 @@ export const CartPaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCos
             <DividerLine/>
             <div className="flex justify-between">
                 <p>Total Items <b>({totalItem})</b></p>
-                <h6 className="font-bold">Rp. {totalPrice.toLocaleString()}</h6>
+                <h6 className="font-bold">Rp. {totalPrice.toLocaleString(currencyFormat)}</h6>
             </div>
             <DividerLine/>
             <ShippingSummaryCard shippingWeight={shippingWeight} shippingCost={shippingCost}/>
@@ -37,7 +38,7 @@ export const CartPaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCos
                             totalDiscountProduct > 0 && (
                                 <div className="flex justify-between">
                                     <p>From Product</p>
-                                    <h6 className="font-bold">-Rp. {totalDiscountProduct.toLocaleString()}</h6>
+                                    <h6 className="font-bold">-Rp. {totalDiscountProduct.toLocaleString(currencyFormat)}</h6>
                                 </div>
                             )
                         }
@@ -45,7 +46,7 @@ export const CartPaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCos
                             totalDiscountVoucher > 0 && (
                                 <div className="flex justify-between">
                                     <p>From Voucher</p>
-                                    <h6 className="font-bold">-Rp. {totalDiscountVoucher.toLocaleString()}</h6>
+                                    <h6 className="font-bold">-Rp. {totalDiscountVoucher.toLocaleString(currencyFormat)}</h6>
                                 </div>
                             )
                         }
@@ -54,7 +55,7 @@ export const CartPaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCos
             <DividerLine/>
             <div className="flex justify-between">
                 <h6 className="font-bold">Final Price</h6>
-                <h4 className="font-bold text-xl">Rp. {finalPrice.toLocaleString()}</h4>
+                <h4 className="font-bold text-xl">Rp. {finalPrice.toLocaleString(currencyFormat)}</h4>
             </div>
             <DividerLine/>
             <div className="flex gap-5 w-full">
