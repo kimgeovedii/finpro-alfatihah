@@ -85,7 +85,7 @@ export default function CartPage() {
     fetchAllCarts(1)
   }
   
-  const handleDecrease = async (cartItemId: string, cartId: string, qty: number, productName: string) => {
+  const handleDecrease = async (cartItemId: string, qty: number, productName: string) => {
     if (qty <= 1) {
       const confirm = await Swal.fire({
         title: "Remove item?",
@@ -97,7 +97,7 @@ export default function CartPage() {
       })
       if (!confirm.isConfirmed) return
   
-      const success = await deleteCart(cartId)
+      const success = await deleteCartItem(cartItemId)
       if (success) {
         await Swal.fire({
           title: "Item deleted",
@@ -142,13 +142,18 @@ export default function CartPage() {
               : 
                 carts.map(ct => (
                   <div key={ct.id} className="mb-6">
-                    <BranchHeader id={ct.branch.id} storeName={ct.branch.storeName} onRemove={() => handleRemoveCart(ct.id)} cartId={ct.id}/>
+                    <BranchHeader 
+                      storeName={ct.branch.storeName} 
+                      city={ct.branch.city}
+                      onRemove={() => handleRemoveCart(ct.id)} 
+                      cartId={ct.id}
+                    />
                     {
                       ct.items.map(dt => (
                         <CartItemCard key={dt.id}
-                          slugName={dt.product.id} branchId={ct.branchId} productName={dt.product.product.productName} description={dt.product.product.description} 
-                          basePrice={dt.product.product.basePrice} mainImage="/mainImages/coke.png" qty={dt.quantity} currentStock={dt.product.currentStock}
-                          onDecrease={() => handleDecrease(dt.id, ct.id, dt.quantity,dt.product.product.productName)}
+                          slugName={dt.product.product.slugName} storeName={ct.branch.storeName} productName={dt.product.product.productName} description={dt.product.product.description} 
+                          basePrice={dt.product.product.basePrice} mainImage={dt.product.product.productImages[0].imageUrl} qty={dt.quantity} currentStock={dt.product.currentStock}
+                          onDecrease={() => handleDecrease(dt.id, dt.quantity,dt.product.product.productName)}
                           onIncrease={() => handleIncrease(dt.id, dt.quantity, dt.product.currentStock)}                        
                           onRemove={() => handleRemoveCartItem(dt.id, `(${dt.quantity}) ${dt.product.product.productName}`)}
                         />
@@ -158,7 +163,7 @@ export default function CartPage() {
                 ))
             }
             {/* Pagination */}
-            { meta && meta.page < meta.total_page && <Button className="mt-4 px-4 py-2 bg-slate-800 text-white rounded-lg" onClick={() => fetchAllCarts(meta.page + 1)}>See More</Button> }
+            { meta && meta.page < meta.totalPages && <Button className="mt-4 px-4 py-2 bg-slate-800 text-white rounded-lg" onClick={() => fetchAllCarts(meta.page + 1)}>See More</Button> }
           </div>
         </div>
       </div>

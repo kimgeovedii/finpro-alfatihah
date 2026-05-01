@@ -27,14 +27,14 @@ export class CartItemService {
         let updatedItem = null
         // If qty become 0, then delete item else just update
         if (qty === 0) {
-            // Repo : delete cart item by id
-            await this.cartItemRepo.deleteCartItemById(cartItemId)
-
             // Repo : get cart by id
             const cart = await this.cartRepo.findByIdAndUser(cartItem.cartId, userId)
+
+            // Repo : delete cart item by id
+            await this.cartItemRepo.deleteCartItemById(cartItemId)
             
             // Repo : delete cart by id
-            if (cart?.items.length === 0) await this.cartRepo.deleteCartById(cartItem.cartId) 
+            if (cart?.items.length === 1) await this.cartRepo.deleteCartById(cartItem.cartId) 
         } else {
             // Make sure requested qty is less or equal stock
             if (qty > stock) throw { code: 422, message: 'Exceeds available stock' }
@@ -54,7 +54,19 @@ export class CartItemService {
         // Check if this cart belongs to user
         if (cartItem.cart.userId !== userId) throw { code: 403, message: 'Forbidden access to this cart item' }
 
+        // Repo : get cart by id
+        const cart = await this.cartRepo.findByIdAndUser(cartItem.cartId, userId)
+
         // Repo : delete cart item by id
         await this.cartItemRepo.deleteCartItemById(cartItemId)
+
+        // Repo : delete cart by id
+        if (cart && cart.items.length === 1) {
+            await this.cartRepo.deleteCartById(cartItem.cartId) 
+
+            return { isCartDeleted: true }
+        } else {
+            return { isCartDeleted: false }
+        }
     }
 }

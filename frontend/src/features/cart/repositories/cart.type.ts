@@ -1,6 +1,6 @@
-import { AddressData } from "@/types/address.type"
+import { AddressData, BranchData } from "@/types/address.type"
 import { PaginationMeta } from "@/types/global.type"
-import { ProductImage } from "@/types/product.type"
+import { ProductImage, ProductItem } from "@/types/product.type"
 import { Schedule } from "@/types/schedule.type"
 
 export type CartSummaryData = {
@@ -14,21 +14,14 @@ export type CartItem = {
     product: {
         id: string
         currentStock: number
-        product: {
-            productName: string
-            basePrice: number
-            description: string
-        }
+        product: ProductItem
     }
 }
 
 export type CartBranch = {
     id: string
     branchId: string
-    branch: {
-        id: string
-        storeName: string
-    }
+    branch: BranchData
     items: CartItem[]
 }
 
@@ -48,9 +41,11 @@ export type CartDetailCategory = {
 }
 
 export type CartDetailProduct = {
+    slugName: string
     productName: string
     description: string
     basePrice: number
+    weight: number
     category: CartDetailCategory
     productImages: ProductImage[]
 }
@@ -60,6 +55,7 @@ export type CartDetailItem = {
     quantity: number
     product: {
         product: CartDetailProduct
+        currentStock: number
     }
 }
 
@@ -85,6 +81,7 @@ export type CartData = {
         addresses: AddressData[]
     }
     totalBasePrice: number
+    totalWeight: number
     totalQty: number
     shipping: CartDetailShipping | null
     openStatus: string

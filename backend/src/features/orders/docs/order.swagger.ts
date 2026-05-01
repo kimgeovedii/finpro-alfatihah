@@ -319,7 +319,7 @@
  *                         page: { type: integer, example: 1 }
  *                         limit: { type: integer, example: 14 }
  *                         total: { type: integer, example: 1 }
- *                         total_page: { type: integer, example: 1 }
+ *                         totalPages: { type: integer, example: 1 }
  *
  *       400:
  *         description: Validation error
@@ -448,6 +448,9 @@
  *                     totalPrice:
  *                       type: number
  *                       example: 224322
+ *                     totalWeight:
+ *                       type: number
+ *                       example: 1400
  *                     finalPrice:
  *                       type: number
  *                       example: 248580
@@ -555,6 +558,12 @@
  *                                   basePrice:
  *                                     type: number
  *                                     example: 14328
+ *                                   weight:
+ *                                     type: number
+ *                                     example: 120
+ *                                   slugName:
+ *                                     type: string
+ *                                     example: coca-cola
  *                                   productImages:
  *                                     type: array
  *                                     items:
@@ -772,7 +781,7 @@
  *                         page: { type: integer, example: 1 }
  *                         limit: { type: integer, example: 14 }
  *                         total: { type: integer, example: 5 }
- *                         total_page: { type: integer, example: 1 }
+ *                         totalPages: { type: integer, example: 1 }
  *
  *       400:
  *         description: Validation error - branchId is not valid UUID

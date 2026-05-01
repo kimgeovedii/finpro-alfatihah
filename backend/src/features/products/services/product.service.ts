@@ -60,8 +60,8 @@ export class ProductService {
     return await this.productRepository.getProductById(id);
   };
 
-  public getProductBySlug = async (slugName: string) => {
-    return await this.productRepository.getProductBySlug(slugName);
+  public getProductBySlug = async (slugName: string, userId: string | null, branchName: string) => {
+    return await this.productRepository.getProductBySlug(slugName, userId, branchName);
   };
 
   public createProduct = async (data: any, files?: Express.Multer.File[]) => {

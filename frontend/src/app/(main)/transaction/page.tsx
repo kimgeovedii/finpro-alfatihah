@@ -108,7 +108,7 @@ export default function TransactionPage() {
             }
             {
               // Pagination
-              meta && meta.page < meta.total_page && <Button className="mt-4 px-4 py-1 bg-teal-700 text-white rounded-lg mx-auto block" onClick={() => fetchAllOrders(meta.page + 1)}>See More</Button> 
+              meta && meta.page < meta.totalPages && <Button className="mt-4 px-4 py-1 bg-teal-700 text-white rounded-lg mx-auto block" onClick={() => fetchAllOrders(meta.page + 1)}>See More</Button> 
             }
           </div>
         </div>
