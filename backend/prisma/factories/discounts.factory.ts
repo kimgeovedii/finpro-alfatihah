@@ -58,11 +58,18 @@ class DiscountsFactory {
             discountValue = faker.number.int({ min: 5000, max: 50000 }) // 5k-50k nominal
         }
 
-        // Generate max discount amount
-        const maxDiscountAmount = faker.number.int({ min: 10000, max: 200000 })
+        // Min & Max purchase amount 
+        let minPurchaseAmount: number | null = null
+        let maxDiscountAmount: number | null = null
 
-        // Min purchase amount (optional)
-        const minPurchaseAmount = Math.random() < 0.6 ? faker.number.int({ min: 50000, max: 200000 }) : null
+        // Only apply min/max for min purchase discount
+        if (discountType === DiscountType.MINIMUM_PURCHASE) {
+            // Min purchase amount
+            minPurchaseAmount = Math.random() < 0.6 ? faker.number.int({ min: 50000, max: 200000 }) : null
+
+            // Generate max discount amount
+            maxDiscountAmount = faker.number.int({ min: 10000, max: 200000 })
+        }
 
         // Start and end dates (discount valid from last 3 days to 30 days in future)
         const today = new Date()

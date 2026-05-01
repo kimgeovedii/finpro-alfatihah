@@ -138,7 +138,7 @@ export class OrderRepository {
                 select: {
                   currentStock: true, product: {
                     select: {
-                      productName: true, description: true, basePrice: true, weight: true, slugName: true,
+                      productName: true, basePrice: true, weight: true, slugName: true,
                       category: {
                         select: { name: true }
                       },
@@ -401,7 +401,7 @@ export class OrderRepository {
   }
 
   async createOrder(userId: string, branchId: string, addressId: string, totalPrice: number, finalPrice: number, shippingCost: number,
-    items: Array<{ product: { id: string; product: { basePrice: number } }; quantity: number; discountId?: string | null }>) {
+    items: Array<{ product: { id: string; product: { basePrice: number } }; quantity: number; }>) {
     
     const paymentDeadlineTime = new Date(Date.now() + paymentDeadline) // 1 hour from now
     const orderNumber = `${orderCode}-${Date.now()}`
@@ -413,7 +413,6 @@ export class OrderRepository {
         items: {
           create: items.map(dt => ({
             productId: dt.product.id,
-            discountId: dt.discountId ?? null,
             price: dt.product.product.basePrice,
             quantity: dt.quantity,
           }))

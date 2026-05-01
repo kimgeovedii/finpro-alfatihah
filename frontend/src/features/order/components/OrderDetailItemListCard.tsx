@@ -19,7 +19,16 @@ export const OrderDetailItemListCard: React.FC<Props> = ({ items, branchName }) 
             </div>
             <DividerLine/>
             <div className="flex flex-col divide-y divide-slate-100 max-h-[70vh] overflow-y-auto pr-3">
-                { items.map((dt, idx) => <ProductOrderCartItemCard key={idx} branchName={branchName} item={dt} variant="order"/> ) }
+                { 
+                    items.map((dt, idx) => 
+                        <ProductOrderCartItemCard 
+                            key={idx} 
+                            branchName={branchName} 
+                            item={dt} 
+                            variant="order"
+                        /> 
+                    ) 
+                }
             </div>
         </div>
     )

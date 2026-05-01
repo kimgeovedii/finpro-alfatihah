@@ -7,7 +7,7 @@ export class CartRepository {
             select: {
                 id: true, userId: true, branchId: true, items: {
                     select: {
-                        id: true, quantity: true, discountId: true,
+                        id: true, quantity: true,
                         product: {                      
                             select: {
                                 id: true, product: {              

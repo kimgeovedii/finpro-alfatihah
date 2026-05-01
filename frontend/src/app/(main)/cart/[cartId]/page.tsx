@@ -256,7 +256,7 @@ export default function CartDetailPage() {
                   cartId: cartId,
                   slugName: dt.product.product.slugName,
                   productName: dt.product.product.productName,
-                  description: dt.product.product.description,
+                  productDiscounts: dt.product.product.productDiscounts,
                   category: dt.product.product.category,
                   productImages: dt.product.product.productImages,
                   quantity: dt.quantity,

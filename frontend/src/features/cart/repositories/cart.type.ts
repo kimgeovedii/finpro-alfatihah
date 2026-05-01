@@ -1,6 +1,6 @@
 import { AddressData, BranchData } from "@/types/address.type"
 import { PaginationMeta } from "@/types/global.type"
-import { ProductImage, ProductItem } from "@/types/product.type"
+import { ProductDiscounts, ProductImage, ProductItem } from "@/types/product.type"
 import { Schedule } from "@/types/schedule.type"
 
 export type CartSummaryData = {
@@ -43,10 +43,10 @@ export type CartDetailCategory = {
 export type CartDetailProduct = {
     slugName: string
     productName: string
-    description: string
     basePrice: number
     weight: number
     category: CartDetailCategory
+    productDiscounts: ProductDiscounts[]
     productImages: ProductImage[]
 }
 

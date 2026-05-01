@@ -51,7 +51,19 @@ export class CartRepository {
               select: {
                 currentStock: true, product: {
                   select: {
-                    productName: true, description: true, basePrice: true, weight: true, slugName: true, productImages: {
+                    productName: true, basePrice: true, weight: true, slugName: true, 
+                    productDiscounts: {
+                      take: 1,
+                      select: {
+                        discount: {
+                          select: {
+                            discountType: true, discountValue: true, discountValueType: true, maxDiscountAmount: true, 
+                            minPurchaseAmount: true, startDate: true, endDate: true,
+                          }
+                        }
+                      }
+                    },
+                    productImages: {
                       select: { imageUrl: true },
                       where: { isPrimary: true },
                       take: 1
@@ -112,11 +124,11 @@ export class CartRepository {
         take: limit,
         orderBy: { createdAt: 'desc' },
         select: {
-          id: true, createdAt: true, branchId: true, 
+          id: true, branchId: true, 
           items: {
             orderBy: { createdAt: 'desc' },
             select: {
-              id: true, quantity: true, createdAt: true,
+              id: true, quantity: true, 
               product: {                         
                 select: {
                   id: true, currentStock: true, product: {                 
@@ -130,9 +142,9 @@ export class CartRepository {
                         select: { imageUrl: true },
                         where: { isPrimary: true },
                         take: 1
-                      }
+                      },
                     }
-                  }
+                  },
                 }
               }
             }

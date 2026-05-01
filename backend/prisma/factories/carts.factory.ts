@@ -27,7 +27,7 @@ class CartFactory {
         if (!branch) throw new Error('Cannot create cart without branch')
 
         // Get inventories from this branch
-        const inventories = await this.branchInventoryRepository.findManyByBranch(branch.id)
+        const inventories = await this.branchInventoryRepository.findManyItemsByBranch(branch.id)
         if (inventories.length === 0) throw new Error('Cannot create cart without branch inventory')
         const selectedInventories = faker.helpers.arrayElements(inventories, faker.number.int({ min: minQuantityItemSelectedSeed, max: Math.min(maxQuantityItemSelectedSeed, inventories.length) }))
 
@@ -35,7 +35,6 @@ class CartFactory {
             id: faker.string.uuid(),
             productId: dt.id,
             quantity: faker.number.int({ min: minQuantityItemSelectedSeed, max: maxQuantityItemSelectedSeed }),
-            discountId: null,
             createdAt: faker.date.past({ years: oldestPeriodYears }),
         }))
 

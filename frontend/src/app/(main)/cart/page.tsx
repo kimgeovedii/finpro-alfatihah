@@ -132,8 +132,8 @@ export default function CartPage() {
                     {
                       ct.items.map(dt => (
                         <CartItemCard key={dt.id}
-                          slugName={dt.product.product.slugName} storeName={ct.branch.storeName} productName={dt.product.product.productName} description={dt.product.product.description} 
-                          basePrice={dt.product.product.basePrice} mainImage={dt.product.product.productImages[0].imageUrl} qty={dt.quantity} currentStock={dt.product.currentStock}
+                          slugName={dt.product.product.slugName} storeName={ct.branch.storeName} productName={dt.product.product.productName} basePrice={dt.product.product.basePrice} 
+                          mainImage={dt.product.product.productImages[0].imageUrl} qty={dt.quantity} currentStock={dt.product.currentStock} 
                           onDecrease={() => handleDecrease(dt.id, dt.quantity,dt.product.product.productName)}
                           onIncrease={() => handleIncrease(dt.id, dt.quantity, dt.product.currentStock)}                        
                           onRemove={() => handleRemoveCartItem(dt.id, `(${dt.quantity}) ${dt.product.product.productName}`)}
