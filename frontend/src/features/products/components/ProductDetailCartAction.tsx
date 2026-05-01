@@ -1,7 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { PlusIcon, MinusIcon, ShoppingBagIcon } from "@heroicons/react/24/outline";
+import {
+  PlusIcon,
+  MinusIcon,
+  ShoppingBagIcon,
+} from "@heroicons/react/24/outline";
 import { ProductDetailCartActionProps } from "@/features/products/types/product.type";
 
 const formatMoney = (value: number) =>
@@ -31,7 +35,9 @@ export const ProductDetailCartAction = ({
             >
               <MinusIcon className="w-5 h-5 stroke-2" />
             </button>
-            <span className="font-extrabold text-xl w-6 text-center text-slate-900">{qty}</span>
+            <span className="font-extrabold text-xl w-6 text-center text-slate-900">
+              {qty}
+            </span>
             <button
               onClick={() => setQty(qty + 1)}
               className="w-11 h-11 flex items-center justify-center rounded-2xl bg-white text-emerald-700 shadow-sm hover:bg-emerald-700 hover:text-white transition-colors"
@@ -47,16 +53,14 @@ export const ProductDetailCartAction = ({
           </div>
         </div>
 
-        <div className="fixed bottom-0 left-0 w-full px-6 pb-8 pt-4 bg-linear-to-t from-slate-50 via-slate-50 to-transparent pointer-events-none z-40">
-          <div className="pointer-events-auto bg-white/80 backdrop-blur-xl p-2 rounded-[2rem] shadow-[0_-8px_40px_-12px_rgba(0,0,0,0.1)]">
-            <motion.button
-              whileTap={{ scale: 0.96 }}
-              className="w-full bg-linear-to-r from-emerald-800 to-emerald-600 text-white py-4 rounded-[1.5rem] font-bold text-lg flex items-center justify-center gap-3 shadow-lg shadow-emerald-700/20"
-            >
-              <ShoppingBagIcon className="w-6 h-6" />
-              Add to Cart
-            </motion.button>
-          </div>
+        <div className="mt-4">
+          <motion.button
+            whileTap={{ scale: 0.96 }}
+            className="w-full bg-linear-to-r from-emerald-800 to-emerald-600 text-white py-4 rounded-[1.5rem] font-bold text-lg flex items-center justify-center gap-3 shadow-lg shadow-emerald-700/20"
+          >
+            <ShoppingBagIcon className="w-6 h-6" />
+            Add to Cart
+          </motion.button>
         </div>
       </>
     );
