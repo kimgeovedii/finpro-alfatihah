@@ -13,7 +13,7 @@ import { roleMiddleware } from "../../../middleware/role.middleware";
 import { EmployeeRole } from "@prisma/client";
 
 export class ProductRouter {
-  private router: Router;
+  public router: Router;
   private productController: ProductController;
 
   constructor() {
@@ -56,7 +56,6 @@ export class ProductRouter {
     this.router.use("/:productId/images", productImageRouter);
   }
 
-  public getRouter = (): Router => {
-    return this.router;
-  };
 }
+
+export default new ProductRouter().router;

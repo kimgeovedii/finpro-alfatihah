@@ -9,7 +9,7 @@ import {
 import { assignProductsSchema } from "../validations/productDiscount.schema";
 
 export class DiscountRouter {
-  private router: Router;
+  public router: Router;
   private discountController: DiscountController;
   private productDiscountController: ProductDiscountController;
 
@@ -49,7 +49,6 @@ export class DiscountRouter {
     );
   }
 
-  public getRouter(): Router {
-    return this.router;
-  }
 }
+
+export default new DiscountRouter().router;
