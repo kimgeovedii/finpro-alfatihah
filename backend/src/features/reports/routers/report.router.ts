@@ -2,7 +2,7 @@ import { Router } from "express";
 import { ReportController } from "../controllers/report.controller";
 
 export class ReportRouter {
-  private router: Router;
+  public router: Router;
   private reportController: ReportController;
 
   constructor() {
@@ -17,7 +17,6 @@ export class ReportRouter {
     this.router.get("/stocks/:productId", this.reportController.getDetailedStockReport);
   }
 
-  public getRouter(): Router {
-    return this.router;
-  }
 }
+
+export default new ReportRouter().router;

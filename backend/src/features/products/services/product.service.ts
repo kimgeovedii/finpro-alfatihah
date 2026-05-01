@@ -19,7 +19,7 @@ export class ProductService {
     const { sortBy = "createdAt", sortOrder = "desc", ...restFilters } = filters;
     const orderDir = (sortOrder === "asc" || sortOrder === "desc") ? sortOrder : "desc";
 
-    const where: any = { ...restFilters };
+    const where: any = { ...restFilters, deletedAt: null };
     if (where.search) {
       where.productName = { contains: where.search, mode: "insensitive" };
       delete where.search;

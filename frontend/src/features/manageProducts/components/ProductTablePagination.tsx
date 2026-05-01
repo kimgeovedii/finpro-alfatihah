@@ -31,7 +31,7 @@ export const ProductTablePagination: React.FC<ProductTablePaginationProps> = ({
   if (total === 0) return null;
 
   return (
-    <div className="px-6 py-4 border-t border-[#eff1f2] flex flex-col sm:flex-row items-center justify-between gap-3 bg-white">
+    <div className="px-6 py-4 border-t border-[#eff1f2] flex flex-col sm:flex-row items-center justify-between gap-3 bg-white mt-4 rounded-b-3xl">
       <p className="text-sm text-[#595c5d]">
         Showing {start} to {end} of {total} results
       </p>
@@ -48,7 +48,10 @@ export const ProductTablePagination: React.FC<ProductTablePaginationProps> = ({
 
         {getPageNumbers().map((p, i) =>
           p === "..." ? (
-            <span key={`ellipsis-${i}`} className="px-2 py-1.5 text-[#595c5d] text-sm">
+            <span
+              key={`ellipsis-${i}`}
+              className="px-2 py-1.5 text-[#595c5d] text-sm"
+            >
               ...
             </span>
           ) : (
@@ -57,7 +60,7 @@ export const ProductTablePagination: React.FC<ProductTablePaginationProps> = ({
               onClick={() => onPageChange(p)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 p === page
-                  ? "bg-[#e0e3e4] text-[#2c2f30]"
+                  ? "bg-[#006666] text-white"
                   : "text-[#595c5d] hover:bg-[#eff1f2]"
               }`}
             >

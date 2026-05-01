@@ -3,7 +3,7 @@ import { StockJournalController } from "../controllers/stockJournal.controller";
 import { authMiddleware } from "../../../middleware/auth.middleware";
 
 export class StockJournalRouter {
-  private router: Router;
+  public router: Router;
   private stockJournalController: StockJournalController;
 
   constructor() {
@@ -25,7 +25,6 @@ export class StockJournalRouter {
     );
   }
 
-  public getRouter(): Router {
-    return this.router;
-  }
 }
+
+export default new StockJournalRouter().router;

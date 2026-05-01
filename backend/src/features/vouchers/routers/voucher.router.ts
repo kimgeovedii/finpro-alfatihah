@@ -5,7 +5,7 @@ import { createVoucherSchema } from "../validations/voucher.schema";
 import { updateDiscountSchema } from "../../discounts/validations/discount.schema";
 
 export class VoucherRouter {
-  private router: Router;
+  public router: Router;
   private voucherController: VoucherController;
 
   constructor() {
@@ -29,7 +29,6 @@ export class VoucherRouter {
     this.router.delete("/:id", this.voucherController.deleteVoucher);
   }
 
-  public getRouter = (): Router => {
-    return this.router;
-  };
 }
+
+export default new VoucherRouter().router;

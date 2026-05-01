@@ -8,7 +8,7 @@ import {
 } from "../validations/branchInventory.schema";
 
 export class BranchInventoryRouter {
-  private router: Router;
+  public router: Router;
   private branchInventoryController: BranchInventoryController;
 
   constructor() {
@@ -41,7 +41,6 @@ export class BranchInventoryRouter {
     );
   }
 
-  public getRouter(): Router {
-    return this.router;
-  }
 }
+
+export default new BranchInventoryRouter().router;
