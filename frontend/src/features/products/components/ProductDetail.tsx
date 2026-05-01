@@ -1,70 +1,33 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+
 import { useProductDetail } from "@/features/products/hooks/useProductDetail";
 import { ProductDetailImageGallery } from "./ProductDetailImageGallery";
 import { ProductDetailInfoContent } from "./ProductDetailInfoContent";
 import { ProductDetailCartAction } from "./ProductDetailCartAction";
 import { ProductBreadcrumb } from "./ProductBreadCrumb";
 import { ProductBranchInfoCard } from "./ProductBranchInfo";
-import Swal from "sweetalert2";
-import { useCreateCart } from "../hooks/useCart";
-import { useDeleteCartItem } from "../hooks/useCartItem";
+import { useStoreSelection } from "../hooks/useStoreSelection";
+import { useProductActions } from "../hooks/useProductActions";
 
-export const ProductDetail = ({ slugName, storeName }: { slugName: string, storeName: string }) => {
-  const { product, isLoading, error, fetchProduct } = useProductDetail(slugName, storeName);
-  const [ qty, setQty ] = useState(1);
-  const [ currentCartQty, setCurrentCartQty ] = useState(0)
-  const { createCart, isCreating } = useCreateCart()
-  const { deleteCartItem, isDeletingItem } = useDeleteCartItem()
+export const ProductDetail = ({
+  slugName,
+  storeName: storeNameProp,
+}: {
+  slugName: string;
+  storeName?: string;
+}) => {
+  const { storeName } = useStoreSelection(storeNameProp);
+  const { product, isLoading, error, fetchProduct } = useProductDetail(
+    slugName,
+    storeName,
+  );
 
-  useEffect(() => {
-    setCurrentCartQty(product?.branchInventories?.[0]?.cartItems?.[0]?.quantity ?? 0)
-  }, [product])
-
-  // Handle action
-  const handleCreateCart = async (branchId: string, productId: string, qty: number) => {
-    const success = await createCart(branchId, productId, qty)
-
-    if (success) {
-      await Swal.fire({
-        title: "Product Added!",
-        text: "Item has been added to your cart.",
-        icon: "success",
-        confirmButtonColor: "#10b981",
-      })
-
-      setQty(1)
-      fetchProduct()
-    }
-  }
-
-  const handleRemoveCartItem = async (cartItemId: string, productName: string) => {
-    const confirm = await Swal.fire({
-      title: "Remove product?",
-      html: `<b>${productName}</b> will be remove from your cart.`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes, remove it",
-      cancelButtonText: "Cancel",
-      confirmButtonColor: "#ef4444",
-    })
-    if (!confirm.isConfirmed) return
-
-    const success = await deleteCartItem(cartItemId)
-    if (success) {
-      await Swal.fire({
-        title: "Item deleted",
-        html: `<b>${productName}</b> has been removed.`,
-        icon: "success",
-        confirmButtonColor: "#10b981",
-      })
-
-      setQty(1)
-      fetchProduct()
-    }
-  }
+  const { cartProps, isAvailable, branchInventory } = useProductActions(
+    product,
+    fetchProduct,
+  );
 
   if (isLoading) {
     return (
@@ -92,25 +55,6 @@ export const ProductDetail = ({ slugName, storeName }: { slugName: string, store
     );
   }
 
-  const cartProps = {
-    qty,
-    setQty,
-    price: product.basePrice,
-    totalPrice: product.basePrice * qty,
-    isCreating,
-    onAddToCart: () =>
-      handleCreateCart(
-        product.branchInventories[0].branchId,
-        product.id,
-        qty 
-      ),
-    currentCartQty,
-    onRemoveFromCart: () => handleRemoveCartItem(
-      product?.branchInventories?.[0]?.cartItems?.[0]?.id,
-      product.productName
-      )
-  };
-
   return (
     <AnimatePresence mode="wait">
       <motion.section
@@ -136,11 +80,24 @@ export const ProductDetail = ({ slugName, storeName }: { slugName: string, store
               price={product.basePrice}
             />
 
-            <ProductBranchInfoCard branch={{
-              storeName: product.branchInventories[0].branch.storeName,
-              address: product.branchInventories[0].branch.address,
-              schedules: product.branchInventories[0].branch.schedules
-            }}/>
+            {branchInventory ? (
+              <ProductBranchInfoCard
+                branch={{
+                  storeName: branchInventory.branch.storeName,
+                  address: branchInventory.branch.address,
+                  schedules: branchInventory.branch.schedules,
+                }}
+              />
+            ) : (
+              <div className="bg-orange-50 border border-orange-100 p-6 rounded-[2rem]">
+                <p className="text-orange-800 font-bold text-sm">
+                  Product not available in this area
+                </p>
+                <p className="text-orange-600 text-xs mt-1">
+                  Please select another location or try again later.
+                </p>
+              </div>
+            )}
 
             <ProductDetailCartAction {...cartProps} variant="mobile" />
           </div>
@@ -167,11 +124,24 @@ export const ProductDetail = ({ slugName, storeName }: { slugName: string, store
                 description={product.description}
                 price={product.basePrice}
               />
-              <ProductBranchInfoCard branch={{
-                storeName: product.branchInventories[0].branch.storeName,
-                address: product.branchInventories[0].branch.address,
-                schedules: product.branchInventories[0].branch.schedules
-              }}/>
+              {branchInventory ? (
+                <ProductBranchInfoCard
+                  branch={{
+                    storeName: branchInventory.branch.storeName,
+                    address: branchInventory.branch.address,
+                    schedules: branchInventory.branch.schedules,
+                  }}
+                />
+              ) : (
+                <div className="bg-orange-50 border border-orange-100 p-6 rounded-[2rem]">
+                  <p className="text-orange-800 font-bold text-sm">
+                    Product not available in this area
+                  </p>
+                  <p className="text-orange-600 text-xs mt-1">
+                    Please select another location or try again later.
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="relative">
