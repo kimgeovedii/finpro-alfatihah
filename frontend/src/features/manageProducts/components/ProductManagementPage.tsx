@@ -18,6 +18,9 @@ export const ProductManagementPage: React.FC = () => {
     categories,
     isLoading,
     searchQuery,
+    selectedCategory,
+    sortBy,
+    sortOrder,
     addDialogOpen,
     setAddDialogOpen,
     deleteDialogOpen,
@@ -30,6 +33,8 @@ export const ProductManagementPage: React.FC = () => {
     isDeleting,
     isUpdating,
     handleSearchChange,
+    handleCategoryChange,
+    handleSort,
     handlePageChange,
     handleAddClick,
     handleCreate,
@@ -37,7 +42,17 @@ export const ProductManagementPage: React.FC = () => {
     handleUpdate,
     handleDeleteClick,
     handleDeleteConfirm,
+    canManage,
+    userLoading,
   } = useManageProducts();
+
+  if (userLoading && !canManage) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#006666]"></div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -50,6 +65,10 @@ export const ProductManagementPage: React.FC = () => {
         searchQuery={searchQuery}
         onSearchChange={handleSearchChange}
         onAddClick={handleAddClick}
+        categories={categories}
+        selectedCategory={selectedCategory}
+        onCategoryChange={handleCategoryChange}
+        canManage={canManage}
       />
 
       <div className="hidden md:block">
@@ -58,6 +77,10 @@ export const ProductManagementPage: React.FC = () => {
           isLoading={isLoading}
           onEdit={handleEditClick}
           onDelete={handleDeleteClick}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
+          onSort={handleSort}
+          canManage={canManage}
         />
         <ProductTablePagination meta={meta} onPageChange={handlePageChange} />
       </div>
@@ -97,6 +120,7 @@ export const ProductManagementPage: React.FC = () => {
                 index={index}
                 onEdit={handleEditClick}
                 onDelete={handleDeleteClick}
+                canManage={canManage}
               />
             ))}
           </AnimatePresence>

@@ -16,16 +16,33 @@ export class ProductService {
     const skip = (page - 1) * limit;
     const take = limit;
 
-    const where: any = { ...filters };
+    const { sortBy = "createdAt", sortOrder = "desc", ...restFilters } = filters;
+    const orderDir = (sortOrder === "asc" || sortOrder === "desc") ? sortOrder : "desc";
+
+    const where: any = { ...restFilters };
     if (where.search) {
       where.productName = { contains: where.search, mode: "insensitive" };
       delete where.search;
+    }
+
+    if (where.minPrice || where.maxPrice) {
+      where.basePrice = {};
+      if (where.minPrice) {
+        where.basePrice.gte = parseFloat(where.minPrice);
+        delete where.minPrice;
+      }
+      if (where.maxPrice) {
+        where.basePrice.lte = parseFloat(where.maxPrice);
+        delete where.maxPrice;
+      }
     }
 
     const { data, total } = await this.productRepository.findAllProducts(
       where,
       skip,
       take,
+      sortBy,
+      orderDir,
     );
 
     return {

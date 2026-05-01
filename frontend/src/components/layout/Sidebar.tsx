@@ -12,6 +12,9 @@ import {
   CubeIcon,
   UsersIcon,
   ChevronRightIcon,
+  PercentBadgeIcon,
+  Square2StackIcon,
+  DocumentChartBarIcon,
 } from "@heroicons/react/24/outline";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/hooks/useSidebar";
@@ -38,6 +41,21 @@ const NAV_ITEMS = [
     icon: <UsersIcon className="w-5 h-5" />,
   },
   {
+    title: "Branches",
+    href: "/dashboard/branches",
+    icon: <GlobeAmericasIcon className="w-5 h-5 />,
+  },
+  {
+    title: "Discounts",
+    href: "/dashboard/discounts",
+    icon: <PercentBadgeIcon className="w-5 h-5 />,
+  },
+  {
+    title: "Stock",
+    href: "/dashboard/stock",
+    icon: <Square2StackIcon className="w-5 h-5 />,
+  },
+  {
     title: "Cart",
     href: "/cart",
     icon: <ShoppingCartIcon className="w-5 h-5" />,
@@ -56,6 +74,11 @@ const NAV_ITEMS = [
     title: "My Transaction",
     href: "/transaction",
     icon: <ArrowsRightLeftIcon className="w-5 h-5" />,
+  },
+  {
+    title: "Report & Analysis",
+    href: "/dashboard/report",
+    icon: <DocumentChartBarIcon className="w-5 h-5" />,
   },
   {
     title: "Tracking Document",

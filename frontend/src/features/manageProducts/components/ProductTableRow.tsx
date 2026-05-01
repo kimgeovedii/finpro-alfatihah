@@ -19,6 +19,7 @@ export const ProductTableRow: React.FC<ProductTableRowProps> = ({
   index,
   onEdit,
   onDelete,
+  canManage,
 }) => {
   const primaryImage = product.productImages?.[0];
 
@@ -76,28 +77,30 @@ export const ProductTableRow: React.FC<ProductTableRowProps> = ({
         {formatPrice(product.basePrice)}
       </td>
 
-      <td className="py-4 px-6 text-right">
-        <div className="flex items-center justify-end gap-2">
-          <motion.button
-            whileHover={{ scale: 1.12 }}
-            whileTap={{ scale: 0.92 }}
-            onClick={() => onEdit(product)}
-            className="p-1.5 text-slate-400 hover:text-[#006666] transition-colors rounded-md hover:bg-[#87eded]/20 cursor-pointer"
-            title="Edit product"
-          >
-            <PencilSquareIcon className="w-4 h-4" />
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.12 }}
-            whileTap={{ scale: 0.92 }}
-            onClick={() => onDelete(product)}
-            className="p-1.5 text-slate-400 hover:text-[#b31b25] transition-colors rounded-md hover:bg-red-50 cursor-pointer"
-            title="Delete product"
-          >
-            <TrashIcon className="w-4 h-4" />
-          </motion.button>
-        </div>
-      </td>
+      {canManage && (
+        <td className="py-4 px-6 text-right">
+          <div className="flex items-center justify-end gap-2">
+            <motion.button
+              whileHover={{ scale: 1.12 }}
+              whileTap={{ scale: 0.92 }}
+              onClick={() => onEdit(product)}
+              className="p-1.5 text-slate-400 hover:text-[#006666] transition-colors rounded-md hover:bg-[#87eded]/20 cursor-pointer"
+              title="Edit product"
+            >
+              <PencilSquareIcon className="w-4 h-4" />
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.12 }}
+              whileTap={{ scale: 0.92 }}
+              onClick={() => onDelete(product)}
+              className="p-1.5 text-slate-400 hover:text-[#b31b25] transition-colors rounded-md hover:bg-red-50 cursor-pointer"
+              title="Delete product"
+            >
+              <TrashIcon className="w-4 h-4" />
+            </motion.button>
+          </div>
+        </td>
+      )}
     </motion.tr>
   );
 };

@@ -2,7 +2,17 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 // Routes that do not require authentication
-const publicRoutes = ["/", "/login", "/register", "/verify-email", "/reset-password", "/confirm-reset-password", "/products", "/login/employee"];
+const publicRoutes = [
+  "/",
+  "/login",
+  "/register",
+  "/verify-email",
+  "/reset-password",
+  "/confirm-reset-password",
+  "/products",
+  "/search",
+  "/login/employee",
+];
 
 // Routes that require verification (must be verified to access)
 const verifiedOnlyRoutes = ["/profile", "/cart", "/transaction", "/checkout"];
@@ -29,13 +39,16 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const isPublicRoute = publicRoutes.some(route => 
-    pathname === route || pathname.startsWith(route + "/")
+  const isPublicRoute = publicRoutes.some(
+    (route) => pathname === route || pathname.startsWith(route + "/"),
   );
 
   // 1. If not logged in and trying to access protected route, redirect
   if (!isPublicRoute && !hasToken) {
-    if (pathname.startsWith("/dashboard") || pathname.startsWith("/manage-order")) {
+    if (
+      pathname.startsWith("/dashboard") ||
+      pathname.startsWith("/manage-order")
+    ) {
       return NextResponse.redirect(new URL("/login/employee", request.url));
     }
     const loginUrl = new URL("/login", request.url);
@@ -50,7 +63,11 @@ export function middleware(request: NextRequest) {
       const role = payload.role;
 
       // Prevent logged-in users from seeing auth pages
-      if ((pathname === "/login" || pathname === "/register" || pathname === "/login/employee")) {
+      if (
+        pathname === "/login" ||
+        pathname === "/register" ||
+        pathname === "/login/employee"
+      ) {
         if (role === "EMPLOYEE") {
           return NextResponse.redirect(new URL("/dashboard", request.url));
         }
@@ -58,21 +75,29 @@ export function middleware(request: NextRequest) {
       }
 
       // Customer trying to access employee routes
-      if (role === "CUSTOMER" && employeeOnlyRoutes.some(route => pathname.startsWith(route))) {
+      if (
+        role === "CUSTOMER" &&
+        employeeOnlyRoutes.some((route) => pathname.startsWith(route))
+      ) {
         return NextResponse.redirect(new URL("/unauthorized", request.url));
       }
 
       // Employee trying to access customer routes
-      const isCustomerRoute = 
-        pathname === "/" || 
-        ["/products", "/cart", "/checkout", "/transaction", "/profile"].some(route => pathname.startsWith(route));
+      const isCustomerRoute =
+        pathname === "/" ||
+        ["/products", "/cart", "/checkout", "/transaction", "/profile"].some(
+          (route) => pathname.startsWith(route),
+        );
 
       if (role === "EMPLOYEE" && isCustomerRoute) {
         return NextResponse.redirect(new URL("/unauthorized", request.url));
       }
 
       // 3. If logged in but accessing verified-only route while unverified (for Customers)
-      if (role === "CUSTOMER" && verifiedOnlyRoutes.some(route => pathname.startsWith(route))) {
+      if (
+        role === "CUSTOMER" &&
+        verifiedOnlyRoutes.some((route) => pathname.startsWith(route))
+      ) {
         if (!payload.emailVerifiedAt) {
           const homeUrl = new URL("/", request.url);
           homeUrl.searchParams.set("unverified", "true");
@@ -88,7 +113,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/((?!api|_next/static|_next/image|assets|favicon.ico).*)",
-  ],
+  matcher: ["/((?!api|_next/static|_next/image|assets|favicon.ico).*)"],
 };

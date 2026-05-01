@@ -70,7 +70,9 @@ export const ProductDetail = ({ slugName, storeName }: { slugName: string, store
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
         <div className="w-12 h-12 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-emerald-800 font-medium animate-pulse">Loading product...</p>
+        <p className="text-emerald-800 font-medium animate-pulse">
+          Loading product...
+        </p>
       </div>
     );
   }
@@ -79,8 +81,12 @@ export const ProductDetail = ({ slugName, storeName }: { slugName: string, store
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="rounded-[2rem] bg-white p-8 text-center shadow-[0_30px_60px_rgba(15,23,42,0.08)]">
-          <p className="text-base font-semibold text-slate-700">Unable to load product.</p>
-          <p className="mt-2 text-sm text-slate-500">{error ?? "Please try again later."}</p>
+          <p className="text-base font-semibold text-slate-700">
+            Unable to load product.
+          </p>
+          <p className="mt-2 text-sm text-slate-500">
+            {error ?? "Please try again later."}
+          </p>
         </div>
       </div>
     );
@@ -114,7 +120,7 @@ export const ProductDetail = ({ slugName, storeName }: { slugName: string, store
         className="w-full bg-slate-50 min-h-screen text-slate-900"
       >
         {/* Mobile Layout */}
-        <div className="lg:hidden flex flex-col pb-32">
+        <div className="lg:hidden flex flex-col pb-12 p-4">
           <div className="w-full overflow-hidden">
             <ProductDetailImageGallery
               productImages={product.productImages}
@@ -122,7 +128,7 @@ export const ProductDetail = ({ slugName, storeName }: { slugName: string, store
             />
           </div>
 
-          <div className="px-5 pt-6 pb-6 flex flex-col gap-6">
+          <div className="px-0 pt-6 pb-6 flex flex-col gap-6">
             <ProductDetailInfoContent
               productName={product.productName}
               categoryName={product.category.name}
@@ -168,7 +174,7 @@ export const ProductDetail = ({ slugName, storeName }: { slugName: string, store
               }}/>
             </div>
 
-            <div className="sticky top-24">
+            <div className="relative">
               <ProductDetailCartAction {...cartProps} variant="desktop" />
             </div>
           </div>

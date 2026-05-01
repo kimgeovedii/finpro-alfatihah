@@ -1,4 +1,12 @@
-// ── API / Data Models ──
+import { User } from "@/features/auth/types";
+
+export type EmployeeRole = "STORE_ADMIN" | "SUPER_ADMIN";
+
+export interface AuthenticatedUser extends User {
+  employee?: {
+    role: EmployeeRole;
+  };
+}
 
 export type ProductImage = {
   id: string;
@@ -44,15 +52,16 @@ export type CreateProductPayload = {
   images?: File[] | null;
 };
 
-
 export type UpdateProductPayload = Partial<CreateProductPayload>;
-
-// ── Component Props ──
 
 export type ProductHeaderProps = {
   searchQuery: string;
   onSearchChange: (value: string) => void;
   onAddClick: () => void;
+  categories: ProductCategory[];
+  selectedCategory: string;
+  onCategoryChange: (value: string) => void;
+  canManage?: boolean;
 };
 
 export type ProductTableProps = {
@@ -60,6 +69,10 @@ export type ProductTableProps = {
   isLoading: boolean;
   onEdit: (product: ManageProduct) => void;
   onDelete: (product: ManageProduct) => void;
+  sortBy: string;
+  sortOrder: "asc" | "desc";
+  onSort: (field: string) => void;
+  canManage?: boolean;
 };
 
 export type ProductTableRowProps = {
@@ -67,6 +80,7 @@ export type ProductTableRowProps = {
   index: number;
   onEdit: (product: ManageProduct) => void;
   onDelete: (product: ManageProduct) => void;
+  canManage?: boolean;
 };
 
 export type ProductTablePaginationProps = {
@@ -104,4 +118,5 @@ export type MobileProductCardProps = {
   index: number;
   onEdit: (product: ManageProduct) => void;
   onDelete: (product: ManageProduct) => void;
+  canManage?: boolean;
 };
