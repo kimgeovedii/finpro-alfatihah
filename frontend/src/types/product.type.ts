@@ -38,6 +38,9 @@ export type ProductOrderCartItem = {
     basePrice: number
     totalPrice: number
     productDiscounts: ProductDiscounts[]
+    discountAmount: number
+    finalTotalPrice: number
+    finalPricePerItem: number
 }
 
 export type ProductCategory = {

@@ -48,6 +48,9 @@ export type CartDetailProduct = {
     category: CartDetailCategory
     productDiscounts: ProductDiscounts[]
     productImages: ProductImage[]
+    discountAmount: number
+    finalTotalPrice: number
+    finalPricePerItem: number
 }
 
 export type CartDetailItem = {
@@ -83,6 +86,8 @@ export type CartData = {
     totalBasePrice: number
     totalWeight: number
     totalQty: number
+    totalDiscountProduct: number
+    finalProductPrice: number
     shipping: CartDetailShipping | null
     openStatus: string
 }

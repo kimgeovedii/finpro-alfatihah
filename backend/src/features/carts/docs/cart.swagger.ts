@@ -492,11 +492,12 @@
  *                                   category:
  *                                     type: object
  *                                     properties:
- *                                       id: { type: string, format: uuid }
  *                                       name: { type: string, example: Canned Goods }
  *                                       slugName: { type: string, example: canned-goods }
- *                                       description: { type: string, example: Canned goods for long-term storage }
  *                                   basePrice: { type: number, example: 16023 }
+ *                                   discountAmount: { type: number, example: 88439 }
+ *                                   finalTotalPrice: { type: number, example: 861393 }
+ *                                   finalPricePerItem: { type: number, example: 66261 }
  *                                   weight: { type: number, example: 1200 }
  *                                   productImages:
  *                                     type: array

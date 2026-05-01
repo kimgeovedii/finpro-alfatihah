@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "../../../config/prisma";
+import { calculateDiscount } from "../../../utils/business";
 
 export class CartRepository {
   async getCartSummary(userId: string, branchId: string | null) {
@@ -51,14 +52,12 @@ export class CartRepository {
               select: {
                 currentStock: true, product: {
                   select: {
-                    productName: true, basePrice: true, weight: true, slugName: true, 
-                    productDiscounts: {
+                    productName: true, basePrice: true, weight: true, slugName: true, productDiscounts: {
                       take: 1,
                       select: {
                         discount: {
                           select: {
-                            discountType: true, discountValue: true, discountValueType: true, maxDiscountAmount: true, 
-                            minPurchaseAmount: true, startDate: true, endDate: true,
+                            discountType: true, discountValue: true, discountValueType: true, maxDiscountAmount: true, minPurchaseAmount: true, startDate: true, endDate: true,
                           }
                         }
                       }
@@ -90,23 +89,47 @@ export class CartRepository {
         }
       }
     })
-
+  
     if (!cart) return null
+  
+    // Map items with discount
+    const items = cart.items.map(item => {
+      const product = item.product.product
+      const discount = product.productDiscounts?.[0]?.discount
+      const totalPrice = product.basePrice * item.quantity
 
-    // Count summary for total price & qty
-    const { totalBasePrice, totalQty, totalWeight } = cart.items.reduce((acc, item) => {
-      const price = item.product.product.basePrice || 0
-      const weight = item.product.product.weight || 0
-      const qty = item.quantity || 0
-
-      acc.totalBasePrice += price * qty
-      acc.totalWeight += weight * qty
-      acc.totalQty += qty
-      
+      const discountAmount = discount
+        ? calculateDiscount(
+            discount.discountType, discount.discountValueType, discount.discountValue, item.quantity, product.basePrice, discount.minPurchaseAmount, discount.maxDiscountAmount
+          )
+        : 0
+  
+      const finalTotalPrice = Math.max(0, totalPrice - discountAmount)
+      const discountPerItem = item.quantity > 0 ? Math.floor(discountAmount / item.quantity) : 0
+      const finalPricePerItem = Math.max(0, product.basePrice - discountPerItem)
+  
+      return {
+        ...item, product: {
+          ...item.product, product: {
+            ...product, discountAmount, finalTotalPrice, finalPricePerItem
+          }
+        }
+      }
+    })
+  
+    // Count summary
+    const { totalBasePrice, totalQty, totalWeight, totalDiscountProduct } = items.reduce((acc, item) => {
+      const product = item.product.product
+  
+      acc.totalBasePrice += product.basePrice * item.quantity
+      acc.totalWeight += product.weight * item.quantity
+      acc.totalQty += item.quantity
+      acc.totalDiscountProduct += product.discountAmount || 0
+  
       return acc
-    }, { totalBasePrice: 0, totalQty: 0, totalWeight: 0 })
-
-    return { ...cart, totalBasePrice, totalQty, totalWeight }
+    }, { totalBasePrice: 0, totalQty: 0, totalWeight: 0, totalDiscountProduct: 0 })
+  
+    return { ...cart, items, totalBasePrice, totalQty, totalWeight, totalDiscountProduct }
   }
 
   async findAllCarts(page: number, limit: number, userId: string, branchId: string | null) {

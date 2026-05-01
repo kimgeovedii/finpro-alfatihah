@@ -263,7 +263,10 @@ export default function CartDetailPage() {
                   currentStock: dt.product.currentStock,
                   weight: dt.product.product.weight * dt.quantity,
                   basePrice: dt.product.product.basePrice,
-                  totalPrice: dt.product.product.basePrice * dt.quantity
+                  totalPrice: dt.product.product.basePrice * dt.quantity,
+                  discountAmount: dt.product.product.discountAmount,
+                  finalTotalPrice: dt.product.product.finalTotalPrice,
+                  finalPricePerItem: dt.product.product.finalPricePerItem
                 }))
               }
               onIncrease={handleIncrease}
