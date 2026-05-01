@@ -71,7 +71,7 @@ export const ProductManagementPage: React.FC = () => {
         canManage={canManage}
       />
 
-      <div className="hidden md:block">
+      <div className="hidden md:block shadow-[0_4px_30px_rgba(0,0,0,0.02)] rounded-3xl bg-white overflow-hidden">
         <ProductTable
           products={products}
           isLoading={isLoading}
@@ -85,7 +85,7 @@ export const ProductManagementPage: React.FC = () => {
         <ProductTablePagination meta={meta} onPageChange={handlePageChange} />
       </div>
 
-      <div className="md:hidden space-y-3">
+      <div className="md:hidden space-y-4">
         {isLoading ? (
           [...Array(4)].map((_, i) => (
             <div

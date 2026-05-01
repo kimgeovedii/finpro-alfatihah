@@ -33,9 +33,9 @@ export const ProductTable: React.FC<ProductTableProps> = ({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.1 }}
-      className="bg-white rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden"
+      className="w-full overflow-x-auto"
     >
-      <div className="overflow-x-auto">
+      <div className="min-w-[800px]">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-[#eff1f2] text-[#595c5d] text-xs uppercase tracking-wider">
