@@ -16,6 +16,7 @@ export type ProductImage = {
 export type ProductCategory = {
   id: string;
   name: string;
+  deletedAt?: string | null;
 };
 
 export type ManageProduct = {

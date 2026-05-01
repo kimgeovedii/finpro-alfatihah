@@ -15,12 +15,20 @@ export class ProductCategoryController {
     next: NextFunction,
   ) => {
     try {
-      const { page = 1, limit = 10, ...filters } = req.query;
+      const {
+        page = 1,
+        limit = 10,
+        sortBy = "name",
+        sortOrder = "asc",
+        ...filters
+      } = req.query;
       const { data, meta } =
         await this.productCategoryService.findAllCategories(
           filters,
           Number(page),
           Number(limit),
+          sortBy as string,
+          sortOrder as "asc" | "desc",
         );
 
       sendSuccess(res, { data, meta }, "Get all categories successfully");
