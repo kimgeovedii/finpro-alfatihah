@@ -53,7 +53,9 @@ export type CreateProductPayload = {
   images?: File[] | null;
 };
 
-export type UpdateProductPayload = Partial<CreateProductPayload>;
+export type UpdateProductPayload = Partial<CreateProductPayload> & {
+  existingImageIds?: string[] | null;
+};
 
 export type ProductHeaderProps = {
   searchQuery: string;

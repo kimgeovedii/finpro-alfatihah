@@ -4,7 +4,6 @@ import {
   CreateProductPayload,
   UpdateProductPayload,
   ManageProduct,
-  ProductCategory,
 } from "@/features/manageProducts/types/manageProduct.type";
 
 export class ManageProductRepository {
@@ -54,11 +53,11 @@ export class ManageProductRepository {
     id: string,
     payload: UpdateProductPayload,
   ): Promise<ManageProduct> => {
-    if (
-      payload.images &&
-      Array.isArray(payload.images) &&
-      payload.images.length > 0
-    ) {
+    const shouldUseFormData =
+      (payload.images && Array.isArray(payload.images) && payload.images.length > 0) ||
+      (payload.existingImageIds && Array.isArray(payload.existingImageIds));
+
+    if (shouldUseFormData) {
       const formData = new FormData();
 
       Object.entries(payload).forEach(([key, value]) => {
@@ -66,6 +65,12 @@ export class ManageProductRepository {
           if (payload.images && Array.isArray(payload.images)) {
             payload.images.forEach((file) => {
               formData.append("images", file);
+            });
+          }
+        } else if (key === "existingImageIds") {
+          if (payload.existingImageIds && Array.isArray(payload.existingImageIds)) {
+            payload.existingImageIds.forEach((id) => {
+              formData.append("existingImageIds", id);
             });
           }
         } else if (value !== undefined && value !== null) {

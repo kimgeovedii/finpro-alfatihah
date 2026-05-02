@@ -67,7 +67,6 @@ export class ProductService {
   public createProduct = async (data: any, files?: Express.Multer.File[]) => {
     const payload = { ...data };
 
-    // Handle file uploads if files are provided
     if (files && Array.isArray(files) && files.length > 0) {
       const imageUrls: string[] = [];
       for (const file of files) {
@@ -90,8 +89,9 @@ export class ProductService {
     files?: Express.Multer.File[],
   ) => {
     const payload = { ...data };
+    const existingImageIds = this.parseExistingImageIds(payload.existingImageIds);
+    delete payload.existingImageIds;
 
-    // Handle file uploads if files are provided
     if (files && Array.isArray(files) && files.length > 0) {
       const imageUrls: string[] = [];
       for (const file of files) {
@@ -105,9 +105,19 @@ export class ProductService {
       payload.imageUrls = imageUrls;
     }
 
-    return await this.productRepository.updateProduct(id, payload);
+    return await this.productRepository.updateProduct(
+      id,
+      payload,
+      existingImageIds,
+    );
   };
 
+  private parseExistingImageIds = (data: any): string[] => {
+    if (!data) return [];
+    if (Array.isArray(data)) return data.filter((id) => typeof id === "string");
+    if (typeof data === "string") return data.split(",").map((id) => id.trim()).filter(Boolean);
+    return [];
+  };
   public deleteProduct = async (id: string) => {
     return await this.productRepository.deleteProduct(id);
   };

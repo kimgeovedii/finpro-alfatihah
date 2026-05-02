@@ -48,6 +48,7 @@ export const EditProductDialog: React.FC<EditProductDialogProps> = ({
       sku: "",
       weight: 0,
       images: null as File[] | null,
+      existingImageIds: [] as string[],
     },
     validationSchema: editProductValidationSchema,
     onSubmit: async (values) => {
@@ -61,6 +62,7 @@ export const EditProductDialog: React.FC<EditProductDialogProps> = ({
 
   useEffect(() => {
     if (open && product) {
+      const currentImageIds = product.productImages.map((img) => img.id);
       formik.setValues({
         productName: product.productName || "",
         slugName: product.slugName || "",
@@ -70,6 +72,7 @@ export const EditProductDialog: React.FC<EditProductDialogProps> = ({
         sku: product.sku || product.slugName || "",
         weight: (product as any).weight || 0,
         images: null,
+        existingImageIds: currentImageIds,
       });
 
       // Set existing images
@@ -80,7 +83,7 @@ export const EditProductDialog: React.FC<EditProductDialogProps> = ({
           id: img.id,
         }));
         setImagePreviews(existingPreviews);
-        setExistingImageIds(product.productImages.map((img) => img.id));
+        setExistingImageIds(currentImageIds);
       } else {
         setImagePreviews([]);
         setExistingImageIds([]);
@@ -130,9 +133,9 @@ export const EditProductDialog: React.FC<EditProductDialogProps> = ({
     setImagePreviews(updatedPreviews);
 
     if (imageToRemove.isExisting && imageToRemove.id) {
-      setExistingImageIds(
-        existingImageIds.filter((id) => id !== imageToRemove.id),
-      );
+      const updatedIds = existingImageIds.filter((id) => id !== imageToRemove.id);
+      setExistingImageIds(updatedIds);
+      formik.setFieldValue("existingImageIds", updatedIds);
     }
 
     const fileArray = updatedPreviews
