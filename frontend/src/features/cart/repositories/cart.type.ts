@@ -32,12 +32,8 @@ export type CartResponse = {
 
 // Cart Detail
 export type CartDetailCategory = {
-    id: string
     name: string
     slugName: string
-    description: string
-    createdAt: string
-    updatedAt: string
 }
 
 export type CartDetailProduct = {
@@ -87,7 +83,7 @@ export type CartData = {
     totalWeight: number
     totalQty: number
     totalDiscountProduct: number
-    finalProductPrice: number
+    finalTotalPrice: number
     shipping: CartDetailShipping | null
     openStatus: string
 }

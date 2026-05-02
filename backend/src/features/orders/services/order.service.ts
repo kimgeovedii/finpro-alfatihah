@@ -16,6 +16,7 @@ import { EmployeeRepository } from "../repositories/employee.repository"
 import { snap } from "../../../config/midtrans"
 import { VoucherUsedRepository } from "../repositories/voucher_used.repository"
 import { VoucherRepository } from "../repositories/voucher.repository"
+import { calculateDiscount } from "../../../utils/business"
 
 export class OrderService {
     private orderRepo = new OrderRepository()
@@ -86,16 +87,31 @@ export class OrderService {
         ])
 
         // Total weight (g)
-        const totalWeight = cart.items.reduce((sum, dt) => sum + dt.product.product.weight, 0)
+        const totalWeight = cart.items.reduce((sum, dt) => sum + (dt.product.product.weight * dt.quantity), 0)
     
         // Helper : get shipping cost from Raja Ongkir + Opencage
         const shippingCost = await getShippingCost(originId, destinationId, totalWeight)
 
         // Calculate total price from cart items
-        const totalPrice = cart.items.reduce((sum, item) => {
+        const { totalBasePrice, totalDiscountProduct, finalTotalPrice } = cart.items.reduce((acc, item) => {
             const basePrice = item.product.product.basePrice
-            return sum + (basePrice * item.quantity)
-        }, 0)
+            const quantity = item.quantity
+            const discount = item.product.product.productDiscounts?.[0]?.discount
+            const itemTotal = basePrice * quantity
+            const discountAmount = discount
+                ? calculateDiscount(discount.discountType, discount.discountValueType, discount.discountValue, quantity, basePrice, discount.minPurchaseAmount, discount.maxDiscountAmount)
+                : 0
+    
+            acc.totalBasePrice += itemTotal
+            acc.totalDiscountProduct += discountAmount
+            acc.finalTotalPrice += Math.max(0, itemTotal - discountAmount)
+    
+            return acc
+        }, {
+            totalBasePrice: 0,
+            totalDiscountProduct: 0,
+            finalTotalPrice: 0
+        })
 
         // Repo : get voucher by id
         let voucher = null
@@ -113,26 +129,24 @@ export class OrderService {
         let discountAmount = 0
         if (voucher) {
             // Must apply with minimum purchase
-            if (voucher.minPurchaseAmount && totalPrice < voucher.minPurchaseAmount) throw { code: 422, message: "Minimum purchase not reached for voucher" }
-
+            if (voucher.minPurchaseAmount && finalTotalPrice < voucher.minPurchaseAmount) throw { code: 422, message: "Minimum purchase not reached for voucher" }
             // Count discount based on type
-            discountAmount = voucher.discountValueType === "PERCENTAGE" ? ((totalPrice * voucher.discountValue) / 100) : voucher.discountValue
+            discountAmount = voucher.discountValueType === "PERCENTAGE" ? ((finalTotalPrice * voucher.discountValue) / 100) : voucher.discountValue
 
             // If discount more than max amount, just take the max
             if (discountAmount > voucher.maxDiscountAmount) discountAmount = voucher.maxDiscountAmount
         }
 
         // Apply voucher
-        let finalPrice = totalPrice
+        let finalPrice = finalTotalPrice
         let finalShippingCost = shippingCost
         if (voucher) {
-            if (voucher.type === "ORDER") finalPrice = totalPrice - discountAmount
+            if (voucher.type === "ORDER") finalPrice = finalTotalPrice - discountAmount
             if (voucher.type === "SHIPPING_COST") finalShippingCost = Math.max(0, shippingCost - discountAmount)
         }
 
         // Repo : create order
-        const order = await this.orderRepo.createOrder(userId, cart.branchId, addressId, totalPrice, finalPrice, shippingCost, cart.items)
-
+        const order = await this.orderRepo.createOrder(userId, cart.branchId, addressId, totalBasePrice, finalPrice, shippingCost, cart.items)
         if (voucher && voucherId) {
             // Repo : reduce quota of the voucher
             await this.voucherRepo.decrementQuota(voucherId)

@@ -1,9 +1,7 @@
 import { DividerLine } from "@/components/layout/DividerLine"
-import { InfoBoxShippingWeightToolTip } from "@/components/layout/InfoBoxShippingWeightToolTip"
 import { ShippingSummaryCard } from "@/components/layout/ShippingSummaryCard"
 import { Button } from "@/components/ui/button"
 import { currencyFormat } from "@/constants/business.const"
-import { InformationCircleIcon } from "@heroicons/react/24/outline"
 import { ArrowRight } from "lucide-react"
 import React from "react"
 

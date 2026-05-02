@@ -73,14 +73,15 @@ export default function CartDetailPage() {
 
   // Calculate price
   const shippingCost = cart.shipping?.shippingCost ?? 0
-  const totalBasePrice = cart.totalBasePrice
+  const finalTotalPrice = cart.finalTotalPrice
+  
   const voucherDiscount = (() => {
     if (!selectedVoucher) return 0
   
     // min purchase validation
     if (
       selectedVoucher.minPurchaseAmount &&
-      totalBasePrice < selectedVoucher.minPurchaseAmount
+      finalTotalPrice < selectedVoucher.minPurchaseAmount
     ) {
       return 0
     }
@@ -88,7 +89,7 @@ export default function CartDetailPage() {
     let discount = 0
     if (selectedVoucher.discountValueType === "PERCENTAGE") {
       const percentage = Math.min(Math.max(selectedVoucher.discountValue, 0), 100)
-      discount = (totalBasePrice * percentage) / 100
+      discount = (finalTotalPrice * percentage) / 100
     } else {
       discount = Math.max(selectedVoucher.discountValue, 0)
     }
@@ -96,13 +97,13 @@ export default function CartDetailPage() {
     // max discount cap
     if (selectedVoucher.maxDiscountAmount) discount = Math.min(discount, selectedVoucher.maxDiscountAmount)
   
-    return discount
+    return Math.ceil(discount)
   })()
 
-  let finalProductPrice = totalBasePrice
+  let finalProductPrice = finalTotalPrice
   let finalShipping = shippingCost
   if (selectedVoucher) {
-    if (selectedVoucher.type === "ORDER") finalProductPrice = totalBasePrice - voucherDiscount
+    if (selectedVoucher.type === "ORDER") finalProductPrice = finalTotalPrice - voucherDiscount
     if (selectedVoucher.type === "SHIPPING_COST") finalShipping = Math.max(0, shippingCost - voucherDiscount)
   }
 
@@ -243,7 +244,7 @@ export default function CartDetailPage() {
             appliedVoucher={selectedVoucher?.voucherCode}
             onApply={handleApply}
             onRemove={handleRemove}
-            totalBasePrice={totalBasePrice}
+            totalBasePrice={finalTotalPrice}
           />
         </div>
         <div className='w-full lg:flex-1 flex flex-col space-y-5'>
@@ -278,8 +279,8 @@ export default function CartDetailPage() {
             totalItem={cart.totalQty}
             shippingWeight={cart.totalWeight}
             shippingCost={shippingCost}
-            totalPrice={totalBasePrice}
-            totalDiscountProduct={0}
+            totalPrice={cart.totalBasePrice}
+            totalDiscountProduct={cart.totalDiscountProduct}
             totalDiscountVoucher={voucherDiscount}
             finalPrice={finalPrice}
             onCheckout={handleCheckout}

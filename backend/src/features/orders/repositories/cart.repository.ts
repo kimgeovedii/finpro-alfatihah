@@ -12,7 +12,16 @@ export class CartRepository {
                             select: {
                                 id: true, product: {              
                                     select: {
-                                        basePrice: true, weight: true
+                                        basePrice: true, weight: true, productDiscounts: {
+                                            take: 1,
+                                            select: {
+                                                discount: {
+                                                    select: {
+                                                        discountType: true, discountValue: true, discountValueType: true, maxDiscountAmount: true, minPurchaseAmount: true, startDate: true, endDate: true,
+                                                    }
+                                                }
+                                            }
+                                        },
                                     }
                                 }
                             }

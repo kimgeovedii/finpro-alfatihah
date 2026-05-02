@@ -48,7 +48,7 @@ export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, t
             <DividerLine/>
             <div className="flex justify-between">
                 <h6 className="font-bold">Final Price</h6>
-                <h4 className="font-bold text-xl">Rp. {(finalPrice + shippingCost).toLocaleString(currencyFormat)}</h4>
+                <h4 className="font-bold text-xl">Rp. {Math.ceil(finalPrice + shippingCost).toLocaleString(currencyFormat)}</h4>
             </div>
             <DividerLine/>
             <div className="flex flex-col gap-3">

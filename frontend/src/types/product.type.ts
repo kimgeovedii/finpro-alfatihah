@@ -15,7 +15,7 @@ export type CartItemDiscount = {
     discountType: DiscountType
     discountValueType: DiscountValueType
     discountValue: number 
-    maxDiscountAmount: number
+    maxDiscountAmount?: number
     minPurchaseAmount?: number
     startDate: string 
     endDate: string

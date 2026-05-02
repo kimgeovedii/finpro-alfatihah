@@ -46,9 +46,7 @@ export class CartRepository {
             }
           },
           select: {
-            id: true,
-            quantity: true,
-            product: {
+            id: true, quantity: true, product: {
               select: {
                 currentStock: true, product: {
                   select: {
@@ -118,18 +116,19 @@ export class CartRepository {
     })
   
     // Count summary
-    const { totalBasePrice, totalQty, totalWeight, totalDiscountProduct } = items.reduce((acc, item) => {
+    const { totalBasePrice, totalQty, totalWeight, totalDiscountProduct, finalTotalPrice } = items.reduce((acc, item) => {
       const product = item.product.product
   
       acc.totalBasePrice += product.basePrice * item.quantity
       acc.totalWeight += product.weight * item.quantity
       acc.totalQty += item.quantity
       acc.totalDiscountProduct += product.discountAmount || 0
+      acc.finalTotalPrice += product.finalTotalPrice || 0
   
       return acc
-    }, { totalBasePrice: 0, totalQty: 0, totalWeight: 0, totalDiscountProduct: 0 })
+    }, { totalBasePrice: 0, totalQty: 0, totalWeight: 0, totalDiscountProduct: 0, finalTotalPrice: 0 })
   
-    return { ...cart, items, totalBasePrice, totalQty, totalWeight, totalDiscountProduct }
+    return { ...cart, items, totalBasePrice, totalQty, totalWeight, totalDiscountProduct, finalTotalPrice }
   }
 
   async findAllCarts(page: number, limit: number, userId: string, branchId: string | null) {
