@@ -9,7 +9,7 @@ export class DiscountRepository {
     sortBy: string = "createdAt",
     sortOrder: "asc" | "desc" = "desc",
   ) => {
-    let finalFilters = { ...filters };
+    let finalFilters = { ...filters, deletedAt: null };
 
     if (finalFilters.status) {
       const statusFilter = getDiscountStatusFilter(finalFilters.status);
@@ -51,8 +51,8 @@ export class DiscountRepository {
   };
 
   public getDiscountById = async (id: string) => {
-    return prisma.discounts.findUnique({
-      where: { id },
+    return prisma.discounts.findFirst({
+      where: { id, deletedAt: null },
     });
   };
 
@@ -104,8 +104,9 @@ export class DiscountRepository {
   };
 
   public deleteDiscount = async (id: string) => {
-    return prisma.discounts.delete({
+    return prisma.discounts.update({
       where: { id },
+      data: { deletedAt: new Date() },
     });
   };
 }
