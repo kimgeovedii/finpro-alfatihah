@@ -157,10 +157,9 @@ export default function TransactionDetailPage() {
                         slugName: dt.product.product.slugName,
                         weight: dt.product.product.weight * dt.quantity,
                         productName: dt.product.product.productName,
-                        description: dt.product.product.description,
                         category: dt.product.product.category,
                         quantity: dt.quantity,
-                        basePrice: dt.product.product.basePrice,
+                        basePrice: dt.price,
                         totalPrice: dt.product.product.basePrice * dt.quantity,
                         productImages: dt.product.product.productImages
                       })) ?? []}

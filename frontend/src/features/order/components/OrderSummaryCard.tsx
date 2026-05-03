@@ -29,18 +29,18 @@ export const OrderSummaryCard: React.FC<Props> = ({ totalPrice, totalFinalPrice,
     return (
         <>
             <p className="text-slate-500 mt-1 mb-4">{summaryText}</p>
-            <div className="flex items-center gap-5 w-full">
+            <div className="flex flex-col md:flex-row items-center gap-5 w-full">
                 <div className="w-full bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300 group cursor-default">
                     <StatsTitleValueText title="Total Spending" val={<>Rp. {totalPrice.toLocaleString(currencyFormat)}</>}/>
                 </div>
                 <div className="w-full bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300 group cursor-default">
-                    <div className="flex gap-5">
+                    <div className="flex gap-5 items-end justify-between">
                         <div>
                             <StatsTitleValueText title="Total Saving" val={<>Rp. {totalSaving.toLocaleString(currencyFormat)}</>}/>
                         </div>
                         {
                             savingPercentage > 0 &&
-                                <div className="mt-4 flex items-center text-sm font-medium text-emerald-600 bg-emerald-50 w-fit px-3 rounded-lg">
+                                <div className="flex items-center text-sm font-medium text-emerald-600 bg-emerald-50 w-fit p-2 rounded-lg">
                                     <ArrowTrendingUpIcon className="w-5 h-5 me-1"/> <span>+{savingPercentage.toFixed(2)}%</span>
                                 </div>
                         }

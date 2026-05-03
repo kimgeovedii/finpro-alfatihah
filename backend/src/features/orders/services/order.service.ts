@@ -17,6 +17,7 @@ import { snap } from "../../../config/midtrans"
 import { VoucherUsedRepository } from "../repositories/voucher_used.repository"
 import { VoucherRepository } from "../repositories/voucher.repository"
 import { calculateDiscount } from "../../../utils/business"
+import { ProductDiscountRepository } from "../repositories/product_discount.repository"
 
 export class OrderService {
     private orderRepo = new OrderRepository()
@@ -30,6 +31,7 @@ export class OrderService {
     private voucherRepo = new VoucherRepository()
     private voucherUsedRepo = new VoucherUsedRepository()
     private employeeRepo = new EmployeeRepository()
+    private productDiscountRepo = new ProductDiscountRepository()
 
     async getAllOrders(page: number, limit: number, userId: string, branchId: string | null, orderNumber: string | null, dateStart: string | null, dateEnd: string | null) {
         return await this.orderRepo.findAllOrders(page, limit, userId, branchId, orderNumber, dateStart, dateEnd)
@@ -107,15 +109,11 @@ export class OrderService {
             acc.finalTotalPrice += Math.max(0, itemTotal - discountAmount)
     
             return acc
-        }, {
-            totalBasePrice: 0,
-            totalDiscountProduct: 0,
-            finalTotalPrice: 0
-        })
+        }, { totalBasePrice: 0, totalDiscountProduct: 0, finalTotalPrice: 0 })
 
-        // Repo : get voucher by id
         let voucher = null
         if (voucherId) {
+            // Repo : get voucher by id
             voucher = await this.voucherRepo.findById(voucherId)
             if (!voucher) throw { code: 404, message: "Voucher not found" }
 
@@ -192,8 +190,10 @@ export class OrderService {
 
         await Promise.all(
             cart.items.map(async (dt) => {
+                const branchInventoryId: string = dt.product.id
+                
                 // Repo : get branch inventory by id
-                const branchInventory = await this.branchInventoryRepo.findById(dt.product.id)
+                const branchInventory = await this.branchInventoryRepo.findById(branchInventoryId)
                 if (!branchInventory) throw { code: 404, message: `Inventory not found` }
         
                 const stockBefore: number = branchInventory.currentStock
@@ -201,11 +201,14 @@ export class OrderService {
                 const quantityChange: number = dt.quantity
         
                 // Repo : update product qty
-                await this.branchInventoryRepo.decrementStock(dt.product.id, dt.quantity)
+                await this.branchInventoryRepo.decrementStock(branchInventoryId, dt.quantity)
+
+                // Repo : update discount quota
+                await this.productDiscountRepo.updateDiscountQuota(branchInventory.productId, dt.quantity)
         
                 // Repo : create stock journal 
                 await this.stockJournalRepo.createStockJournal(
-                    branchInventory.productId, dt.product.id, 'OUT', quantityChange, stockBefore, stockAfter, 'ORDER', order.id, orderMessageToBranch
+                    branchInventory.productId, branchInventoryId, 'OUT', quantityChange, stockBefore, stockAfter, 'ORDER', order.id, orderMessageToBranch
                 )
             })
         )

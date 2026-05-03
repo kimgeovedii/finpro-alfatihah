@@ -70,7 +70,7 @@ export const ProductOrderCartItemCard: React.FC<ProductOrderCartCardProps> = ({ 
             <div className="text-right flex-shrink-0 flex flex-row md:flex-col justify-between w-full md:w-auto">
                 <div className="text-start md:text-end">
                     {
-                        variant === "cart" ? 
+                        variant === "cart" && item.finalPricePerItem && item.finalTotalPrice && item.discountAmount ? 
                             <>
                                 <p className="text-sm font-bold text-slate-800">
                                     Rp. {item.finalTotalPrice.toLocaleString(currencyFormat)}
@@ -80,22 +80,30 @@ export const ProductOrderCartItemCard: React.FC<ProductOrderCartCardProps> = ({ 
                                         Rp. {(item.discountAmount > 0 ? item.finalPricePerItem : item.basePrice).toLocaleString(currencyFormat)} / item
                                     </p>
                                     {
-                                        item.discountAmount > 0 && (
+                                        item.discountAmount > 0 && 
                                             <p className="text-slate-400 line-through">
                                                 Rp. {item.basePrice.toLocaleString(currencyFormat)}
                                             </p>
-                                        )
                                     }
                                 </div>
                             </>
                         :
                             <>
-                                <p className="text-sm font-bold text-slate-800">
-                                    Rp. {(item.finalTotalPrice ?? (item.basePrice * item.quantity)).toLocaleString(currencyFormat)}
-                                </p>
-                                <p className="text-xs text-slate-400 font-semibold">
-                                    Rp. {item.basePrice.toLocaleString(currencyFormat)} / item
-                                </p>
+                                {
+                                    item.basePrice > 0 ?
+                                        <>
+                                        <p className="text-sm font-bold text-slate-800">
+                                                Rp. {(item.finalTotalPrice ?? (item.basePrice * item.quantity)).toLocaleString(currencyFormat)}
+                                            </p>
+                                            <p className="text-xs text-slate-400 font-semibold">
+                                                Rp. {item.basePrice.toLocaleString(currencyFormat)} / item
+                                            </p>
+                                        </>
+                                    : 
+                                        <p className="text-xs text-green-400 bg-green-100 px-2 py-1 rounded-lg font-semibold">
+                                            Free Item
+                                        </p>
+                                }
                             </>
                     }
                 </div>

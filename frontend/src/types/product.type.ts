@@ -37,10 +37,10 @@ export type ProductOrderCartItem = {
     weight: number
     basePrice: number
     totalPrice: number
-    productDiscounts: ProductDiscounts[]
-    discountAmount: number
-    finalTotalPrice: number
-    finalPricePerItem: number
+    productDiscounts?: ProductDiscounts[]
+    discountAmount?: number
+    finalTotalPrice?: number
+    finalPricePerItem?: number
 }
 
 export type ProductCategory = {

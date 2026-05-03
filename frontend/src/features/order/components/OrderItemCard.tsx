@@ -58,9 +58,14 @@ export const OrderItemCard: React.FC<Props> = ({ orderId, orderNumber, status, t
                     <Badge className={`capitalize font-semibold ${statusClass}`}>{finalStatus}</Badge>
                 </div>
                 <CopyFieldButton label="Order number" value={orderNumber} />
-                <p className="text-slate-500 text-sm mb-1"><span>({totalItems})</span> Purchased Item</p>
-                <p className="text-slate-500 text-sm font-semibold mb-0">{productList}</p>
-                { status === 'WAITING_PAYMENT' && paymentEvidence === null && paymentMethod === "MANUAL" && <PaymentEvidenceUploadButton orderId={orderId} paymentDeadline={paymentDeadline}/> }
+                <p className="text-slate-500 text-sm mb-1"><span>({totalItems})</span> Purchased Product</p>
+                <p className="text-slate-500 text-sm font-semibold">{productList}</p>
+                { 
+                    status === 'WAITING_PAYMENT' && paymentEvidence === null && paymentMethod === "MANUAL" && 
+                        <div className="mt-2">
+                            <PaymentEvidenceUploadButton orderId={orderId} paymentDeadline={paymentDeadline}/> 
+                        </div>
+                }
                 {
                     status === 'WAITING_PAYMENT' && paymentEvidence !== null && 
                         <>
@@ -96,21 +101,15 @@ export const OrderItemCard: React.FC<Props> = ({ orderId, orderNumber, status, t
                     <div className="text-end">
                         {
                             status !== 'CANCELLED' && 
-                                <div className="flex gap-x-4 items-end">
-                                    <div>
-                                        <p className="text-emerald-600 font-semibold text-sm">shipping cost</p>
-                                        <p className="text-emerald-600 font-semibold text-sm">Rp. {shippingCost.toLocaleString(currencyFormat)}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-gray-500 font-semibold text-sm mb-0">Total Spend</p>
-                                        <p className="text-emerald-800 font-bold text-xl">Rp {finalPrice.toLocaleString(currencyFormat)}</p>
-                                    </div>
-                                </div>
+                                <>
+                                    <p className="text-gray-500 font-semibold text-sm mb-0">Total Spend</p>
+                                    <p className="text-emerald-800 font-bold text-xl">Rp {(finalPrice + shippingCost).toLocaleString(currencyFormat)}</p>
+                                </>
                         }
                         {
                             totalPrice !== finalPrice && status !== 'CANCELLED' &&
-                                <div className="bg-red-100 p-1 text-center rounded-md mt-1">
-                                    <p className="text-gray-500 font-semibold text-sm mb-0">You saved <b className="text-red-400">Rp. {(totalPrice - finalPrice).toLocaleString(currencyFormat)}</b></p>
+                                <div className="bg-green-100 p-1 text-center rounded-md mt-1 px-2">
+                                    <p className="text-gray-500 font-semibold text-sm mb-0">You saved <b className="text-green-600">Rp. {(totalPrice - finalPrice).toLocaleString(currencyFormat)}</b></p>
                                 </div>
                         }
                     </div>

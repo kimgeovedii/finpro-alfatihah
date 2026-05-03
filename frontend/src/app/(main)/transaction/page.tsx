@@ -73,23 +73,27 @@ export default function TransactionPage() {
           }    
           <DividerLine/>
           <div className="flex flex-wrap items-end gap-3 mb-5 bg-white p-4 rounded-xl justify-between">
-            <div className="flex gap-2">
-              <div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 w-full lg:w-auto">
+              <div className="col-span-2 md:col-span-2">
                 <p className="text-xs text-slate-500 mb-1">Order Number</p>
-                <Input placeholder="e.g. ORD-123" value={orderNumber} onChange={(e) => setOrderNumber(e.target.value)} className="w-48 h-9 text-sm"/>
+                <Input placeholder="e.g. ORD-123" value={orderNumber} onChange={(e) => setOrderNumber(e.target.value)} className="w-full" />
               </div>
-              <div>
+              <div className="col-span-1">
                 <p className="text-xs text-slate-500 mb-1">Start Date</p>
-                <Input type="date" value={dateStart} onChange={(e) => setDateStart(e.target.value)} className="h-9 text-sm"/>
+                <Input type="date" value={dateStart} onChange={(e) => setDateStart(e.target.value)} className="w-full" />
               </div>
-              <div>
+              <div className="col-span-1">
                 <p className="text-xs text-slate-500 mb-1">End Date</p>
-                <Input type="date" value={dateEnd} onChange={(e) => setDateEnd(e.target.value)} className="h-9 text-sm"/>
+                <Input type="date" value={dateEnd} onChange={(e) => setDateEnd(e.target.value)} className="w-full" />
               </div>
             </div>
-            <div className="flex gap-2">
-              <Button onClick={handleSearch} className="h-9"><MagnifyingGlassIcon/> Search</Button>
-              <Button onClick={downloadTransactionHistory} className="h-9"><CloudArrowDownIcon/> Transaction History</Button>
+            <div className="flex w-full md:w-auto gap-2">
+              <Button onClick={handleSearch} className="flex-1 md:flex-none h-9">
+                <MagnifyingGlassIcon /> Search
+              </Button>
+              <Button onClick={downloadTransactionHistory} className="flex-1 md:flex-none h-9">
+                <CloudArrowDownIcon /> Transaction History
+              </Button>
             </div>
           </div>
           <div>
