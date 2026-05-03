@@ -75,7 +75,6 @@ export const EditProductDialog: React.FC<EditProductDialogProps> = ({
         existingImageIds: currentImageIds,
       });
 
-      // Set existing images
       if (product.productImages && product.productImages.length > 0) {
         const existingPreviews = product.productImages.map((img) => ({
           preview: img.imageUrl,

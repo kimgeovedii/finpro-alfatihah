@@ -8,6 +8,13 @@ import {
 } from "../validations/discount.schema";
 import { assignProductsSchema } from "../validations/productDiscount.schema";
 
+import {
+  authMiddleware,
+  optionalAuthMiddleware,
+} from "../../../middleware/auth.middleware";
+import { roleMiddleware } from "../../../middleware/role.middleware";
+import { EmployeeRole } from "@prisma/client";
+
 export class DiscountRouter {
   public router: Router;
   private discountController: DiscountController;
@@ -21,26 +28,43 @@ export class DiscountRouter {
   }
 
   private routes() {
-    this.router.get("/", this.discountController.findAllDiscounts);
+    this.router.get(
+      "/",
+      optionalAuthMiddleware,
+      this.discountController.findAllDiscounts,
+    );
     this.router.post(
       "/",
+      authMiddleware,
+      roleMiddleware([EmployeeRole.STORE_ADMIN]),
       validate(createDiscountSchema),
       this.discountController.createDiscount,
     );
     this.router.put(
       "/:id",
+      authMiddleware,
+      roleMiddleware([EmployeeRole.STORE_ADMIN]),
       validate(updateDiscountSchema),
       this.discountController.updateDiscount,
     );
-    this.router.delete("/:id", this.discountController.deleteDiscount);
+    this.router.delete(
+      "/:id",
+      authMiddleware,
+      roleMiddleware([EmployeeRole.STORE_ADMIN]),
+      this.discountController.deleteDiscount,
+    );
 
     this.router.post(
       "/:discountId/products",
+      authMiddleware,
+      roleMiddleware([EmployeeRole.STORE_ADMIN]),
       validate(assignProductsSchema),
       this.productDiscountController.assignProducts,
     );
     this.router.delete(
       "/:discountId/products/:productId",
+      authMiddleware,
+      roleMiddleware([EmployeeRole.STORE_ADMIN]),
       this.productDiscountController.removeProductDiscount,
     );
     this.router.get(
@@ -48,7 +72,6 @@ export class DiscountRouter {
       this.productDiscountController.getDiscountProducts,
     );
   }
-
 }
 
 export default new DiscountRouter().router;

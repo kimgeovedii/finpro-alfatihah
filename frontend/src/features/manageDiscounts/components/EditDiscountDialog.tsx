@@ -10,7 +10,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useFormik } from "formik";
 import { createDiscountSchema } from "../validations/discount.validation";
-import { IUpdateDiscountRequest, IDiscount, DiscountType, DiscountValueType } from "../types/discount.type";
+import {
+  IUpdateDiscountRequest,
+  EditDiscountDialogProps,
+} from "../types/discount.type";
 import {
   Select,
   SelectContent,
@@ -22,27 +25,25 @@ import { useEffect, useState } from "react";
 import { apiFetch } from "@/utils/api";
 import { motion, AnimatePresence } from "framer-motion";
 
-interface EditDiscountDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSubmit: (id: string, values: IUpdateDiscountRequest) => Promise<void>;
-  isSubmitting: boolean;
-  discount: IDiscount | null;
-}
-
 export const EditDiscountDialog = ({
   open,
   onOpenChange,
   onSubmit,
   isSubmitting,
   discount,
+  user,
 }: EditDiscountDialogProps) => {
   const [branches, setBranches] = useState<any[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
 
   useEffect(() => {
     if (open) {
       apiFetch<{ data: any[] }>("/branches")
         .then((res) => setBranches(res.data || []))
+        .catch(console.error);
+
+      apiFetch<{ data: any[] }>("/products?limit=100")
+        .then((res) => setProducts(res.data || []))
         .catch(console.error);
     }
   }, [open]);
@@ -56,9 +57,12 @@ export const EditDiscountDialog = ({
       minPurchaseAmount: 0,
       maxDiscountAmount: 0,
       startDate: new Date().toISOString().split("T")[0],
-      endDate: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString().split("T")[0],
+      endDate: new Date(new Date().setDate(new Date().getDate() + 7))
+        .toISOString()
+        .split("T")[0],
       quota: 100,
       branchId: "",
+      productIds: [],
     },
     validationSchema: createDiscountSchema,
     onSubmit: async (values) => {
@@ -74,6 +78,8 @@ export const EditDiscountDialog = ({
 
   useEffect(() => {
     if (discount && open) {
+      const productIds =
+        discount.productDiscounts?.map((pd) => pd.productId) || [];
       formik.setValues({
         name: discount.name,
         discountType: discount.discountType,
@@ -85,6 +91,7 @@ export const EditDiscountDialog = ({
         endDate: new Date(discount.endDate).toISOString().split("T")[0],
         quota: discount.quota,
         branchId: discount.branchId,
+        productIds: productIds,
       });
     } else if (!open) {
       formik.resetForm();
@@ -168,8 +175,19 @@ export const EditDiscountDialog = ({
                     </div>
 
                     <div className="space-y-1.5">
-                      <Label>Value Type</Label>
+                      <Label
+                        className={
+                          formik.values.discountType === "BUY_ONE_GET_ONE_FREE"
+                            ? "opacity-50"
+                            : ""
+                        }
+                      >
+                        Value Type
+                      </Label>
                       <Select
+                        disabled={
+                          formik.values.discountType === "BUY_ONE_GET_ONE_FREE"
+                        }
                         value={formik.values.discountValueType}
                         onValueChange={(val) =>
                           formik.setFieldValue("discountValueType", val)
@@ -182,7 +200,7 @@ export const EditDiscountDialog = ({
                           <SelectItem value="PERCENTAGE">
                             Percentage (%)
                           </SelectItem>
-                          <SelectItem value="NOMINAL">Nominal ($)</SelectItem>
+                          <SelectItem value="NOMINAL">Nominal (Rp)</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -190,11 +208,23 @@ export const EditDiscountDialog = ({
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <Label htmlFor="discountValue">Value</Label>
+                      <Label
+                        htmlFor="discountValue"
+                        className={
+                          formik.values.discountType === "BUY_ONE_GET_ONE_FREE"
+                            ? "opacity-50"
+                            : ""
+                        }
+                      >
+                        Value
+                      </Label>
                       <Input
                         id="discountValue"
                         type="number"
                         name="discountValue"
+                        disabled={
+                          formik.values.discountType === "BUY_ONE_GET_ONE_FREE"
+                        }
                         value={formik.values.discountValue}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
@@ -229,11 +259,25 @@ export const EditDiscountDialog = ({
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <Label htmlFor="minPurchaseAmount">Min Purchase</Label>
+                      <Label
+                        htmlFor="minPurchaseAmount"
+                        className={
+                          formik.values.discountType === "PRODUCT_DISCOUNT" ||
+                          formik.values.discountType === "BUY_ONE_GET_ONE_FREE"
+                            ? "opacity-50"
+                            : ""
+                        }
+                      >
+                        Min Purchase
+                      </Label>
                       <Input
                         id="minPurchaseAmount"
                         type="number"
                         name="minPurchaseAmount"
+                        disabled={
+                          formik.values.discountType === "PRODUCT_DISCOUNT" ||
+                          formik.values.discountType === "BUY_ONE_GET_ONE_FREE"
+                        }
                         value={formik.values.minPurchaseAmount || 0}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
@@ -242,11 +286,33 @@ export const EditDiscountDialog = ({
                     </div>
 
                     <div className="space-y-1.5">
-                      <Label htmlFor="maxDiscountAmount">Max Discount</Label>
+                      <Label
+                        htmlFor="maxDiscountAmount"
+                        className={
+                          formik.values.discountType ===
+                            "BUY_ONE_GET_ONE_FREE" ||
+                          ((formik.values.discountType === "PRODUCT_DISCOUNT" ||
+                            formik.values.discountType ===
+                              "MINIMUM_PURCHASE") &&
+                            formik.values.discountValueType === "NOMINAL")
+                            ? "opacity-50"
+                            : ""
+                        }
+                      >
+                        Max Discount
+                      </Label>
                       <Input
                         id="maxDiscountAmount"
                         type="number"
                         name="maxDiscountAmount"
+                        disabled={
+                          formik.values.discountType ===
+                            "BUY_ONE_GET_ONE_FREE" ||
+                          ((formik.values.discountType === "PRODUCT_DISCOUNT" ||
+                            formik.values.discountType ===
+                              "MINIMUM_PURCHASE") &&
+                            formik.values.discountValueType === "NOMINAL")
+                        }
                         value={formik.values.maxDiscountAmount}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
@@ -293,30 +359,71 @@ export const EditDiscountDialog = ({
                     </div>
                   </div>
 
+                  {(!user?.employee ||
+                    user.employee.role === "SUPER_ADMIN") && (
+                    <div className="space-y-1.5">
+                      <Label>Applicable Branch</Label>
+                      <Select
+                        value={formik.values.branchId}
+                        onValueChange={(val) =>
+                          formik.setFieldValue("branchId", val)
+                        }
+                      >
+                        <SelectTrigger className="h-9">
+                          <SelectValue placeholder="Select a branch" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {branches.map((b) => (
+                            <SelectItem key={b.id} value={b.id}>
+                              {b.storeName}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {formik.touched.branchId && formik.errors.branchId && (
+                        <p className="text-red-500 text-xs">
+                          {formik.errors.branchId}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
                   <div className="space-y-1.5">
-                    <Label>Applicable Branch</Label>
-                    <Select
-                      value={formik.values.branchId}
-                      onValueChange={(val) =>
-                        formik.setFieldValue("branchId", val)
-                      }
-                    >
-                      <SelectTrigger className="h-9">
-                        <SelectValue placeholder="Select a branch" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {branches.map((b) => (
-                          <SelectItem key={b.id} value={b.id}>
-                            {b.storeName}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {formik.touched.branchId && formik.errors.branchId && (
-                      <p className="text-red-500 text-xs">
-                        {formik.errors.branchId}
-                      </p>
-                    )}
+                    <Label>Apply to Products</Label>
+                    <div className="border rounded-xl p-3 bg-gray-50/50 space-y-2 max-h-40 overflow-y-auto custom-scrollbar">
+                      {products.map((product) => (
+                        <label
+                          key={product.id}
+                          className="flex items-center gap-3 p-2 hover:bg-white rounded-lg cursor-pointer transition-colors border border-transparent hover:border-gray-100"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={formik.values.productIds?.includes(
+                              product.id,
+                            )}
+                            onChange={() => {
+                              const current = formik.values.productIds || [];
+                              const next = current.includes(product.id)
+                                ? current.filter((id) => id !== product.id)
+                                : [...current, product.id];
+                              formik.setFieldValue("productIds", next);
+                            }}
+                            className="w-4 h-4 rounded border-gray-300 text-[#006666] focus:ring-[#006666]"
+                          />
+                          <span className="text-sm text-[#2c2f30]">
+                            {product.productName}
+                          </span>
+                        </label>
+                      ))}
+                      {products.length === 0 && (
+                        <p className="text-xs text-center py-4 text-gray-400">
+                          No products found.
+                        </p>
+                      )}
+                    </div>
+                    <p className="text-[10px] text-gray-400">
+                      Select one or more products this discount applies to.
+                    </p>
                   </div>
                 </div>
 
