@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import React from "react"
 import { AddressAdditionalInfoSection } from "./AddressAdditionalInfoSection"
+import { PencilSquareIcon } from "@heroicons/react/24/outline"
 
 interface Address {
     id: string
@@ -23,7 +24,7 @@ export const AddressSelectionModal: React.FC<Props> = ({ address, appliedAddress
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button className="text-emerald-700 bg-white text-sm font-bold hover:text-emerald-600 transition-colors">Change</Button>
+                <Button className="text-emerald-700 bg-white text-sm font-bold hover:text-emerald-600 transition-colors"><PencilSquareIcon/> Change</Button>
             </DialogTrigger>
             <DialogContent className="w-full max-w-[700px] rounded-2xl">
                 <DialogHeader>

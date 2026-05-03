@@ -7,6 +7,9 @@ import Swal from "sweetalert2";
 import { Button } from "@/components/ui/button";
 import { MessageBox } from "@/components/layout/MessageBox";
 import { SkeletonBox } from "@/components/layout/SkeletonBox";
+import { DividerLine } from "@/components/layout/DividerLine";
+import { showPopUp } from "@/utils/message.util";
+import { actionMessages } from "@/constants/message.const";
 
 export default function CartPage() {
   // Handle hook
@@ -19,64 +22,48 @@ export default function CartPage() {
   // Handle action
   const handleRemoveCart = async (cartId: string) => {
     const confirm = await Swal.fire({
-      title: "Remove cart?",
-      text: "All items in this cart will be deleted.",
+      title: actionMessages.cartAskRemoveTitle,
+      text: actionMessages.cartAskRemoveDesc,
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Yes, remove it",
-      cancelButtonText: "Cancel",
+      confirmButtonText: actionMessages.confirmDeleteButton,
       confirmButtonColor: "#ef4444",
     })
     if (!confirm.isConfirmed) return
 
+    // Call hook
     const success = await deleteCart(cartId)
     if (success) {
-      await Swal.fire({
-        title: "Cart deleted",
-        text: "Your cart has been removed.",
-        icon: "success",
-        confirmButtonColor: "#10b981",
+      await showPopUp(actionMessages.cartDeletedSuccessTitle, actionMessages.cartDeletedSuccessDesc, "success", "#10b981", () => {
+        fetchCartSummary()
+        fetchAllCarts(1)
       })
-
-      fetchCartSummary()
-      fetchAllCarts(1)
     }
   }
 
   const handleRemoveCartItem = async (cartItemId: string, productName: string) => {
     const confirm = await Swal.fire({
-      title: "Remove cart item?",
-      html: `<b>${productName}</b> items in this cart will be deleted.`,
+      title: actionMessages.productAskRemoveTitle,
+      html: `<b>${productName}</b> ${actionMessages.productAskRemoveDesc}`,
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Yes, remove it",
-      cancelButtonText: "Cancel",
+      confirmButtonText: actionMessages.confirmDeleteButton,
       confirmButtonColor: "#ef4444",
     })
     if (!confirm.isConfirmed) return
 
     const success = await deleteCartItem(cartItemId)
     if (success) {
-      await Swal.fire({
-        title: "Item deleted",
-        html: `<b>${productName}</b> has been removed.`,
-        icon: "success",
-        confirmButtonColor: "#10b981",
+      await showPopUp(actionMessages.productRemoveSuccessTitle, `<b>${productName}</b> ${actionMessages.productRemoveSuccessDesc}`, "success", null, () => {
+        fetchCartSummary()
+        fetchAllCarts(1)
       })
-
-      fetchCartSummary()
-      fetchAllCarts(1)
     }
   }
 
   const handleIncrease = async (itemId: string, qty: number, stock: number) => {
     if (qty >= stock) {
-      Swal.fire({
-        icon: "info",
-        title: "Stock limit reached",
-        text: "You already selected all available items.",
-        confirmButtonColor: "#10b981",
-      })
+      await showPopUp(actionMessages.productCartFailedAddTitle, actionMessages.productCartFailedAddDesc, "info")
       return
     }
   
@@ -88,24 +75,18 @@ export default function CartPage() {
   const handleDecrease = async (cartItemId: string, qty: number, productName: string) => {
     if (qty <= 1) {
       const confirm = await Swal.fire({
-        title: "Remove item?",
-        html: `<b>${productName}</b> will be removed from cart.`,
+        title: actionMessages.productAskRemoveTitle,
+        html: `<b>${productName}</b> ${actionMessages.productAskRemoveDesc}`,
         icon: "warning",
         showCancelButton: true,
-        confirmButtonText: "Yes, remove",
+        confirmButtonText: actionMessages.confirmDeleteButton,
         confirmButtonColor: "#ef4444",
       })
       if (!confirm.isConfirmed) return
   
       const success = await deleteCartItem(cartItemId)
       if (success) {
-        await Swal.fire({
-          title: "Item deleted",
-          html: `<b>${productName}</b> has been removed.`,
-          icon: "success",
-          confirmButtonColor: "#10b981",
-        })
-
+        await showPopUp(actionMessages.productRemoveSuccessTitle, `<b>${productName}</b> ${actionMessages.productRemoveSuccessDesc}`, "success")
         fetchCartSummary()
         fetchAllCarts(1)
       }
@@ -126,7 +107,7 @@ export default function CartPage() {
             // Render loading element
             isLoading ? <SkeletonBox extraClass={'min-h-[30px]'}/> : <CartSummary totalItems={summary?.totalItems ?? 0} totalQty={summary?.totalQty ?? 0}/>
           }
-          <hr className="my-5"/>
+          <DividerLine/>
           <div>
             {
               isLoadingAllCart ?
@@ -151,8 +132,8 @@ export default function CartPage() {
                     {
                       ct.items.map(dt => (
                         <CartItemCard key={dt.id}
-                          slugName={dt.product.product.slugName} storeName={ct.branch.storeName} productName={dt.product.product.productName} description={dt.product.product.description} 
-                          basePrice={dt.product.product.basePrice} mainImage={dt.product.product.productImages[0].imageUrl} qty={dt.quantity} currentStock={dt.product.currentStock}
+                          slugName={dt.product.product.slugName} storeName={ct.branch.storeName} productName={dt.product.product.productName} basePrice={dt.product.product.basePrice} 
+                          mainImage={dt.product.product.productImages[0].imageUrl} qty={dt.quantity} currentStock={dt.product.currentStock} 
                           onDecrease={() => handleDecrease(dt.id, dt.quantity,dt.product.product.productName)}
                           onIncrease={() => handleIncrease(dt.id, dt.quantity, dt.product.currentStock)}                        
                           onRemove={() => handleRemoveCartItem(dt.id, `(${dt.quantity}) ${dt.product.product.productName}`)}

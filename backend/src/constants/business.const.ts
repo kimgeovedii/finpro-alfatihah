@@ -16,3 +16,6 @@ export const mockShipmentPricePerKG: number = 18000
 export const maxSizePaymentEvidence: number = 2 * 1024 * 1024 // 2 mb
 export const allowedMimeTypesPaymentEvidence: string[] = ["image/jpeg", "image/png", "image/jpg"]
 export const allowedExtensionsPaymentEvidence = [".jpg", ".jpeg", ".png"]
+
+// Currency
+export const currencyFormat: string = "id-ID"

@@ -1,7 +1,7 @@
 'use client'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import { OrderStatus, statusColorMap } from "@/constants/business.const"
+import { currencyFormat, OrderStatus, statusColorMap } from "@/constants/business.const"
 import { Badge } from "@/components/ui/badge"
 import { formatDate } from "@/utils/converter.util"
 import { BanknotesIcon, CheckIcon } from "@heroicons/react/24/outline"
@@ -92,7 +92,7 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
                                                 <p className="text-xs text-slate-400">{dt.customerEmail}</p>
                                             </TableCell>
                                             <TableCell className="text-slate-600">{formatDate(dt.createdAt,true)}</TableCell>
-                                            <TableCell className="text-slate-800 font-medium">Rp {dt.finalPrice.toLocaleString("id-ID")}</TableCell>
+                                            <TableCell className="text-slate-800 font-medium">Rp {dt.finalPrice.toLocaleString(currencyFormat)}</TableCell>
                                             <TableCell className="max-w-[140px]">
                                                 <Badge className={`capitalize px-2 font-semibold whitespace-normal break-words text-center h-auto mx-auto block rounded-lg ${statusClass}`}>{finalStatus}</Badge>
                                             </TableCell>
@@ -112,7 +112,7 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
                                                                 <div className="flex flex-col mt-2 text-center">
                                                                     <Image src={dt.payments[0].evidence ?? ""} className="w-full mx-auto h-full mb-2 rounded-lg" alt={dt.payments[0].evidence ?? ""} width={100} height={100}/>
                                                                     <p className="mb-0">Transaction Amount</p>
-                                                                    <p className="font-bold mb-4">Rp {dt.finalPrice.toLocaleString("id-ID")}</p>
+                                                                    <p className="font-bold mb-4">Rp {dt.finalPrice.toLocaleString(currencyFormat)}</p>
                                                                     {
                                                                         dt.status === "WAITING_PAYMENT_CONFIRMATION" && 
                                                                             <>
@@ -152,7 +152,7 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
             {
                 meta && 
                     <div className="flex items-center justify-between mt-5 pt-4 border-t border-slate-100">
-                        <p className="text-sm text-slate-400">Showing {startItem} to {endItem} of {totalOrders.toLocaleString()} orders</p>
+                        <p className="text-sm text-slate-400">Showing {startItem} to {endItem} of {totalOrders.toLocaleString(currencyFormat)} orders</p>
                         <div className="flex items-center gap-1">
                             <Button variant="outline" size="sm" onClick={() => onPageChange(currentPage - 1)} disabled={currentPage <= 1} className="h-8 w-8 p-0">‹</Button>
                             { pageNumbers.map((p) => <Button key={p} variant={p === currentPage ? "default" : "outline"} size="sm" onClick={() => onPageChange(p)} className={`h-8 w-8 p-0 ${p === currentPage ? "bg-teal-700 border-teal-700 hover:bg-teal-800" : ""}`}>{p}</Button>) }

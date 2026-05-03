@@ -155,7 +155,7 @@
  *         schema:
  *           type: string
  *           format: uuid
- *           example: fb6359b6-7841-4145-b7fc-eb08c660a3b3
+ *           example: 3212d7e9-0dd0-4558-8ae8-813fd063970a
  *     responses:
  *       200:
  *         description: Cart fetched successfully
@@ -177,15 +177,11 @@
  *                           id:
  *                             type: string
  *                             format: uuid
- *                             example: ccd9da4c-447f-4d00-8e07-ddf423b4e240
- *                           createdAt:
- *                             type: string
- *                             format: date-time
- *                             example: 2026-04-09T09:16:49.198Z
+ *                             example: 96c69d82-a91e-4ded-bc3a-7088236918ae
  *                           branchId:
  *                             type: string
  *                             format: uuid
- *                             example: fb6359b6-7841-4145-b7fc-eb08c660a3b3
+ *                             example: 3212d7e9-0dd0-4558-8ae8-813fd063970a
  *                           items:
  *                             type: array
  *                             items:
@@ -194,67 +190,58 @@
  *                                 id:
  *                                   type: string
  *                                   format: uuid
- *                                   example: 7d2a37c0-9adc-4267-85f1-29aa04ab3223
+ *                                   example: 54295d89-c211-455f-928d-d9b7631be94a
  *                                 quantity:
  *                                   type: integer
  *                                   example: 3
- *                                 createdAt:
- *                                   type: string
- *                                   format: date-time
- *                                   example: 2026-04-09T09:44:47.455Z
  *                                 product:
  *                                   type: object
  *                                   properties:
  *                                     id:
  *                                       type: string
  *                                       format: uuid
- *                                       example: e4d4d386-2b89-47bf-8162-c74e44c0f908
+ *                                       example: 38401a75-286e-4cdb-8624-30a5ff12aad9
  *                                     currentStock:
  *                                       type: integer
- *                                       example: 50
+ *                                       example: 249
  *                                     product:
  *                                       type: object
  *                                       properties:
  *                                         productName:
  *                                           type: string
- *                                           example: Coca Cola
+ *                                           example: Sunpride Cavendish Banana 1kg
  *                                         slugName:
  *                                           type: string
- *                                           example: coca-cola
- *                                         description:
- *                                           type: string
- *                                           example: Soft drink that make u diabetes
+ *                                           example: sunpride-cavendish-banana-1kg-5a2lp
  *                                         basePrice:
  *                                           type: number
- *                                           example: 10000
+ *                                           example: 48660
+ *                                         description:
+ *                                           type: string
+ *                                           example: Sweet and naturally ripened Cavendish bananas from the Sunpride farms...
  *                                         category:
  *                                           type: object
  *                                           properties:
- *                                             name:
- *                                               type: string
- *                                               example: Beverages
- *                                             slugName:
- *                                               type: string
- *                                               example: beverages
+ *                                             name: { type: string, example: Fruits }
+ *                                             slugName: { type: string, example: fruits }
+ *                                         productImages:
+ *                                           type: array
+ *                                           items:
+ *                                             type: object
+ *                                             properties:
+ *                                               imageUrl: { type: string, example: https://loremflickr.com/800/600/1kg?lock=3983 }
  *                           branch:
  *                             type: object
  *                             properties:
- *                               id:
- *                                 type: string
- *                                 format: uuid
- *                                 example: fb6359b6-7841-4145-b7fc-eb08c660a3b3
- *                               storeName:
- *                                 type: string
- *                                 example: Toko Pusat Jakarta
- *                               city:
- *                                 type: string
- *                                 example: Jakarta
+ *                               id: { type: string, format: uuid, example: 3212d7e9-0dd0-4558-8ae8-813fd063970a }
+ *                               storeName: { type: string, example: Pasar Segar Monas }
+ *                               city: { type: string, example: Jakarta Pusat }
  *                     meta:
  *                       type: object
  *                       properties:
  *                         page: { type: integer, example: 1 }
  *                         limit: { type: integer, example: 14 }
- *                         total: { type: integer, example: 1 }
+ *                         total: { type: integer, example: 2 }
  *                         totalPages: { type: integer, example: 1 }
  *
  *       400:
@@ -505,11 +492,12 @@
  *                                   category:
  *                                     type: object
  *                                     properties:
- *                                       id: { type: string, format: uuid }
  *                                       name: { type: string, example: Canned Goods }
  *                                       slugName: { type: string, example: canned-goods }
- *                                       description: { type: string, example: Canned goods for long-term storage }
  *                                   basePrice: { type: number, example: 16023 }
+ *                                   discountAmount: { type: number, example: 88439 }
+ *                                   finalTotalPrice: { type: number, example: 861393 }
+ *                                   finalPricePerItem: { type: number, example: 66261 }
  *                                   weight: { type: number, example: 1200 }
  *                                   productImages:
  *                                     type: array

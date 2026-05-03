@@ -1,13 +1,11 @@
 "use client"
-import Link from "next/link"
 import { useParams } from "next/navigation"
-import { ArrowLeftIcon } from "@heroicons/react/24/outline"
-import { Button } from "@/components/ui/button"
 import { OrderMatchingTable } from "@/features/order/components/OrderMatchingTable"
 import { useCancelOrderStatusById, useOrderDetailData, useUpdateOrderStatusById } from "@/features/order/hooks/useOrder"
 import Swal from "sweetalert2"
 import { SkeletonBox } from "@/components/layout/SkeletonBox"
 import { MessageBox } from "@/components/layout/MessageBox"
+import { BackButton } from "@/components/button/BackButton"
 
 export default function ManageOrdersDetailPage() {
   // Handle param
@@ -64,13 +62,7 @@ export default function ManageOrdersDetailPage() {
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto">
-      <div className="flex items-center gap-3 mb-5">
-        <Link href="/manage-order">
-          <Button variant="destructive" className="text-md px-3 py-5">
-            <ArrowLeftIcon className="w-4 h-4" /> Back
-          </Button>
-        </Link>
-      </div>
+      <BackButton url="manage-order"/>
       {
         isLoading ? 
           // Render loading element

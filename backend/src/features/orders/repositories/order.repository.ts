@@ -1,7 +1,8 @@
-import { OrderStatus, Prisma, UserRole } from "@prisma/client";
+import { DiscountType, OrderStatus, Prisma, UserRole } from "@prisma/client";
 import { prisma } from "../../../config/prisma";
 import { orderAutoConfirmLimitHour, orderCode, paymentDeadline } from "../../../constants/business.const";
 import { getDistanceInKm } from "../../../utils/location";
+import { calculateDiscount } from "../../../utils/business";
 
 export class OrderRepository {
   async findRandomOrder() {
@@ -134,11 +135,11 @@ export class OrderRepository {
           },
           items: {
             select: {
-              id: true, quantity: true, product: {
+              id: true, quantity: true, price: true, product: {
                 select: {
                   currentStock: true, product: {
                     select: {
-                      productName: true, description: true, basePrice: true, weight: true, slugName: true,
+                      productName: true, weight: true, slugName: true,
                       category: {
                         select: { name: true }
                       },
@@ -401,23 +402,54 @@ export class OrderRepository {
   }
 
   async createOrder(userId: string, branchId: string, addressId: string, totalPrice: number, finalPrice: number, shippingCost: number,
-    items: Array<{ product: { id: string; product: { basePrice: number } }; quantity: number; discountId?: string | null }>) {
+    items: Array<{ 
+      product: { 
+        id: string; product: { 
+          basePrice: number; productDiscounts?: { 
+          discount: { 
+            discountType: string; discountValue: number; discountValueType: string; maxDiscountAmount?: number | null; minPurchaseAmount?: number | null 
+          } }[] 
+        } }; 
+      quantity: number; }>) {
     
     const paymentDeadlineTime = new Date(Date.now() + paymentDeadline) // 1 hour from now
     const orderNumber = `${orderCode}-${Date.now()}`
 
     return await prisma.orders.create({
       data: {
-        orderNumber, userId, branchId, addressId, totalPrice, finalPrice, shippingCost,
-        status: 'WAITING_PAYMENT', paymentDeadline: paymentDeadlineTime,
-        items: {
-          create: items.map(dt => ({
-            productId: dt.product.id,
-            discountId: dt.discountId ?? null,
-            price: dt.product.product.basePrice,
-            quantity: dt.quantity,
-          }))
-        }
+          orderNumber, userId, branchId, addressId, totalPrice, finalPrice, shippingCost,
+          status: 'WAITING_PAYMENT', paymentDeadline: paymentDeadlineTime,
+          items: {
+            create: items.flatMap(dt => {
+              const basePrice = dt.product.product.basePrice
+              const quantity = dt.quantity
+              const discount = dt.product.product.productDiscounts?.[0]?.discount
+
+              // Discount calculation
+              const discountAmount = discount ? calculateDiscount(discount.discountType, discount.discountValueType, discount.discountValue, quantity, basePrice, discount.minPurchaseAmount, discount.maxDiscountAmount) : 0
+              const discountPerItem = quantity > 0 ? Math.floor(discountAmount / quantity) : 0
+              const finalPricePerItem = Math.max(0, basePrice - discountPerItem)
+
+              const result = [
+                {
+                  productId: dt.product.id,
+                  price: finalPricePerItem,
+                  quantity: quantity
+                }
+              ]
+
+              // Extra one
+              if (discount?.discountType === DiscountType.BUY_ONE_GET_ONE_FREE) {
+                result.push({
+                  productId: dt.product.id,
+                  price: 0,
+                  quantity: 1
+                })
+              }
+
+              return result
+            })
+          }
       },
       select: { id: true, orderNumber: true, paymentDeadline: true }
     })
@@ -479,6 +511,41 @@ export class OrderRepository {
       data: {
         status: "CONFIRMED", confirmedAt: new Date(),
       },
+    })
+  }
+
+  async getTransactionHistory(userId: string) {
+    return await prisma.orders.findMany({
+      orderBy: [
+        { createdAt: "desc" },
+      ],
+      where: {
+        userId,
+        status: {
+          in: ["CONFIRMED","SHIPPED"]
+        }
+      },
+      select: {
+        createdAt: true, orderNumber: true,
+        branch: {
+          select: { storeName: true }
+        },
+        items: {
+          select: {
+            quantity: true, product: {
+              select: {
+                product: {
+                  select: {
+                    productName: true, basePrice: true, category: {
+                      select: { name: true }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     })
   }
 }
