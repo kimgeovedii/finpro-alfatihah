@@ -5,12 +5,17 @@ export class ProductRepository {
     filters: any,
     skip?: number,
     take?: number,
+    orderBy: string = "createdAt",
+    orderDir: "asc" | "desc" = "desc",
   ) => {
     const [data, total] = await prisma.$transaction([
       prisma.products.findMany({
         where: filters,
         skip,
         take,
+        orderBy: {
+          [orderBy]: orderDir,
+        },
         include: {
           category: {
             select: {
@@ -35,8 +40,8 @@ export class ProductRepository {
   };
 
   public getProductById = async (id: string) => {
-    return prisma.products.findUnique({
-      where: { id },
+    return prisma.products.findFirst({
+      where: { id, deletedAt: null },
       include: {
         category: {
           select: {
@@ -124,8 +129,8 @@ export class ProductRepository {
       };
     }
   
-    return prisma.products.findUnique({
-      where: { slugName },
+    return prisma.products.findFirst({
+      where: { slugName, deletedAt: null },
       include,
     });
   };
@@ -204,8 +209,9 @@ export class ProductRepository {
   };
 
   public deleteProduct = async (id: string) => {
-    return prisma.products.delete({
+    return prisma.products.update({
       where: { id },
+      data: { deletedAt: new Date() }
     });
   };
 
@@ -214,6 +220,7 @@ export class ProductRepository {
       branchInventories: {
         some: { branchId: branchId },
       },
+      deletedAt: null,
     };
 
     const count = await prisma.products.count({ where });

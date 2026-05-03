@@ -5,13 +5,17 @@ import {
   CreateProductPayload,
   UpdateProductPayload,
   ProductCategory,
+  AuthenticatedUser,
 } from "@/features/manageProducts/types/manageProduct.type";
 import { ManageProductRepository } from "@/features/manageProducts/repositories/manageProduct.repository";
+import { useAuthService } from "@/features/auth/hooks/useAuthService";
 import toast from "react-hot-toast";
 
 const repo = new ManageProductRepository();
 
 export const useManageProducts = () => {
+  const { user, fetchUser, isLoading: userLoading } = useAuthService();
+  const authUser = user as AuthenticatedUser;
   const [products, setProducts] = useState<ManageProduct[]>([]);
   const [meta, setMeta] = useState<PaginationMeta>({
     total: 0,
@@ -21,6 +25,19 @@ export const useManageProducts = () => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+
+  useEffect(() => {
+    if (!userLoading && (!authUser || !authUser.employee)) {
+      fetchUser();
+    }
+  }, [fetchUser, userLoading, authUser]);
+
+  const canManage =
+    authUser?.employee?.role === "SUPER_ADMIN" ||
+    (authUser as any)?.role === "SUPER_ADMIN";
 
   const [categories, setCategories] = useState<ProductCategory[]>([]);
 
@@ -55,6 +72,9 @@ export const useManageProducts = () => {
           page,
           meta.limit,
           debouncedSearch || undefined,
+          selectedCategory || undefined,
+          sortBy,
+          sortOrder,
         );
 
         if (Array.isArray(response)) {
@@ -78,7 +98,7 @@ export const useManageProducts = () => {
         setIsLoading(false);
       }
     },
-    [meta.limit, debouncedSearch],
+    [meta.limit, debouncedSearch, selectedCategory, sortBy, sortOrder],
   );
 
   const fetchCategories = useCallback(async () => {
@@ -96,7 +116,7 @@ export const useManageProducts = () => {
 
   useEffect(() => {
     fetchProducts(1);
-  }, [debouncedSearch]);
+  }, [debouncedSearch, selectedCategory, sortBy, sortOrder]);
 
   useEffect(() => {
     fetchCategories();
@@ -186,6 +206,9 @@ export const useManageProducts = () => {
     categories,
     isLoading,
     searchQuery,
+    selectedCategory,
+    sortBy,
+    sortOrder,
 
     addDialogOpen,
     setAddDialogOpen,
@@ -198,8 +221,20 @@ export const useManageProducts = () => {
     isSubmitting,
     isDeleting,
     isUpdating,
+    canManage,
+    userLoading,
+    user: authUser,
 
     handleSearchChange,
+    handleCategoryChange: setSelectedCategory,
+    handleSort: (field: string) => {
+      if (sortBy === field) {
+        setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+      } else {
+        setSortBy(field);
+        setSortOrder("asc");
+      }
+    },
     handlePageChange,
     handleAddClick,
     handleCreate,

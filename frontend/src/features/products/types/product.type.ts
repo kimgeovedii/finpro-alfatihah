@@ -1,4 +1,3 @@
-// API / Data Models
 export interface ProductBreadCrumb {
   name: string;
 }
@@ -77,7 +76,8 @@ export type ProductDetailCartActionProps = {
   totalPrice: number;
   variant: "mobile" | "desktop";
   isCreating: boolean;
-  currentCartQty: number;         
+  currentCartQty: number;
   onAddToCart: () => void;
   onRemoveFromCart: () => void;
+  disabled?: boolean;
 };

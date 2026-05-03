@@ -227,6 +227,7 @@ model products {
   categoryId        String               @map("category_id")
   sku               String               @unique
   weight            Float
+  deletedAt         DateTime?            @map("deleted_at")
   branchInventories branch_inventories[]
   mutationJournals  mutation_journals[]
   productDiscounts  product_discounts[]

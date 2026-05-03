@@ -19,6 +19,7 @@ export const MobileProductCard: React.FC<MobileProductCardProps> = ({
   index,
   onEdit,
   onDelete,
+  canManage,
 }) => {
   const primaryImage = product.productImages?.[0];
 
@@ -65,24 +66,26 @@ export const MobileProductCard: React.FC<MobileProductCardProps> = ({
             </p>
             <p className="text-xs text-[#595c5d] truncate">{product.slugName}</p>
           </div>
-          <div className="flex items-center gap-1 shrink-0">
-            <motion.button
-              whileTap={{ scale: 0.9 }}
-              onClick={() => onEdit(product)}
-              className="p-1.5 text-slate-400 hover:text-[#006666] transition-colors rounded-md hover:bg-[#87eded]/20"
-              title="Edit product"
-            >
-              <PencilSquareIcon className="w-4 h-4" />
-            </motion.button>
-            <motion.button
-              whileTap={{ scale: 0.9 }}
-              onClick={() => onDelete(product)}
-              className="p-1.5 text-slate-400 hover:text-[#b31b25] transition-colors rounded-md hover:bg-red-50"
-              title="Delete product"
-            >
-              <TrashIcon className="w-4 h-4" />
-            </motion.button>
-          </div>
+          {canManage && (
+            <div className="flex items-center gap-1 shrink-0">
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                onClick={() => onEdit(product)}
+                className="p-1.5 text-slate-400 hover:text-[#006666] transition-colors rounded-md hover:bg-[#87eded]/20"
+                title="Edit product"
+              >
+                <PencilSquareIcon className="w-4 h-4" />
+              </motion.button>
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                onClick={() => onDelete(product)}
+                className="p-1.5 text-slate-400 hover:text-[#b31b25] transition-colors rounded-md hover:bg-red-50"
+                title="Delete product"
+              >
+                <TrashIcon className="w-4 h-4" />
+              </motion.button>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center gap-3 mt-2">

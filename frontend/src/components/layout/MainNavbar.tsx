@@ -16,7 +16,7 @@ import {
   ChevronDownIcon,
   MapIcon,
 } from "@heroicons/react/24/outline";
-import { 
+import {
   HomeIcon as HomeIconSolid,
   TicketIcon as TicketIconSolid,
   ClipboardDocumentListIcon as ClipboardDocumentListIconSolid,
@@ -31,10 +31,10 @@ export const MainNavbar = () => {
   const pathname = usePathname();
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
-  
+
   const userDropdownRef = useRef<HTMLDivElement>(null);
   const locationDropdownRef = useRef<HTMLDivElement>(null);
-  
+
   const {
     user,
     cartItems,
@@ -49,21 +49,22 @@ export const MainNavbar = () => {
     isVerified,
   } = useNavbar();
 
-  const { 
-    locationName, 
-    addresses, 
-    setAddresses, 
-    selectAddress, 
-    selectCurrentLocation, 
+  const {
+    locationName,
+    addresses,
+    setAddresses,
+    selectAddress,
+    selectCurrentLocation,
     selectedLocationType,
-    selectedAddressId
+    selectedAddressId,
   } = useHomeStore();
 
   // Fetch addresses on mount if logged in
   useEffect(() => {
     if (mounted && isAuthenticated()) {
-      addressService.getAddresses()
-        .then(data => setAddresses(Array.isArray(data) ? data : []))
+      addressService
+        .getAddresses()
+        .then((data) => setAddresses(Array.isArray(data) ? data : []))
         .catch(console.error);
     }
   }, [mounted, isAuthenticated, setAddresses]);
@@ -71,10 +72,16 @@ export const MainNavbar = () => {
   // Close dropdowns on click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (userDropdownRef.current && !userDropdownRef.current.contains(event.target as Node)) {
+      if (
+        userDropdownRef.current &&
+        !userDropdownRef.current.contains(event.target as Node)
+      ) {
         setIsUserDropdownOpen(false);
       }
-      if (locationDropdownRef.current && !locationDropdownRef.current.contains(event.target as Node)) {
+      if (
+        locationDropdownRef.current &&
+        !locationDropdownRef.current.contains(event.target as Node)
+      ) {
         setIsLocationDropdownOpen(false);
       }
     };
@@ -84,14 +91,33 @@ export const MainNavbar = () => {
 
   const navItems = [
     { name: "Home", href: "/", icon: HomeIcon, activeIcon: HomeIconSolid },
-    { name: "Promo", href: "/promo", icon: TicketIcon, activeIcon: TicketIconSolid },
-    { name: "Transaction", href: "/transaction", icon: ClipboardDocumentListIcon, activeIcon: ClipboardDocumentListIconSolid },
-    { name: "Akun", href: "/profile", icon: UserIcon, activeIcon: UserIconSolid },
+    {
+      name: "Promo",
+      href: "/promo",
+      icon: TicketIcon,
+      activeIcon: TicketIconSolid,
+    },
+    {
+      name: "Transaction",
+      href: "/transaction",
+      icon: ClipboardDocumentListIcon,
+      activeIcon: ClipboardDocumentListIconSolid,
+    },
+    {
+      name: "Akun",
+      href: "/profile",
+      icon: UserIcon,
+      activeIcon: UserIconSolid,
+    },
   ];
 
   const userMenuItems = [
     { name: "My Profile", href: "/profile", icon: UserIcon },
-    { name: "Transactions", href: "/transaction", icon: ClipboardDocumentListIcon },
+    {
+      name: "Transactions",
+      href: "/transaction",
+      icon: ClipboardDocumentListIcon,
+    },
     { name: "Vouchers & Promo", href: "/promo", icon: TicketIcon },
   ];
 
@@ -108,18 +134,21 @@ export const MainNavbar = () => {
                 src="https://res.cloudinary.com/dvfywdxnt/image/upload/v1777146483/logo-apps_opuem6.png"
               />
             </Link>
-            
+
             {/* Search Bar */}
-            <form onSubmit={onSearchSubmit} className="relative flex-1 max-w-md hidden sm:flex">
+            <form
+              onSubmit={onSearchSubmit}
+              className="relative flex-1 max-w-md hidden sm:flex"
+            >
               <input
                 type="text"
-                placeholder="Cari produk segar..."
+                placeholder="All your daily needs..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full bg-slate-100 dark:bg-slate-800 text-sm rounded-2xl pl-5 pr-10 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all border border-transparent focus:border-primary/30"
               />
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={isSearching}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors p-1"
               >
@@ -131,18 +160,24 @@ export const MainNavbar = () => {
           <div className="flex items-center gap-2 md:gap-6">
             {/* Location Dropdown */}
             <div className="hidden lg:block relative" ref={locationDropdownRef}>
-              <button 
-                onClick={() => setIsLocationDropdownOpen(!isLocationDropdownOpen)}
+              <button
+                onClick={() =>
+                  setIsLocationDropdownOpen(!isLocationDropdownOpen)
+                }
                 className="flex items-center gap-2 px-4 py-2 bg-slate-50 dark:bg-slate-800 rounded-full border border-slate-100 dark:border-slate-700 hover:border-primary/30 transition-all group"
               >
                 <MapPinIcon className="h-3.5 w-3.5 text-primary" />
                 <div className="text-left">
-                  <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 leading-none mb-0.5">Dikirim Ke</p>
+                  <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 leading-none mb-0.5">
+                    Dikirim Ke
+                  </p>
                   <span className="text-[10px] font-bold text-slate-700 dark:text-slate-200 truncate max-w-[120px] block">
                     {locationName || "Set Lokasi..."}
                   </span>
                 </div>
-                <ChevronDownIcon className={`h-3 w-3 text-slate-400 transition-transform ${isLocationDropdownOpen ? 'rotate-180' : ''}`} />
+                <ChevronDownIcon
+                  className={`h-3 w-3 text-slate-400 transition-transform ${isLocationDropdownOpen ? "rotate-180" : ""}`}
+                />
               </button>
 
               <AnimatePresence>
@@ -154,53 +189,80 @@ export const MainNavbar = () => {
                     className="absolute left-0 mt-3 w-72 bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden z-[60]"
                   >
                     <div className="p-5 border-b border-slate-50 dark:border-slate-800">
-                      <h4 className="text-sm font-black text-slate-800 dark:text-slate-100">Pilih Lokasi Pengiriman</h4>
-                      <p className="text-[10px] text-slate-400 font-medium mt-1">Sesuaikan alamat agar kami bisa mencarikan cabang terdekat.</p>
+                      <h4 className="text-sm font-black text-slate-800 dark:text-slate-100">
+                        Pilih Lokasi Pengiriman
+                      </h4>
+                      <p className="text-[10px] text-slate-400 font-medium mt-1">
+                        Sesuaikan alamat agar kami bisa mencarikan cabang
+                        terdekat.
+                      </p>
                     </div>
 
                     <div className="max-h-80 overflow-y-auto p-2 custom-scrollbar">
                       {/* Current Location Option */}
-                      <button 
+                      <button
                         onClick={() => {
                           selectCurrentLocation();
                           setIsLocationDropdownOpen(false);
                         }}
-                        className={`w-full flex items-center gap-3 p-3 rounded-2xl transition-all text-left ${selectedLocationType === "current" ? 'bg-primary/5 text-primary' : 'hover:bg-slate-50 text-slate-600'}`}
+                        className={`w-full flex items-center gap-3 p-3 rounded-2xl transition-all text-left ${selectedLocationType === "current" ? "bg-primary/5 text-primary" : "hover:bg-slate-50 text-slate-600"}`}
                       >
-                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${selectedLocationType === "current" ? 'bg-primary/10' : 'bg-slate-100'}`}>
+                        <div
+                          className={`w-8 h-8 rounded-xl flex items-center justify-center ${selectedLocationType === "current" ? "bg-primary/10" : "bg-slate-100"}`}
+                        >
                           <MapIcon className="h-4 w-4" />
                         </div>
                         <div>
-                          <p className="text-xs font-bold">Lokasi Saat Ini (GPS)</p>
-                          <p className="text-[10px] opacity-60">Gunakan sensor GPS perangkat</p>
+                          <p className="text-xs font-bold">
+                            Lokasi Saat Ini (GPS)
+                          </p>
+                          <p className="text-[10px] opacity-60">
+                            Gunakan sensor GPS perangkat
+                          </p>
                         </div>
-                        {selectedLocationType === "current" && <div className="ml-auto w-1.5 h-1.5 bg-primary rounded-full" />}
+                        {selectedLocationType === "current" && (
+                          <div className="ml-auto w-1.5 h-1.5 bg-primary rounded-full" />
+                        )}
                       </button>
 
                       {/* Addresses List */}
                       {isAuthenticated() && addresses.length > 0 && (
                         <div className="mt-2 pt-2 border-t border-slate-50 dark:border-slate-800">
-                          <p className="px-3 py-2 text-[9px] font-black uppercase tracking-widest text-slate-400">Alamat Tersimpan</p>
+                          <p className="px-3 py-2 text-[9px] font-black uppercase tracking-widest text-slate-400">
+                            Alamat Tersimpan
+                          </p>
                           {addresses.map((addr) => (
-                            <button 
+                            <button
                               key={addr.id}
                               onClick={() => {
                                 selectAddress(addr.id);
                                 setIsLocationDropdownOpen(false);
                               }}
-                              className={`w-full flex items-center gap-3 p-3 rounded-2xl transition-all text-left group ${selectedAddressId === addr.id ? 'bg-primary/5 text-primary' : 'hover:bg-slate-50 text-slate-600'}`}
+                              className={`w-full flex items-center gap-3 p-3 rounded-2xl transition-all text-left group ${selectedAddressId === addr.id ? "bg-primary/5 text-primary" : "hover:bg-slate-50 text-slate-600"}`}
                             >
-                              <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${selectedAddressId === addr.id ? 'bg-primary/10' : 'bg-slate-100'}`}>
+                              <div
+                                className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${selectedAddressId === addr.id ? "bg-primary/10" : "bg-slate-100"}`}
+                              >
                                 <MapPinIconSolid className="h-4 w-4" />
                               </div>
                               <div className="min-w-0">
                                 <div className="flex items-center gap-1.5">
-                                  <p className="text-xs font-bold truncate">{addr.label}</p>
-                                  {addr.isPrimary && <span className="text-[8px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-md font-black uppercase">Utama</span>}
+                                  <p className="text-xs font-bold truncate">
+                                    {addr.label}
+                                  </p>
+                                  {addr.isPrimary && (
+                                    <span className="text-[8px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-md font-black uppercase">
+                                      Utama
+                                    </span>
+                                  )}
                                 </div>
-                                <p className="text-[10px] opacity-60 truncate">{addr.address}</p>
+                                <p className="text-[10px] opacity-60 truncate">
+                                  {addr.address}
+                                </p>
                               </div>
-                              {selectedAddressId === addr.id && <div className="ml-auto w-1.5 h-1.5 bg-primary rounded-full shrink-0" />}
+                              {selectedAddressId === addr.id && (
+                                <div className="ml-auto w-1.5 h-1.5 bg-primary rounded-full shrink-0" />
+                              )}
                             </button>
                           ))}
                         </div>
@@ -208,14 +270,16 @@ export const MainNavbar = () => {
 
                       {!isAuthenticated() && (
                         <div className="p-4 text-center">
-                          <p className="text-xs text-slate-400 font-medium">Login untuk melihat alamat tersimpan Anda.</p>
+                          <p className="text-xs text-slate-400 font-medium">
+                            Login untuk melihat alamat tersimpan Anda.
+                          </p>
                         </div>
                       )}
                     </div>
 
                     <div className="p-4 bg-slate-50 dark:bg-slate-800/50">
-                      <Link 
-                        href="/profile" 
+                      <Link
+                        href="/profile"
                         onClick={() => setIsLocationDropdownOpen(false)}
                         className="w-full py-2.5 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-200 flex items-center justify-center hover:bg-slate-50 transition-all"
                       >
@@ -226,7 +290,7 @@ export const MainNavbar = () => {
                 )}
               </AnimatePresence>
             </div>
-            
+
             {mounted && (
               <div className="flex items-center gap-4 md:gap-5 text-slate-700 dark:text-slate-200">
                 {/* Search Toggle Mobile Only */}
@@ -235,9 +299,11 @@ export const MainNavbar = () => {
                 </button>
 
                 {/* Cart button */}
-                <button 
+                <button
                   className={`active:scale-95 transition-transform relative p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full ${
-                    !isAuthenticated() || !isVerified() ? "opacity-50 cursor-not-allowed" : ""
+                    !isAuthenticated() || !isVerified()
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
                   }`}
                   onClick={handleCartClick}
                 >
@@ -250,18 +316,27 @@ export const MainNavbar = () => {
                 </button>
 
                 {/* Desktop User Menu with Dropdown */}
-                <div className="hidden md:flex items-center gap-4" ref={userDropdownRef}>
+                <div
+                  className="hidden md:flex items-center gap-4"
+                  ref={userDropdownRef}
+                >
                   {isAuthenticated() ? (
                     <div className="relative pl-4 border-l border-slate-200 dark:border-slate-700">
-                      <button 
-                        onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+                      <button
+                        onClick={() =>
+                          setIsUserDropdownOpen(!isUserDropdownOpen)
+                        }
                         className="group flex items-center gap-3 py-1 hover:opacity-80 transition-all"
                       >
                         {user?.avatar ? (
-                          <img 
-                            src={user.avatar.startsWith("http") ? user.avatar : `${process.env.NEXT_PUBLIC_API_URL?.replace("/api", "")}/${user.avatar.startsWith("/") ? user.avatar.slice(1) : user.avatar}`} 
-                            alt="Avatar" 
-                            className="h-8 w-8 rounded-full object-cover ring-2 ring-primary/10 group-hover:ring-primary/40 transition-all" 
+                          <img
+                            src={
+                              user.avatar.startsWith("http")
+                                ? user.avatar
+                                : `${process.env.NEXT_PUBLIC_API_URL?.replace("/api", "")}/${user.avatar.startsWith("/") ? user.avatar.slice(1) : user.avatar}`
+                            }
+                            alt="Avatar"
+                            className="h-8 w-8 rounded-full object-cover ring-2 ring-primary/10 group-hover:ring-primary/40 transition-all"
                           />
                         ) : (
                           <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20">
@@ -269,12 +344,16 @@ export const MainNavbar = () => {
                           </div>
                         )}
                         <div className="hidden lg:block text-left">
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Account</p>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">
+                            Account
+                          </p>
                           <div className="flex items-center gap-1">
                             <p className="text-xs font-black text-slate-800 dark:text-slate-100 truncate max-w-[100px]">
                               {user?.username || user?.email?.split("@")[0]}
                             </p>
-                            <ChevronDownIcon className={`h-3 w-3 text-slate-400 transition-transform duration-300 ${isUserDropdownOpen ? 'rotate-180' : ''}`} />
+                            <ChevronDownIcon
+                              className={`h-3 w-3 text-slate-400 transition-transform duration-300 ${isUserDropdownOpen ? "rotate-180" : ""}`}
+                            />
                           </div>
                         </div>
                       </button>
@@ -289,13 +368,17 @@ export const MainNavbar = () => {
                             className="absolute right-0 mt-3 w-56 bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden z-[60]"
                           >
                             <div className="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
-                              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Logged in as</p>
-                              <p className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">{user?.email}</p>
+                              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">
+                                Logged in as
+                              </p>
+                              <p className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">
+                                {user?.email}
+                              </p>
                             </div>
 
                             <div className="p-2">
                               {userMenuItems.map((item) => (
-                                <Link 
+                                <Link
                                   key={item.name}
                                   href={item.href}
                                   onClick={() => setIsUserDropdownOpen(false)}
@@ -308,7 +391,7 @@ export const MainNavbar = () => {
                             </div>
 
                             <div className="p-2 bg-slate-50 dark:bg-slate-800/50">
-                              <button 
+                              <button
                                 onClick={() => {
                                   handleLogout();
                                   setIsUserDropdownOpen(false);
@@ -325,13 +408,13 @@ export const MainNavbar = () => {
                     </div>
                   ) : (
                     <div className="flex items-center gap-3 pl-4 border-l border-slate-200 dark:border-slate-700">
-                      <Link 
+                      <Link
                         href="/login"
                         className="text-xs font-bold text-slate-600 hover:text-primary transition-colors px-4 py-2"
                       >
                         Login
                       </Link>
-                      <Link 
+                      <Link
                         href="/register"
                         className="text-xs font-bold text-white bg-primary hover:bg-primary/90 px-6 py-2 rounded-full shadow-lg shadow-primary/20 transition-all active:scale-95"
                       >
@@ -352,20 +435,24 @@ export const MainNavbar = () => {
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             const Icon = isActive ? item.activeIcon : item.icon;
-            
+
             return (
-              <Link 
+              <Link
                 key={item.name}
                 href={item.href}
                 className="flex flex-col items-center justify-center flex-1 h-full gap-1 transition-all active:scale-90"
               >
-                <div className={`relative p-1 rounded-xl transition-all ${isActive ? 'text-primary' : 'text-slate-400'}`}>
+                <div
+                  className={`relative p-1 rounded-xl transition-all ${isActive ? "text-primary" : "text-slate-400"}`}
+                >
                   <Icon className="h-6 w-6" />
                   {item.name === "Transaction" && isAuthenticated() && (
-                     <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900" />
+                    <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900" />
                   )}
                 </div>
-                <span className={`text-[10px] font-bold tracking-tight ${isActive ? 'text-primary' : 'text-slate-400'}`}>
+                <span
+                  className={`text-[10px] font-bold tracking-tight ${isActive ? "text-primary" : "text-slate-400"}`}
+                >
                   {item.name}
                 </span>
               </Link>
@@ -373,7 +460,7 @@ export const MainNavbar = () => {
           })}
         </div>
       </div>
-      
+
       {/* Spacer for bottom nav to prevent content overlap */}
       <div className="md:hidden h-16" />
     </>

@@ -13,12 +13,16 @@ export class ManageProductRepository {
     limit: number = 10,
     search?: string,
     categoryId?: string,
+    sortBy?: string,
+    sortOrder?: string,
   ): Promise<ManageProductListResponse> => {
     const params = new URLSearchParams();
     params.set("page", String(page));
     params.set("limit", String(limit));
     if (search) params.set("search", search);
     if (categoryId) params.set("categoryId", categoryId);
+    if (sortBy) params.set("sortBy", sortBy);
+    if (sortOrder) params.set("sortOrder", sortOrder);
 
     return await apiFetch<ManageProductListResponse>(
       `/products?${params.toString()}`,
@@ -30,11 +34,9 @@ export class ManageProductRepository {
     payload: CreateProductPayload,
   ): Promise<ManageProduct> => {
     const formData = new FormData();
-    
-    // Add all non-file fields
+
     Object.entries(payload).forEach(([key, value]) => {
       if (key === "images") {
-        // Handle multiple images
         if (payload.images && Array.isArray(payload.images)) {
           payload.images.forEach((file) => {
             formData.append("images", file);
@@ -48,19 +50,19 @@ export class ManageProductRepository {
     return await apiFetch<ManageProduct>("/products", "post", formData);
   };
 
-
   public updateProduct = async (
     id: string,
     payload: UpdateProductPayload,
   ): Promise<ManageProduct> => {
-    // Check if there are images to upload
-    if (payload.images && Array.isArray(payload.images) && payload.images.length > 0) {
+    if (
+      payload.images &&
+      Array.isArray(payload.images) &&
+      payload.images.length > 0
+    ) {
       const formData = new FormData();
 
-      // Add all non-file fields
       Object.entries(payload).forEach(([key, value]) => {
         if (key === "images") {
-          // Handle multiple images
           if (payload.images && Array.isArray(payload.images)) {
             payload.images.forEach((file) => {
               formData.append("images", file);

@@ -4,7 +4,7 @@ import { createProductCategoriesSchema } from "../validations/productCategory.sc
 import { validate } from "../../../middleware/validate";
 
 export class ProductCategoryRouter {
-  private router: Router;
+  public router: Router;
   private productCategoriesController: ProductCategoryController;
 
   constructor() {
@@ -28,7 +28,6 @@ export class ProductCategoryRouter {
     this.router.delete("/:id", this.productCategoriesController.deleteCategory);
   }
 
-  public getRouter = (): Router => {
-    return this.router;
-  };
 }
+
+export default new ProductCategoryRouter().router;

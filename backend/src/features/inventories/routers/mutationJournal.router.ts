@@ -5,7 +5,7 @@ import { validate } from "../../../middleware/validate";
 import { createMutationSchema, updateMutationStatusSchema } from "../validations/mutationJournal.schema";
 
 export class MutationJournalRouter {
-  private router: Router;
+  public router: Router;
   private mutationJournalController: MutationJournalController;
 
   constructor() {
@@ -21,7 +21,6 @@ export class MutationJournalRouter {
     this.router.patch("/:id/status", authMiddleware, validate(updateMutationStatusSchema), this.mutationJournalController.updateMutationStatus);
   }
 
-  public getRouter(): Router {
-    return this.router;
-  }
 }
+
+export default new MutationJournalRouter().router;
