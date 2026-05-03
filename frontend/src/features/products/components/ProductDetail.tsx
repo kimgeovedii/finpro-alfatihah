@@ -24,7 +24,7 @@ export const ProductDetail = ({ slugName, storeName }: { slugName: string, store
   }, [product])
 
   // Handle action
-  const handleCreateCart = async (branchId: string, productId: string, qty: number) => {
+  const handleAddToCart = async (branchId: string, productId: string, qty: number) => {
     const success = await createCart(branchId, productId, qty)
 
     if (success) {
@@ -93,7 +93,7 @@ export const ProductDetail = ({ slugName, storeName }: { slugName: string, store
     totalPrice: product.basePrice * qty,
     isCreating,
     onAddToCart: () =>
-      handleCreateCart(
+      handleAddToCart(
         product.branchInventories[0].branchId,
         product.id,
         qty 

@@ -23,7 +23,7 @@ export interface ProductCard {
   category: { id: string; name: string };
   productImages: { id: string; imageUrl: string }[];
   branchName?: string;
-  branchId?: string;
+  branchId: string;
   branchCity?: string;
 }
 

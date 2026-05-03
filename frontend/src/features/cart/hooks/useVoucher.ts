@@ -15,7 +15,6 @@ export const useAllVoucherData = () => {
 
         try {
             const res = await voucherRepository.getAllVouchers(page, search)
-            console.log(res)
 
             setVouchers((prev) => page === 1 ? res.data : [...prev, ...res.data])
             setMeta(res.meta)

@@ -1,4 +1,5 @@
 import { CopyFieldButton } from "@/components/button/CopyFieldButton"
+import { DividerLine } from "@/components/layout/DividerLine"
 import { formatDate } from "@/utils/converter.util"
 import { BuildingOfficeIcon } from "@heroicons/react/24/outline"
 import { CalendarDays, Clock, MapPin } from "lucide-react"
@@ -60,7 +61,7 @@ export const OrderDetailBranchCard: React.FC<Props> = ({ branch, orderInfo }) =>
         <div className="bg-white rounded-3xl">
             <div className="p-5 pb-0">
                 <CopyFieldButton label="Order number" value={orderInfo.orderNumber} customClass="text-lg font-semibold"/>
-                <hr className="my-4"/>
+                <DividerLine/>
                 <div className="flex flex-col space-y-2">
                     <div className="flex justify-between items-center">
                         <label className="font-semibold text-sm mb-0">Order Status</label>
@@ -75,7 +76,7 @@ export const OrderDetailBranchCard: React.FC<Props> = ({ branch, orderInfo }) =>
                         <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-md ${getPaymentStatusStyle(orderInfo.paymentStatus)}`}>{orderInfo.paymentStatus}</span>
                     </div>
                 </div>
-                <hr className="mt-4"/>
+                <DividerLine/>
             </div>
             <div className="flex flex-wrap gap-5 w-full p-4">
                 <div className="flex items-center gap-3 flex-1">

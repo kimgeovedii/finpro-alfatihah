@@ -1,3 +1,4 @@
+import { DividerLine } from "@/components/layout/DividerLine"
 import { MapIcon, PhoneIcon, UserIcon } from "@heroicons/react/24/outline"
 
 type Props = {
@@ -27,7 +28,7 @@ export const OrderManagementTableShippedSection: React.FC<Props> = ({ branchCity
                     <p className="text-sm">Shiped At</p>
                     <p className="text-sm font-bold">{shippedAt}</p>
                 </div>
-                <hr className="my-2"/>
+                <DividerLine/>
                 <h6 className="font-bold text-sm">Customer's Address</h6>
                 <div>
                     <p className="text-slate-800 font-bold text-sm mb-0.5">{labelCustomer}</p>

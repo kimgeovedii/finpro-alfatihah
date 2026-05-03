@@ -31,3 +31,40 @@ export const getStoreOpenStatus = (schedules: Schedule[]): string => {
 
     return `Closed`
 }
+
+export const calculateDiscount = ( discountType: string, discountValueType: string, discountValue: number, quantity: number, basePrice: number, minPurchaseAmount?: number | null, maxDiscountAmount?: number | null) => {
+    const totalPrice = basePrice * quantity
+
+    // BOGO
+    if (discountType === "BUY_ONE_GET_ONE_FREE") return 0
+
+    // Product discount
+    if (discountType === "PRODUCT_DISCOUNT") {
+        if (discountValueType === "PERCENTAGE") {
+            return Math.round((totalPrice * discountValue) / 100)
+        }
+
+        return discountValue * quantity
+    }
+
+    // Minimum purchase
+    if (discountType === "MINIMUM_PURCHASE") {
+        if (!minPurchaseAmount || totalPrice < minPurchaseAmount) return 0
+
+        let discountAmount = 0
+
+        if (discountValueType === "PERCENTAGE") {
+            discountAmount = (totalPrice * discountValue) / 100
+        } else {
+            discountAmount = discountValue
+        }
+
+        if (maxDiscountAmount) {
+            discountAmount = Math.min(discountAmount, maxDiscountAmount)
+        }
+
+        return Math.round(discountAmount)
+    }
+
+    return 0
+}

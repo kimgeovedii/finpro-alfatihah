@@ -3,6 +3,8 @@ import { OrderController } from "../controllers/order.controller"
 import { authMiddleware } from "../../../middleware/auth.middleware"
 import { OrderWebhookController } from "../controllers/order_webhook.controller"
 import { OrderExportController } from "../controllers/order_export.controller"
+import { EmployeeRole } from "@prisma/client"
+import { roleMiddleware } from "../../../middleware/role.middleware"
 
 class OrderRouter {
     public router: Router
@@ -29,7 +31,7 @@ class OrderRouter {
         // Normal API
         transactionRouter.get("/", this.orderController.getAllTransaction)
         transactionRouter.get("/:orderNumber", this.orderController.getOrderDetailByOrderNumber)
-        transactionRouter.get("/management/:branchId", this.orderController.getAllTransactionManagementByBranchId)
+        transactionRouter.get("/management/:branchId", roleMiddleware([EmployeeRole.STORE_ADMIN, EmployeeRole.SUPER_ADMIN]), this.orderController.getAllTransactionManagementByBranchId)
         // Export
         this.router.get("/export/invoice/:orderNumber", this.orderExportController.getInvoicePdf)
         this.router.get("/export/history", this.orderExportController.getTransactionHistoryExcel)
@@ -37,11 +39,11 @@ class OrderRouter {
 
         const summaryRouter = Router()
         summaryRouter.get("/", this.orderController.getTransactionSummary)
-        summaryRouter.get("/:branchId", this.orderController.getTransactionSummaryByBranchId)
+        summaryRouter.get("/:branchId", roleMiddleware([EmployeeRole.STORE_ADMIN, EmployeeRole.SUPER_ADMIN]), this.orderController.getTransactionSummaryByBranchId)
         this.router.use("/summary", summaryRouter)
 
         this.router.post("/checkout", this.orderController.postAddCheckoutOrder)
-        this.router.post("/shipping/:orderNumber", this.orderController.postAddShipping)
+        this.router.post("/shipping/:orderNumber", roleMiddleware([EmployeeRole.SUPER_ADMIN]), this.orderController.postAddShipping)
         this.router.post("/cancelling/:orderNumber", this.orderController.postCancelOrder)
         this.router.post("/confirming/:orderNumber", this.orderController.postConfirmOrder)        
     }

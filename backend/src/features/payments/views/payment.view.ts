@@ -1,3 +1,4 @@
+import { currencyFormat } from "../../../constants/business.const"
 import { mailTemplateStyle } from "../../../utils/template"
 
 type Payment = {
@@ -15,7 +16,7 @@ export const getPaymentConfirmationTemplate = (data: Payload) => {
     const paymentsHtml = `
         <div class="context-box" style="margin-bottom:16px;">
             <p style="margin:0 0 6px 0;"><strong>Order ID:</strong> ${data.payment.orderNumber}</p>
-            <p style="margin:0 0 10px 0; color:#059669; font-weight:600;">Amount: Rp ${data.payment.amount.toLocaleString("id-ID")}</p>
+            <p style="margin:0 0 10px 0; color:#059669; font-weight:600;">Amount: Rp ${data.payment.amount.toLocaleString(currencyFormat)}</p>
             <a href="${data.payment.evidence}" target="_blank">
                 <img src="${data.payment.evidence}" alt="Payment Evidence" style="max-width:200px; border-radius:8px; border:1px solid #eee;"/>
             </a>

@@ -12,6 +12,7 @@ export type OrderItemProduct = {
 export type OrderItem = {
     id: string
     quantity: number
+    price: number
     product: OrderItemProduct
 }
 

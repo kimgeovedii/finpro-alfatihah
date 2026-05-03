@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button"
 import { formatDate } from "@/utils/converter.util"
 import React from "react"
 import Swal from "sweetalert2"
-import { statusColorMap } from "@/constants/business.const"
-import { PhotoIcon } from "@heroicons/react/24/outline"
+import { currencyFormat, statusColorMap } from "@/constants/business.const"
+import { ArrowRightIcon, PhotoIcon } from "@heroicons/react/24/outline"
 import Link from "next/link"
 import { PaymentEvidenceUploadButton } from "./PaymentEvidenceUploadButton"
+import { DividerLine } from "@/components/layout/DividerLine"
 
 type Props = {
     orderId: string
@@ -57,13 +58,18 @@ export const OrderItemCard: React.FC<Props> = ({ orderId, orderNumber, status, t
                     <Badge className={`capitalize font-semibold ${statusClass}`}>{finalStatus}</Badge>
                 </div>
                 <CopyFieldButton label="Order number" value={orderNumber} />
-                <p className="text-slate-500 text-sm mb-1"><span>({totalItems})</span> Purchased Item</p>
-                <p className="text-slate-500 text-sm font-semibold mb-0">{productList}</p>
-                { status === 'WAITING_PAYMENT' && paymentEvidence === null && paymentMethod === "MANUAL" && <PaymentEvidenceUploadButton orderId={orderId} paymentDeadline={paymentDeadline}/> }
+                <p className="text-slate-500 text-sm mb-1"><span>({totalItems})</span> Purchased Product</p>
+                <p className="text-slate-500 text-sm font-semibold">{productList}</p>
+                { 
+                    status === 'WAITING_PAYMENT' && paymentEvidence === null && paymentMethod === "MANUAL" && 
+                        <div className="mt-2">
+                            <PaymentEvidenceUploadButton orderId={orderId} paymentDeadline={paymentDeadline}/> 
+                        </div>
+                }
                 {
                     status === 'WAITING_PAYMENT' && paymentEvidence !== null && 
                         <>
-                            <hr className="my-3"/>
+                            <DividerLine/>
                             <div className="bg-green-100 p-2 rounded-lg flex justify-between w-full items-center">
                                 <p className="text-gray-700 font-bold text-sm">Now just wait until your payment validated</p>
                                 <div className="text-end">
@@ -76,40 +82,34 @@ export const OrderItemCard: React.FC<Props> = ({ orderId, orderNumber, status, t
                 {
                     status === 'REJECTED' && paymentEvidence !== null && 
                         <>
-                            <hr className="my-3"/>
+                            <DividerLine/>
                             <div className="bg-red-100 p-2 rounded-lg w-full">
                                 <p className="text-gray-700 font-bold text-sm">We're sorry. But your transaction is rejected by our shop</p>
                                 {evidenceElement(paymentEvidence??"")}
                             </div>
                         </>
                 }
-                <hr className="my-3"/>
+                <DividerLine/>
                 <div className="flex justify-between items-center w-full">
                     <div>
                         <p className="text-gray-500 font-normal text-sm mb-0">Checkout At</p>
                         <p className="text-gray-500 font-bold text-sm mb-2">{formatDate(createdAt,false)}</p>
                         <Link href={`/transaction/${orderNumber}`}>
-                            <Button className="bg-teal-700 text-white font-semibold text-sm px-5">Manage</Button>
+                            <Button className="bg-teal-700 text-white font-semibold text-sm px-3"><ArrowRightIcon/> Manage</Button>
                         </Link>
                     </div>
                     <div className="text-end">
                         {
                             status !== 'CANCELLED' && 
-                                <div className="flex gap-x-4 items-end">
-                                    <div>
-                                        <p className="text-emerald-600 font-semibold text-sm">shipping cost</p>
-                                        <p className="text-emerald-600 font-semibold text-sm">Rp. {shippingCost.toLocaleString("id-ID")}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-gray-500 font-semibold text-sm mb-0">Total Spend</p>
-                                        <p className="text-emerald-800 font-bold text-xl">Rp {finalPrice.toLocaleString("id-ID")}</p>
-                                    </div>
-                                </div>
+                                <>
+                                    <p className="text-gray-500 font-semibold text-sm mb-0">Total Spend</p>
+                                    <p className="text-emerald-800 font-bold text-xl">Rp {(finalPrice + shippingCost).toLocaleString(currencyFormat)}</p>
+                                </>
                         }
                         {
                             totalPrice !== finalPrice && status !== 'CANCELLED' &&
-                                <div className="bg-red-100 p-1 text-center rounded-md mt-1">
-                                    <p className="text-gray-500 font-semibold text-sm mb-0">You saved <b className="text-red-400">Rp. {(totalPrice - finalPrice).toLocaleString("id-ID")}</b></p>
+                                <div className="bg-green-100 p-1 text-center rounded-md mt-1 px-2">
+                                    <p className="text-gray-500 font-semibold text-sm mb-0">You saved <b className="text-green-600">Rp. {(totalPrice - finalPrice).toLocaleString(currencyFormat)}</b></p>
                                 </div>
                         }
                     </div>
