@@ -11,6 +11,12 @@ import { StockJournalDialog } from "./StockJournalDialog";
 import { ProductTablePagination } from "@/features/manageProducts/components/ProductTablePagination";
 
 export const StockManagementPage: React.FC = () => {
+  const [isMounted, setIsMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const {
     inventory,
     branches,
@@ -21,14 +27,21 @@ export const StockManagementPage: React.FC = () => {
     isJournalLoading,
     searchQuery,
     selectedBranchId,
+    selectedStockStatus,
     updateStockOpen,
     journalOpen,
     selectedItem,
     isSubmitting,
+    isStoreAdmin,
+    user,
+    sortBy,
+    sortOrder,
 
     handleSearchChange,
     setSelectedBranchId,
+    setSelectedStockStatus,
     handlePageChange,
+    handleSort,
     handleUpdateClick,
     handleViewJournal,
     handleUpdateSubmit,
@@ -42,6 +55,8 @@ export const StockManagementPage: React.FC = () => {
     setUpdateStockOpen(true);
   };
 
+  if (!isMounted) return null;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -54,21 +69,26 @@ export const StockManagementPage: React.FC = () => {
         onSearchChange={handleSearchChange}
         selectedBranchId={selectedBranchId}
         onBranchChange={setSelectedBranchId}
+        selectedStockStatus={selectedStockStatus}
+        onStatusChange={setSelectedStockStatus}
         branches={branches}
         onAddClick={handleGlobalUpdateClick}
+        isStoreAdmin={isStoreAdmin}
       />
 
       {/* Desktop View */}
-      <div className="hidden lg:block">
+      <div className="hidden md:block shadow-[0_4px_30px_rgba(0,0,0,0.02)] rounded-3xl bg-white overflow-hidden">
         <StockTable
           inventory={inventory}
           isLoading={isLoading}
           onUpdateStock={handleUpdateClick}
           onViewJournal={handleViewJournal}
+          isStoreAdmin={isStoreAdmin}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
+          onSort={handleSort}
         />
-        <div className="mt-6 flex justify-end">
-          <ProductTablePagination meta={meta} onPageChange={handlePageChange} />
-        </div>
+        <ProductTablePagination meta={meta} onPageChange={handlePageChange} />
       </div>
 
       {/* Mobile View */}
@@ -99,9 +119,7 @@ export const StockManagementPage: React.FC = () => {
             ))}
           </AnimatePresence>
         )}
-        <div className="mt-6">
-          <ProductTablePagination meta={meta} onPageChange={handlePageChange} />
-        </div>
+        <ProductTablePagination meta={meta} onPageChange={handlePageChange} />
       </div>
 
       <UpdateStockDialog
@@ -112,6 +130,8 @@ export const StockManagementPage: React.FC = () => {
         isSubmitting={isSubmitting}
         branches={branches}
         allProducts={allProducts}
+        isStoreAdmin={isStoreAdmin}
+        userBranchId={user?.employee?.branchId}
       />
 
       <StockJournalDialog

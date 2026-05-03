@@ -6,6 +6,8 @@ import {
   createBranchInventorySchema,
   updateBranchInventorySchema,
 } from "../validations/branchInventory.schema";
+import { roleMiddleware } from "../../../middleware/role.middleware";
+import { EmployeeRole } from "@prisma/client";
 
 export class BranchInventoryRouter {
   public router: Router;
@@ -18,25 +20,33 @@ export class BranchInventoryRouter {
   }
 
   private routes() {
-    this.router.get("/", this.branchInventoryController.findAllBranchInventories);
-    
+    this.router.get(
+      "/",
+      authMiddleware,
+      roleMiddleware([EmployeeRole.STORE_ADMIN, EmployeeRole.SUPER_ADMIN]),
+      this.branchInventoryController.findAllBranchInventories,
+    );
+
     this.router.post(
       "/",
       authMiddleware,
+      roleMiddleware([EmployeeRole.STORE_ADMIN, EmployeeRole.SUPER_ADMIN]),
       validate(createBranchInventorySchema),
       this.branchInventoryController.createBranchInventory,
     );
-    
+
     this.router.patch(
       "/:id",
       authMiddleware,
+      roleMiddleware([EmployeeRole.STORE_ADMIN, EmployeeRole.SUPER_ADMIN]),
       validate(updateBranchInventorySchema),
       this.branchInventoryController.updateBranchInventory,
     );
-    
+
     this.router.delete(
       "/:id",
       authMiddleware,
+      roleMiddleware([EmployeeRole.STORE_ADMIN, EmployeeRole.SUPER_ADMIN]),
       this.branchInventoryController.deleteBranchInventory,
     );
   }

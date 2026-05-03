@@ -9,12 +9,19 @@ import {
 } from "../types/manageStock.type";
 import { BranchInventoryRepository } from "../repositories/branchInventory.repository";
 import { ManageProductRepository } from "@/features/manageProducts/repositories/manageProduct.repository";
+import { useUser } from "@/features/auth/hooks/useUser";
+import { UserWithEmployee } from "../types/manageStock.type";
 import toast from "react-hot-toast";
 
 const repo = new BranchInventoryRepository();
 const productRepo = new ManageProductRepository();
 
 export const useManageStock = () => {
+  const { user: baseUser } = useUser();
+  const user = baseUser as UserWithEmployee | null;
+  const isStoreAdmin = user?.employee?.role === "STORE_ADMIN";
+  const userBranchId = user?.employee?.branchId;
+
   const [inventory, setInventory] = useState<BranchInventory[]>([]);
   const [branches, setBranches] = useState<Branch[]>([]);
   const [allProducts, setAllProducts] = useState<ManageProduct[]>([]);
@@ -29,7 +36,17 @@ export const useManageStock = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isJournalLoading, setIsJournalLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedBranchId, setSelectedBranchId] = useState("all");
+  const [selectedBranchId, setSelectedBranchId] = useState<string>("all");
+  const [selectedStockStatus, setSelectedStockStatus] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("updatedAt");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+
+  // Effect to lock branch for STORE_ADMIN
+  useEffect(() => {
+    if (isStoreAdmin && userBranchId) {
+      setSelectedBranchId(userBranchId);
+    }
+  }, [isStoreAdmin, userBranchId]);
 
   const [updateStockOpen, setUpdateStockOpen] = useState(false);
   const [journalOpen, setJournalOpen] = useState(false);
@@ -57,7 +74,10 @@ export const useManageStock = () => {
           page,
           limit: meta.limit,
           branchId: selectedBranchId,
+          stockStatus: selectedStockStatus,
           productName: debouncedSearch || undefined,
+          sortBy,
+          sortOrder,
         });
 
         if (response && response.data) {
@@ -73,7 +93,14 @@ export const useManageStock = () => {
         setIsLoading(false);
       }
     },
-    [meta.limit, debouncedSearch, selectedBranchId],
+    [
+      meta.limit,
+      debouncedSearch,
+      selectedBranchId,
+      selectedStockStatus,
+      sortBy,
+      sortOrder,
+    ],
   );
 
   const fetchBranches = useCallback(async () => {
@@ -96,7 +123,13 @@ export const useManageStock = () => {
 
   useEffect(() => {
     fetchInventory(1);
-  }, [debouncedSearch, selectedBranchId]);
+  }, [
+    debouncedSearch,
+    selectedBranchId,
+    selectedStockStatus,
+    sortBy,
+    sortOrder,
+  ]);
 
   useEffect(() => {
     fetchBranches();
@@ -108,6 +141,18 @@ export const useManageStock = () => {
       fetchInventory(page);
     },
     [fetchInventory],
+  );
+
+  const handleSort = useCallback(
+    (column: string) => {
+      if (sortBy === column) {
+        setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+      } else {
+        setSortBy(column);
+        setSortOrder("desc");
+      }
+    },
+    [sortBy, sortOrder],
   );
 
   const handleUpdateClick = (item: BranchInventory) => {
@@ -164,6 +209,8 @@ export const useManageStock = () => {
   };
 
   return {
+    user,
+    isStoreAdmin,
     inventory,
     branches,
     journals,
@@ -180,10 +227,15 @@ export const useManageStock = () => {
 
     handleSearchChange,
     setSelectedBranchId,
+    selectedStockStatus,
+    setSelectedStockStatus,
     handlePageChange,
+    handleSort,
     handleUpdateClick,
     handleViewJournal,
     handleUpdateSubmit,
+    sortBy,
+    sortOrder,
     setUpdateStockOpen,
     setJournalOpen,
     setSelectedItem,
