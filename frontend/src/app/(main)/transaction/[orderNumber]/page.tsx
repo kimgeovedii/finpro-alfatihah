@@ -1,10 +1,7 @@
 "use client";
-import { Button } from '@/components/ui/button';
 import { OrderDetailBranchCard } from '@/features/order/components/OrderDetailBranchCard';
 import { OrderDetailItemListCard } from '@/features/order/components/OrderDetailItemListCard';
 import { PaymentSummaryCard } from '@/features/order/components/PaymentSummary';
-import { ArrowLeftIcon } from '@heroicons/react/24/outline';
-import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { Check, Package, Truck, Home } from "lucide-react"
 import { OrderStatusStepsCard } from '@/features/order/components/OrderStatusStepsCard';
@@ -13,6 +10,7 @@ import { formatListSchedule } from '@/utils/converter.util';
 import Swal from 'sweetalert2';
 import { SkeletonBox } from '@/components/layout/SkeletonBox';
 import { MessageBox } from '@/components/layout/MessageBox';
+import { BackButton } from '@/components/button/BackButton';
 
 export default function TransactionDetailPage() {
   // For repo fetching
@@ -98,13 +96,7 @@ export default function TransactionDetailPage() {
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto w-full">
-      <div className='flex items-center gap-3 mb-5'>
-        <Link href={'/transaction'}>
-          <Button variant='destructive' className='text-md px-3 py-5'>
-            <ArrowLeftIcon className="w-4 h-4"/> Back
-          </Button>
-        </Link>
-      </div>
+      <BackButton url="transaction"/>
       {
         !isLoading && (!order || order?.payments.length === 0 ) ?
           // Render failed fetching condition
@@ -165,10 +157,9 @@ export default function TransactionDetailPage() {
                         slugName: dt.product.product.slugName,
                         weight: dt.product.product.weight * dt.quantity,
                         productName: dt.product.product.productName,
-                        description: dt.product.product.description,
                         category: dt.product.product.category,
                         quantity: dt.quantity,
-                        basePrice: dt.product.product.basePrice,
+                        basePrice: dt.price,
                         totalPrice: dt.product.product.basePrice * dt.quantity,
                         productImages: dt.product.product.productImages
                       })) ?? []}

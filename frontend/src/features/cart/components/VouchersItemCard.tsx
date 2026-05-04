@@ -1,6 +1,7 @@
 import { TicketIcon, TruckIcon } from "@heroicons/react/24/outline"
 import { VoucherData } from "../repositories/voucher.type"
 import { Button } from "@/components/ui/button"
+import { currencyFormat } from "@/constants/business.const"
 
 interface Props {
     item: VoucherData
@@ -12,7 +13,7 @@ interface Props {
 }
 
 export const VouchersItemCard: React.FC<Props> = ({ item, isApplied, totalBasePrice, onApply, onRemove }) => {
-    const discountLabel = item.discountValueType === "PERCENTAGE" ? `${item.discountValue}% off` : `Rp ${item.discountValue.toLocaleString("id-ID")} off`
+    const discountLabel = item.discountValueType === "PERCENTAGE" ? `${item.discountValue}% off` : `Rp ${item.discountValue.toLocaleString(currencyFormat)} off`
     const isMinPurchaseValid = item.minPurchaseAmount == null || totalBasePrice >= item.minPurchaseAmount
     const isExpired = item.expiredDate ? new Date() > new Date(item.expiredDate) : false
     const isQuotaEmpty = item.quota <= 0
@@ -21,7 +22,7 @@ export const VouchersItemCard: React.FC<Props> = ({ item, isApplied, totalBasePr
     let errorMessage = ""
     if (isExpired) errorMessage = "Voucher expired"
     else if (isQuotaEmpty) errorMessage = "Voucher quota exceeded"
-    else if (!isMinPurchaseValid) errorMessage = `Min purchase Rp ${item.minPurchaseAmount?.toLocaleString("id-ID")}`
+    else if (!isMinPurchaseValid) errorMessage = `Min purchase Rp ${item.minPurchaseAmount?.toLocaleString(currencyFormat)}`
 
     return (
         <div className={`bg-white rounded-2xl border-3 border-dashed p-3 flex items-center justify-between gap-3 ${isDisabled ? "border-slate-100 opacity-60" : "border-slate-200"}`}>
@@ -32,7 +33,7 @@ export const VouchersItemCard: React.FC<Props> = ({ item, isApplied, totalBasePr
                 <div>
                     <p className="text-slate-800 font-bold text-sm mb-0">{item.voucherCode}</p>
                     <p className="text-slate-400 text-xs">{item.name} · <b className="text-red-400">{discountLabel}</b></p>
-                    <p className="text-xs text-orange-400">Max Discount Rp. {item.maxDiscountAmount.toLocaleString()}{ isDisabled && <span className="text-xs text-red-400 mt-1"> · {errorMessage}</span> }</p>
+                    <p className="text-xs text-orange-400">Max Discount Rp. {item.maxDiscountAmount.toLocaleString(currencyFormat)}{ isDisabled && <span className="text-xs text-red-400 mt-1"> · {errorMessage}</span> }</p>
                 </div>
             </div>
             {

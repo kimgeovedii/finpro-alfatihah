@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ArchiveBoxIcon, XMarkIcon } from "@heroicons/react/24/outline"
 import { useState } from "react"
 import { OrderMatchingItem } from "./OrderMatchingTable"
+import { currencyFormat } from "@/constants/business.const"
 
 type Props = {
     items: OrderMatchingItem[]
@@ -71,8 +72,8 @@ export const OrderMatchingProcessedSection: React.FC<Props> = ({ items, status, 
                                                 <TableCell>{dt.stockAfter}</TableCell>
                                             </>
                                     }
-                                    <TableCell>Rp {dt.price.toLocaleString()}</TableCell>
-                                    <TableCell>Rp {(dt.price * dt.quantity).toLocaleString()}</TableCell>
+                                    <TableCell>Rp {dt.price.toLocaleString(currencyFormat)}</TableCell>
+                                    <TableCell>Rp {(dt.price * dt.quantity).toLocaleString(currencyFormat)}</TableCell>
                                 </TableRow>
                             )
                         })

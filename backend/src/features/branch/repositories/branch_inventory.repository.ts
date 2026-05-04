@@ -24,7 +24,7 @@ export class BranchInventoryRepository {
         })
     }
 
-    findManyByBranch = async (branchId: string) => {
+    findManyItemsByBranch = async (branchId: string) => {
         return prisma.branch_inventories.findMany({
             where: { branchId },
             select: {

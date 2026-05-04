@@ -104,7 +104,7 @@ export class PaymentService {
         if (!payment) throw { code: 404, message: 'Payment not found' }
 
         // Repo : update payment by order id
-        const paymentUpdated = await this.paymentRepo.updatePaymentEvidenceByOrderId(payment.orderId, null, 'REJECTED')
+        const paymentUpdated = await this.paymentRepo.updatePaymentEvidenceByOrderId(payment.orderId, null, payload.isConfirm ? 'SUCCESS' : 'REJECTED')
         if (paymentUpdated.count !== 1) throw { code: 404, message: 'Payment not found' }
         
         // Repo : update order by order id

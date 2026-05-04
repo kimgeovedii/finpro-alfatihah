@@ -16,7 +16,11 @@ export const formatDate = (isoString: string, withTime: boolean = false): string
 }
 
 export const formatListSchedule = (schedules: Schedule[]) => {
-    return schedules.sort((a, b) => dayOrderRule.indexOf(a.dayName) - dayOrderRule.indexOf(b.dayName))
-        .map(dt => `${dt.dayName} (${dt.startTime} - ${dt.endTime})`)
-        .join(", ") ?? "-"
+    if (schedules.length > 0) {
+        return schedules.sort((a, b) => dayOrderRule.indexOf(a.dayName) - dayOrderRule.indexOf(b.dayName))
+            .map(dt => `${dt.dayName} (${dt.startTime} - ${dt.endTime})`)
+            .join(", ")
+    } else {
+        return '-'
+    }
 }

@@ -1,5 +1,4 @@
-import { BuildingOfficeIcon } from "@heroicons/react/24/outline"
-import { CalendarDays, MapPin } from "lucide-react"
+import { BuildingOfficeIcon, CalendarDaysIcon, MapPinIcon } from "@heroicons/react/24/outline"
 import React from "react"
 import { AddressSelectionModal } from "./AddressSelectionModal"
 import { AddressAdditionalInfoSection } from "./AddressAdditionalInfoSection"
@@ -44,13 +43,13 @@ export const AddressSelectionCard: React.FC<Props> = ({ branch, addressList, sel
                 <div className="relative flex flex-col gap-3">
                     <div className="flex items-center gap-3 text-white/80 text-sm">
                         <div className="w-7 h-7 rounded-lg bg-white/15 flex items-center justify-center flex-shrink-0">
-                            <MapPin className="w-3.5 h-3.5 text-white"/>
+                            <MapPinIcon className="w-3.5 h-3.5 text-white"/>
                         </div>
                         <span>{branch.address}</span>
                     </div>
                     <div className="flex items-center gap-3 text-white/80 text-xs">
                         <div className="w-7 h-7 rounded-lg bg-white/15 flex items-center justify-center flex-shrink-0">
-                            <CalendarDays className="w-3.5 h-3.5 text-white"/>
+                            <CalendarDaysIcon className="w-3.5 h-3.5 text-white"/>
                         </div>
                         <span>{branch.schedule}</span>
                     </div>

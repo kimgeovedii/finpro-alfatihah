@@ -1,33 +1,19 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-
 import { useProductDetail } from "@/features/products/hooks/useProductDetail";
 import { ProductDetailImageGallery } from "./ProductDetailImageGallery";
 import { ProductDetailInfoContent } from "./ProductDetailInfoContent";
 import { ProductDetailCartAction } from "./ProductDetailCartAction";
 import { ProductBreadcrumb } from "./ProductBreadCrumb";
 import { ProductBranchInfoCard } from "./ProductBranchInfo";
-import { useStoreSelection } from "../hooks/useStoreSelection";
 import { useProductActions } from "../hooks/useProductActions";
+import { useStoreSelection } from "../hooks/useStoreSelection";
 
-export const ProductDetail = ({
-  slugName,
-  storeName: storeNameProp,
-}: {
-  slugName: string;
-  storeName?: string;
-}) => {
+export const ProductDetail = ({ slugName, storeName: storeNameProp }: { slugName: string, storeName?: string }) => {
   const { storeName } = useStoreSelection(storeNameProp);
-  const { product, isLoading, error, fetchProduct } = useProductDetail(
-    slugName,
-    storeName,
-  );
-
-  const { cartProps, isAvailable, branchInventory } = useProductActions(
-    product,
-    fetchProduct,
-  );
+  const { product, isLoading, error, fetchProduct } = useProductDetail(slugName, storeName);
+  const { cartProps, isAvailable, branchInventory } = useProductActions(product, fetchProduct);
 
   if (isLoading) {
     return (
@@ -57,12 +43,7 @@ export const ProductDetail = ({
 
   return (
     <AnimatePresence mode="wait">
-      <motion.section
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="w-full bg-slate-50 min-h-screen text-slate-900"
-      >
+      <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="w-full bg-slate-50 min-h-screen text-slate-900">
         {/* Mobile Layout */}
         <div className="lg:hidden flex flex-col pb-12 p-4">
           <div className="w-full overflow-hidden">
@@ -71,7 +52,6 @@ export const ProductDetail = ({
               productName={product.productName}
             />
           </div>
-
           <div className="px-0 pt-6 pb-6 flex flex-col gap-6">
             <ProductDetailInfoContent
               productName={product.productName}
@@ -79,7 +59,6 @@ export const ProductDetail = ({
               description={product.description}
               price={product.basePrice}
             />
-
             {branchInventory ? (
               <ProductBranchInfoCard
                 branch={{
@@ -98,7 +77,6 @@ export const ProductDetail = ({
                 </p>
               </div>
             )}
-
             <ProductDetailCartAction {...cartProps} variant="mobile" />
           </div>
         </div>
@@ -108,7 +86,6 @@ export const ProductDetail = ({
           <div className="mb-8">
             <ProductBreadcrumb name={product.productName} />
           </div>
-
           <div className="grid grid-cols-[1.2fr_1fr_0.8fr] gap-8 xl:gap-14 items-start">
             <div>
               <ProductDetailImageGallery
@@ -116,7 +93,6 @@ export const ProductDetail = ({
                 productName={product.productName}
               />
             </div>
-
             <div>
               <ProductDetailInfoContent
                 productName={product.productName}

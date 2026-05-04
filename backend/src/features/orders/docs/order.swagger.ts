@@ -552,9 +552,6 @@
  *                                   productName:
  *                                     type: string
  *                                     example: Carrots
- *                                   description:
- *                                     type: string
- *                                     example: Fresh crunchy carrots, perfect for salads or cooking
  *                                   basePrice:
  *                                     type: number
  *                                     example: 14328

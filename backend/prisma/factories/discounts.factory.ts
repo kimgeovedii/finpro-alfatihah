@@ -48,21 +48,36 @@ class DiscountsFactory {
         if (!employee) throw new Error('Cannot create discount without employee')
 
         const discountType = this.getRandomDiscountType()
-        const discountValueType = this.getRandomDiscountValueType()
+        let discountValueType = this.getRandomDiscountValueType()
 
         // Generate discount value based on type
-        let discountValue: number
-        if (discountValueType === DiscountValueType.PERCENTAGE) {
-            discountValue = faker.number.int({ min: 5, max: 50 }) // 5-50% off
+        let discountValue: number = 0
+
+        if (discountType !== DiscountType.BUY_ONE_GET_ONE_FREE) {
+            const nominalMultiplication: number = 5000
+            const percentageMultiplication: number = 5
+
+            if (discountValueType === DiscountValueType.PERCENTAGE) {
+                discountValue = faker.number.int({ min: 1, max: 10 }) * percentageMultiplication // 5-30% off
+            } else {
+                discountValue = faker.number.int({ min: 1, max: 10 }) * nominalMultiplication // 5k-50k nominal
+            }
         } else {
-            discountValue = faker.number.int({ min: 5000, max: 50000 }) // 5k-50k nominal
+            discountValueType = DiscountValueType.NOMINAL
         }
 
-        // Generate max discount amount
-        const maxDiscountAmount = faker.number.int({ min: 10000, max: 200000 })
+        // Min & Max purchase amount 
+        let minPurchaseAmount: number | null = null
+        let maxDiscountAmount: number | null = null
+        // Only apply min/max for min purchase discount
+        if (discountType === DiscountType.MINIMUM_PURCHASE) {
+            // Min purchase amount
+            const percentageMultiplication: number = 15000
+            minPurchaseAmount = faker.number.int({ min: 1, max: 10 }) * percentageMultiplication
 
-        // Min purchase amount (optional)
-        const minPurchaseAmount = Math.random() < 0.6 ? faker.number.int({ min: 50000, max: 200000 }) : null
+            // Generate max discount amount
+            maxDiscountAmount = minPurchaseAmount * 5
+        }
 
         // Start and end dates (discount valid from last 3 days to 30 days in future)
         const today = new Date()
@@ -73,18 +88,8 @@ class DiscountsFactory {
         const quota = faker.number.int({ min: 10, max: 100 })
 
         const discountNames = [
-            'Spring Sale',
-            'Weekend Special',
-            'Flash Deal',
-            'Member Discount',
-            'New Customer Offer',
-            'Bulk Purchase Discount',
-            'Seasonal Promotion',
-            'Bundle Deal',
-            'Loyalty Reward',
-            'Holiday Special',
-            'Grand Sale',
-            'Clearance Discount'
+            'Spring Sale', 'Weekend Special', 'Flash Deal', 'Member Discount', 'New Customer Offer', 'Bulk Purchase Discount',
+            'Seasonal Promotion', 'Bundle Deal', 'Loyalty Reward', 'Holiday Special', 'Grand Sale', 'Clearance Discount'
         ]
 
         const name = faker.helpers.arrayElement(discountNames)
