@@ -4,6 +4,7 @@ import { PaymentMethodType } from "@/types/global.type"
 import { PaymentMethodItemCard } from "./PaymentMethodItemCard"
 import { DividerLine } from "@/components/layout/DividerLine"
 import { Button } from "@/components/ui/button"
+import { HeadingText } from "@/components/layout/HeadingText"
 
 interface Props {
     selectedMethod: PaymentMethodType
@@ -15,7 +16,7 @@ export const PaymentMethodSelect: React.FC<Props> = ({ selectedMethod, onSelectM
     return (
         <div className="bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 mb-4">
             <div className="flex justify-between items-center">
-                <h5 className="font-bold">Payment Method</h5>
+                <HeadingText children="Payment Method" level={2}/>
                 <Button className="text-emerald-700 bg-transparent text-sm font-bold hover:text-emerald-600 transition-colors"><QuestionMarkCircleIcon/> Help Me</Button>
             </div>
             <DividerLine/>

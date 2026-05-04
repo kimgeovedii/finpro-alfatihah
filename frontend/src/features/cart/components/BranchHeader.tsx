@@ -1,3 +1,4 @@
+import { HeadingText } from "@/components/layout/HeadingText"
 import { MiniTagBox } from "@/components/layout/MiniTagBox"
 import { Button } from "@/components/ui/button"
 import { BuildingOfficeIcon, ShoppingCartIcon, TrashIcon } from "@heroicons/react/24/outline"
@@ -20,8 +21,8 @@ export const BranchHeader: React.FC<Props> = ({ storeName, cartId, city, onRemov
                     <BuildingOfficeIcon className="w-5 h-5"/>
                 </div>
                 <Link href={`/${storeName}`}>
-                    <h3 className="text-xl font-bold text-slate-800 tracking-tight cursor-pointer line-clamp-1">{storeName}</h3>
-                    <MiniTagBox context="City" val={city}/>
+                    <HeadingText children={storeName} level={2}/>
+                    <MiniTagBox val={city}/>
                 </Link>
                 <div className="flex-1 h-px bg-slate-200 ml-4"></div>
             </div>

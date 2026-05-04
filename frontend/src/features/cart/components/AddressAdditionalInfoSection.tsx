@@ -1,3 +1,4 @@
+import { HeadingText } from "@/components/layout/HeadingText"
 import { cardBaseClass, cardSelectedClass, cardUnselectedClass } from "@/constants/style.const"
 import { CheckIcon, HomeIcon, MapIcon, PhoneIcon, UserIcon } from "@heroicons/react/24/outline"
 import React from "react"
@@ -22,7 +23,7 @@ export const AddressAdditionalInfoSection: React.FC<Props> = ({ label, address, 
                 </div>
                 <div>
                     <div className="flex flex-col lg:flex-row items-start justify-between w-full relative">
-                        <p className="text-slate-800 font-bold text-sm mb-0.5 w-full break-all whitespace-normal line-clamp-2">{label}</p>
+                        <HeadingText level={4} children={label}/>
                         {
                             isSelected && 
                                 <div className="mt-2 lg:mt-0 lg:ml-2 w-5 h-5 rounded-full bg-emerald-700 flex items-center justify-center">

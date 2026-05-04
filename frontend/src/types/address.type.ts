@@ -14,9 +14,10 @@ export type AddressData = {
 }
 
 export type BranchData = {
-    id: string
+    id?: string
     storeName: string
     address: string
-    city: string
+    city?: string
     schedules: Schedule[]
+    openStatus?: string
 }

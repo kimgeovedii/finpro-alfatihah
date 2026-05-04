@@ -1,5 +1,6 @@
 'use client'
 import { DividerLine } from "@/components/layout/DividerLine"
+import { HeadingText } from "@/components/layout/HeadingText"
 import { SkeletonBox } from "@/components/layout/SkeletonBox"
 import { OrderStatus } from "@/constants/business.const"
 import { useAuthStore } from "@/features/auth/store/useAuthStore"
@@ -69,7 +70,8 @@ export default function ManageOrdersPage() {
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto">
             <div className="flex items-center justify-between">
                 <div className="w-full">
-                    <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight mb-4">Manage Order</h1>
+                    <HeadingText level={1} children="Manage Order"/>
+                    <div className="mt-2">
                     {
                         isLoadingSummaryByBranchId ?
                             <>
@@ -95,6 +97,7 @@ export default function ManageOrdersPage() {
                                 finishedOrderLastMonth={summaryByBranchId?.finishedOrderLastMonth ?? 0}
                             />
                     }
+                    </div>
                     <DividerLine/>
                     <OrderFiltersBar
                         branchId={branchId}

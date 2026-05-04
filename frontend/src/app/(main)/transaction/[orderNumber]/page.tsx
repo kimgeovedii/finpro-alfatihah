@@ -6,11 +6,11 @@ import { useParams } from 'next/navigation';
 import { Check, Package, Truck, Home } from "lucide-react"
 import { OrderStatusStepsCard } from '@/features/order/components/OrderStatusStepsCard';
 import { useCancelOrderStatusById, useConfirmOrderStatusById, useOrderDetailData } from '@/features/order/hooks/useOrder';
-import { formatListSchedule } from '@/utils/converter.util';
 import Swal from 'sweetalert2';
 import { SkeletonBox } from '@/components/layout/SkeletonBox';
 import { MessageBox } from '@/components/layout/MessageBox';
 import { BackButton } from '@/components/button/BackButton';
+import { HeadingText } from '@/components/layout/HeadingText';
 
 export default function TransactionDetailPage() {
   // For repo fetching
@@ -90,13 +90,13 @@ export default function TransactionDetailPage() {
       icon: <Home className="w-4 h-4"/>
     }
   ]
-  
-  // Format shop's schedule
-  const scheduleText = order?.branch?.schedules ? formatListSchedule(order?.branch?.schedules) : '-'
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto w-full">
-      <BackButton url="transaction"/>
+      <div className='flex gap-5 items-center'>
+        <BackButton url="transaction"/>
+        <HeadingText children="Transaction Detail" level={1}/>
+      </div>
       {
         !isLoading && (!order || order?.payments.length === 0 ) ?
           // Render failed fetching condition
@@ -122,10 +122,10 @@ export default function TransactionDetailPage() {
                     />
                     <OrderDetailBranchCard
                       branch={{
-                        name: order?.branch?.storeName ?? "-",
-                        address: `${order?.branch?.address}, ${order?.branch?.city}`,
-                        schedule: scheduleText,
-                        imageUrl: "/images/branch.jpg",
+                        storeName: order?.branch?.storeName ?? "-",
+                        address: order?.branch?.address ?? "-",
+                        schedules: order?.branch?.schedules ?? [],
+                        city: order?.branch?.city ?? "-"
                       }}
                       orderInfo={{
                         orderNumber,

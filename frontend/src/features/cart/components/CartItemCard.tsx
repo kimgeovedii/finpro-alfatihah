@@ -1,3 +1,4 @@
+import { HeadingText } from "@/components/layout/HeadingText"
 import { Button } from "@/components/ui/button"
 import { currencyFormat } from "@/constants/business.const"
 import { TrashIcon } from "@heroicons/react/24/outline"
@@ -26,18 +27,18 @@ export const CartItemCard: React.FC<Props> = ({ slugName, storeName, productName
                 <Image src={mainImage} alt={mainImage} className="w-full h-40 sm:w-20 sm:h-20 rounded-xl object-cover shadow" height={100} width={100}/>
                 <div>
                     <Link href={`/${storeName}/${slugName}`}>
-                        <h3 className="text-lg font-semibold text-slate-800 line-clamp-1">{productName}</h3>
+                        <HeadingText level={3} children={productName}/>
                     </Link>
                     <div className="flex gap-2 items-center hidden lg:flex mt-2">
                         <p className="text-emerald-700 font-bold text-lg">Rp {basePrice.toLocaleString(currencyFormat)}</p>
-                        <p className="text-gray-500 text-sm">per item</p>
+                        <p className="text-gray-500 text-sm">/ item</p>
                     </div>
                 </div>
             </div>
             <div className="flex items-center w-full lg:w-auto justify-between gap-5 mt-2 lg:mt-0">
                 <div className="items-center block lg:hidden mt-2">
                     <p className="text-emerald-700 font-bold text-lg">Rp {basePrice.toLocaleString(currencyFormat)}</p>
-                    <p className="text-gray-500 text-sm">per item</p>
+                    <p className="text-gray-500 text-sm">/ item</p>
                 </div>
                 <div className="flex items-center gap-2">
                     <Button onClick={onRemove} className="bg-transparent text-slate-400 hover:text-red-500 transition cursor-pointer">

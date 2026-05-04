@@ -8,6 +8,7 @@ import { VouchersItemCard } from "./VouchersItemCard"
 import { Button } from "@/components/ui/button"
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline"
 import { DividerLine } from "@/components/layout/DividerLine"
+import { HeadingText } from "@/components/layout/HeadingText"
 
 interface Props {
     appliedVoucher?: string | null
@@ -50,7 +51,7 @@ export const VouchersSelectionCard: React.FC<Props> = ({ appliedVoucher, totalBa
     return (
         <div className="bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 mb-4">
             <div className="flex justify-between mb-3 items-center">
-                <h5 className="font-bold">My Vouchers</h5>
+                <HeadingText children="My Vouchers" level={2}/>
                 <Button className="text-emerald-700 bg-transparent text-sm font-bold hover:text-emerald-600 transition-colors"><MagnifyingGlassIcon/> Find The Best One!</Button>
             </div>
             <DividerLine/>

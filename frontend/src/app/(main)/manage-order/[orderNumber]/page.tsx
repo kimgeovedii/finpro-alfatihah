@@ -6,6 +6,7 @@ import Swal from "sweetalert2"
 import { SkeletonBox } from "@/components/layout/SkeletonBox"
 import { MessageBox } from "@/components/layout/MessageBox"
 import { BackButton } from "@/components/button/BackButton"
+import { HeadingText } from "@/components/layout/HeadingText"
 
 export default function ManageOrdersDetailPage() {
   // Handle param
@@ -62,7 +63,10 @@ export default function ManageOrdersDetailPage() {
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto">
-      <BackButton url="manage-order"/>
+      <div className='flex gap-5 items-center'>
+        <BackButton url="manage-order"/>
+        <HeadingText children="Transaction Detail" level={1}/>
+      </div>
       {
         isLoading ? 
           // Render loading element
@@ -90,6 +94,7 @@ export default function ManageOrdersDetailPage() {
                 }
                 shippingCost={order?.shippingCost ?? 0}
                 confirmedAt={order?.confirmedAt}
+                shippedAt={order?.shippedAt}
                 finalPrice={order?.finalPrice ?? 0}
                 isLoading={isLoading}
                 payments={order?.payments ?? []}

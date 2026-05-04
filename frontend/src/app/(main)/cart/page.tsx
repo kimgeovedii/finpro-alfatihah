@@ -10,6 +10,7 @@ import { SkeletonBox } from "@/components/layout/SkeletonBox";
 import { DividerLine } from "@/components/layout/DividerLine";
 import { showPopUp } from "@/utils/message.util";
 import { actionMessages } from "@/constants/message.const";
+import { HeadingText } from "@/components/layout/HeadingText";
 
 export default function CartPage() {
   // Handle hook
@@ -102,7 +103,7 @@ export default function CartPage() {
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto">
       <div className="flex items-center justify-between">
         <div className="w-full">
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">Your Basket</h1>
+          <HeadingText children="Your Cart" level={1}/>
           {
             // Render loading element
             isLoading ? <SkeletonBox extraClass={'min-h-[30px]'}/> : <CartSummary totalItems={summary?.totalItems ?? 0} totalQty={summary?.totalQty ?? 0}/>
@@ -125,7 +126,7 @@ export default function CartPage() {
                   <div key={ct.id} className="mb-6">
                     <BranchHeader 
                       storeName={ct.branch.storeName} 
-                      city={ct.branch.city}
+                      city={ct.branch.city ?? "-"}
                       onRemove={() => handleRemoveCart(ct.id)} 
                       cartId={ct.id}
                     />

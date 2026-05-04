@@ -59,11 +59,6 @@ const NAV_ITEMS = [
     icon: Square2StackIcon,
   },
   {
-    title: "Cart",
-    href: "/cart",
-    icon: ShoppingCartIcon,
-  },
-  {
     title: "Manage Order",
     href: "/manage-order",
     icon: ClipboardDocumentCheckIcon,
@@ -72,11 +67,6 @@ const NAV_ITEMS = [
     title: "Manage Project",
     href: "/manage-project",
     icon: BriefcaseIcon,
-  },
-  {
-    title: "My Transaction",
-    href: "/transaction",
-    icon: ArrowsRightLeftIcon,
   },
   {
     title: "Report & Analysis",

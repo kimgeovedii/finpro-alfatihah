@@ -1,9 +1,11 @@
 "use client";
 import { DividerLine } from "@/components/layout/DividerLine";
+import { HeadingText } from "@/components/layout/HeadingText";
 import { MessageBox } from "@/components/layout/MessageBox";
 import { SkeletonBox } from "@/components/layout/SkeletonBox";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { OrderItemCard } from "@/features/order/components/OrderItemCard";
 import { OrderSummaryCard } from "@/features/order/components/OrderSummaryCard";
 import { useDownloadTransactionHistory } from "@/features/order/hooks/useExport";
@@ -46,7 +48,7 @@ export default function TransactionPage() {
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto">
       <div className="flex items-center justify-between">
         <div className="w-full">
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">My History</h1>
+          <HeadingText level={1} children="My History"/>
           {
             !isLoadingSummary && summary ? 
               <OrderSummaryCard 
@@ -75,24 +77,24 @@ export default function TransactionPage() {
           <div className="flex flex-wrap items-end gap-3 mb-5 bg-white p-4 rounded-xl justify-between">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2 w-full lg:w-auto">
               <div className="col-span-2 md:col-span-2">
-                <p className="text-xs text-slate-500 mb-1">Order Number</p>
+                <Label className="text-xs text-slate-500 mb-1">Order Number</Label>
                 <Input placeholder="e.g. ORD-123" value={orderNumber} onChange={(e) => setOrderNumber(e.target.value)} className="w-full" />
               </div>
               <div className="col-span-1">
-                <p className="text-xs text-slate-500 mb-1">Start Date</p>
+                <Label className="text-xs text-slate-500 mb-1">Start Date</Label>
                 <Input type="date" value={dateStart} onChange={(e) => setDateStart(e.target.value)} className="w-full" />
               </div>
               <div className="col-span-1">
-                <p className="text-xs text-slate-500 mb-1">End Date</p>
+                <Label className="text-xs text-slate-500 mb-1">End Date</Label>
                 <Input type="date" value={dateEnd} onChange={(e) => setDateEnd(e.target.value)} className="w-full" />
               </div>
             </div>
             <div className="flex w-full md:w-auto gap-2">
               <Button onClick={handleSearch} className="flex-1 md:flex-none h-9">
-                <MagnifyingGlassIcon /> Search
+                <MagnifyingGlassIcon/> Search
               </Button>
               <Button onClick={downloadTransactionHistory} className="flex-1 md:flex-none h-9">
-                <CloudArrowDownIcon /> Transaction History
+                <CloudArrowDownIcon/> Transaction History
               </Button>
             </div>
           </div>

@@ -9,12 +9,12 @@ import { useRouter } from 'next/navigation'
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
-import { formatListSchedule } from '@/utils/converter.util';
 import { SkeletonBox } from '@/components/layout/SkeletonBox';
 import { VoucherData } from '@/features/cart/repositories/voucher.type';
 import { BackButton } from '@/components/button/BackButton';
 import { actionMessages } from '@/constants/message.const';
 import { showPopUp } from '@/utils/message.util';
+import { HeadingText } from '@/components/layout/HeadingText';
 
 export default function CartDetailPage() {
   // Handle param
@@ -109,9 +109,6 @@ export default function CartDetailPage() {
 
   const finalPrice = Math.round(finalProductPrice + finalShipping)
   
-  // Format shop's schedule
-  const scheduleText = cart?.branch?.schedules ? formatListSchedule(cart?.branch?.schedules) : '-'
-
   // Handle action
   const handleApply = (voucher: VoucherData) => setSelectedVoucher(voucher)
   const handleRemove = () => setSelectedVoucher(null)
@@ -216,15 +213,18 @@ export default function CartDetailPage() {
   
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto">
-      <BackButton url="cart"/>
+      <div className='flex gap-5 items-center'>
+        <BackButton url="cart"/>
+        <HeadingText children="Cart Detail" level={1}/>
+      </div>
       <div className='flex flex-col lg:flex-row w-full gap-5'>
         <div className='w-full lg:flex-1 flex flex-col space-y-5'>
           <AddressSelectionCard
             branch={{
-              name: cart?.branch.storeName,
+              storeName: cart?.branch.storeName,
               address: cart.branch.address,
-              schedule: scheduleText,
-              statusOpen: cart.openStatus,
+              schedules: cart.branch.schedules,
+              openStatus: cart.openStatus,
             }}
             selectedAddressId={selectedAddressId}
             onSelect={(id: string) => setSelectedAddressId(id)}

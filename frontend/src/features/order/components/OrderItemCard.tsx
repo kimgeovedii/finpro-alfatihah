@@ -53,13 +53,13 @@ export const OrderItemCard: React.FC<Props> = ({ orderId, orderNumber, status, t
     return (
         <div className="flex items-center justify-between bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 mb-4">
             <div className="w-full">
-                <div className="flex w-full justify-between items-center">
-                    <p className="text-slate-500 text-sm mb-0">Order Number</p>
+                <div className="flex justify-between items-center">
+                    <CopyFieldButton label="Order number" value={orderNumber} />
                     <Badge className={`capitalize font-semibold ${statusClass}`}>{finalStatus}</Badge>
                 </div>
-                <CopyFieldButton label="Order number" value={orderNumber} />
-                <p className="text-slate-500 text-sm mb-1"><span>({totalItems})</span> Purchased Product</p>
-                <p className="text-slate-500 text-sm font-semibold">{productList}</p>
+                <DividerLine/>
+                <p className="text-slate-500 text-sm mb-1 font-semibold"><span>({totalItems})</span> Product{totalItems > 1 ? <>s</> : <></>} Purchased</p>
+                <p className="text-slate-500 text-sm line-clamp-3">{productList}</p>
                 { 
                     status === 'WAITING_PAYMENT' && paymentEvidence === null && paymentMethod === "MANUAL" && 
                         <div className="mt-2">

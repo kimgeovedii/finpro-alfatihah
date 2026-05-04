@@ -1,8 +1,10 @@
+import { Schedule } from "./schedule.type"
+
 // For handling branch info card
 export type BranchInfoData = {
-    name: string
+    storeName: string
     address: string
-    schedule: string
+    schedule: Schedule[]
     imageUrl?: string
-    statusOpen: string
+    openStatus: string
 }

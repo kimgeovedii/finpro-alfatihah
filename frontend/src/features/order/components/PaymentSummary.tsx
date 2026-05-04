@@ -8,6 +8,7 @@ import { InfoBoxShippingWeightToolTip } from "@/components/layout/InfoBoxShippin
 import { courierShippingDefault, currencyFormat } from "@/constants/business.const"
 import { ShippingSummaryCard } from "@/components/layout/ShippingSummaryCard"
 import { DividerLine } from "@/components/layout/DividerLine"
+import { HeadingText } from "@/components/layout/HeadingText"
 
 type Props = {
     orderId: string
@@ -30,25 +31,25 @@ export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, t
     
     return (
         <div className="bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 mb-4">
-            <h5 className="font-bold mb-3">Payment Summary</h5>
+            <HeadingText children="Payment Summary" level={2}/>
             <DividerLine/>
             <div className="flex justify-between">
                 <p>Total Items <b>({totalItem})</b></p>
-                <h6 className="font-bold">Rp. {totalPrice.toLocaleString(currencyFormat)}</h6>
+                <p className="font-bold">Rp. {totalPrice.toLocaleString(currencyFormat)}</p>
             </div>
             {
                 totalSaving > 0 && 
                     <div className="flex justify-between">
                         <p>Total Saving</p>
-                        <h6 className="font-bold">Rp. {totalSaving.toLocaleString(currencyFormat)}</h6>
+                        <p className="font-bold">Rp. {totalSaving.toLocaleString(currencyFormat)}</p>
                     </div>
             }
             <DividerLine/>
             <ShippingSummaryCard shippingWeight={shippingWeight} shippingCost={shippingCost}/>
             <DividerLine/>
             <div className="flex justify-between">
-                <h6 className="font-bold">Final Price</h6>
-                <h4 className="font-bold text-xl">Rp. {Math.ceil(finalPrice + shippingCost).toLocaleString(currencyFormat)}</h4>
+                <HeadingText children="Discount" level={3}/>
+                <p className="font-bold text-xl">Rp. {Math.ceil(finalPrice + shippingCost).toLocaleString(currencyFormat)}</p>
             </div>
             <DividerLine/>
             <div className="flex flex-col gap-3">
