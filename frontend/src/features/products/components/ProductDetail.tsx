@@ -1,84 +1,19 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-
 import { useProductDetail } from "@/features/products/hooks/useProductDetail";
 import { ProductDetailImageGallery } from "./ProductDetailImageGallery";
 import { ProductDetailInfoContent } from "./ProductDetailInfoContent";
 import { ProductDetailCartAction } from "./ProductDetailCartAction";
 import { ProductBreadcrumb } from "./ProductBreadCrumb";
 import { ProductBranchInfoCard } from "./ProductBranchInfo";
-import Swal from "sweetalert2";
-import { useCreateCart } from "../hooks/useCart";
-import { useDeleteCartItem } from "../hooks/useCartItem";
-// import { useStoreSelection } from "../hooks/useStoreSelection";
-// import { useProductActions } from "../hooks/useProductActions";
+import { useProductActions } from "../hooks/useProductActions";
+import { useStoreSelection } from "../hooks/useStoreSelection";
 
-export const ProductDetail = ({ 
-  slugName, 
-  storeName
-//   storeName: storeNameProp
-}: { 
-  slugName: string, 
-  storeName: string 
-  //storeName?: string;
- }) => {
+export const ProductDetail = ({ slugName, storeName: storeNameProp }: { slugName: string, storeName?: string }) => {
+  const { storeName } = useStoreSelection(storeNameProp);
   const { product, isLoading, error, fetchProduct } = useProductDetail(slugName, storeName);
-  const [ qty, setQty ] = useState(1);
-  const [ currentCartQty, setCurrentCartQty ] = useState(0)
-  const { createCart, isCreating } = useCreateCart()
-  const { deleteCartItem, isDeletingItem } = useDeleteCartItem()
-//   const { cartProps, isAvailable, branchInventory } = useProductActions(
-//     product,
-//     fetchProduct,
-//   );
-
-  useEffect(() => {
-    setCurrentCartQty(product?.branchInventories?.[0]?.cartItems?.[0]?.quantity ?? 0)
-  }, [product])
-
-  // Handle action
-  const handleAddToCart = async (branchId: string, productId: string, qty: number) => {
-    const success = await createCart(branchId, productId, qty)
-
-    if (success) {
-      await Swal.fire({
-        title: "Product Added!",
-        text: "Item has been added to your cart.",
-        icon: "success",
-        confirmButtonColor: "#10b981",
-      })
-
-      setQty(1)
-      fetchProduct()
-    }
-  }
-
-  const handleRemoveCartItem = async (cartItemId: string, productName: string) => {
-    const confirm = await Swal.fire({
-      title: "Remove product?",
-      html: `<b>${productName}</b> will be remove from your cart.`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes, remove it",
-      cancelButtonText: "Cancel",
-      confirmButtonColor: "#ef4444",
-    })
-    if (!confirm.isConfirmed) return
-
-    const success = await deleteCartItem(cartItemId)
-    if (success) {
-      await Swal.fire({
-        title: "Item deleted",
-        html: `<b>${productName}</b> has been removed.`,
-        icon: "success",
-        confirmButtonColor: "#10b981",
-      })
-
-      setQty(1)
-      fetchProduct()
-    }
-  }
+  const { cartProps, isAvailable, branchInventory } = useProductActions(product, fetchProduct);
 
   if (isLoading) {
     return (
@@ -106,33 +41,9 @@ export const ProductDetail = ({
     );
   }
 
-  const cartProps = {
-    qty,
-    setQty,
-    price: product.basePrice,
-    totalPrice: product.basePrice * qty,
-    isCreating,
-    onAddToCart: () =>
-      handleAddToCart(
-        product.branchInventories[0].branchId,
-        product.id,
-        qty 
-      ),
-    currentCartQty,
-    onRemoveFromCart: () => handleRemoveCartItem(
-      product?.branchInventories?.[0]?.cartItems?.[0]?.id,
-      product.productName
-      )
-  };
-
   return (
     <AnimatePresence mode="wait">
-      <motion.section
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="w-full bg-slate-50 min-h-screen text-slate-900"
-      >
+      <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="w-full bg-slate-50 min-h-screen text-slate-900">
         {/* Mobile Layout */}
         <div className="lg:hidden flex flex-col pb-12 p-4">
           <div className="w-full overflow-hidden">
@@ -141,7 +52,6 @@ export const ProductDetail = ({
               productName={product.productName}
             />
           </div>
-
           <div className="px-0 pt-6 pb-6 flex flex-col gap-6">
             <ProductDetailInfoContent
               productName={product.productName}
@@ -149,7 +59,6 @@ export const ProductDetail = ({
               description={product.description}
               price={product.basePrice}
             />
-
             {branchInventory ? (
               <ProductBranchInfoCard
                 branch={{
@@ -168,7 +77,6 @@ export const ProductDetail = ({
                 </p>
               </div>
             )}
-
             <ProductDetailCartAction {...cartProps} variant="mobile" />
           </div>
         </div>
@@ -178,7 +86,6 @@ export const ProductDetail = ({
           <div className="mb-8">
             <ProductBreadcrumb name={product.productName} />
           </div>
-
           <div className="grid grid-cols-[1.2fr_1fr_0.8fr] gap-8 xl:gap-14 items-start">
             <div>
               <ProductDetailImageGallery
@@ -186,7 +93,6 @@ export const ProductDetail = ({
                 productName={product.productName}
               />
             </div>
-
             <div>
               <ProductDetailInfoContent
                 productName={product.productName}
