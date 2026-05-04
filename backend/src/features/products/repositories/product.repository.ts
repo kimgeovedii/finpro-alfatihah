@@ -154,22 +154,32 @@ export class ProductRepository {
   };
 
 
-  public updateProduct = async (id: string, data: any) => {
+  public updateProduct = async (
+    id: string,
+    data: any,
+    existingImageIds: string[] = [],
+  ) => {
     const { imageUrls, ...updateData } = data;
+    const shouldDeleteOldImages = existingImageIds.length > 0 || (imageUrls && Array.isArray(imageUrls) && imageUrls.length > 0);
 
-    // If imageUrls are provided, delete old images and create new ones
-    if (imageUrls && Array.isArray(imageUrls) && imageUrls.length > 0) {
+    if (shouldDeleteOldImages) {
+      const productImageUpdate: any = {
+        deleteMany: existingImageIds.length > 0 ? { id: { notIn: existingImageIds } } : {},
+      };
+
+      if (imageUrls && Array.isArray(imageUrls) && imageUrls.length > 0) {
+        const startPrimaryIndex = existingImageIds.length === 0 ? 0 : 1;
+        productImageUpdate.create = imageUrls.map((imageUrl: string, index: number) => ({
+          imageUrl,
+          isPrimary: existingImageIds.length === 0 && index === 0,
+        }));
+      }
+
       return prisma.products.update({
         where: { id },
         data: {
           ...updateData,
-          productImages: {
-            deleteMany: {},
-            create: imageUrls.map((imageUrl, index) => ({
-              imageUrl,
-              isPrimary: index === 0,
-            })),
-          },
+          productImages: productImageUpdate,
         },
         include: {
           category: {

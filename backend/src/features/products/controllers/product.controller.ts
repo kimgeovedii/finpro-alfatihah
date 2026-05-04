@@ -67,7 +67,9 @@ export class ProductController {
     next: NextFunction,
   ) => {
     try {
-      const files = req.files as Express.Multer.File[] | undefined;
+      const files = Array.isArray(req.files)
+        ? (req.files as Express.Multer.File[])
+        : (req.files as { [fieldname: string]: Express.Multer.File[] } | undefined)?.images;
       const data = await this.productService.createProduct(req.body, files);
       sendSuccess(res, data, "Create product successfully");
     } catch (error: any) {
@@ -81,7 +83,9 @@ export class ProductController {
     next: NextFunction,
   ) => {
     try {
-      const files = req.files as Express.Multer.File[] | undefined;
+      const files = Array.isArray(req.files)
+        ? (req.files as Express.Multer.File[])
+        : (req.files as { [fieldname: string]: Express.Multer.File[] } | undefined)?.images;
       const data = await this.productService.updateProduct(
         req.params.id as string,
         req.body,

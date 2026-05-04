@@ -103,7 +103,7 @@ export const useManageProducts = () => {
 
   const fetchCategories = useCallback(async () => {
     try {
-      const data = await repo.getAllCategories();
+      const data = await repo.getAllCategories(1, 100, undefined, true);
       if (Array.isArray(data)) {
         setCategories(data);
       } else if (data && "data" in (data as any)) {

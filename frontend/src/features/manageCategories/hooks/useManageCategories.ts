@@ -6,11 +6,26 @@ import {
   UpdateCategoryPayload,
 } from "@/features/manageCategories/types/manageCategory.type";
 import { ManageCategoryRepository } from "@/features/manageCategories/repositories/manageCategory.repository";
+import { useAuthService } from "@/features/auth/hooks/useAuthService";
+import { AuthenticatedUser } from "@/features/manageProducts/types/manageProduct.type";
 import toast from "react-hot-toast";
 
 const repo = new ManageCategoryRepository();
 
 export const useManageCategories = () => {
+  const { user, fetchUser, isLoading: userLoading } = useAuthService();
+  const authUser = user as AuthenticatedUser;
+  
+  useEffect(() => {
+    if (!userLoading && (!authUser || !authUser.employee)) {
+      fetchUser();
+    }
+  }, [fetchUser, userLoading, authUser]);
+
+  const canManage =
+    authUser?.employee?.role === "SUPER_ADMIN" ||
+    (authUser as any)?.role === "SUPER_ADMIN";
+
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [meta, setMeta] = useState<PaginationMeta>({
     total: 0,
@@ -19,8 +34,10 @@ export const useManageCategories = () => {
     totalPages: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
+  const [searchQuery, setSearchQuery] = useState("");
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -41,6 +58,18 @@ export const useManageCategories = () => {
     }, 400);
   }, []);
 
+  const handleSort = useCallback(
+    (field: string) => {
+      if (sortBy === field) {
+        setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+      } else {
+        setSortBy(field);
+        setSortOrder("asc");
+      }
+    },
+    [sortBy, sortOrder],
+  );
+
   const fetchCategories = useCallback(
     async (page: number = 1) => {
       try {
@@ -49,6 +78,9 @@ export const useManageCategories = () => {
           page,
           meta.limit,
           debouncedSearch || undefined,
+          false,
+          sortBy,
+          sortOrder,
         );
 
         if (response && "data" in response) {
@@ -64,12 +96,12 @@ export const useManageCategories = () => {
         setIsLoading(false);
       }
     },
-    [meta.limit, debouncedSearch],
+    [meta.limit, debouncedSearch, sortBy, sortOrder],
   );
 
   useEffect(() => {
     fetchCategories(1);
-  }, [debouncedSearch]);
+  }, [debouncedSearch, sortBy, sortOrder]);
 
   const handlePageChange = useCallback(
     (page: number) => {
@@ -157,6 +189,9 @@ export const useManageCategories = () => {
     meta,
     isLoading,
     searchQuery,
+    sortBy,
+    sortOrder,
+    handleSort,
     addDialogOpen,
     setAddDialogOpen,
     editDialogOpen,
@@ -174,5 +209,7 @@ export const useManageCategories = () => {
     handleCreate,
     handleUpdate,
     handleDeleteConfirm,
+    canManage,
+    userLoading,
   };
 };

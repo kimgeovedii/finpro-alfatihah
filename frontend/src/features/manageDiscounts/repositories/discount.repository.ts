@@ -20,12 +20,20 @@ export class DiscountRepository {
     limit?: number;
     search?: string;
     branchId?: string;
+    sortBy?: string;
+    sortOrder?: string;
+    discountType?: string;
+    status?: string;
   }): Promise<GetDiscountsResponse> {
     const searchParams = new URLSearchParams();
     if (params?.page) searchParams.append("page", params.page.toString());
     if (params?.limit) searchParams.append("limit", params.limit.toString());
     if (params?.search) searchParams.append("search", params.search);
     if (params?.branchId) searchParams.append("branchId", params.branchId);
+    if (params?.sortBy) searchParams.append("sortBy", params.sortBy);
+    if (params?.sortOrder) searchParams.append("sortOrder", params.sortOrder);
+    if (params?.discountType) searchParams.append("discountType", params.discountType);
+    if (params?.status) searchParams.append("status", params.status);
 
     return apiFetch<GetDiscountsResponse>(`/discounts?${searchParams.toString()}`);
   }

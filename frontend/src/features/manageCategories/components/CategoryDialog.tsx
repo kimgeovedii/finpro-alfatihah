@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import { useFormik } from "formik";
 import {
   Dialog,
@@ -25,10 +25,11 @@ export const CategoryDialog: React.FC<CategoryDialogProps> = ({
   title,
 }) => {
   const formik = useFormik({
+    enableReinitialize: true,
     initialValues: {
-      name: "",
-      slugName: "",
-      description: "",
+      name: category?.name || "",
+      slugName: category?.slugName || "",
+      description: category?.description || "",
     },
     validationSchema: categoryValidationSchema,
     onSubmit: async (values, { resetForm }) => {

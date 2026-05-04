@@ -213,6 +213,7 @@ model product_categories {
   description String
   createdAt   DateTime   @default(now()) @map("created_at")
   updatedAt   DateTime?  @updatedAt @map("updated_at")
+  deletedAt   DateTime?  @map("deleted_at")
   products    products[]
 }
 
@@ -310,6 +311,7 @@ model discounts {
   quota             Int
   createdAt         DateTime            @default(now()) @map("created_at")
   updatedAt         DateTime?           @updatedAt @map("updated_at")
+  deletedAt         DateTime?           @map("deleted_at")
   branchId          String              @map("branch_id")
   createdBy         String              @map("created_by")
   branch            Branch              @relation(fields: [branchId], references: [id], onDelete: Cascade)

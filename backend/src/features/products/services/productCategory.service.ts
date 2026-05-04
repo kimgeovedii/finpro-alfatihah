@@ -11,6 +11,8 @@ export class ProductCategoryService {
     filters: any,
     page: number,
     limit: number,
+    sortBy: string = "name",
+    sortOrder: "asc" | "desc" = "asc",
   ) => {
     const skip = (page - 1) * limit;
     const take = limit;
@@ -23,8 +25,18 @@ export class ProductCategoryService {
       };
     }
 
+    if (filters.includeDeleted === "true" || filters.includeDeleted === true) {
+      where.includeDeleted = true;
+    }
+
     const { data, total } =
-      await this.productCategoryRepository.findAllCategories(where, skip, take);
+      await this.productCategoryRepository.findAllCategories(
+        where,
+        skip,
+        take,
+        sortBy,
+        sortOrder,
+      );
 
     return {
       data,

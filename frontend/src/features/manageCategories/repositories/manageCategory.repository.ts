@@ -11,11 +11,17 @@ export class ManageCategoryRepository {
     page: number = 1,
     limit: number = 10,
     search?: string,
+    includeDeleted: boolean = false,
+    sortBy: string = "name",
+    sortOrder: "asc" | "desc" = "asc",
   ): Promise<ManageCategoryListResponse> => {
     const params = new URLSearchParams();
     params.set("page", String(page));
     params.set("limit", String(limit));
     if (search) params.set("name", search);
+    if (includeDeleted) params.set("includeDeleted", "true");
+    params.set("sortBy", sortBy);
+    params.set("sortOrder", sortOrder);
 
     return await apiFetch<ManageCategoryListResponse>(
       `/product-categories?${params.toString()}`,

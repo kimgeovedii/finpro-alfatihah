@@ -27,7 +27,10 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const selectedCategoryName = categories.find(c => c.id === selectedCategory)?.name || "All Categories";
+  const selectedCat = categories.find(c => c.id === selectedCategory);
+  const selectedCategoryName = selectedCat 
+    ? `${selectedCat.name}${selectedCat.deletedAt ? " (Deleted)" : ""}`
+    : "All Categories";
   return (
     <motion.div
       initial={{ opacity: 0, y: -10 }}
@@ -115,7 +118,7 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
                             selectedCategory === cat.id ? "text-[#006666] font-semibold bg-[#f0fdfa]" : "text-[#475569]"
                           }`}
                         >
-                          {cat.name}
+                          {cat.name} {cat.deletedAt && <span className="text-xs text-red-400 ml-1">(Deleted)</span>}
                         </button>
                       ))}
                     </div>

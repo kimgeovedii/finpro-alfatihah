@@ -6,9 +6,6 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
 // create axios instance with defaults
 const api: AxiosInstance = axios.create({
   baseURL: API_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
 });
 
 // helper to update tokens in cookies
@@ -87,9 +84,13 @@ export async function apiFetch<T>(
     url: endpoint,
     method,
     data: body,
-    ...(isFormData && {
-      headers: {},
-    }),
+    ...(isFormData
+      ? {}
+      : {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }),
   });
   const data = response.data;
 
