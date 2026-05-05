@@ -61,6 +61,7 @@ export const ProductDetail = ({ slugName, storeName: storeNameProp }: { slugName
               categoryName={product.category.name}
               description={product.description}
               price={product.basePrice}
+              discountedPrice={cartProps.discountedPrice}
             />
             {branchInventory ? (
               <BranchInfoCard branch={branchInventory.branch}/>
@@ -97,6 +98,7 @@ export const ProductDetail = ({ slugName, storeName: storeNameProp }: { slugName
                 categoryName={product.category.name}
                 description={product.description}
                 price={product.basePrice}
+                discountedPrice={cartProps.discountedPrice}
               />
               {branchInventory ? (
                 <BranchInfoCard branch={branchInventory.branch}/>
