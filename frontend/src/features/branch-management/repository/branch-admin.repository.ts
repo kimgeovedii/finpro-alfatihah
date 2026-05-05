@@ -8,7 +8,8 @@ import {
   UpdateBranchPayload,
   CreateSchedulePayload,
   UpdateSchedulePayload,
-} from "../types/branch-admin.types";
+  EmployeeListResponse,
+} from "../types/branch-admin.type";
 
 export class BranchAdminRepository {
   public getAllBranches = async (
@@ -68,14 +69,16 @@ export class BranchAdminRepository {
     return await apiFetch<Employee[]>(`/admin/branches/employees/store-admins${query}`, "get");
   };
 
-  public getAllEmployees = async (params?: { search?: string; role?: string; branchId?: string }): Promise<Employee[]> => {
+  public getAllEmployees = async (params?: { search?: string; role?: string; branchId?: string; isUnassigned?: boolean; page?: number; limit?: number }): Promise<EmployeeListResponse> => {
     const query = new URLSearchParams();
     if (params?.search) query.set("search", params.search);
     if (params?.role) query.set("role", params.role);
     if (params?.branchId) query.set("branchId", params.branchId);
+    if (params?.isUnassigned) query.set("isUnassigned", "true");
+    if (params?.page) query.set("page", String(params.page));
+    if (params?.limit) query.set("limit", String(params.limit));
     
-    const res = await apiFetch<any>(`/admin/branches/employees?${query.toString()}`, "get");
-    return res.data || res; // apiFetch might return {success: true, data: [...]}
+    return await apiFetch<EmployeeListResponse>(`/admin/branches/employees?${query.toString()}`, "get");
   };
 
   public createEmployee = async (payload: { fullName: string; email: string; role: string; branchId?: string }): Promise<Employee> => {
@@ -84,5 +87,9 @@ export class BranchAdminRepository {
 
   public assignAdmin = async (branchId: string, employeeId: string): Promise<void> => {
     await apiFetch<void>(`/admin/branches/${branchId}/assign-admin`, "patch", { employeeId });
+  };
+
+  public unassignEmployee = async (employeeId: string): Promise<void> => {
+    await apiFetch<void>(`/admin/branches/employees/${employeeId}/unassign`, "patch");
   };
 }

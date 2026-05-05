@@ -21,6 +21,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/hooks/useSidebar";
+import { useAuthStore } from "@/features/auth/store/useAuthStore";
 
 const NAV_ITEMS = [
   {
@@ -39,11 +40,6 @@ const NAV_ITEMS = [
     icon: TagIcon,
   },
   {
-    title: "Accounts",
-    href: "/dashboard/accounts",
-    icon: UsersIcon,
-  },
-  {
     title: "Branches",
     href: "/dashboard/branches",
     icon: GlobeAmericasIcon,
@@ -59,48 +55,28 @@ const NAV_ITEMS = [
     icon: Square2StackIcon,
   },
   {
-    title: "Cart",
-    href: "/cart",
-    icon: ShoppingCartIcon,
-  },
-  {
     title: "Manage Order",
     href: "/manage-order",
     icon: ClipboardDocumentCheckIcon,
-  },
-  {
-    title: "Manage Project",
-    href: "/manage-project",
-    icon: BriefcaseIcon,
-  },
-  {
-    title: "My Transaction",
-    href: "/transaction",
-    icon: ArrowsRightLeftIcon,
   },
   {
     title: "Report & Analysis",
     href: "/dashboard/report",
     icon: DocumentChartBarIcon,
   },
-  {
-    title: "Tracking Document",
-    href: "/tracking",
-    icon: ClipboardDocumentCheckIcon,
-  },
-  {
-    title: "Master Data",
-    href: "/master-data",
-    icon: ServerStackIcon,
-  },
-  {
-    title: "Settings",
-    href: "/settings",
-    icon: Cog6ToothIcon,
-  },
 ];
 
 export const Sidebar = () => {
+  const user = useAuthStore((state) => state.user);
+  const isSuperAdmin = (user as any)?.employee?.role === "SUPER_ADMIN" || user?.role === "SUPER_ADMIN";
+
+  const filteredNavItems = NAV_ITEMS.filter((item) => {
+    if (item.title === "Branches") {
+      return isSuperAdmin;
+    }
+    return true;
+  });
+
   const {
     pathname,
     isExpanded,
@@ -131,7 +107,7 @@ export const Sidebar = () => {
       >
         {/* Navigation for Mobile */}
         <div className="flex-1 flex flex-col z-10 gap-3 px-3 py-10 overflow-y-auto custom-scrollbar overflow-x-hidden mt-16">
-          {NAV_ITEMS.map((item) => {
+          {filteredNavItems.map((item) => {
             const isActive =
               item.href === "/dashboard"
                 ? pathname === "/dashboard"
@@ -197,7 +173,7 @@ export const Sidebar = () => {
 
           {/* Navigation */}
           <div className="flex-1 flex flex-col gap-3 px-3 py-10 overflow-y-auto custom-scrollbar overflow-x-hidden">
-            {NAV_ITEMS.map((item) => {
+            {filteredNavItems.map((item) => {
               const isActive =
                 item.href === "/dashboard"
                   ? pathname === "/dashboard"

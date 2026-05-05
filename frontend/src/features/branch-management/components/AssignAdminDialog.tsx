@@ -7,7 +7,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Employee, Branch } from "../types/branch-admin.types";
+import { Employee, Branch } from "../types/branch-admin.type";
 import { Label } from "@/components/ui/label";
 import { 
   Command, 
@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/popover";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { BranchAdminRepository } from "../repositories/branch-admin.repository";
+import { BranchAdminRepository } from "../repository/branch-admin.repository";
 
 const repo = new BranchAdminRepository();
 

@@ -1,13 +1,5 @@
 import React from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Branch } from "../types/branch-admin.types";
+import { Branch } from "../types/branch-admin.type";
 import { BranchTableRow } from "./BranchTableRow";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -50,33 +42,35 @@ export const BranchTable: React.FC<BranchTableProps> = ({
   }
 
   return (
-    <div className="rounded-xl border border-slate-200 overflow-hidden bg-white">
-      <Table>
-        <TableHeader className="bg-slate-50/50">
-          <TableRow>
-            <TableHead className="w-[250px]">Store Name</TableHead>
-            <TableHead>Location</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Admins</TableHead>
-            <TableHead>Completeness</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {branches.map((branch, index) => (
-            <BranchTableRow
-              key={branch.id}
-              branch={branch}
-              index={index}
-              onEdit={onEdit}
-              onDelete={onDelete}
-              onManageSchedules={onManageSchedules}
-              onAssignAdmin={onAssignAdmin}
-              onViewAdmins={onViewAdmins}
-            />
-          ))}
-        </TableBody>
-      </Table>
+    <div className="w-full overflow-x-auto rounded-xl border border-slate-200">
+      <div className="min-w-[1000px]">
+        <table className="w-full text-left border-collapse bg-white">
+          <thead>
+            <tr className="bg-[#eff1f2] text-[#595c5d] text-xs uppercase tracking-wider">
+              <th className="py-4 px-6 font-medium w-[250px]">Store Name</th>
+              <th className="py-4 px-6 font-medium">Location</th>
+              <th className="py-4 px-6 font-medium">Status</th>
+              <th className="py-4 px-6 font-medium">Admins</th>
+              <th className="py-4 px-6 font-medium">Completeness</th>
+              <th className="py-4 px-6 font-medium text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-[#eff1f2]/50">
+            {branches.map((branch, index) => (
+              <BranchTableRow
+                key={branch.id}
+                branch={branch}
+                index={index}
+                onEdit={onEdit}
+                onDelete={onDelete}
+                onManageSchedules={onManageSchedules}
+                onAssignAdmin={onAssignAdmin}
+                onViewAdmins={onViewAdmins}
+              />
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
