@@ -220,25 +220,11 @@ export default function CartDetailPage() {
       <div className='flex flex-col lg:flex-row w-full gap-5'>
         <div className='w-full lg:flex-1 flex flex-col space-y-5'>
           <AddressSelectionCard
-            branch={{
-              storeName: cart?.branch.storeName,
-              address: cart.branch.address,
-              schedules: cart.branch.schedules,
-              openStatus: cart.openStatus,
-            }}
+            branch={cart.branch}
             selectedAddressId={selectedAddressId}
             onSelect={(id: string) => setSelectedAddressId(id)}
-            addressList={
-              cart.user.addresses.map(dt => ({
-                id: dt.id,
-                label: dt.label,
-                address: dt.address,
-                receiptName: dt.receiptName,
-                phone: dt.phone,
-                isPrimary: dt.isPrimary,
-                distance: cart.shipping?.distance ?? 0
-              }))
-            }
+            addressList={cart.user.addresses}
+            maxDeliveryDistance={cart.branch.maxDeliveryDistance}
           />
           <VouchersSelectionCard
             appliedVoucher={selectedVoucher?.voucherCode}

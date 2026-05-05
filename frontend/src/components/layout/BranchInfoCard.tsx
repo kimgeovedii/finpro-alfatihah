@@ -1,7 +1,6 @@
 import { BuildingOfficeIcon, CalendarDaysIcon, MapPinIcon } from "@heroicons/react/24/outline";
 import React from "react";
 import { formatListSchedule } from "@/utils/converter.util";
-import { BranchInfoData } from "@/types/branch.type";
 import { BranchData } from "@/types/address.type";
 
 type Props = {

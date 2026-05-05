@@ -1,31 +1,26 @@
-import { BuildingOfficeIcon, CalendarDaysIcon, MapPinIcon } from "@heroicons/react/24/outline"
 import React from "react"
 import { AddressSelectionModal } from "./AddressSelectionModal"
 import { AddressAdditionalInfoSection } from "./AddressAdditionalInfoSection"
-import { BranchInfoData } from "@/types/branch.type"
 import { HeadingText } from "@/components/layout/HeadingText"
 import { BranchInfoCard } from "@/components/layout/BranchInfoCard"
-
-interface DeliveryAddress {
-    id: string
-    label: string
-    address: string
-    receiptName: string
-    phone: string
-    distance: number
-    isPrimary: boolean
-}
+import { AddressData, BranchData } from "@/types/address.type"
 
 type Props = {
-    branch: BranchInfoData
-    addressList: DeliveryAddress[]
+    branch: BranchData
+    addressList: AddressData[]
     selectedAddressId: string | null
+    maxDeliveryDistance: number
     
     onSelect: (addressId: string) => void
 }
 
-export const AddressSelectionCard: React.FC<Props> = ({ branch, addressList, selectedAddressId, onSelect }) => {
-    const selectedAddress = addressList.find(a => a.id === selectedAddressId) ?? null
+export const AddressSelectionCard: React.FC<Props> = ({ branch, addressList, selectedAddressId, maxDeliveryDistance, onSelect }) => {
+    const selectedAddress = (() => {
+        const primary = addressList.find(dt => dt.isPrimary && dt.isWithinRange)
+        if (primary) return primary
+
+        return addressList.find(dt => dt.isWithinRange) ?? null
+    })()
 
     return (
         <div className="bg-white rounded-3xl">
@@ -37,16 +32,14 @@ export const AddressSelectionCard: React.FC<Props> = ({ branch, addressList, sel
                         address={addressList}
                         appliedAddress={selectedAddressId}
                         onSelect={onSelect}
+                        maxDeliveryDistance={maxDeliveryDistance}
                     />
                 </div>
                 {
                     selectedAddress && 
                         <AddressAdditionalInfoSection
-                            receiptName={selectedAddress.receiptName}
-                            phone={selectedAddress.phone}
-                            distance={selectedAddress.distance}
-                            label={selectedAddress.label}
-                            address={selectedAddress.address}
+                            {...selectedAddress}
+                            maxDeliveryDistance={maxDeliveryDistance}                  
                         />
                 }
             </div>

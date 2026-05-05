@@ -4,7 +4,7 @@ import { BranchInventoryRepository } from "../repositories/branch_inventory.repo
 import { cronCartReminderMaxDays } from "../../../constants/feature.const"
 import { Mailer } from "../../../config/mailer";
 import { CartGroup, getCartReminderEmailTemplate } from "../views/cart.view";
-import { courierShippingDefault, weightGramsShippingDefault } from "../../../constants/business.const";
+import { courierShippingDefault } from "../../../constants/business.const";
 import { isWithinDeliveryRange } from "../../../utils/location";
 import { getCityIdFromCoords, getShippingCost } from "../../../utils/shipping";
 import { getStoreOpenStatus } from "../../../utils/business";
@@ -24,63 +24,45 @@ export class CartService {
         if (!cart) throw { code: 404, message: 'Cart not found' }
         
         let shipping = null
-        let addressList = cart.user.addresses.length
+        let addressTotal = cart.user.addresses.length
+        let addressList 
     
-        if (addressId || addressList > 0) {
-            const courier = courierShippingDefault
-            shipping = {
-                shippingCost: 0,
-                distance: 0,
-                courier
-            }
-            if (addressId && addressList === 0 ) throw { code: 404, message: 'Address not found' }
-    
-            let selectedAddress = null
+        if (addressId || addressTotal > 0) {
             const branchLat = cart.branch.latitude
             const branchLong = cart.branch.longitude
+            let selectedAddress = null
+
+            // Remap address to count distance
+            addressList = cart.user.addresses.map(dt => {
+                const { distance, isInsideRange } = isWithinDeliveryRange(dt.lat, dt.long, branchLat, branchLong, cart.branch.maxDeliveryDistance)
+                
+                return { ...dt, distance, isWithinRange: isInsideRange }
+            })
+
+            const courier = courierShippingDefault
+            shipping = { shippingCost: 0, distance: 0, courier }
+            if (addressId && addressTotal === 0 ) throw { code: 404, message: 'Address not found' }
+    
             // Total weight (g)
             const totalWeight = cart.items.reduce((sum, dt) => sum + (dt.product.product.weight * dt.quantity), 0)
     
             // If address provided just take it 
-            if (addressId) selectedAddress = cart.user.addresses.find(a => a.id === addressId)
+            if (addressId) selectedAddress = addressList.find(a => a.id === addressId)
             if (!selectedAddress && addressId) throw { code: 404, message: 'Address not found' }
     
             // If address not provided. Find primary or nearest valid
-            if (!selectedAddress && addressList > 0) {
-                const primaryAddress = cart.user.addresses.find(a => a.isPrimary)
+            if (!selectedAddress && addressTotal > 0) {
+                const primaryAddress = addressList.find(a => a.isPrimary)
     
-                // Try primary first
-                if (primaryAddress) {
-                    const rangeValidate = isWithinDeliveryRange(primaryAddress.lat, primaryAddress.long, branchLat, branchLong, cart.branch.maxDeliveryDistance)
-    
-                    if (rangeValidate.isInsideRange) {
-                        selectedAddress = {
-                            ...primaryAddress,
-                            distance: rangeValidate.distance
-                        }
-                        shipping.distance = rangeValidate.distance
-                    }
-                }
-    
-                // If primary not valid, fallback to nearest valid
-                if (!selectedAddress) {
-                    const validAddresses = cart.user.addresses
-                        .map(dt => {
-                            const rangeValidate = isWithinDeliveryRange(dt.lat, dt.long, branchLat, branchLong, cart.branch.maxDeliveryDistance)
-    
-                            return {
-                                ...dt,
-                                distance: rangeValidate.distance,
-                                isInsideRange: rangeValidate.isInsideRange
-                            }
-                        })
-                        .filter(dt => dt.isInsideRange)
-                        .sort((a, b) => a.distance - b.distance)
+                if (primaryAddress?.isWithinRange) {
+                    selectedAddress = primaryAddress
+                } else {
+                    // Reuse already-computed distance & isWithinRange
+                    const validAddresses = addressList.filter(dt => dt.isWithinRange).sort((a, b) => a.distance - b.distance)
     
                     if (validAddresses.length === 0) throw { code: 422, message: 'None of your address in shipping range' }
     
                     selectedAddress = validAddresses[0]
-                    shipping.distance = selectedAddress.distance
                 }
             }
     
@@ -112,7 +94,12 @@ export class CartService {
         // Helper : get store open status by schedule and current server time
         const openStatus = getStoreOpenStatus(cart.branch.schedules)
     
-        return { ...cart, shipping, openStatus }
+        return { 
+            ...cart, 
+            user: { ...cart.user, addresses: addressList },
+            shipping, 
+            openStatus 
+        }
     }
 
     async getCartSummary(userId: string, branchId: string | null) {

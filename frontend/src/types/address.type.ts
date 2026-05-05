@@ -10,6 +10,8 @@ export type AddressData = {
     notes: string
     phone: string   
     address: string
+    distance?: number 
+    isWithinRange?: boolean
     isPrimary: boolean
 }
 
