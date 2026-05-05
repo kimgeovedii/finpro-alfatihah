@@ -7,6 +7,15 @@ export class AuthRepository {
     });
   }
 
+  async findByEmailWithEmployee(email: string) {
+    return prisma.user.findUnique({
+      where: { email },
+      include: {
+        employee: true,
+      }
+    });
+  }
+
   async findById(id: string) {
     return prisma.user.findUnique({
       where: { id },

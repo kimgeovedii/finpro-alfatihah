@@ -16,12 +16,14 @@ export class BranchInventoryController {
     next: NextFunction,
   ) => {
     try {
+      const authReq = req as AuthRequest;
       const { page = 1, limit = 10, ...filters } = req.query;
       const { data, meta } =
         await this.branchInventoryService.findAllBranchInventories(
           filters,
           Number(page),
           Number(limit),
+          authReq.user,
         );
 
       sendSuccess(
@@ -41,12 +43,11 @@ export class BranchInventoryController {
   ) => {
     try {
       const authReq = req as AuthRequest;
-      const userId = authReq.user?.userId;
-      if (!userId) throw new Error("User unauthorized");
+      if (!authReq.user) throw new Error("User unauthorized");
 
       const data = await this.branchInventoryService.createBranchInventory(
         req.body,
-        userId,
+        authReq.user,
       );
       sendSuccess(res, data, "Create branch inventory successfully");
     } catch (error) {
@@ -61,13 +62,12 @@ export class BranchInventoryController {
   ) => {
     try {
       const authReq = req as AuthRequest;
-      const userId = authReq.user?.userId;
-      if (!userId) throw new Error("User unauthorized");
+      if (!authReq.user) throw new Error("User unauthorized");
 
       const data = await this.branchInventoryService.updateBranchInventory(
         req.params.id as string,
         req.body,
-        userId,
+        authReq.user,
       );
       sendSuccess(res, data, "Update branch inventory successfully");
     } catch (error) {
@@ -82,12 +82,11 @@ export class BranchInventoryController {
   ) => {
     try {
       const authReq = req as AuthRequest;
-      const userId = authReq.user?.userId;
-      if (!userId) throw new Error("User unauthorized");
+      if (!authReq.user) throw new Error("User unauthorized");
 
       const data = await this.branchInventoryService.deleteBranchInventory(
         req.params.id as string,
-        userId,
+        authReq.user,
       );
       sendSuccess(res, data, "Delete branch inventory successfully");
     } catch (error) {

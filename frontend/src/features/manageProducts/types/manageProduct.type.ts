@@ -16,6 +16,7 @@ export type ProductImage = {
 export type ProductCategory = {
   id: string;
   name: string;
+  deletedAt?: string | null;
 };
 
 export type ManageProduct = {
@@ -52,7 +53,9 @@ export type CreateProductPayload = {
   images?: File[] | null;
 };
 
-export type UpdateProductPayload = Partial<CreateProductPayload>;
+export type UpdateProductPayload = Partial<CreateProductPayload> & {
+  existingImageIds?: string[] | null;
+};
 
 export type ProductHeaderProps = {
   searchQuery: string;

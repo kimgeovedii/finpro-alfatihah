@@ -1,6 +1,9 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Response } from "express";
 import { DiscountService } from "../services/discount.service";
 import { sendSuccess } from "../../../utils/apiResponse";
+import { AuthRequest } from "../../../middleware/auth.middleware";
+import { prisma } from "../../../config/prisma";
+import { EmployeeRole } from "@prisma/client";
 
 export class DiscountController {
   private discountService: DiscountService;
@@ -10,21 +13,21 @@ export class DiscountController {
   }
 
   public findAllDiscounts = async (
-    req: Request,
+    req: AuthRequest,
     res: Response,
     next: NextFunction,
   ) => {
     try {
-      const { page = 1, limit = 10, search, ...restQuery } = req.query;
-      const filters: any = { ...restQuery };
-
-      if (search) {
-        filters.name = { contains: search as string, mode: "insensitive" };
+      if (req.user?.userId && !req.user.employee) {
+        const emp = await prisma.employee.findUnique({
+          where: { userId: req.user.userId },
+        });
+        if (emp) req.user.employee = emp;
       }
+
       const { data, meta } = await this.discountService.findAllDiscounts(
-        filters,
-        Number(page),
-        Number(limit),
+        req.query,
+        req.user,
       );
 
       sendSuccess(res, { data, meta }, "Get all discounts successfully");
@@ -34,12 +37,21 @@ export class DiscountController {
   };
 
   public createDiscount = async (
-    req: Request,
+    req: AuthRequest,
     res: Response,
     next: NextFunction,
   ) => {
     try {
-      const data = await this.discountService.createDiscount(req.body);
+      const body = { ...req.body };
+
+      if (req.user?.employee) {
+        body.createdBy = req.user.employee.id;
+        if (req.user.employee.role === EmployeeRole.STORE_ADMIN) {
+          body.branchId = req.user.employee.branchId;
+        }
+      }
+
+      const data = await this.discountService.createDiscount(body);
       sendSuccess(res, data, "Create discount successfully");
     } catch (error) {
       next(error);
@@ -47,15 +59,25 @@ export class DiscountController {
   };
 
   public updateDiscount = async (
-    req: Request,
+    req: AuthRequest,
     res: Response,
     next: NextFunction,
   ) => {
     try {
-      const data = await this.discountService.updateDiscount(
-        req.params.id as string,
-        req.body,
-      );
+      const id = req.params.id as string;
+
+      if (req.user?.employee?.role === EmployeeRole.STORE_ADMIN) {
+        const discount = await this.discountService.getDiscountById(id);
+        if (discount.branchId !== req.user.employee.branchId) {
+          return res.status(403).json({
+            success: false,
+            message:
+              "Forbidden: You can only update your own branch's discounts",
+          });
+        }
+      }
+
+      const data = await this.discountService.updateDiscount(id, req.body);
       sendSuccess(res, data, "Update discount successfully");
     } catch (error) {
       next(error);
@@ -63,14 +85,25 @@ export class DiscountController {
   };
 
   public deleteDiscount = async (
-    req: Request,
+    req: AuthRequest,
     res: Response,
     next: NextFunction,
   ) => {
     try {
-      const data = await this.discountService.deleteDiscount(
-        req.params.id as string,
-      );
+      const id = req.params.id as string;
+
+      if (req.user?.employee?.role === EmployeeRole.STORE_ADMIN) {
+        const discount = await this.discountService.getDiscountById(id);
+        if (discount.branchId !== req.user.employee.branchId) {
+          return res.status(403).json({
+            success: false,
+            message:
+              "Forbidden: You can only delete your own branch's discounts",
+          });
+        }
+      }
+
+      const data = await this.discountService.deleteDiscount(id);
       sendSuccess(res, data, "Delete discount successfully");
     } catch (error) {
       next(error);

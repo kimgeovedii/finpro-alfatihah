@@ -7,14 +7,14 @@ export class ReportService {
     this.reportRepository = new ReportRepository();
   }
 
-  public async getSalesReport(month: number, year: number) {
+  public async getSalesReport(month: number, year: number, branchId?: string) {
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 0, 23, 59, 59, 999);
 
-    const summary = await this.reportRepository.getMonthlySalesSummary(startDate, endDate);
-    const byCategory = await this.reportRepository.getSalesByCategory(startDate, endDate);
-    const byProduct = await this.reportRepository.getSalesByProduct(startDate, endDate);
-    const yearlyTrend = await this.reportRepository.getYearlySalesTrend(year);
+    const summary = await this.reportRepository.getMonthlySalesSummary(startDate, endDate, branchId);
+    const byCategory = await this.reportRepository.getSalesByCategory(startDate, endDate, branchId);
+    const byProduct = await this.reportRepository.getSalesByProduct(startDate, endDate, branchId);
+    const yearlyTrend = await this.reportRepository.getYearlySalesTrend(year, branchId);
 
     const formatNumber = (val: any) => typeof val === "bigint" ? Number(val) : val;
 
@@ -40,11 +40,11 @@ export class ReportService {
     };
   }
 
-  public async getStockReport(month: number, year: number) {
+  public async getStockReport(month: number, year: number, branchId?: string) {
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 0, 23, 59, 59, 999);
 
-    const summary = await this.reportRepository.getStockSummary(startDate, endDate);
+    const summary = await this.reportRepository.getStockSummary(startDate, endDate, branchId);
     
     const formatNumber = (val: any) => typeof val === "bigint" ? Number(val) : val;
 
@@ -56,10 +56,10 @@ export class ReportService {
     }));
   }
 
-  public async getDetailedStockReport(productId: string, month: number, year: number) {
+  public async getDetailedStockReport(productId: string, month: number, year: number, branchId?: string) {
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 0, 23, 59, 59, 999);
 
-    return await this.reportRepository.getDetailedStock(productId, startDate, endDate);
+    return await this.reportRepository.getDetailedStock(productId, startDate, endDate, branchId);
   }
 }

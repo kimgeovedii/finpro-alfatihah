@@ -4,7 +4,6 @@ import {
   CreateProductPayload,
   UpdateProductPayload,
   ManageProduct,
-  ProductCategory,
 } from "@/features/manageProducts/types/manageProduct.type";
 
 export class ManageProductRepository {
@@ -54,11 +53,11 @@ export class ManageProductRepository {
     id: string,
     payload: UpdateProductPayload,
   ): Promise<ManageProduct> => {
-    if (
-      payload.images &&
-      Array.isArray(payload.images) &&
-      payload.images.length > 0
-    ) {
+    const shouldUseFormData =
+      (payload.images && Array.isArray(payload.images) && payload.images.length > 0) ||
+      (payload.existingImageIds && Array.isArray(payload.existingImageIds));
+
+    if (shouldUseFormData) {
       const formData = new FormData();
 
       Object.entries(payload).forEach(([key, value]) => {
@@ -66,6 +65,12 @@ export class ManageProductRepository {
           if (payload.images && Array.isArray(payload.images)) {
             payload.images.forEach((file) => {
               formData.append("images", file);
+            });
+          }
+        } else if (key === "existingImageIds") {
+          if (payload.existingImageIds && Array.isArray(payload.existingImageIds)) {
+            payload.existingImageIds.forEach((id) => {
+              formData.append("existingImageIds", id);
             });
           }
         } else if (value !== undefined && value !== null) {
@@ -83,7 +88,18 @@ export class ManageProductRepository {
     await apiFetch<void>(`/products/${id}`, "delete");
   };
 
-  public getAllCategories = async (): Promise<ProductCategory[]> => {
-    return await apiFetch<ProductCategory[]>("/product-categories", "get");
+  public getAllCategories = async (
+    page: number = 1,
+    limit: number = 10,
+    search?: string,
+    includeDeleted: boolean = false,
+  ): Promise<any> => {
+    const params = new URLSearchParams();
+    params.set("page", String(page));
+    params.set("limit", String(limit));
+    if (search) params.set("name", search);
+    if (includeDeleted) params.set("includeDeleted", "true");
+
+    return await apiFetch<any>(`/product-categories?${params.toString()}`, "get");
   };
 }

@@ -208,11 +208,13 @@ export const AddProductDialog: React.FC<AddProductDialogProps> = ({
                         <SelectValue placeholder="Select a category" />
                       </SelectTrigger>
                       <SelectContent>
-                        {categories.map((cat) => (
-                          <SelectItem key={cat.id} value={cat.id}>
-                            {cat.name}
-                          </SelectItem>
-                        ))}
+                        {categories
+                          .filter((cat) => !cat.deletedAt)
+                          .map((cat) => (
+                            <SelectItem key={cat.id} value={cat.id}>
+                              {cat.name}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                     {formik.touched.categoryId && formik.errors.categoryId && (

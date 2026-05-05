@@ -1,10 +1,10 @@
 import { apiFetch } from "@/utils/api";
-import { 
-  ManageStockListResponse, 
-  StockJournalListResponse, 
-  UpdateStockPayload, 
-  Branch, 
-  BranchInventory 
+import {
+  ManageStockListResponse,
+  StockJournalListResponse,
+  UpdateStockPayload,
+  Branch,
+  BranchInventory,
 } from "../types/manageStock.type";
 
 export class BranchInventoryRepository {
@@ -13,14 +13,25 @@ export class BranchInventoryRepository {
     limit?: number;
     branchId?: string;
     productName?: string;
+    stockStatus?: string;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
   }): Promise<ManageStockListResponse> {
     const searchParams = new URLSearchParams();
     if (params.page) searchParams.append("page", params.page.toString());
     if (params.limit) searchParams.append("limit", params.limit.toString());
-    if (params.branchId && params.branchId !== "all") searchParams.append("branchId", params.branchId);
-    if (params.productName) searchParams.append("productName", params.productName);
+    if (params.branchId && params.branchId !== "all")
+      searchParams.append("branchId", params.branchId);
+    if (params.productName)
+      searchParams.append("productName", params.productName);
+    if (params.stockStatus && params.stockStatus !== "all")
+      searchParams.append("stockStatus", params.stockStatus);
+    if (params.sortBy) searchParams.append("sortBy", params.sortBy);
+    if (params.sortOrder) searchParams.append("sortOrder", params.sortOrder);
 
-    return apiFetch<ManageStockListResponse>(`/branch-inventories?${searchParams.toString()}`);
+    return apiFetch<ManageStockListResponse>(
+      `/branch-inventories?${searchParams.toString()}`,
+    );
   }
 
   async getBranches(): Promise<Branch[]> {
@@ -35,8 +46,15 @@ export class BranchInventoryRepository {
     }
   }
 
-  async updateStock(id: string, payload: UpdateStockPayload): Promise<BranchInventory> {
-    return apiFetch<BranchInventory>(`/branch-inventories/${id}`, "patch", payload);
+  async updateStock(
+    id: string,
+    payload: UpdateStockPayload,
+  ): Promise<BranchInventory> {
+    return apiFetch<BranchInventory>(
+      `/branch-inventories/${id}`,
+      "patch",
+      payload,
+    );
   }
 
   async createBranchInventory(payload: {
@@ -57,9 +75,12 @@ export class BranchInventoryRepository {
     const searchParams = new URLSearchParams();
     if (params.page) searchParams.append("page", params.page.toString());
     if (params.limit) searchParams.append("limit", params.limit.toString());
-    if (params.branchInventoryId) searchParams.append("branchInventoryId", params.branchInventoryId);
+    if (params.branchInventoryId)
+      searchParams.append("branchInventoryId", params.branchInventoryId);
     if (params.productId) searchParams.append("productId", params.productId);
 
-    return apiFetch<StockJournalListResponse>(`/stock-journals?${searchParams.toString()}`);
+    return apiFetch<StockJournalListResponse>(
+      `/stock-journals?${searchParams.toString()}`,
+    );
   }
 }
