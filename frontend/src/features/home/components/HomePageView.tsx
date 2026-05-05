@@ -23,7 +23,6 @@ export const HomePageView = () => {
         <NotificationHandler />
       </Suspense>
       <HeroCarousel />
-      <ExclusiveVoucher />
       <LocationPrompt />
       <NearestStoreMap 
         branches={allBranches} 
@@ -31,6 +30,7 @@ export const HomePageView = () => {
         nearestBranch={nearestBranch} 
         onRequestLocation={requestLocation}
       />
+      <ExclusiveVoucher />
       <ProductList products={products} isLoading={isLoading} />
     </>
   );

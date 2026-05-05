@@ -57,6 +57,11 @@ export interface BranchListResponse {
   meta: PaginationMeta;
 }
 
+export interface EmployeeListResponse {
+  employees: Employee[];
+  meta: PaginationMeta;
+}
+
 export interface CreateBranchPayload {
   storeName: string;
   address: string;

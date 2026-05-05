@@ -5,7 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Branch } from "../types/branch-admin.types";
+import { Branch } from "../types/branch-admin.type";
 import { Badge } from "@/components/ui/badge";
 import { UserIcon, EnvelopeIcon } from "@heroicons/react/24/outline";
 
