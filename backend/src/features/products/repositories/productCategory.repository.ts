@@ -5,18 +5,25 @@ export class productCategoryRepository {
     filters: any,
     skip?: number,
     take?: number,
+    sortBy: string = "name",
+    sortOrder: "asc" | "desc" = "asc",
   ) => {
+    const { includeDeleted, ...otherFilters } = filters;
+    const where = {
+      ...otherFilters,
+      ...(includeDeleted ? {} : { deletedAt: null }),
+    };
     const [data, total] = await prisma.$transaction([
       prisma.product_categories.findMany({
-        where: filters,
+        where,
         skip,
         take,
         orderBy: {
-          name: "asc",
+          [sortBy]: sortOrder,
         },
       }),
       prisma.product_categories.count({
-        where: filters,
+        where,
       }),
     ]);
     return { data, total };
@@ -38,9 +45,12 @@ export class productCategoryRepository {
   };
 
   public deleteCategory = async (id: string) => {
-    return await prisma.product_categories.delete({
+    return await prisma.product_categories.update({
       where: {
         id,
+      },
+      data: {
+        deletedAt: new Date(),
       },
     });
   };
@@ -52,6 +62,7 @@ export class productCategoryRepository {
           equals: name,
           mode: "insensitive",
         },
+        deletedAt: null,
       },
     });
   };

@@ -48,7 +48,7 @@ class OrderFactory {
         if (!branch) throw new Error('Cannot create order without branch')
 
         // Get random inventories from this branch
-        const inventories = await this.branchInventoryRepository.findManyByBranch(branch.id)
+        const inventories = await this.branchInventoryRepository.findManyItemsByBranch(branch.id)
         if (inventories.length === 0) throw new Error('Cannot create order without branch inventory')
         const selectedInventories = faker.helpers.arrayElements(inventories, faker.number.int({ min: 1, max: Math.min(15, inventories.length) }))
 
@@ -58,7 +58,7 @@ class OrderFactory {
             const quantity = faker.number.int({ min: minQuantityItemSelectedSeed, max: maxQuantityItemSelectedSeed })
             const price = quantity * dt.product.basePrice
             totalPrice += price
-            return { id: faker.string.uuid(), productId: dt.id, price, quantity, discountId: null }
+            return { id: faker.string.uuid(), productId: dt.id, price, quantity }
         })
 
         // Generate pricing — finalPrice <= totalPrice + shippingCost

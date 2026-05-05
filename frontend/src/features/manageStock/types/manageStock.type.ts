@@ -2,7 +2,23 @@ import {
   ManageProduct,
   PaginationMeta,
 } from "@/features/manageProducts/types/manageProduct.type";
+import { User } from "@/features/auth/types";
+
 export type { ManageProduct, PaginationMeta };
+
+export type EmployeeRole = "STORE_ADMIN" | "SUPER_ADMIN";
+
+export interface Employee {
+  id: string;
+  fullName: string;
+  role: EmployeeRole;
+  branchId: string | null;
+  userId: string | null;
+}
+
+export interface UserWithEmployee extends User {
+  employee?: Employee;
+}
 
 export type Branch = {
   id: string;
@@ -62,8 +78,11 @@ export type StockHeaderProps = {
   onSearchChange: (value: string) => void;
   selectedBranchId: string;
   onBranchChange: (value: string) => void;
+  selectedStockStatus: string;
+  onStatusChange: (value: string) => void;
   branches: Branch[];
   onAddClick: () => void;
+  isStoreAdmin?: boolean;
 };
 
 export type StockTableProps = {
@@ -71,6 +90,10 @@ export type StockTableProps = {
   isLoading: boolean;
   onUpdateStock: (item: BranchInventory) => void;
   onViewJournal: (item: BranchInventory) => void;
+  isStoreAdmin?: boolean;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+  onSort?: (column: string) => void;
 };
 
 export type StockTableRowProps = {
@@ -78,6 +101,7 @@ export type StockTableRowProps = {
   index: number;
   onUpdateStock: (item: BranchInventory) => void;
   onViewJournal: (item: BranchInventory) => void;
+  isStoreAdmin?: boolean;
 };
 
 export type UpdateStockPayload = {
@@ -95,6 +119,8 @@ export type UpdateStockDialogProps = {
   isSubmitting: boolean;
   branches: Branch[];
   allProducts: ManageProduct[];
+  isStoreAdmin?: boolean;
+  userBranchId?: string | null;
 };
 
 export type StockJournalDialogProps = {

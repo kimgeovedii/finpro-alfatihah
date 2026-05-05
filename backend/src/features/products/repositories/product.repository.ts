@@ -5,12 +5,17 @@ export class ProductRepository {
     filters: any,
     skip?: number,
     take?: number,
+    orderBy: string = "createdAt",
+    orderDir: "asc" | "desc" = "desc",
   ) => {
     const [data, total] = await prisma.$transaction([
       prisma.products.findMany({
         where: filters,
         skip,
         take,
+        orderBy: {
+          [orderBy]: orderDir,
+        },
         include: {
           category: {
             select: {
@@ -35,8 +40,8 @@ export class ProductRepository {
   };
 
   public getProductById = async (id: string) => {
-    return prisma.products.findUnique({
-      where: { id },
+    return prisma.products.findFirst({
+      where: { id, deletedAt: null },
       include: {
         category: {
           select: {
@@ -124,8 +129,8 @@ export class ProductRepository {
       };
     }
   
-    return prisma.products.findUnique({
-      where: { slugName },
+    return prisma.products.findFirst({
+      where: { slugName, deletedAt: null },
       include,
     });
   };
@@ -149,22 +154,32 @@ export class ProductRepository {
   };
 
 
-  public updateProduct = async (id: string, data: any) => {
+  public updateProduct = async (
+    id: string,
+    data: any,
+    existingImageIds: string[] = [],
+  ) => {
     const { imageUrls, ...updateData } = data;
+    const shouldDeleteOldImages = existingImageIds.length > 0 || (imageUrls && Array.isArray(imageUrls) && imageUrls.length > 0);
 
-    // If imageUrls are provided, delete old images and create new ones
-    if (imageUrls && Array.isArray(imageUrls) && imageUrls.length > 0) {
+    if (shouldDeleteOldImages) {
+      const productImageUpdate: any = {
+        deleteMany: existingImageIds.length > 0 ? { id: { notIn: existingImageIds } } : {},
+      };
+
+      if (imageUrls && Array.isArray(imageUrls) && imageUrls.length > 0) {
+        const startPrimaryIndex = existingImageIds.length === 0 ? 0 : 1;
+        productImageUpdate.create = imageUrls.map((imageUrl: string, index: number) => ({
+          imageUrl,
+          isPrimary: existingImageIds.length === 0 && index === 0,
+        }));
+      }
+
       return prisma.products.update({
         where: { id },
         data: {
           ...updateData,
-          productImages: {
-            deleteMany: {},
-            create: imageUrls.map((imageUrl, index) => ({
-              imageUrl,
-              isPrimary: index === 0,
-            })),
-          },
+          productImages: productImageUpdate,
         },
         include: {
           category: {
@@ -204,8 +219,9 @@ export class ProductRepository {
   };
 
   public deleteProduct = async (id: string) => {
-    return prisma.products.delete({
+    return prisma.products.update({
       where: { id },
+      data: { deletedAt: new Date() }
     });
   };
 
@@ -214,6 +230,7 @@ export class ProductRepository {
       branchInventories: {
         some: { branchId: branchId },
       },
+      deletedAt: null,
     };
 
     const count = await prisma.products.count({ where });

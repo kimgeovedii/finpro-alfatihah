@@ -8,9 +8,12 @@ import { validate } from "../../../middleware/validate";
 import { ProductImageRouter } from "./productImage.router";
 import { optionalAuthMiddleware } from "../../../middleware/auth.middleware";
 import { memoryUploader } from "../../../middleware/uploader.middleware";
+import { authMiddleware } from "../../../middleware/auth.middleware";
+import { roleMiddleware } from "../../../middleware/role.middleware";
+import { EmployeeRole } from "@prisma/client";
 
 export class ProductRouter {
-  private router: Router;
+  public router: Router;
   private productController: ProductController;
 
   constructor() {
@@ -26,6 +29,8 @@ export class ProductRouter {
     
     this.router.post(
       "/",
+      authMiddleware,
+      roleMiddleware([EmployeeRole.SUPER_ADMIN]),
       memoryUploader().array("images", 10),
       validate(createProductSchema),
       this.productController.createProduct,
@@ -33,17 +38,24 @@ export class ProductRouter {
 
     this.router.put(
       "/:id",
+      authMiddleware,
+      roleMiddleware([EmployeeRole.SUPER_ADMIN]),
       memoryUploader().array("images", 10),
       validate(updateProductSchema),
       this.productController.updateProduct,
     );
-    this.router.delete("/:id", this.productController.deleteProduct);
+    
+    this.router.delete(
+      "/:id",
+      authMiddleware,
+      roleMiddleware([EmployeeRole.SUPER_ADMIN]),
+      this.productController.deleteProduct,
+    );
 
     const productImageRouter = new ProductImageRouter().getRouter();
     this.router.use("/:productId/images", productImageRouter);
   }
 
-  public getRouter = (): Router => {
-    return this.router;
-  };
 }
+
+export default new ProductRouter().router;

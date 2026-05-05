@@ -1,5 +1,4 @@
 "use client";
-import { Button } from '@/components/ui/button';
 import { AddressSelectionCard } from '@/features/cart/components/AddressSelectionCard';
 import { CartDetailItemListCard } from '@/features/cart/components/CartDetailItemListCard';
 import { CartPaymentSummaryCard } from '@/features/cart/components/CartPaymentSummaryCard';
@@ -7,14 +6,15 @@ import { PaymentMethodSelect } from '@/features/cart/components/PaymentMethodSel
 import { VouchersSelectionCard } from '@/features/cart/components/VouchersSelectionCard';
 import { useCartDetailData, useCheckoutCartItem, useDeleteCartItem, useUpdateCartItem } from '@/features/cart/hooks/useCart';
 import { useRouter } from 'next/navigation'
-import { ArrowLeftIcon } from '@heroicons/react/24/outline';
-import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import { formatListSchedule } from '@/utils/converter.util';
 import { SkeletonBox } from '@/components/layout/SkeletonBox';
 import { VoucherData } from '@/features/cart/repositories/voucher.type';
+import { BackButton } from '@/components/button/BackButton';
+import { actionMessages } from '@/constants/message.const';
+import { showPopUp } from '@/utils/message.util';
 
 export default function CartDetailPage() {
   // Handle param
@@ -36,13 +36,13 @@ export default function CartDetailPage() {
     if (!isLoading && !cart && error) {
       Swal.fire({
         icon: "error",
-        title: "Cart not found",
+        title: actionMessages.cartFailedOpen,
         text: error,
-        confirmButtonText: "Back to Cart",
+        confirmButtonText: actionMessages.cartAskBack,
         allowOutsideClick: false,
         allowEscapeKey: false,
       }).then((result) => {
-        if (result.isConfirmed) router.push('/')
+        if (result.isConfirmed) router.push('/cart')
       })
     }
 
@@ -73,14 +73,15 @@ export default function CartDetailPage() {
 
   // Calculate price
   const shippingCost = cart.shipping?.shippingCost ?? 0
-  const totalBasePrice = cart.totalBasePrice
+  const finalTotalPrice = cart.finalTotalPrice
+  
   const voucherDiscount = (() => {
     if (!selectedVoucher) return 0
   
     // min purchase validation
     if (
       selectedVoucher.minPurchaseAmount &&
-      totalBasePrice < selectedVoucher.minPurchaseAmount
+      finalTotalPrice < selectedVoucher.minPurchaseAmount
     ) {
       return 0
     }
@@ -88,7 +89,7 @@ export default function CartDetailPage() {
     let discount = 0
     if (selectedVoucher.discountValueType === "PERCENTAGE") {
       const percentage = Math.min(Math.max(selectedVoucher.discountValue, 0), 100)
-      discount = (totalBasePrice * percentage) / 100
+      discount = (finalTotalPrice * percentage) / 100
     } else {
       discount = Math.max(selectedVoucher.discountValue, 0)
     }
@@ -96,13 +97,13 @@ export default function CartDetailPage() {
     // max discount cap
     if (selectedVoucher.maxDiscountAmount) discount = Math.min(discount, selectedVoucher.maxDiscountAmount)
   
-    return discount
+    return Math.ceil(discount)
   })()
 
-  let finalProductPrice = totalBasePrice
+  let finalProductPrice = finalTotalPrice
   let finalShipping = shippingCost
   if (selectedVoucher) {
-    if (selectedVoucher.type === "ORDER") finalProductPrice = totalBasePrice - voucherDiscount
+    if (selectedVoucher.type === "ORDER") finalProductPrice = finalTotalPrice - voucherDiscount
     if (selectedVoucher.type === "SHIPPING_COST") finalShipping = Math.max(0, shippingCost - voucherDiscount)
   }
 
@@ -142,12 +143,7 @@ export default function CartDetailPage() {
 
   const handleIncrease = async (cartItemId: string, qty: number, stock: number) => {
     if (qty >= stock) {
-      Swal.fire({
-        icon: "info",
-        title: "Stock limit reached",
-        text: "You already selected all available items.",
-        confirmButtonColor: "#10b981",
-      })
+      await showPopUp(actionMessages.productCartFailedAddTitle, actionMessages.productCartFailedAddDesc, "info")
       return
     }
   
@@ -168,16 +164,7 @@ export default function CartDetailPage() {
       if (!confirm.isConfirmed) return
   
       const success = await deleteCartItem(cartItemId)
-      if (success) {
-        await Swal.fire({
-          title: "Item deleted",
-          html: `<b>${productName}</b> has been removed.`,
-          icon: "success",
-          confirmButtonColor: "#10b981",
-        })
-
-        fetchCartDetail(cartId)
-      }
+      if (success) await showPopUp(actionMessages.productRemoveSuccessTitle, `<b>${productName}</b> ${actionMessages.productRemoveSuccessDesc}`, "success")
     } else {
       await updateCartItem(cartItemId, qty - 1)
     }
@@ -187,11 +174,7 @@ export default function CartDetailPage() {
 
   const handleCheckout = async () => {
     if (!selectedAddressId) {
-      Swal.fire({
-        icon: "warning",
-        title: "Please select an address",
-        confirmButtonColor: "#10b981",
-      })
+      await showPopUp(actionMessages.orderCreateFailed, actionMessages.orderAskAddress, "warning")
       return
     }
 
@@ -233,13 +216,7 @@ export default function CartDetailPage() {
   
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto">
-      <div className='flex items-center gap-3 mb-5'>
-        <Link href={'/cart'}>
-          <Button variant='destructive' className='text-md px-3 py-5'>
-            <ArrowLeftIcon className="w-4 h-4"/> Back
-          </Button>
-        </Link>
-      </div>
+      <BackButton url="cart"/>
       <div className='flex flex-col lg:flex-row w-full gap-5'>
         <div className='w-full lg:flex-1 flex flex-col space-y-5'>
           <AddressSelectionCard
@@ -267,7 +244,7 @@ export default function CartDetailPage() {
             appliedVoucher={selectedVoucher?.voucherCode}
             onApply={handleApply}
             onRemove={handleRemove}
-            totalBasePrice={totalBasePrice}
+            totalBasePrice={finalTotalPrice}
           />
         </div>
         <div className='w-full lg:flex-1 flex flex-col space-y-5'>
@@ -280,14 +257,17 @@ export default function CartDetailPage() {
                   cartId: cartId,
                   slugName: dt.product.product.slugName,
                   productName: dt.product.product.productName,
-                  description: dt.product.product.description,
+                  productDiscounts: dt.product.product.productDiscounts,
                   category: dt.product.product.category,
                   productImages: dt.product.product.productImages,
                   quantity: dt.quantity,
                   currentStock: dt.product.currentStock,
                   weight: dt.product.product.weight * dt.quantity,
                   basePrice: dt.product.product.basePrice,
-                  totalPrice: dt.product.product.basePrice * dt.quantity
+                  totalPrice: dt.product.product.basePrice * dt.quantity,
+                  discountAmount: dt.product.product.discountAmount,
+                  finalTotalPrice: dt.product.product.finalTotalPrice,
+                  finalPricePerItem: dt.product.product.finalPricePerItem
                 }))
               }
               onIncrease={handleIncrease}
@@ -299,8 +279,8 @@ export default function CartDetailPage() {
             totalItem={cart.totalQty}
             shippingWeight={cart.totalWeight}
             shippingCost={shippingCost}
-            totalPrice={totalBasePrice}
-            totalDiscountProduct={0}
+            totalPrice={cart.totalBasePrice}
+            totalDiscountProduct={cart.totalDiscountProduct}
             totalDiscountVoucher={voucherDiscount}
             finalPrice={finalPrice}
             onCheckout={handleCheckout}

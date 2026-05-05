@@ -59,10 +59,6 @@
  *                           type: string
  *                           format: uuid
  *                           example: e4d4d386-2b89-47bf-8162-c74e44c0f908
- *                         discountId:
- *                           type: string
- *                           nullable: true
- *                           example: null
  *                         quantity:
  *                           type: integer
  *                           example: 1

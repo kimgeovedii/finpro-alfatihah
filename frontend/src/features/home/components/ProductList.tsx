@@ -37,9 +37,12 @@ const EmptyProducts = () => (
       <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
         <ShoppingCart className="w-10 h-10 text-slate-300" />
       </div>
-      <h3 className="text-xl font-bold text-slate-800 mb-2">No Products Found</h3>
+      <h3 className="text-xl font-bold text-slate-800 mb-2">
+        No Products Found
+      </h3>
       <p className="text-slate-500 max-w-xs mx-auto">
-        We couldn't find any products right now. Try searching in another location.
+        We couldn't find any products right now. Try searching in another
+        location.
       </p>
     </div>
   </section>
@@ -51,16 +54,33 @@ interface ProductListProps {
 }
 
 export const ProductList = ({ products, isLoading }: ProductListProps) => {
-  const { productsMeta, fetchNearestBranch, userCoords, productLocationCoords, isProductsLoadingMore, nearestBranch } = useHomeStore();
+  const {
+    productsMeta,
+    fetchNearestBranch,
+    userCoords,
+    productLocationCoords,
+    isProductsLoadingMore,
+    nearestBranch,
+  } = useHomeStore();
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
   const handleLoadMore = useCallback(() => {
-    if (productsMeta && productsMeta.page < productsMeta.totalPages && !isProductsLoadingMore) {
+    if (
+      productsMeta &&
+      productsMeta.page < productsMeta.totalPages &&
+      !isProductsLoadingMore
+    ) {
       const lat = productLocationCoords?.lat || userCoords?.lat;
       const lng = productLocationCoords?.lng || userCoords?.lng;
       fetchNearestBranch(lat, lng, productsMeta.page + 1);
     }
-  }, [productsMeta, isProductsLoadingMore, productLocationCoords, userCoords, fetchNearestBranch]);
+  }, [
+    productsMeta,
+    isProductsLoadingMore,
+    productLocationCoords,
+    userCoords,
+    fetchNearestBranch,
+  ]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -69,7 +89,7 @@ export const ProductList = ({ products, isLoading }: ProductListProps) => {
           handleLoadMore();
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.1 },
     );
 
     if (loadMoreRef.current) {
@@ -91,7 +111,9 @@ export const ProductList = ({ products, isLoading }: ProductListProps) => {
           </div>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-8">
-          {[...Array(10)].map((_, i) => <ProductSkeleton key={i} />)}
+          {[...Array(10)].map((_, i) => (
+            <ProductSkeleton key={i} />
+          ))}
         </div>
       </section>
     );
@@ -109,37 +131,41 @@ export const ProductList = ({ products, isLoading }: ProductListProps) => {
             Recommendations
           </h2>
           <p className="text-slate-500 mt-2 font-medium">
-            {isLocationSet 
-              ? "Specially picked for you from the nearest store" 
+            {isLocationSet
+              ? "Specially picked for you from the nearest store"
               : "Our best products, specially picked for you"}
           </p>
         </div>
-        <Link 
-          href="/products" 
+        <Link
+          href="/products"
           className="group flex items-center gap-2 text-primary font-bold hover:text-primary-hover transition-all self-start sm:self-auto bg-primary/5 px-6 py-3 rounded-full hover:bg-primary/10"
         >
-          See All 
+          See All
           <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
         </Link>
       </div>
-      
+
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 md:gap-8">
         {products.map((product, index) => (
-          <ProductCardItem 
-            key={product.id} 
-            product={product} 
-            index={index} 
+          <ProductCardItem
+            key={product.id}
+            product={product}
+            index={index}
             branchName={product.branchName}
             branchId={product.branchId}
             branchCity={product.branchCity}
           />
         ))}
 
-        {isProductsLoadingMore && [...Array(4)].map((_, i) => <ProductSkeleton key={`more-${i}`} />)}
+        {isProductsLoadingMore &&
+          [...Array(4)].map((_, i) => <ProductSkeleton key={`more-${i}`} />)}
       </div>
 
       {/* Sentinel for infinite scroll */}
-      <div ref={loadMoreRef} className="h-20 w-full flex items-center justify-center mt-10">
+      <div
+        ref={loadMoreRef}
+        className="h-20 w-full flex items-center justify-center mt-10"
+      >
         {isProductsLoadingMore && (
           <div className="flex items-center gap-3 text-slate-400 font-bold animate-pulse">
             <ChevronDown className="w-5 h-5 animate-bounce" />

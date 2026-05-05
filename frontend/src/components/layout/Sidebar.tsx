@@ -12,6 +12,12 @@ import {
   CubeIcon,
   UsersIcon,
   ChevronRightIcon,
+  PercentBadgeIcon,
+  Square2StackIcon,
+  DocumentChartBarIcon,
+  ShoppingCartIcon,
+  BriefcaseIcon,
+  ServerStackIcon,
 } from "@heroicons/react/24/outline";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/hooks/useSidebar";
@@ -20,57 +26,77 @@ const NAV_ITEMS = [
   {
     title: "Dashboard",
     href: "/dashboard",
-    icon: <HomeIcon className="w-5 h-5" />,
+    icon: HomeIcon,
   },
   {
     title: "Products",
     href: "/dashboard/products",
-    icon: <CubeIcon className="w-5 h-5" />,
+    icon: CubeIcon,
   },
   {
     title: "Categories",
     href: "/dashboard/categories",
-    icon: <TagIcon className="w-5 h-5" />,
+    icon: TagIcon,
   },
   {
     title: "Accounts",
     href: "/dashboard/accounts",
-    icon: <UsersIcon className="w-5 h-5" />,
+    icon: UsersIcon,
+  },
+  {
+    title: "Branches",
+    href: "/dashboard/branches",
+    icon: GlobeAmericasIcon,
+  },
+  {
+    title: "Discounts",
+    href: "/dashboard/discounts",
+    icon: PercentBadgeIcon,
+  },
+  {
+    title: "Stock",
+    href: "/dashboard/stock",
+    icon: Square2StackIcon,
   },
   {
     title: "Cart",
     href: "/cart",
-    icon: <ShoppingCartIcon className="w-5 h-5" />,
+    icon: ShoppingCartIcon,
   },
   {
-    title: 'Manage Order',
-    href: '/manage-order',
-    icon: <ClipboardDocumentCheckIcon className="w-5 h-5" />
+    title: "Manage Order",
+    href: "/manage-order",
+    icon: ClipboardDocumentCheckIcon,
   },
   {
-    title: 'Manage Project',
-    href: '/manage-project',
-    icon: <BriefcaseIcon className="w-5 h-5" />
+    title: "Manage Project",
+    href: "/manage-project",
+    icon: BriefcaseIcon,
   },
   {
     title: "My Transaction",
     href: "/transaction",
-    icon: <ArrowsRightLeftIcon className="w-5 h-5" />,
+    icon: ArrowsRightLeftIcon,
+  },
+  {
+    title: "Report & Analysis",
+    href: "/dashboard/report",
+    icon: DocumentChartBarIcon,
   },
   {
     title: "Tracking Document",
     href: "/tracking",
-    icon: <ClipboardDocumentCheckIcon className="w-5 h-5" />,
+    icon: ClipboardDocumentCheckIcon,
   },
   {
     title: "Master Data",
     href: "/master-data",
-    icon: <ServerStackIcon className="w-5 h-5" />,
+    icon: ServerStackIcon,
   },
   {
     title: "Settings",
     href: "/settings",
-    icon: <Cog6ToothIcon className="w-5 h-5" />,
+    icon: Cog6ToothIcon,
   },
 ];
 
@@ -91,7 +117,7 @@ export const Sidebar = () => {
       {/* Mobile Overlay */}
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 md:hidden transition-opacity"
+          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-60 md:hidden transition-opacity"
           onClick={closeMobileMenu}
         />
       )}
@@ -99,7 +125,7 @@ export const Sidebar = () => {
       {/* Mobile Drawer */}
       <aside
         className={cn(
-          "fixed top-0 bottom-0 left-0 bg-[#122e2c] transition-all duration-300 ease-in-out flex flex-col z-50 shadow-2xl overflow-visible w-64 md:hidden rounded-tr-[40px] rounded-br-[40px]",
+          "fixed top-0 bottom-0 left-0 bg-[#122e2c] transition-all duration-300 ease-in-out flex flex-col z-70 shadow-2xl overflow-visible w-64 md:hidden rounded-tr-[40px] rounded-br-[40px]",
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
@@ -148,7 +174,7 @@ export const Sidebar = () => {
       >
         <aside
           className={cn(
-            "absolute top-20 md:top-0 inset-y-0 left-0 bg-[#122e2c] transition-all duration-300 ease-in-out flex flex-col z-50 shadow-2xl overflow-visible",
+            "absolute top-20 md:top-0 inset-y-0 left-0 bg-[#122e2c] transition-all duration-300 ease-in-out flex flex-col z-40 shadow-2xl overflow-visible",
             "rounded-tr-[40px] rounded-br-[40px]",
             isExpanded || isPinned ? "w-64" : "w-20",
           )}
@@ -157,7 +183,7 @@ export const Sidebar = () => {
           <button
             onClick={togglePinned}
             className={cn(
-              "absolute top-6 h-7 w-7 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-lg transition-transform duration-300 z-50 hover:scale-110",
+              "absolute top-6 h-7 w-7 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-lg transition-transform duration-300 z-40 hover:scale-110",
               "-right-3.5",
             )}
           >

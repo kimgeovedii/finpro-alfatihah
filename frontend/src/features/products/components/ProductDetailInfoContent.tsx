@@ -22,7 +22,7 @@ export const ProductDetailInfoContent = ({
       {/* Mobile Header */}
       <div className="lg:hidden flex justify-between items-start gap-4">
         <div className="flex-1 min-w-0">
-          <h1 className="font-extrabold text-2xl text-slate-900 tracking-tight leading-tight">
+          <h1 className="font-extrabold text-xl text-slate-900 tracking-tight leading-tight wrap-break-word">
             {productName}
           </h1>
           <p className="text-slate-500 font-medium mt-1 text-sm">

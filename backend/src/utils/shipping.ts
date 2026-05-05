@@ -7,7 +7,7 @@ const RAJA_ONGKIR_API_KEY = process.env.RAJA_ONGKIR_API_KEY!
 const OPENCAGE_API_KEY = process.env.OPENCAGE_API_KEY!
 
 // Reverse geocode lat/long to city name using OpenCage
-const getCityFromCoords = async (lat: number, long: number): Promise<string> => {
+export const getCityFromCoords = async (lat: number, long: number): Promise<string> => {
     if (isShipmentTesting) return mockShipmentCity
     
     // Exec the API
@@ -31,7 +31,7 @@ const getCityFromCoords = async (lat: number, long: number): Promise<string> => 
 }
 
 // Search destination id from Raja Ongkir V2 by city name
-const getLocationId = async (cityName: string): Promise<number> => {
+export const getLocationId = async (cityName: string): Promise<number> => {
     if (isShipmentTesting) return 151
 
     // Exec the API

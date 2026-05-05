@@ -5,30 +5,48 @@ import { ShoppingCart, Store } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ProductCard } from "../types/home.types";
-import { toast } from "sonner";
+import { useCreateCart } from "@/features/products/hooks/useCart";
+import Swal from "sweetalert2";
+import { Button } from "@/components/ui/button";
+import { useAuthStore } from "@/features/auth/store/useAuthStore";
+import { actionMessages } from "@/constants/message.const";
+import { showPopUp } from "@/utils/message.util";
+import { currencyFormat } from "@/constants/business.const";
 
 interface ProductCardItemProps {
   product: ProductCard;
   index: number;
   branchName?: string;
-  branchId?: string;
+  branchId: string;
   branchCity?: string;
 }
 
 export const ProductCardItem = ({ product, index, branchName, branchId, branchCity }: ProductCardItemProps) => {
   const router = useRouter();
 
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    toast.error("Pemberitahuan", {
-      description: "Fitur tambah ke keranjang sedang dalam pengembangan",
-    });
-  };
+  // Handle hook
+  const { createCart, isCreating } = useCreateCart()
+  const role = useAuthStore((state) => state.user?.role)
+
+  const handleAddToCart = async (e: React.MouseEvent, branchId: string, productId: string) => {
+    e.preventDefault()
+    e.stopPropagation()
+    
+    // Customer guard
+    if (!role) {      
+      await showPopUp(actionMessages.productAddFailed, actionMessages.productSignInRequired, "error")
+      return
+    }
+
+    // Call hook
+    const success = await createCart(branchId, productId)
+
+    if (success) await showPopUp(actionMessages.productAddSuccessTitle, actionMessages.productCartSuccessDesc, "success")
+  }
 
   const handleCardClick = () => {
-    router.push(`/products/${product.slugName}`);
-  };
+    router.push(`/products/${product.slugName}`)
+  }
 
   return (
     <motion.div 
@@ -70,13 +88,13 @@ export const ProductCardItem = ({ product, index, branchName, branchId, branchCi
           )}
 
           {/* Hover Action Button */}
-          <button 
-            onClick={handleAddToCart}
+          <Button 
+            onClick={(e) => handleAddToCart(e, branchId, product.id)}
             disabled={product.currentStock === 0}
-            className="absolute bottom-3 right-3 bg-primary text-white p-3.5 rounded-2xl shadow-2xl opacity-0 translate-y-4 transition-all duration-300 group-hover/card:opacity-100 group-hover/card:translate-y-0 hover:bg-emerald-600 active:scale-90 z-20"
+            className="absolute bottom-3 right-3 bg-primary text-white w-12 h-12 rounded-2xl shadow-2xl opacity-0 translate-y-4 transition-all duration-300 group-hover/card:opacity-100 group-hover/card:translate-y-0 hover:bg-emerald-600 active:scale-90 z-20"
           >
-            <ShoppingCart className="w-5 h-5" />
-          </button>
+            <ShoppingCart className="w-5 h-5"/>
+          </Button>
         </div>
 
         {/* Content */}
@@ -93,10 +111,10 @@ export const ProductCardItem = ({ product, index, branchName, branchId, branchCi
           <div className="mt-auto pt-3 flex flex-col gap-3">
             <div className="flex flex-col">
               <span className="text-lg md:text-xl font-black text-slate-900 dark:text-white tracking-tight">
-                Rp {product.basePrice.toLocaleString("id-ID")}
+                Rp {product.basePrice.toLocaleString(currencyFormat)}
               </span>
               <div className="flex items-center gap-2 mt-0.5">
-                <span className="text-[10px] text-slate-400 line-through">Rp {(product.basePrice * 1.2).toLocaleString("id-ID")}</span>
+                <span className="text-[10px] text-slate-400 line-through">Rp {(product.basePrice * 1.2).toLocaleString(currencyFormat)}</span>
                 <span className="text-[10px] font-black text-orange-500">20%</span>
               </div>
             </div>

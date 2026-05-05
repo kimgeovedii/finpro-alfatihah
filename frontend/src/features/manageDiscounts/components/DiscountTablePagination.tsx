@@ -3,17 +3,7 @@
 import React from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
-interface PaginationMeta {
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
-
-interface DiscountTablePaginationProps {
-  meta: PaginationMeta;
-  onPageChange: (page: number) => void;
-}
+import { DiscountTablePaginationProps } from "../types/discount.type";
 
 export const DiscountTablePagination: React.FC<DiscountTablePaginationProps> = ({
   meta,

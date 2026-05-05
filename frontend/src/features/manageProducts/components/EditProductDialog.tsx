@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { EditProductDialogProps } from "@/features/manageProducts/types/manageProduct.type";
-import { manageProductValidationSchema } from "@/features/manageProducts/validations/manageProduct.validation";
+import { editProductValidationSchema } from "@/features/manageProducts/validations/manageProduct.validation";
 
 export const EditProductDialog: React.FC<EditProductDialogProps> = ({
   open,
@@ -48,8 +48,9 @@ export const EditProductDialog: React.FC<EditProductDialogProps> = ({
       sku: "",
       weight: 0,
       images: null as File[] | null,
+      existingImageIds: [] as string[],
     },
-    validationSchema: manageProductValidationSchema,
+    validationSchema: editProductValidationSchema,
     onSubmit: async (values) => {
       try {
         await onSubmit(values);
@@ -61,6 +62,7 @@ export const EditProductDialog: React.FC<EditProductDialogProps> = ({
 
   useEffect(() => {
     if (open && product) {
+      const currentImageIds = product.productImages.map((img) => img.id);
       formik.setValues({
         productName: product.productName || "",
         slugName: product.slugName || "",
@@ -70,9 +72,9 @@ export const EditProductDialog: React.FC<EditProductDialogProps> = ({
         sku: product.sku || product.slugName || "",
         weight: (product as any).weight || 0,
         images: null,
+        existingImageIds: currentImageIds,
       });
 
-      // Set existing images
       if (product.productImages && product.productImages.length > 0) {
         const existingPreviews = product.productImages.map((img) => ({
           preview: img.imageUrl,
@@ -80,7 +82,7 @@ export const EditProductDialog: React.FC<EditProductDialogProps> = ({
           id: img.id,
         }));
         setImagePreviews(existingPreviews);
-        setExistingImageIds(product.productImages.map((img) => img.id));
+        setExistingImageIds(currentImageIds);
       } else {
         setImagePreviews([]);
         setExistingImageIds([]);
@@ -91,7 +93,12 @@ export const EditProductDialog: React.FC<EditProductDialogProps> = ({
   const handleImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
-      const newImages: Array<{ file?: File; preview: string; isExisting: boolean; id?: string }> = [];
+      const newImages: Array<{
+        file?: File;
+        preview: string;
+        isExisting: boolean;
+        id?: string;
+      }> = [];
 
       Array.from(files).forEach((file) => {
         const reader = new FileReader();
@@ -125,18 +132,15 @@ export const EditProductDialog: React.FC<EditProductDialogProps> = ({
     setImagePreviews(updatedPreviews);
 
     if (imageToRemove.isExisting && imageToRemove.id) {
-      setExistingImageIds(
-        existingImageIds.filter((id) => id !== imageToRemove.id),
-      );
+      const updatedIds = existingImageIds.filter((id) => id !== imageToRemove.id);
+      setExistingImageIds(updatedIds);
+      formik.setFieldValue("existingImageIds", updatedIds);
     }
 
     const fileArray = updatedPreviews
       .filter((img) => img.file)
       .map((img) => img.file as File);
-    formik.setFieldValue(
-      "images",
-      fileArray.length > 0 ? fileArray : null,
-    );
+    formik.setFieldValue("images", fileArray.length > 0 ? fileArray : null);
   };
 
   const handleClose = (isOpen: boolean) => {
@@ -239,11 +243,13 @@ export const EditProductDialog: React.FC<EditProductDialogProps> = ({
                         <SelectValue placeholder="Select a category" />
                       </SelectTrigger>
                       <SelectContent>
-                        {categories.map((cat) => (
-                          <SelectItem key={cat.id} value={cat.id}>
-                            {cat.name}
-                          </SelectItem>
-                        ))}
+                        {categories
+                          .filter((cat) => !cat.deletedAt)
+                          .map((cat) => (
+                            <SelectItem key={cat.id} value={cat.id}>
+                              {cat.name}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                     {formik.touched.categoryId && formik.errors.categoryId && (

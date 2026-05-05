@@ -39,7 +39,7 @@ export class CartService {
             const branchLat = cart.branch.latitude
             const branchLong = cart.branch.longitude
             // Total weight (g)
-            const totalWeight = cart.items.reduce((sum, dt) => sum + dt.product.product.weight, 0)
+            const totalWeight = cart.items.reduce((sum, dt) => sum + (dt.product.product.weight * dt.quantity), 0)
     
             // If address provided just take it 
             if (addressId) selectedAddress = cart.user.addresses.find(a => a.id === addressId)

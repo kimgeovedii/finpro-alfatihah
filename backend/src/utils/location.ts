@@ -20,9 +20,3 @@ export const isWithinDeliveryRange = (userLat: number, userLon: number, branchLa
     
     return { isInsideRange , distance }
 }
-
-export const calculateShippingCost = (userLat: number, userLon: number, branchLat: number, branchLon: number): number => {
-    const distance = getDistanceInKm(userLat, userLon, branchLat, branchLon)
-    
-    return baseShippingCost + Math.ceil(distance) * shippingRatePerKM
-}

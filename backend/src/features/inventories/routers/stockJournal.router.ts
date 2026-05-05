@@ -1,9 +1,11 @@
 import { Router } from "express";
 import { StockJournalController } from "../controllers/stockJournal.controller";
 import { authMiddleware } from "../../../middleware/auth.middleware";
+import { roleMiddleware } from "../../../middleware/role.middleware";
+import { EmployeeRole } from "@prisma/client";
 
 export class StockJournalRouter {
-  private router: Router;
+  public router: Router;
   private stockJournalController: StockJournalController;
 
   constructor() {
@@ -16,16 +18,17 @@ export class StockJournalRouter {
     this.router.get(
       "/",
       authMiddleware,
+      roleMiddleware([EmployeeRole.STORE_ADMIN, EmployeeRole.SUPER_ADMIN]),
       this.stockJournalController.findAllStockJournals,
     );
     this.router.get(
       "/:id",
       authMiddleware,
+      roleMiddleware([EmployeeRole.STORE_ADMIN, EmployeeRole.SUPER_ADMIN]),
       this.stockJournalController.findStockJournalById,
     );
   }
 
-  public getRouter(): Router {
-    return this.router;
-  }
 }
+
+export default new StockJournalRouter().router;

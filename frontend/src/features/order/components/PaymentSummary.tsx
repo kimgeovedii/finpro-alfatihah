@@ -4,6 +4,10 @@ import React from "react"
 import { PaymentEvidenceUploadButton } from "./PaymentEvidenceUploadButton"
 import { OrderCancelButton } from "./OrderCancelButton"
 import { useDownloadInvoice } from "../hooks/useExport"
+import { InfoBoxShippingWeightToolTip } from "@/components/layout/InfoBoxShippingWeightToolTip"
+import { courierShippingDefault, currencyFormat } from "@/constants/business.const"
+import { ShippingSummaryCard } from "@/components/layout/ShippingSummaryCard"
+import { DividerLine } from "@/components/layout/DividerLine"
 
 type Props = {
     orderId: string
@@ -27,31 +31,26 @@ export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, t
     return (
         <div className="bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 mb-4">
             <h5 className="font-bold mb-3">Payment Summary</h5>
+            <DividerLine/>
             <div className="flex justify-between">
                 <p>Total Items <b>({totalItem})</b></p>
-                <h6 className="font-bold">Rp. {totalPrice.toLocaleString()}</h6>
-            </div>
-            <div className="flex justify-between">
-                <p>Shipping Cost</p>
-                <h6 className="font-bold">Rp. {shippingCost.toLocaleString()}</h6>
-            </div>
-            <div className="flex justify-between">
-                <p>Shipping Weight</p>
-                <h6 className="font-bold">{(shippingWeight / 1000).toFixed(2)} Kg</h6>
+                <h6 className="font-bold">Rp. {totalPrice.toLocaleString(currencyFormat)}</h6>
             </div>
             {
                 totalSaving > 0 && 
                     <div className="flex justify-between">
                         <p>Total Saving</p>
-                        <h6 className="font-bold">Rp. {totalSaving.toLocaleString()}</h6>
+                        <h6 className="font-bold">Rp. {totalSaving.toLocaleString(currencyFormat)}</h6>
                     </div>
             }
-            <hr className="my-3"/>
+            <DividerLine/>
+            <ShippingSummaryCard shippingWeight={shippingWeight} shippingCost={shippingCost}/>
+            <DividerLine/>
             <div className="flex justify-between">
                 <h6 className="font-bold">Final Price</h6>
-                <h4 className="font-bold text-xl">Rp. {(finalPrice + shippingCost).toLocaleString()}</h4>
+                <h4 className="font-bold text-xl">Rp. {Math.ceil(finalPrice + shippingCost).toLocaleString(currencyFormat)}</h4>
             </div>
-            <hr className="mt-3 mb-5"/>
+            <DividerLine/>
             <div className="flex flex-col gap-3">
                 { status === 'WAITING_PAYMENT' && paymentEvidence === null && paymentMethod === "MANUAL" && <PaymentEvidenceUploadButton orderId={orderId} paymentDeadline={paymentDeadline}/> }
                 { status === 'WAITING_PAYMENT' && <OrderCancelButton orderNumber={orderNumber} onCancel={onCancel}/> }

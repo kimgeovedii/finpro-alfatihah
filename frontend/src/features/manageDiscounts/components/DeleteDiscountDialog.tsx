@@ -11,15 +11,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { IDiscount } from "../types/discount.type";
-
-interface DeleteDiscountDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  discount: IDiscount | null;
-  onConfirm: () => void;
-  isDeleting: boolean;
-}
+import { DeleteDiscountDialogProps } from "../types/discount.type";
 
 export const DeleteDiscountDialog: React.FC<DeleteDiscountDialogProps> = ({
   open,

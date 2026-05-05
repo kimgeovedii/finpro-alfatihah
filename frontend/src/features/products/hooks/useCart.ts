@@ -5,7 +5,7 @@ export const useCreateCart = () => {
     const [isCreating, setIsCreating] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
-    const createCart = async (branchId: string, productId: string, qty: number): Promise<boolean> => {
+    const createCart = async (branchId: string, productId: string, qty: number = 1): Promise<boolean> => {
         setIsCreating(true)
         setError(null)
 

@@ -15,6 +15,9 @@ export const CategoryManagementPage: React.FC = () => {
     meta,
     isLoading,
     searchQuery,
+    sortBy,
+    sortOrder,
+    handleSort,
     addDialogOpen,
     setAddDialogOpen,
     editDialogOpen,
@@ -32,7 +35,17 @@ export const CategoryManagementPage: React.FC = () => {
     handleCreate,
     handleUpdate,
     handleDeleteConfirm,
+    canManage,
+    userLoading,
   } = useManageCategories();
+
+  if (userLoading && !canManage) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#006666]"></div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -45,14 +58,19 @@ export const CategoryManagementPage: React.FC = () => {
         searchQuery={searchQuery}
         onSearchChange={handleSearchChange}
         onAddClick={handleAddClick}
+        canManage={canManage}
       />
 
-      <div className="space-y-4">
+      <div className="shadow-[0_4px_30px_rgba(0,0,0,0.02)] rounded-3xl bg-white overflow-hidden border border-[#eff1f2]">
         <CategoryTable
           categories={categories}
           isLoading={isLoading}
           onEdit={handleEditClick}
           onDelete={handleDeleteClick}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
+          onSort={handleSort}
+          canManage={canManage}
         />
         
         <ProductTablePagination 

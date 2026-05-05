@@ -13,13 +13,22 @@ export class StockJournalRepository {
         take,
         orderBy: { createdAt: "desc" },
         include: {
-          product: {
-            select: { productName: true, basePrice: true },
+          branchInventory: {
+            select: {
+              branch: {
+                select: {
+                  storeName: true,
+                },
+              },
+              product: {
+                select: { productName: true, basePrice: true },
+              },
+            },
           },
           employee: {
-            select: { fullName: true }
-          }
-        }
+            select: { fullName: true },
+          },
+        },
       }),
       prisma.stock_journals.count({
         where: filters,
@@ -36,8 +45,8 @@ export class StockJournalRepository {
         product: true,
         employee: true,
         order: true,
-        mutation: true
-      }
+        mutation: true,
+      },
     });
-  }
+  };
 }

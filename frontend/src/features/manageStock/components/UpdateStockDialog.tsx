@@ -24,7 +24,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { BuildingStorefrontIcon, CubeIcon } from "@heroicons/react/24/outline";
+import {
+  BuildingStorefrontIcon,
+  CubeIcon,
+  MagnifyingGlassIcon,
+} from "@heroicons/react/24/outline";
 
 export const UpdateStockDialog: React.FC<UpdateStockDialogProps> = ({
   open,
@@ -34,7 +38,11 @@ export const UpdateStockDialog: React.FC<UpdateStockDialogProps> = ({
   isSubmitting,
   branches,
   allProducts,
+  isStoreAdmin,
+  userBranchId,
 }) => {
+  const [productSearchQuery, setProductSearchQuery] = React.useState("");
+
   const formik = useFormik({
     initialValues: {
       actualStock: 0,
@@ -50,6 +58,9 @@ export const UpdateStockDialog: React.FC<UpdateStockDialogProps> = ({
   });
 
   useEffect(() => {
+    if (!open) {
+      setProductSearchQuery("");
+    }
     if (open) {
       if (inventoryItem) {
         formik.setValues({
@@ -64,7 +75,7 @@ export const UpdateStockDialog: React.FC<UpdateStockDialogProps> = ({
           actualStock: 0,
           notes: "",
           productId: "",
-          branchId: "",
+          branchId: isStoreAdmin && userBranchId ? userBranchId : "",
           isNew: true,
         });
       }
@@ -134,8 +145,9 @@ export const UpdateStockDialog: React.FC<UpdateStockDialogProps> = ({
                         onValueChange={(val) =>
                           formik.setFieldValue("branchId", val)
                         }
+                        disabled={isStoreAdmin}
                       >
-                        <SelectTrigger className="w-full rounded-lg border-[#eff1f2] focus:ring-[#006666]/10 text-sm">
+                        <SelectTrigger className="w-full rounded-lg border-[#eff1f2] focus:ring-[#006666]/10 text-sm disabled:opacity-80">
                           <SelectValue placeholder="Select Branch" />
                         </SelectTrigger>
                         <SelectContent className="rounded-xl border-[#eff1f2]">
@@ -174,12 +186,48 @@ export const UpdateStockDialog: React.FC<UpdateStockDialogProps> = ({
                         <SelectTrigger className="w-full rounded-lg border-[#eff1f2] focus:ring-[#006666]/10 text-sm">
                           <SelectValue placeholder="Select Product" />
                         </SelectTrigger>
-                        <SelectContent className="rounded-xl border-[#eff1f2] max-h-64 overflow-y-auto">
-                          {allProducts.map((product) => (
-                            <SelectItem key={product.id} value={product.id}>
-                              {product.productName}
-                            </SelectItem>
-                          ))}
+                        <SelectContent className="rounded-xl border-[#eff1f2]">
+                          <div className="sticky top-0 bg-white p-2 border-b border-[#eff1f2] z-10">
+                            <div className="relative">
+                              <MagnifyingGlassIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#64748b]" />
+                              <Input
+                                placeholder="Filter products..."
+                                value={productSearchQuery}
+                                onChange={(e) =>
+                                  setProductSearchQuery(e.target.value)
+                                }
+                                className="h-8 pl-8 text-xs bg-[#f5f6f7] border-none focus-visible:ring-1 focus-visible:ring-[#006666]/20"
+                                onClick={(e) => e.stopPropagation()}
+                                onKeyDown={(e) => e.stopPropagation()}
+                              />
+                            </div>
+                          </div>
+                          <div className="max-h-56 overflow-y-auto pt-1">
+                            {allProducts
+                              .filter((p) =>
+                                p.productName
+                                  .toLowerCase()
+                                  .includes(productSearchQuery.toLowerCase()),
+                              )
+                              .map((product) => (
+                                <SelectItem key={product.id} value={product.id}>
+                                  <div className="flex flex-col py-0.5">
+                                    <span className="font-medium text-[#2c2f30]">
+                                      {product.productName}
+                                    </span>
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            {allProducts.filter((p) =>
+                              p.productName
+                                .toLowerCase()
+                                .includes(productSearchQuery.toLowerCase()),
+                            ).length === 0 && (
+                              <div className="py-6 text-center text-xs text-[#64748b] italic">
+                                No products matching "{productSearchQuery}"
+                              </div>
+                            )}
+                          </div>
                         </SelectContent>
                       </Select>
                     )}
@@ -194,7 +242,7 @@ export const UpdateStockDialog: React.FC<UpdateStockDialogProps> = ({
                     <div className="space-y-1.5">
                       <Label
                         htmlFor="actualStock"
-                        className="text-[#2c2f30] font-semibold"
+                        className="text-[#302d2c] font-semibold"
                       >
                         New Stock Level
                       </Label>
@@ -206,14 +254,14 @@ export const UpdateStockDialog: React.FC<UpdateStockDialogProps> = ({
                         value={formik.values.actualStock}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
-                        className="h-10 text-lg font-mono font-bold text-[#006666] border-[#eff1f2] focus:ring-[#006666]/10"
+                        className="h-10 text-lg font-mono font-bold text-[#2c2f30] border-[#eff1f2] focus:ring-[#006666]/10"
                       />
                     </div>
                     <div className="space-y-1.5 flex flex-col justify-end">
                       <div className="text-[10px] text-[#595c5d] font-semibold uppercase tracking-wider mb-1">
                         Current Stock
                       </div>
-                      <div className="h-10 flex items-center px-4 bg-[#f5f6f7] rounded-lg text-lg font-mono font-bold text-[#2c2f30] border border-[#eff1f2]">
+                      <div className="h-10 flex items-center px-4 bg-[#f5f6f7] rounded-lg text-md font-mono font-bold text-[#2c2f30] border border-[#eff1f2]">
                         {inventoryItem?.currentStock ?? 0}
                       </div>
                     </div>
