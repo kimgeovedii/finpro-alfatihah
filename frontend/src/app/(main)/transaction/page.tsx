@@ -8,41 +8,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { OrderItemCard } from "@/features/order/components/OrderItemCard";
 import { OrderSummaryCard } from "@/features/order/components/OrderSummaryCard";
-import { useDownloadTransactionHistory } from "@/features/order/hooks/useExport";
 import { useAllOrderData, useOrderSummary } from "@/features/order/hooks/useOrder";
+import { useOrderActions } from "@/features/order/hooks/useOrderAction";
 import { CloudArrowDownIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
-import Swal from "sweetalert2";
 
 export default function TransactionPage() {
   // Handle hook
   const { summary, isLoadingSummary } = useOrderSummary()
   const { orders, meta, isLoading, fetchAllOrders } = useAllOrderData()
-  const { downloadTransactionHistory } = useDownloadTransactionHistory()
-  // For filtering
-  const [orderNumber, setOrderNumber] = useState("")
-  const [dateStart, setDateStart] = useState("")
-  const [dateEnd, setDateEnd] = useState("")
-
-  // Handle action
-  const handleSearch = () => {
-    if ((dateStart && !dateEnd) || (!dateStart && dateEnd)) {
-      Swal.fire({
-        title: "Filter failed",
-        text: "dateStart and dateEnd must be provided together",
-        icon: "error",
-        confirmButtonColor: "#10b981",
-      })
-
-      return
-    }
-
-    fetchAllOrders(1, {
-      orderNumber: orderNumber || undefined,
-      dateStart: dateStart || undefined,
-      dateEnd: dateEnd || undefined,
-    })
-  }
+  
+  // Call hook : actions
+  const { orderNumber, setOrderNumber, dateStart, setDateStart, dateEnd, setDateEnd, handleSearch, downloadTransactionHistory } = useOrderActions(fetchAllOrders)
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto">

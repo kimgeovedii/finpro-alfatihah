@@ -2,69 +2,24 @@
 import { DividerLine } from "@/components/layout/DividerLine"
 import { HeadingText } from "@/components/layout/HeadingText"
 import { SkeletonBox } from "@/components/layout/SkeletonBox"
-import { OrderStatus } from "@/constants/business.const"
 import { useAuthStore } from "@/features/auth/store/useAuthStore"
 import { OrderFiltersBar } from "@/features/order/components/OrderFiltersBar"
-import { OrderTableItem, OrderManagementTable } from "@/features/order/components/OrderManagementTable"
+import { OrderManagementTable } from "@/features/order/components/OrderManagementTable"
 import { OrderSummaryByBranchCard } from "@/features/order/components/OrderSummaryByBranchCard"
 import { useAllBranchData } from "@/features/order/hooks/useBranch"
-import { useOrderManagement, useOrderSummaryByBranchId } from "@/features/order/hooks/useOrder"
-import { useUpdatePaymentStatusById } from "@/features/order/hooks/usePayment"
-import { useEffect, useState } from "react"
-import Swal from "sweetalert2"
+import { useOrderSummaryByBranchId } from "@/features/order/hooks/useManageOrder"
+import { useManageOrderActions } from "@/features/order/hooks/useManageOrderAction"
 
 export default function ManageOrdersPage() {
+    // Call hook : data
     const role = useAuthStore((state) => state.user?.role)
-
-    // Handle hook
-    const [ branchId, setBranchId ] = useState<string>("ALL")
-    const [ search, setSearch ] = useState<string>("")
-
-    const { summaryByBranchId, isLoadingSummaryByBranchId } = useOrderSummaryByBranchId(branchId)
-    const { orders, meta, isLoading, status, handlePageChange, handleStatusChange, handleBranchChange } = useOrderManagement()
-    const { updatePayment, isUpdatingPayment } = useUpdatePaymentStatusById()
     const { branchs, isBranchLoading } = useAllBranchData()
 
-    // Sync branch
-    useEffect(() => {
-        handleBranchChange(branchId)
-    }, [branchId])
+    // Call hook : actions
+    const { branchId, setBranchId, search, setSearch, tableOrders, meta, isLoading, status, handlePageChange, handleStatusChange, handleValidatePaymentEvidence } = useManageOrderActions()
 
-    // Handle action
-    const handleValidatePaymentEvidence = async (paymentId: string, isConfirm: boolean) => {
-        const confirm = await Swal.fire({
-            title: "Validate transaction?",
-            text: `Are you sure want to ${isConfirm ? 'confirm' : 'reject'} this transaction?`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Yes, proceed",
-            cancelButtonText: "Cancel",
-            confirmButtonColor: "#2d766f",
-        })
-        if (!confirm.isConfirmed) return
-    
-        const success = await updatePayment(paymentId, isConfirm)
-        if (success) {
-            await Swal.fire({
-                title: "Order validated!",
-                text: "Your customer will receive notification as soon as possible",
-                icon: "success",
-                confirmButtonColor: "#10b981",
-            })
-        }
-    }
-
-    const tableOrders: OrderTableItem[] = orders.map(dt => ({
-        id: dt.id,
-        orderNumber: dt.orderNumber,
-        storeName: dt.branch.storeName,
-        customerName: dt.user.username,
-        customerEmail: dt.user.email,
-        createdAt: dt.createdAt,
-        finalPrice: dt.finalPrice,
-        payments: dt.payments,
-        status: dt.status as OrderStatus,
-    }))
+    // Call hook : summary (depends on branchId from actions)
+    const { summaryByBranchId, isLoadingSummaryByBranchId } = useOrderSummaryByBranchId(branchId)
 
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto">

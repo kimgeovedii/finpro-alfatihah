@@ -47,8 +47,14 @@ export default function CartDetailPage() {
     }
 
     if (cart?.user?.addresses?.length) {
-      const primary = cart.user.addresses.find(dt => dt.isPrimary) ?? cart.user.addresses[0]
-      setSelectedAddressId(primary.id)
+      const selectedAddress = (() => {
+        const primary = cart?.user?.addresses?.find(dt => dt.isPrimary && dt.isWithinRange)
+        if (primary) return primary
+
+        return cart?.user?.addresses?.find(dt => dt.isWithinRange) ?? cart.user.addresses[0]
+      })()
+
+      setSelectedAddressId(selectedAddress.id)
     }
   }, [cart, isLoading, error, router])
 
@@ -177,12 +183,12 @@ export default function CartDetailPage() {
 
     const confirmResult = await Swal.fire({
       icon: "question",
-      title: "Confirm Checkout",
-      text: "Are you sure you want to place this order?",
+      title: actionMessages.cartAskCheckoutTitle,
+      text: actionMessages.cartAskCheckoutDesc,
       showCancelButton: true,
       confirmButtonColor: "#10b981",
       cancelButtonColor: "#ef4444",
-      confirmButtonText: "Yes, place order",
+      confirmButtonText: actionMessages.confirmCheckout,
       cancelButtonText: "Cancel",
     })
     if (!confirmResult.isConfirmed) return
