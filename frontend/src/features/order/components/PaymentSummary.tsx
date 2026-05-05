@@ -4,8 +4,7 @@ import React from "react"
 import { PaymentEvidenceUploadButton } from "./PaymentEvidenceUploadButton"
 import { OrderCancelButton } from "./OrderCancelButton"
 import { useDownloadInvoice } from "../hooks/useExport"
-import { InfoBoxShippingWeightToolTip } from "@/components/layout/InfoBoxShippingWeightToolTip"
-import { courierShippingDefault, currencyFormat } from "@/constants/business.const"
+import { currencyFormat } from "@/constants/business.const"
 import { ShippingSummaryCard } from "@/components/layout/ShippingSummaryCard"
 import { DividerLine } from "@/components/layout/DividerLine"
 import { HeadingText } from "@/components/layout/HeadingText"
@@ -24,9 +23,10 @@ type Props = {
     finalPrice: number
     paymentMethod?: string | null
     onCancel: (orderNumber: string) => void
+    onSuccess: () => void
 }
 
-export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, totalPrice, totalSaving, finalPrice, orderId, status, paymentDeadline, paymentEvidence, orderNumber, onCancel, paymentMethod, shippingWeight }) => {
+export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, totalPrice, totalSaving, finalPrice, orderId, status, paymentDeadline, paymentEvidence, orderNumber, onCancel, paymentMethod, shippingWeight, onSuccess }) => {
     const { downloadInvoiceOrder } = useDownloadInvoice()
     
     return (
@@ -53,7 +53,7 @@ export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, t
             </div>
             <DividerLine/>
             <div className="flex flex-col gap-3">
-                { status === 'WAITING_PAYMENT' && paymentEvidence === null && paymentMethod === "MANUAL" && <PaymentEvidenceUploadButton orderId={orderId} paymentDeadline={paymentDeadline}/> }
+                { status === 'WAITING_PAYMENT' && paymentEvidence === null && paymentMethod === "MANUAL" && <PaymentEvidenceUploadButton orderId={orderId} paymentDeadline={paymentDeadline} onSuccess={onSuccess}/> }
                 { status === 'WAITING_PAYMENT' && <OrderCancelButton orderNumber={orderNumber} onCancel={onCancel}/> }
             </div>
             <div className="flex gap-5 w-full mt-3">

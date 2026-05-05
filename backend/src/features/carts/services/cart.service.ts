@@ -93,12 +93,18 @@ export class CartService {
 
         // Helper : get store open status by schedule and current server time
         const openStatus = getStoreOpenStatus(cart.branch.schedules)
-    
-        return { 
-            ...cart, 
-            user: { ...cart.user, addresses: addressList },
-            shipping, 
-            openStatus 
+      
+        return {
+            ...cart,
+            branch: {
+                ...cart.branch,
+                openStatus,
+            },
+            user: {
+                ...cart.user,
+                addresses: addressList,
+            },
+            shipping,
         }
     }
 

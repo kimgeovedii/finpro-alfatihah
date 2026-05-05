@@ -24,9 +24,10 @@ type Props = {
     paymentMethod?: string
     paymentStatus?: string
     paymentEvidence?: string
+    onSuccess: () => void
 }
 
-export const OrderItemCard: React.FC<Props> = ({ orderId, orderNumber, status, totalPrice, finalPrice, shippingCost, paymentDeadline, totalItems, productList, createdAt, paymentEvidence, paymentMethod, paymentStatus }) => {
+export const OrderItemCard: React.FC<Props> = ({ orderId, orderNumber, status, totalPrice, finalPrice, shippingCost, paymentDeadline, totalItems, productList, createdAt, paymentEvidence, paymentMethod, paymentStatus, onSuccess }) => {
     // Color mapping
     const statusClass = statusColorMap[status] || "bg-slate-400"
     const finalStatus = status.replaceAll('_',' ')
@@ -63,7 +64,7 @@ export const OrderItemCard: React.FC<Props> = ({ orderId, orderNumber, status, t
                 { 
                     status === 'WAITING_PAYMENT' && paymentEvidence === null && paymentMethod === "MANUAL" && 
                         <div className="mt-2">
-                            <PaymentEvidenceUploadButton orderId={orderId} paymentDeadline={paymentDeadline}/> 
+                            <PaymentEvidenceUploadButton orderId={orderId} paymentDeadline={paymentDeadline} onSuccess={onSuccess}/> 
                         </div>
                 }
                 {

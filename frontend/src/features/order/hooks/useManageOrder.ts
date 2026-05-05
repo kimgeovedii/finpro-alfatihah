@@ -46,5 +46,6 @@ export const useOrderManagement = () => {
         page, setPage,
         branchId, setBranchId,
         search, setSearch,
+        fetchOrders
     }
 }

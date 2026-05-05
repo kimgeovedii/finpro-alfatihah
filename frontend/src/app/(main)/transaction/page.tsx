@@ -88,7 +88,7 @@ export default function TransactionPage() {
                   key={idx}
                   orderId={dt.id} orderNumber={dt.orderNumber} status={dt.status} totalPrice={dt.totalPrice} finalPrice={dt.finalPrice} shippingCost={dt.shippingCost}
                   paymentDeadline={dt.paymentDeadline} totalItems={dt.totalItems} productList={dt.productList} createdAt={dt.createdAt} paymentMethod={dt.payments[0]?.method}
-                  paymentStatus={dt.payments[0]?.status} paymentEvidence={dt.payments[0]?.evidence}
+                  paymentStatus={dt.payments[0]?.status} paymentEvidence={dt.payments[0]?.evidence} onSuccess={fetchAllOrders}
                 />
               ))
             }

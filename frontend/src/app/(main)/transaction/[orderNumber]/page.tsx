@@ -5,63 +5,22 @@ import { PaymentSummaryCard } from '@/features/order/components/PaymentSummary';
 import { useParams } from 'next/navigation';
 import { Check, Package, Truck, Home } from "lucide-react"
 import { OrderStatusStepsCard } from '@/features/order/components/OrderStatusStepsCard';
-import { useCancelOrderStatusById, useConfirmOrderStatusById, useOrderDetailData } from '@/features/order/hooks/useOrder';
-import Swal from 'sweetalert2';
+import { useOrderDetailData } from '@/features/order/hooks/useOrder';
 import { SkeletonBox } from '@/components/layout/SkeletonBox';
 import { MessageBox } from '@/components/layout/MessageBox';
 import { BackButton } from '@/components/button/BackButton';
 import { HeadingText } from '@/components/layout/HeadingText';
+import { useOrderActions } from '@/features/order/hooks/useOrderAction';
 
 export default function TransactionDetailPage() {
-  // For repo fetching
+  // For repo (fetch)
   const params = useParams()
   const orderNumber = params?.orderNumber as string
   const { order, isLoading, fetchOrderDetail } = useOrderDetailData(orderNumber)
-  const { confirmOrder, isConfirmingOrder } = useConfirmOrderStatusById()
-  const { cancelOrder, isCancellingOrder } = useCancelOrderStatusById()
-
-  // Handle action
-  const handleCancelOrder = async (orderNumber: string) => {
-    const confirm = await Swal.fire({
-      title: "Order Rejection",
-      text: `Are you sure want to cancel this order?`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes, proceed",
-      cancelButtonText: "Cancel",
-      confirmButtonColor: "#2d766f",
-    })
-    if (!confirm.isConfirmed) return 
-
-    const { success, message } = await cancelOrder(orderNumber)
-    await Swal.fire({
-      title: success ? "Order cancel!" : "Opps!",
-      text: message,
-      icon: success ? "success" : "error",
-      confirmButtonColor: "#10b981",
-    })
-  }
-
-  const handleConfirmOrder = async (orderNumber: string) => {
-    const confirm = await Swal.fire({
-      title: "Order Confirmation",
-      text: `Are you sure want to confirm this order?`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes, proceed",
-      cancelButtonText: "Cancel",
-      confirmButtonColor: "#2d766f",
-    })
-    if (!confirm.isConfirmed) return 
-
-    const { success, message } = await confirmOrder(orderNumber)
-    await Swal.fire({
-      title: success ? "Order confirm!" : "Opps!",
-      text: message,
-      icon: success ? "success" : "error",
-      confirmButtonColor: "#10b981",
-    })
-  }
+  
+  // Call hook (action)
+  const onSuccess = () => fetchOrderDetail(orderNumber)
+  const { handleCancelOrder, handleConfirmOrder } = useOrderActions(() => {}, onSuccess)
 
   // Order status state props
   const statusSteps = [
@@ -125,7 +84,8 @@ export default function TransactionDetailPage() {
                         storeName: order?.branch?.storeName ?? "-",
                         address: order?.branch?.address ?? "-",
                         schedules: order?.branch?.schedules ?? [],
-                        city: order?.branch?.city ?? "-"
+                        city: order?.branch?.city ?? "-",
+                        openStatus: order?.branch.openStatus
                       }}
                       orderInfo={{
                         orderNumber,
@@ -177,7 +137,8 @@ export default function TransactionDetailPage() {
                       paymentDeadline={order?.paymentDeadline ?? '-'} 
                       paymentEvidence={order?.payments[0].evidence}
                       paymentMethod={order?.payments[0].method}
-                      onCancel={handleCancelOrder}         
+                      onCancel={handleCancelOrder} 
+                      onSuccess={onSuccess}        
                     />
                   </>
                 }

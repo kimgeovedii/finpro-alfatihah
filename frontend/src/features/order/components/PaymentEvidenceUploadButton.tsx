@@ -5,13 +5,15 @@ import React, { useRef } from "react"
 import { useUploadPaymentEvidence } from "../hooks/usePayment"
 import Swal from "sweetalert2"
 import { allowedMimeTypesPaymentEvidence, maxSizePaymentEvidence } from "@/constants/business.const"
+import { showPopUp } from "@/utils/message.util"
 
 type Props = {
     orderId: string
     paymentDeadline: string
+    onSuccess: () => void
 }
 
-export const PaymentEvidenceUploadButton: React.FC<Props> = ({ orderId, paymentDeadline }) => {
+export const PaymentEvidenceUploadButton: React.FC<Props> = ({ orderId, paymentDeadline, onSuccess }) => {
     // For file handling
     const fileInputRef = useRef<HTMLInputElement>(null)
     const { uploadEvidence, isUploading } = useUploadPaymentEvidence()
@@ -22,23 +24,13 @@ export const PaymentEvidenceUploadButton: React.FC<Props> = ({ orderId, paymentD
 
         // Validation file type
         if (!allowedMimeTypesPaymentEvidence.includes(file.type)) {
-            Swal.fire({ 
-                icon:"error", 
-                title: "Upload failed", 
-                text: "Only JPG, JPEG, PNG, and GIF files are allowed.", 
-                confirmButtonColor: "#ef4444" 
-            })
+            showPopUp("Upload failed", "Only JPG, JPEG, PNG, and GIF files are allowed.", "error")
             return
         }
 
         // Validation size
         if (file.size > maxSizePaymentEvidence) {
-            Swal.fire({ 
-                icon:"error", 
-                title: "Upload failed", 
-                text: "File size must not exceed 10 MB.", 
-                confirmButtonColor: "#ef4444" 
-            })
+            showPopUp("Upload failed", "File size must not exceed 10 MB.", "error")
             return
         }
 
@@ -50,6 +42,8 @@ export const PaymentEvidenceUploadButton: React.FC<Props> = ({ orderId, paymentD
             title: result.success ? result.message : "Upload failed", 
             text: result.message, 
             confirmButtonColor: result.success ? "#10b981" : "#ef4444" 
+        }).then(() => {
+            if (result.success) onSuccess()
         })
     }
 
