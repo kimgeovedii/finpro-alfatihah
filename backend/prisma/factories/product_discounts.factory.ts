@@ -24,11 +24,11 @@ class ProductDiscountsFactory {
     }
 
     private async findRandomDiscount() {
-        const { meta } = await this.discountService.findAllDiscounts({}, 1, 1);
+        const { meta } = await this.discountService.findAllDiscounts({ page: 1, limit: 1 });
         if (meta.total === 0) return null;
 
         const skip = Math.floor(Math.random() * meta.total);
-        const { data } = await this.discountService.findAllDiscounts({}, skip + 1, 1);
+        const { data } = await this.discountService.findAllDiscounts({ page: skip + 1, limit: 1 });
         
         return data[0];
     }
@@ -72,7 +72,7 @@ class ProductDiscountsFactory {
         let hasMore = true;
 
         while(hasMore) {
-           const { data, meta } = await this.discountService.findAllDiscounts({}, page, 50);
+           const { data, meta } = await this.discountService.findAllDiscounts({ page, limit: 50 });
            discounts.push(...data);
            if (page >= meta.totalPages || data.length === 0) hasMore = false;
            page++;
