@@ -82,8 +82,22 @@ export class BranchAdminService {
     return this.adminRepo.findAvailableStoreAdmins(search);
   }
 
-  async getAllEmployees(query: { search?: string; role?: any }) {
-    return this.adminRepo.findAllEmployees(query);
+  async getAllEmployees(query: any) {
+    const page = parseInt(query.page) || 1;
+    const limit = parseInt(query.limit) || 10;
+    const search = query.search || undefined;
+    const role = query.role || undefined;
+    const branchId = query.branchId || undefined;
+    const isUnassigned = query.isUnassigned === "true";
+
+    return this.adminRepo.findAllEmployees({
+      search,
+      role,
+      branchId,
+      isUnassigned,
+      page,
+      limit,
+    });
   }
 
   async createEmployee(data: any) {
@@ -92,5 +106,9 @@ export class BranchAdminService {
 
   async assignAdmin(branchId: string, employeeId: string) {
     return this.adminRepo.assignEmployee(branchId, employeeId);
+  }
+
+  async unassignEmployee(employeeId: string) {
+    return this.adminRepo.unassignEmployee(employeeId);
   }
 }

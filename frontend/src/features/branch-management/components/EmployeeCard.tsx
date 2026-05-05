@@ -4,14 +4,15 @@ import React from "react";
 import { EnvelopeIcon } from "@heroicons/react/24/outline";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Employee } from "../types/branch-admin.types";
+import { Employee } from "../types/branch-admin.type";
 
 interface EmployeeCardProps {
   employee: Employee;
   onRemove?: (id: string) => void;
+  onAssignClick?: (employee: Employee) => void;
 }
 
-export const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, onRemove }) => {
+export const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, onRemove, onAssignClick }) => {
   const initials = employee.fullName
     .split(" ")
     .map((n) => n[0])
@@ -32,6 +33,9 @@ export const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, onRemove }
             <EnvelopeIcon className="w-3 h-3 flex-shrink-0" />
             <span className="truncate">{employee.user?.email}</span>
           </div>
+          <div className="mt-1 text-xs text-slate-500 font-medium">
+            Assignment: <span className="font-bold text-slate-700">{employee.branch?.storeName || "Unassigned"}</span>
+          </div>
         </div>
       </div>
 
@@ -46,14 +50,28 @@ export const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, onRemove }
         >
           {employee.role.replace("_", " ")}
         </span>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onRemove?.(employee.id)}
-          className="h-8 px-3 text-xs font-bold text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
-        >
-          Remove
-        </Button>
+        <div className="flex gap-2">
+          {!employee.branchId && onAssignClick && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onAssignClick(employee)}
+              className="h-8 px-3 text-xs font-bold text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg border-emerald-200 transition-colors"
+            >
+              Assign
+            </Button>
+          )}
+          {onRemove && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onRemove(employee.id)}
+              className="h-8 px-3 text-xs font-bold text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              Remove
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );

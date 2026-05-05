@@ -10,6 +10,8 @@ import { BranchScheduleDialog } from "./BranchScheduleDialog";
 import { AssignAdminDialog } from "./AssignAdminDialog";
 import { BranchAdminsDialog } from "./BranchAdminsDialog";
 import { EmployeeFormDialog } from "./EmployeeFormDialog";
+import { EmployeeList } from "./EmployeeList";
+import { AssignEmployeeDialog } from "./AssignEmployeeDialog";
 import {
   Pagination,
   PaginationContent,
@@ -75,6 +77,15 @@ export const BranchManagementPage = () => {
     fetchBranches,
     fetchAvailableAdmins,
     debouncedSearch,
+    employeeMeta,
+    employeeFilter,
+    handleEmployeePageChange,
+    handleEmployeeFilterChange,
+    assignEmployeeDialogOpen,
+    setAssignEmployeeDialogOpen,
+    selectedEmployee,
+    handleAssignEmployeeClick,
+    handleAssignEmployeeSubmit,
   } = useBranchManagement();
 
   React.useEffect(() => {
@@ -102,14 +113,14 @@ export const BranchManagementPage = () => {
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex p-1.5 bg-slate-100 rounded-2xl w-fit border border-slate-200/50">
+        <div className="flex items-center gap-2 p-1 bg-[#eff1f2] rounded-xl w-fit overflow-x-auto no-scrollbar max-w-full border border-[#eff1f2]">
             <button
                 onClick={() => setActiveTab("branches")}
                 className={cn(
-                    "flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all",
+                    "flex items-center gap-2 px-4 sm:px-6 py-2 whitespace-nowrap rounded-lg text-sm font-medium transition-all",
                     activeTab === "branches" 
-                        ? "bg-white text-emerald-600 shadow-sm" 
-                        : "text-slate-500 hover:text-slate-700 hover:bg-white/50"
+                        ? "bg-white shadow-sm text-[#006666]" 
+                        : "text-[#595c5d] hover:text-[#2c2f30]"
                 )}
             >
                 <BuildingStorefrontIcon className="w-4 h-4" />
@@ -118,10 +129,10 @@ export const BranchManagementPage = () => {
             <button
                 onClick={() => setActiveTab("employees")}
                 className={cn(
-                    "flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all",
+                    "flex items-center gap-2 px-4 sm:px-6 py-2 whitespace-nowrap rounded-lg text-sm font-medium transition-all",
                     activeTab === "employees" 
-                        ? "bg-white text-emerald-600 shadow-sm" 
-                        : "text-slate-500 hover:text-slate-700 hover:bg-white/50"
+                        ? "bg-white shadow-sm text-[#006666]" 
+                        : "text-[#595c5d] hover:text-[#2c2f30]"
                 )}
             >
                 <UsersIcon className="w-4 h-4" />
@@ -194,60 +205,17 @@ export const BranchManagementPage = () => {
             )}
         </>
       ) : (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between gap-4 bg-white/60 backdrop-blur-xl border border-white/40 p-4 rounded-2xl shadow-sm">
-                <div className="relative w-full md:w-96">
-                    <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                    <Input
-                    placeholder="Search employees by name or email..."
-                    className="pl-10 bg-white/50 border-slate-200 focus:ring-emerald-500 rounded-xl"
-                    />
-                </div>
-                <Button
-                    onClick={handleAddEmployee}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-sm flex items-center gap-2"
-                >
-                    <UserPlusIcon className="w-4 h-4" />
-                    Add Employee
-                </Button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {employees.map((emp) => (
-                    <div key={emp.id} className="bg-white border border-slate-200 p-6 rounded-[24px] shadow-sm hover:shadow-md transition-all group relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-50 rounded-full -mr-12 -mt-12 group-hover:bg-emerald-100 transition-colors" />
-                        
-                        <div className="flex items-center gap-4 relative z-10">
-                            <div className="h-14 w-14 rounded-2xl bg-emerald-500 text-white flex items-center justify-center font-bold text-xl shadow-lg shadow-emerald-200">
-                                {emp.fullName.split(' ').map(n => n[0]).join('')}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                                <h4 className="font-bold text-slate-800 truncate">{emp.fullName}</h4>
-                                <p className="text-xs text-slate-500 font-medium">{emp.user?.email}</p>
-                            </div>
-                        </div>
-
-                        <div className="mt-6 space-y-3">
-                            <div className="flex items-center justify-between text-xs font-bold text-slate-400 uppercase tracking-wider">
-                                <span>Role</span>
-                                <span className={cn(
-                                    "px-2 py-1 rounded-md text-[10px]",
-                                    emp.role === "SUPER_ADMIN" ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700"
-                                )}>
-                                    {emp.role.replace('_', ' ')}
-                                </span>
-                            </div>
-                            <div className="flex items-center justify-between text-xs font-bold text-slate-400 uppercase tracking-wider">
-                                <span>Assignment</span>
-                                <span className="text-slate-700">
-                                    {emp.branch?.storeName || "Unassigned"}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </div>
+        <EmployeeList
+          employees={employees}
+          meta={employeeMeta}
+          searchQuery={searchQuery}
+          filter={employeeFilter}
+          onSearchChange={handleSearchChange}
+          onFilterChange={handleEmployeeFilterChange}
+          onPageChange={handleEmployeePageChange}
+          onAddEmployee={handleAddEmployee}
+          onAssignClick={handleAssignEmployeeClick}
+        />
       )}
 
       {/* Dialogs */}
@@ -297,6 +265,15 @@ export const BranchManagementPage = () => {
         branches={branches}
         onSubmit={handleEmployeeSubmit}
         isSubmitting={isSubmitting}
+      />
+
+      <AssignEmployeeDialog
+        open={assignEmployeeDialogOpen}
+        onOpenChange={setAssignEmployeeDialogOpen}
+        employee={selectedEmployee}
+        branches={branches}
+        isSubmitting={isSubmitting}
+        onAssign={handleAssignEmployeeSubmit}
       />
     </div>
   );

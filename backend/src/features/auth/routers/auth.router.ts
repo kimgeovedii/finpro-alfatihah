@@ -69,8 +69,8 @@ class AuthRouter {
       this.authController.resendVerification,
     );
     
-    this.router.post("/login", loginRateLimiter, this.authController.login);
-    this.router.post("/login/employee", loginRateLimiter, this.authController.employeeLogin);
+    this.router.post("/login", this.authController.login);
+    this.router.post("/login/employee", this.authController.employeeLogin);
     this.router.post("/refresh", refreshRateLimiter, this.authController.refreshToken);
     
     // Reset Password

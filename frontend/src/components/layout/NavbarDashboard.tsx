@@ -55,7 +55,7 @@ export const Navbar = () => {
               {user?.username || "Admin"}
             </p>
             <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest mt-0.5">
-              Admin
+              {((user as any)?.employee?.role || user?.role)?.replace("_", " ")}
             </p>
           </div>
 

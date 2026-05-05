@@ -33,26 +33,40 @@ export class BranchAdminRepository {
     });
   }
 
-  async findAllEmployees(query: { search?: string; role?: EmployeeRole; branchId?: string }) {
-    return prisma.employee.findMany({
-      where: {
-        ...(query.role && { role: query.role }),
-        ...(query.branchId && { branchId: query.branchId }),
-        ...(query.search && {
-          OR: [
-            { fullName: { contains: query.search, mode: "insensitive" } },
-            { user: { email: { contains: query.search, mode: "insensitive" } } },
-          ],
-        }),
-      },
-      include: {
-        user: true,
-        branch: {
-          select: { storeName: true }
-        }
-      },
-      orderBy: { fullName: "asc" },
-    });
+  async findAllEmployees(query: { search?: string; role?: EmployeeRole; branchId?: string; isUnassigned?: boolean; page?: number; limit?: number }) {
+    const page = query.page || 1;
+    const limit = query.limit || 10;
+    const skip = (page - 1) * limit;
+
+    const where: any = {
+      ...(query.role && { role: query.role }),
+      ...(query.branchId && { branchId: query.branchId }),
+      ...(query.isUnassigned && { branchId: null }),
+      ...(query.search && {
+        OR: [
+          { fullName: { contains: query.search, mode: "insensitive" } },
+          { user: { email: { contains: query.search, mode: "insensitive" } } },
+        ],
+      }),
+    };
+
+    const [total, data] = await prisma.$transaction([
+      prisma.employee.count({ where }),
+      prisma.employee.findMany({
+        where,
+        include: {
+          user: true,
+          branch: {
+            select: { storeName: true },
+          },
+        },
+        orderBy: { fullName: "asc" },
+        skip,
+        take: limit,
+      }),
+    ]);
+
+    return { data, total };
   }
 
   async findSchedulesByBranchId(branchId: string) {
@@ -88,6 +102,13 @@ export class BranchAdminRepository {
     return prisma.employee.update({
       where: { id: employeeId },
       data: { branchId },
+    });
+  }
+
+  async unassignEmployee(employeeId: string) {
+    return prisma.employee.update({
+      where: { id: employeeId },
+      data: { branchId: null },
     });
   }
 

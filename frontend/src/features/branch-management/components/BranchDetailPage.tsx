@@ -41,7 +41,12 @@ export const BranchDetailPage = () => {
     fetchEmployees,
     debouncedSearch,
     handleSearchChange,
-    searchQuery
+    searchQuery,
+    employeeMeta,
+    employeeFilter,
+    handleEmployeePageChange,
+    handleEmployeeFilterChange,
+    handleRemoveEmployee,
   } = useBranchManagement();
 
   useEffect(() => {
@@ -122,16 +127,17 @@ export const BranchDetailPage = () => {
             </div>
         </div>
 
-        {/* Right: Workforce Management */}
         <div className="lg:col-span-8">
             <EmployeeList 
                 employees={employees}
+                meta={employeeMeta}
+                filter={employeeFilter}
+                hideFilter={true}
                 searchQuery={searchQuery}
                 onSearchChange={handleSearchChange}
-                onRemoveEmployee={(id) => {
-                    // TODO: Implement remove logic if needed
-                    console.log("Remove employee:", id);
-                }}
+                onFilterChange={handleEmployeeFilterChange}
+                onPageChange={handleEmployeePageChange}
+                onRemoveEmployee={handleRemoveEmployee}
             />
         </div>
       </div>

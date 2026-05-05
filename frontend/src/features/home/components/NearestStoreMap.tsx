@@ -73,7 +73,7 @@ export const NearestStoreMap = ({
   );
 
   return (
-    <section className="transition-all duration-500 ease-in-out mt-2 mb-2">
+    <section className="transition-all duration-500 ease-in-out mt-8 mb-8">
       {!isExpanded ? (
         <motion.div
           layoutId="map-container"
