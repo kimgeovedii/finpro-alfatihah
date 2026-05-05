@@ -1,5 +1,5 @@
 import { currencyFormat } from "../../../constants/business.const"
-import { mailTemplateStyle } from "../../../utils/template"
+import { getMailBodyTemplate, mailTemplateStyle } from "../../../utils/template"
 
 type CartItem = {
     productName: string
@@ -55,36 +55,25 @@ export const getCartReminderEmailTemplate = (username: string, carts: CartGroup[
         `
     }).join("")
 
+    const body = getMailBodyTemplate('Your Cart is Waiting', username, `
+        <p>You still have items in your cart from the last few days. Complete your purchase before they run out!.</p>
+        ${cartHtml}
+        <p>It's been more than <strong>2 days</strong> since you added these items.</p>
+        <p>Don't miss out, checkout now while they're still available.</p>
+    `)
+
     return `
         <!DOCTYPE html>
         <html lang="en">
-        <head>
-            <meta charset="UTF-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-            <title>Cart Reminder</title>
-            ${mailTemplateStyle()}
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1>Your Cart is Waiting</h1>
-                </div>
-                <div class="content">
-                    <p>Hello <strong>${username}</strong>,</p>
-                    <p>You still have items in your cart from the last few days. Complete your purchase before they run out!.</p>
-                    ${cartHtml}
-                    <p>It's been more than <strong>2 days</strong> since you added these items.</p>
-                    <p>Don't miss out, checkout now while they're still available.</p>
-                    <p>
-                        Best regards,<br/>
-                        <strong>Alfatihah</strong>
-                    </p>
-                </div>
-                <div class="footer">
-                    © ${new Date().getFullYear()} Alfatihah. All rights reserved.
-                </div>
-            </div>
-        </body>
+            <head>
+                <meta charset="UTF-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                <title>Cart Reminder</title>
+                ${mailTemplateStyle()}
+            </head>
+            <body>
+                ${body}
+            </body>
         </html>
     `
 }
