@@ -35,6 +35,7 @@ export interface CategoryHeaderProps {
   searchQuery: string;
   onSearchChange: (value: string) => void;
   onAddClick: () => void;
+  canManage?: boolean;
 }
 
 export interface CategoryTableProps {
@@ -42,6 +43,10 @@ export interface CategoryTableProps {
   isLoading: boolean;
   onEdit: (category: ProductCategory) => void;
   onDelete: (category: ProductCategory) => void;
+  sortBy: string;
+  sortOrder: "asc" | "desc";
+  onSort: (field: string) => void;
+  canManage?: boolean;
 }
 
 export interface CategoryTableRowProps {
@@ -49,6 +54,7 @@ export interface CategoryTableRowProps {
   index: number;
   onEdit: (category: ProductCategory) => void;
   onDelete: (category: ProductCategory) => void;
+  canManage?: boolean;
 }
 
 export interface CategoryDialogProps {

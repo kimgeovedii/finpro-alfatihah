@@ -22,6 +22,14 @@ export interface YearlyTrend {
   revenue: number;
 }
 
+export interface SalesReportProps {
+  data: SalesReportData | null;
+  isLoading: boolean;
+  month: number;
+  year: number;
+  branchId: string;
+}
+
 export interface SalesReportData {
   summary: SalesSummary;
   byCategory: SalesByCategory[];
@@ -39,9 +47,38 @@ export interface StockSummaryItem {
 
 export type StockReportData = StockSummaryItem[];
 
+import { Branch } from "@/features/manageStock/types/manageStock.type";
+
+export interface UserWithEmployee {
+  employee?: {
+    role: "STORE_ADMIN" | "SUPER_ADMIN";
+    branchId?: string;
+  };
+}
+
+export interface ReportHeaderProps {
+  month: number;
+  year: number;
+  branchId: string;
+  branches: Branch[];
+  isStoreAdmin: boolean;
+  onMonthChange: (month: number) => void;
+  onYearChange: (year: number) => void;
+  onBranchChange: (branchId: string) => void;
+}
+
+export interface StockReportProps {
+  data: StockReportData | null;
+  isLoading: boolean;
+  month: number;
+  year: number;
+  branchId: string;
+}
+
 export interface DetailedStockItem {
   id: string;
   transactionType: "IN" | "OUT";
+  referenceType: "ORDER" | "MANUAL" | "MUTATION";
   quantityChange: number;
   stockBefore: number;
   stockAfter: number;

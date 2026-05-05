@@ -18,4 +18,8 @@ export const updateProductSchema = z.object({
   basePrice: z.coerce.number().min(0, "Price is required").optional(),
   sku: z.string().min(1, "SKU is required").optional(),
   weight: z.coerce.number().min(0, "Weight is required").optional(),
+  existingImageIds: z
+    .array(z.string())
+    .optional()
+    .transform((ids) => ids ?? []),
 });

@@ -16,6 +16,7 @@ export class StockJournalController {
     next: NextFunction,
   ) => {
     try {
+      const authReq = req as AuthRequest;
       const {
         page = 1,
         limit = 10,
@@ -36,6 +37,7 @@ export class StockJournalController {
           filters,
           Number(page),
           Number(limit),
+          authReq.user,
         );
 
       sendSuccess(res, { data, meta }, "Get all stock journals successfully");
@@ -50,8 +52,10 @@ export class StockJournalController {
     next: NextFunction,
   ) => {
     try {
+      const authReq = req as AuthRequest;
       const data = await this.stockJournalService.findStockJournalById(
         req.params.id as string,
+        authReq.user,
       );
       if (!data)
         return res.status(404).send({ message: "Stock journal not found" });

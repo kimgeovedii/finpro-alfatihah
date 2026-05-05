@@ -19,6 +19,7 @@ export const createDiscountSchema = z
     endDate: z.string().min(1, "End Date is required"),
     quota: z.number().min(0, "Quota is required"),
     branchId: z.string().min(1, "Branch is required"),
+    productIds: z.array(z.string()).optional(),
   })
   .refine(
     (data) => {
@@ -64,6 +65,7 @@ export const updateDiscountSchema = z
     endDate: z.string().min(1, "End Date is required").optional(),
     quota: z.number().min(0, "Quota is required").optional(),
     branchId: z.string().min(1, "Branch is required").optional(),
+    productIds: z.array(z.string()).optional(),
   })
   .refine(
     (data) => {

@@ -207,7 +207,7 @@ export class AuthService {
   }
 
   async employeeLogin(dto: LoginDto, device?: string, ip?: string) {
-    const user = await this.authRepository.findByEmail(dto.email);
+    const user = await this.authRepository.findByEmailWithEmployee(dto.email);
 
     if (!user || !user.password) {
       throw new Error("Invalid credentials");
