@@ -19,7 +19,7 @@ export const AddressSelectionModal: React.FC<Props> = ({ address, appliedAddress
             <DialogTrigger asChild>
                 <Button className="text-emerald-700 bg-white text-sm font-bold hover:text-emerald-600 transition-colors"><PencilSquareIcon/> Change</Button>
             </DialogTrigger>
-            <DialogContent className="w-full max-w-[700px] rounded-2xl">
+            <DialogContent className="w-[95vw] md:w-full max-w-[700px] rounded-2xl p-5">
                 <DialogHeader>
                     <DialogTitle className="font-bold mb-3">My Address</DialogTitle>
                 </DialogHeader>
@@ -27,10 +27,11 @@ export const AddressSelectionModal: React.FC<Props> = ({ address, appliedAddress
                     {
                         address.map(dt => 
                             <AddressAdditionalInfoSection key={dt.id}
-                            action={() => onSelect(dt.id)}
-                            {...dt}
-                            isSelected={appliedAddress === dt.id}
-                            maxDeliveryDistance={maxDeliveryDistance}                  />
+                                action={() => onSelect(dt.id)}
+                                {...dt}
+                                isSelected={appliedAddress === dt.id}
+                                maxDeliveryDistance={maxDeliveryDistance}                  
+                            />
                         )
                     }
                 </div>

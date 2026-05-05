@@ -84,7 +84,7 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
                                     return (
                                         <TableRow key={dt.id} className="hover:bg-slate-50">
                                             <TableCell className="font-semibold text-slate-800">
-                                                <MiniTagBox context={"Branch"} val={dt.storeName}/>
+                                                <MiniTagBox val={dt.storeName}/>
                                                 <CopyFieldButton label="Order number" value={dt.orderNumber} customClass="text-sm font-semibold"/>
                                             </TableCell>
                                             <TableCell>
@@ -134,7 +134,7 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
                                             <TableCell>
                                                 {
                                                     dt.status !== "WAITING_PAYMENT" && dt.status !== "WAITING_PAYMENT_CONFIRMATION" ?
-                                                        <Link href={`/manage-order/${dt.orderNumber}`}>
+                                                        <Link href={`/dashboard/manage-order/${dt.orderNumber}`}>
                                                             <Button className="bg-transparent text-teal-700 font-semibold text-sm hover:underline">Manage</Button>
                                                         </Link>
                                                     :

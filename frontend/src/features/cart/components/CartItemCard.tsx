@@ -22,7 +22,7 @@ type Props = {
 
 export const CartItemCard: React.FC<Props> = ({ slugName, storeName, productName, basePrice, mainImage, qty, onIncrease, onDecrease, onRemove }) => {
     return (
-        <div className="flex flex-col lg:flex-row items-center justify-between bg-white/60 backdrop-blur-xl border border-white/40 p-3 md:p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 mb-4">
+        <div className="flex flex-col lg:flex-row items-center md:items-start lg:items-center justify-between bg-white/60 backdrop-blur-xl border border-white/40 p-3 md:p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 mb-4">
             <div className="flex flex-col sm:flex-row items-center gap-5">
                 <Image src={mainImage} alt={mainImage} className="w-full h-40 sm:w-20 sm:h-20 rounded-xl object-cover shadow" height={100} width={100}/>
                 <div>

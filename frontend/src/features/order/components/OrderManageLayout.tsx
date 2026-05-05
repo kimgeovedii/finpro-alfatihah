@@ -10,7 +10,7 @@ import { useAllBranchData } from "@/features/order/hooks/useBranch"
 import { useOrderSummaryByBranchId } from "@/features/order/hooks/useManageOrder"
 import { useManageOrderActions } from "@/features/order/hooks/useManageOrderAction"
 
-export default function ManageOrdersPage() {
+export function OrderManageLayout() {
     // Call hook : data
     const role = useAuthStore((state) => state.user?.role)
     const { branchs, isBranchLoading } = useAllBranchData()
@@ -22,7 +22,7 @@ export default function ManageOrdersPage() {
     const { summaryByBranchId, isLoadingSummaryByBranchId } = useOrderSummaryByBranchId(branchId)
 
     return (
-        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-[1080px] mx-auto">
+        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full mx-auto">
             <div className="flex items-center justify-between">
                 <div className="w-full">
                     <HeadingText level={1} children="Manage Order"/>
