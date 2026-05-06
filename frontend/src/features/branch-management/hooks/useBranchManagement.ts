@@ -1,299 +1,310 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useEffect } from "react";
+import { useBranchAdminStore } from "../service/branch-admin.service";
 import {
   Branch,
-  PaginationMeta,
   CreateBranchPayload,
   UpdateBranchPayload,
   CreateSchedulePayload,
   UpdateSchedulePayload,
   Employee,
-  BranchSchedule,
-} from "../types/branch-admin.types";
-import { BranchAdminRepository } from "../repositories/branch-admin.repository";
+} from "../types/branch-admin.type";
 import toast from "react-hot-toast";
 
-const repo = new BranchAdminRepository();
 
 export const useBranchManagement = () => {
-  const [branches, setBranches] = useState<Branch[]>([]);
-  const [meta, setMeta] = useState<PaginationMeta>({
-    total: 0,
-    page: 1,
-    limit: 10,
-    totalPages: 0,
-  });
-  const [isLoading, setIsLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
+  // ── Subscribe only to STATE slices (no actions) to avoid infinite re-renders ──
+  const branches = useBranchAdminStore((s) => s.branches);
+  const meta = useBranchAdminStore((s) => s.meta);
+  const selectedBranch = useBranchAdminStore((s) => s.selectedBranch);
+  const isLoading = useBranchAdminStore((s) => s.isLoading);
+  const isSubmitting = useBranchAdminStore((s) => s.isSubmitting);
+  const isDeleting = useBranchAdminStore((s) => s.isDeleting);
+
+  const employees = useBranchAdminStore((s) => s.employees);
+  const employeeMeta = useBranchAdminStore((s) => s.employeeMeta);
+  const employeeFilter = useBranchAdminStore((s) => s.employeeFilter);
+  const availableAdmins = useBranchAdminStore((s) => s.availableAdmins);
+  const selectedEmployee = useBranchAdminStore((s) => s.selectedEmployee);
+  const isLoadingEmployees = useBranchAdminStore((s) => s.isLoadingEmployees);
+
+  const currentSchedules = useBranchAdminStore((s) => s.currentSchedules);
+  const isLoadingSchedules = useBranchAdminStore((s) => s.isLoadingSchedules);
+
+  const searchQuery = useBranchAdminStore((s) => s.searchQuery);
+  const debouncedSearch = useBranchAdminStore((s) => s.debouncedSearch);
+
+  const branchDialogOpen = useBranchAdminStore((s) => s.branchDialogOpen);
+  const deleteDialogOpen = useBranchAdminStore((s) => s.deleteDialogOpen);
+  const scheduleDialogOpen = useBranchAdminStore((s) => s.scheduleDialogOpen);
+  const assignAdminDialogOpen = useBranchAdminStore((s) => s.assignAdminDialogOpen);
+  const viewAdminsDialogOpen = useBranchAdminStore((s) => s.viewAdminsDialogOpen);
+  const employeeDialogOpen = useBranchAdminStore((s) => s.employeeDialogOpen);
+  const assignEmployeeDialogOpen = useBranchAdminStore((s) => s.assignEmployeeDialogOpen);
+
+  // ── Stable action references (never change) ──
+  const actions = useBranchAdminStore.getState;
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Dialog states
-  const [branchDialogOpen, setBranchDialogOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [scheduleDialogOpen, setScheduleDialogOpen] = useState(false);
-  const [assignAdminDialogOpen, setAssignAdminDialogOpen] = useState(false);
-  const [viewAdminsDialogOpen, setViewAdminsDialogOpen] = useState(false);
-  const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null);
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  const [availableAdmins, setAvailableAdmins] = useState<Employee[]>([]);
-  const [employees, setEmployees] = useState<Employee[]>([]);
-  const [currentSchedules, setCurrentSchedules] = useState<BranchSchedule[]>([]);
-  const [isLoadingSchedules, setIsLoadingSchedules] = useState(false);
-  const [isLoadingEmployees, setIsLoadingEmployees] = useState(false);
-
-  // New Dialog State
-  const [employeeDialogOpen, setEmployeeDialogOpen] = useState(false);
-
+  // ── Search with debounce ──
   const handleSearchChange = useCallback((value: string) => {
-    setSearchQuery(value);
+    const s = actions();
+    s.setSearchQuery(value);
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      setDebouncedSearch(value);
+      actions().setDebouncedSearch(value);
     }, 400);
-  }, []);
+  }, [actions]);
 
-  const fetchBranches = useCallback(
-    async (page: number = 1) => {
-      try {
-        setIsLoading(true);
-        const response = await repo.getAllBranches(
-          page,
-          meta.limit,
-          debouncedSearch || undefined
-        );
-
-        if (response) {
-          setBranches(response.branches);
-          setMeta(response.meta);
-        }
-      } catch (err) {
-        toast.error("Failed to load branches");
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [meta.limit, debouncedSearch]
-  );
+  // ── Fetch helpers (stable — no reactive deps) ──
+  const fetchBranches = useCallback(async (page: number = 1) => {
+    try {
+      await actions().fetchBranches(page);
+    } catch {
+      toast.error("Failed to load branches");
+    }
+  }, [actions]);
 
   const fetchBranchDetail = useCallback(async (id: string) => {
     try {
-      setIsLoading(true);
-      const data = await repo.getBranchById(id);
-      setSelectedBranch(data);
-      return data;
-    } catch (err) {
+      return await actions().fetchBranchDetail(id);
+    } catch {
       toast.error("Failed to load branch details");
       return null;
-    } finally {
-      setIsLoading(false);
     }
-  }, []);
+  }, [actions]);
 
   const fetchAvailableAdmins = useCallback(async () => {
-    try {
-      const admins = await repo.getAvailableAdmins();
-      setAvailableAdmins(admins);
-    } catch (err) {
-      console.error("Failed to load admins", err);
-    }
-  }, []);
+    await actions().fetchAvailableAdmins();
+  }, [actions]);
 
   const fetchSchedules = useCallback(async (branchId: string) => {
     try {
-      setIsLoadingSchedules(true);
-      const data = await repo.getSchedules(branchId);
-      setCurrentSchedules(data);
-    } catch (err) {
+      await actions().fetchSchedules(branchId);
+    } catch {
       toast.error("Failed to load schedules");
-    } finally {
-      setIsLoadingSchedules(false);
     }
-  }, []);
+  }, [actions]);
 
-  const handlePageChange = (page: number) => {
+  const fetchEmployees = useCallback(async (params?: { search?: string; branchId?: string; page?: number; limit?: number }) => {
+    await actions().fetchEmployees(params);
+  }, [actions]);
+
+  // ── UI handlers ──
+  const handlePageChange = useCallback((page: number) => {
     fetchBranches(page);
-  };
+  }, [fetchBranches]);
 
-  const handleAddBranch = () => {
-    setSelectedBranch(null);
-    setBranchDialogOpen(true);
-  };
+  const handleAddBranch = useCallback(() => {
+    actions().setSelectedBranch(null);
+    actions().setBranchDialogOpen(true);
+  }, [actions]);
 
-  const handleEditBranch = (branch: Branch) => {
-    setSelectedBranch(branch);
-    setBranchDialogOpen(true);
-  };
+  const handleEditBranch = useCallback((branch: Branch) => {
+    actions().setSelectedBranch(branch);
+    actions().setBranchDialogOpen(true);
+  }, [actions]);
 
-  const handleDeleteClick = (branch: Branch) => {
-    setSelectedBranch(branch);
-    setDeleteDialogOpen(true);
-  };
+  const handleDeleteClick = useCallback((branch: Branch) => {
+    actions().setSelectedBranch(branch);
+    actions().setDeleteDialogOpen(true);
+  }, [actions]);
 
-  const handleManageSchedules = (branch: Branch) => {
-    setSelectedBranch(branch);
+  const handleManageSchedules = useCallback((branch: Branch) => {
+    actions().setSelectedBranch(branch);
     fetchSchedules(branch.id);
-    setScheduleDialogOpen(true);
-  };
+    actions().setScheduleDialogOpen(true);
+  }, [actions, fetchSchedules]);
 
-  const handleAssignAdminClick = (branch: Branch) => {
-    setSelectedBranch(branch);
-    setAssignAdminDialogOpen(true);
-  };
+  const handleAssignAdminClick = useCallback((branch: Branch) => {
+    actions().setSelectedBranch(branch);
+    actions().setAssignAdminDialogOpen(true);
+  }, [actions]);
 
-  const handleViewAdmins = (branch: Branch) => {
-    setSelectedBranch(branch);
-    setViewAdminsDialogOpen(true);
-  };
+  const handleViewAdmins = useCallback((branch: Branch) => {
+    actions().setSelectedBranch(branch);
+    actions().setViewAdminsDialogOpen(true);
+  }, [actions]);
 
-  const handleBranchSubmit = async (values: CreateBranchPayload | UpdateBranchPayload) => {
+  const handleBranchSubmit = useCallback(async (values: CreateBranchPayload | UpdateBranchPayload) => {
+    const s = actions();
     try {
-      setIsSubmitting(true);
-      if (selectedBranch) {
-        await repo.updateBranch(selectedBranch.id, values);
+      if (s.selectedBranch) {
+        await s.updateBranch(s.selectedBranch.id, values);
         toast.success("Branch updated");
-        // Update local selected branch state if we are in detail view
-        const updated = await repo.getBranchById(selectedBranch.id);
-        setSelectedBranch(updated);
       } else {
-        await repo.createBranch(values as CreateBranchPayload);
+        await s.createBranch(values as CreateBranchPayload);
         toast.success("Branch created");
       }
-      setBranchDialogOpen(false);
-      fetchBranches(meta.page);
+      s.setBranchDialogOpen(false);
+      fetchBranches(s.meta.page);
     } catch (err: any) {
       toast.error(err.message || "Operation failed");
       throw err;
-    } finally {
-      setIsSubmitting(false);
     }
-  };
+  }, [actions, fetchBranches]);
 
-  const handleDeleteConfirm = async () => {
-    if (!selectedBranch) return;
+  const handleDeleteConfirm = useCallback(async () => {
+    const s = actions();
+    if (!s.selectedBranch) return;
     try {
-      setIsDeleting(true);
-      await repo.deleteBranch(selectedBranch.id);
+      await s.deleteBranch(s.selectedBranch.id);
       toast.success("Branch deleted");
-      setDeleteDialogOpen(false);
-      fetchBranches(meta.page);
+      s.setDeleteDialogOpen(false);
+      fetchBranches(s.meta.page);
     } catch (err: any) {
       toast.error(err.message || "Delete failed");
-    } finally {
-      setIsDeleting(false);
     }
-  };
+  }, [actions, fetchBranches]);
 
-  const handleScheduleSubmit = async (values: CreateSchedulePayload | UpdateSchedulePayload) => {
-    const targetBranchId = selectedBranch?.id;
+  const handleScheduleSubmit = useCallback(async (values: CreateSchedulePayload | UpdateSchedulePayload) => {
+    const s = actions();
+    const targetBranchId = s.selectedBranch?.id;
     if (!targetBranchId) return;
 
     try {
-      setIsLoadingSchedules(true);
       if ((values as any).id && !(values as any).id.startsWith("placeholder")) {
-        await repo.updateSchedule((values as any).id, values as UpdateSchedulePayload);
+        await s.updateSchedule((values as any).id, values as UpdateSchedulePayload);
       } else {
-        await repo.createSchedule(targetBranchId, values as CreateSchedulePayload);
+        await s.createSchedule(targetBranchId, values as CreateSchedulePayload);
       }
       toast.success("Schedule updated");
       fetchSchedules(targetBranchId);
     } catch (err: any) {
       toast.error(err.message || "Failed to update schedule");
-    } finally {
-        setIsLoadingSchedules(false);
     }
-  };
+  }, [actions, fetchSchedules]);
 
-  const handleDeleteSchedule = async (scheduleId: string) => {
-    const targetBranchId = selectedBranch?.id;
+  const handleDeleteSchedule = useCallback(async (scheduleId: string) => {
+    const s = actions();
+    const targetBranchId = s.selectedBranch?.id;
     if (!targetBranchId) return;
 
     try {
-      setIsLoadingSchedules(true);
-      await repo.deleteSchedule(scheduleId);
+      await s.deleteSchedule(scheduleId);
       toast.success("Schedule removed");
       fetchSchedules(targetBranchId);
     } catch (err: any) {
       toast.error(err.message || "Failed to remove schedule");
-    } finally {
-        setIsLoadingSchedules(false);
     }
-  };
+  }, [actions, fetchSchedules]);
 
-  const fetchEmployees = useCallback(async (params?: { search?: string; branchId?: string }) => {
+  const handleAddEmployee = useCallback(() => {
+    actions().setEmployeeDialogOpen(true);
+  }, [actions]);
+
+  const handleEmployeeSubmit = useCallback(async (values: any) => {
+    const s = actions();
     try {
-      setIsLoadingEmployees(true);
-      const data = await repo.getAllEmployees(params);
-      setEmployees(data);
-    } catch (err) {
-      console.error("Failed to load employees", err);
-    } finally {
-      setIsLoadingEmployees(false);
-    }
-  }, []);
-
-  const handleAddEmployee = () => {
-    setEmployeeDialogOpen(true);
-  };
-
-  const handleEmployeeSubmit = async (values: any) => {
-    try {
-      setIsSubmitting(true);
-      await repo.createEmployee(values);
+      await s.createEmployee(values);
       toast.success("Employee created successfully");
-      setEmployeeDialogOpen(false);
-      
-      // Refresh current employee list if we are in a specific branch view
+      s.setEmployeeDialogOpen(false);
+
       if (values.branchId && values.branchId !== "none") {
         fetchEmployees({ branchId: values.branchId });
       } else {
         fetchEmployees();
       }
-      
+
       fetchAvailableAdmins();
     } catch (err: any) {
       toast.error(err.message || "Failed to create employee");
-    } finally {
-      setIsSubmitting(false);
     }
-  };
+  }, [actions, fetchEmployees, fetchAvailableAdmins]);
 
-  const handleAssignAdmin = async (employeeId: string) => {
-    if (!selectedBranch) return;
+  const handleAssignAdmin = useCallback(async (employeeId: string) => {
+    const s = actions();
+    if (!s.selectedBranch) return;
     try {
-      await repo.assignAdmin(selectedBranch.id, employeeId);
+      await s.assignAdmin(s.selectedBranch.id, employeeId);
       toast.success("Admin assigned");
-      fetchBranches(meta.page);
+      fetchBranches(s.meta.page);
     } catch (err: any) {
       toast.error(err.message || "Failed to assign admin");
     }
-  };
+  }, [actions, fetchBranches]);
+
+  const handleEmployeePageChange = useCallback((page: number) => {
+    fetchEmployees({ page });
+  }, [fetchEmployees]);
+
+  const handleEmployeeFilterChange = useCallback((filter: "all" | "unassigned") => {
+    const s = actions();
+    s.setEmployeeFilter(filter);
+    s.setEmployeeMeta({ ...s.employeeMeta, page: 1 });
+  }, [actions]);
+
+  const handleAssignEmployeeClick = useCallback((employee: Employee) => {
+    actions().setSelectedEmployee(employee);
+    actions().setAssignEmployeeDialogOpen(true);
+  }, [actions]);
+
+  const handleAssignEmployeeSubmit = useCallback(async (branchId: string) => {
+    const s = actions();
+    if (!s.selectedEmployee) return;
+    try {
+      await s.assignAdmin(branchId, s.selectedEmployee.id);
+      toast.success("Employee assigned to branch successfully");
+      s.setAssignEmployeeDialogOpen(false);
+      fetchEmployees();
+      fetchBranches(s.meta.page);
+    } catch (err: any) {
+      toast.error(err.message || "Failed to assign employee");
+    }
+  }, [actions, fetchEmployees, fetchBranches]);
+
+  const handleRemoveEmployee = useCallback(async (employeeId: string) => {
+    const s = actions();
+    try {
+      await s.unassignEmployee(employeeId);
+      toast.success("Employee removed from branch");
+      fetchEmployees({ branchId: s.selectedBranch?.id });
+    } catch (err: any) {
+      toast.error(err.message || "Failed to remove employee");
+    }
+  }, [actions, fetchEmployees]);
 
   return {
+    // State
     branches,
     meta,
     isLoading,
     searchQuery,
     debouncedSearch,
-    fetchBranches,
-    fetchAvailableAdmins,
-    branchDialogOpen,
-    setBranchDialogOpen,
-    deleteDialogOpen,
-    setDeleteDialogOpen,
-    scheduleDialogOpen,
-    setScheduleDialogOpen,
-    assignAdminDialogOpen,
-    setAssignAdminDialogOpen,
     selectedBranch,
-    setSelectedBranch,
     isSubmitting,
     isDeleting,
     availableAdmins,
+    employees,
+    isLoadingEmployees,
     currentSchedules,
     isLoadingSchedules,
+    employeeMeta,
+    employeeFilter,
+    selectedEmployee,
+
+    // Dialog states
+    branchDialogOpen,
+    setBranchDialogOpen: actions().setBranchDialogOpen,
+    deleteDialogOpen,
+    setDeleteDialogOpen: actions().setDeleteDialogOpen,
+    scheduleDialogOpen,
+    setScheduleDialogOpen: actions().setScheduleDialogOpen,
+    assignAdminDialogOpen,
+    setAssignAdminDialogOpen: actions().setAssignAdminDialogOpen,
+    viewAdminsDialogOpen,
+    setViewAdminsDialogOpen: actions().setViewAdminsDialogOpen,
+    employeeDialogOpen,
+    setEmployeeDialogOpen: actions().setEmployeeDialogOpen,
+    assignEmployeeDialogOpen,
+    setAssignEmployeeDialogOpen: actions().setAssignEmployeeDialogOpen,
+    setSelectedBranch: actions().setSelectedBranch,
+    setSelectedEmployee: actions().setSelectedEmployee,
+
+    // Actions
+    fetchBranches,
+    fetchBranchDetail,
+    fetchAvailableAdmins,
+    fetchEmployees,
     handleSearchChange,
     handlePageChange,
     handleAddBranch,
@@ -306,16 +317,13 @@ export const useBranchManagement = () => {
     handleDeleteConfirm,
     handleScheduleSubmit,
     handleDeleteSchedule,
-    handleAssignAdmin,
     handleAddEmployee,
     handleEmployeeSubmit,
-    fetchEmployees,
-    fetchBranchDetail,
-    employees,
-    isLoadingEmployees,
-    employeeDialogOpen,
-    setEmployeeDialogOpen,
-    viewAdminsDialogOpen,
-    setViewAdminsDialogOpen,
+    handleAssignAdmin,
+    handleEmployeePageChange,
+    handleEmployeeFilterChange,
+    handleAssignEmployeeClick,
+    handleAssignEmployeeSubmit,
+    handleRemoveEmployee,
   };
 };

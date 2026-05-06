@@ -45,6 +45,7 @@ export class BranchAdminRouter {
 
     // Employee Assignment
     this.router.patch("/:branchId/assign-admin", this.branchAdminController.assignAdmin);
+    this.router.patch("/employees/:employeeId/unassign", this.branchAdminController.unassignEmployee);
   }
 
   public getRouter(): Router {

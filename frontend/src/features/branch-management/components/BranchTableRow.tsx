@@ -1,7 +1,6 @@
 import React from "react";
-import { TableCell, TableRow } from "@/components/ui/table";
 import { useRouter } from "next/navigation";
-import { Branch } from "../types/branch-admin.types";
+import { Branch } from "../types/branch-admin.type";
 import { Button } from "@/components/ui/button";
 import { 
   PencilIcon, 
@@ -36,26 +35,26 @@ export const BranchTableRow: React.FC<BranchTableRowProps> = ({
   const router = useRouter();
 
   return (
-    <TableRow className="group hover:bg-slate-50/50 transition-colors">
-      <TableCell className="font-medium text-slate-900">
+    <tr className="hover:bg-[#e6e8ea]/30 transition-colors group">
+      <td className="py-4 px-6 font-medium text-slate-900">
         <div className="flex flex-col">
           <span>{branch.storeName}</span>
           <span className="text-xs text-slate-500 font-normal">{branch.id.slice(0, 8)}...</span>
         </div>
-      </TableCell>
-      <TableCell>
+      </td>
+      <td className="py-4 px-6">
         <div className="flex items-center gap-1.5 text-sm text-slate-600">
           <MapPinIcon className="w-4 h-4 text-emerald-500" />
           <span>{branch.city}, {branch.province}</span>
         </div>
-      </TableCell>
-      <TableCell>
+      </td>
+      <td className="py-4 px-6">
         <Badge variant={branch.isActive ? "default" : "secondary"} className={branch.isActive ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-100" : ""}>
           {branch.isActive ? "Active" : "Inactive"}
         </Badge>
-      </TableCell>
-      <TableCell 
-        className="cursor-pointer hover:bg-slate-100/50 transition-colors" 
+      </td>
+      <td 
+        className="py-4 px-6 cursor-pointer hover:bg-slate-100/50 transition-colors" 
         onClick={() => router.push(`/dashboard/branches/${branch.id}`)}
       >
         <div className="flex items-center gap-3">
@@ -85,8 +84,8 @@ export const BranchTableRow: React.FC<BranchTableRowProps> = ({
             </div>
           )}
         </div>
-      </TableCell>
-      <TableCell>
+      </td>
+      <td className="py-4 px-6">
         <div className="flex items-center gap-3">
           {/* Admin status */}
           <div className="relative">
@@ -133,8 +132,8 @@ export const BranchTableRow: React.FC<BranchTableRowProps> = ({
             )}
           </div>
         </div>
-      </TableCell>
-      <TableCell className="text-right">
+      </td>
+      <td className="py-4 px-6 text-right">
         <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <Link href={`/dashboard/branches/${branch.id}`}>
             <Button
@@ -156,7 +155,7 @@ export const BranchTableRow: React.FC<BranchTableRowProps> = ({
             <TrashIcon className="w-4 h-4" />
           </Button>
         </div>
-      </TableCell>
-    </TableRow>
+      </td>
+    </tr>
   );
 };

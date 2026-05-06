@@ -135,8 +135,19 @@ export class BranchAdminController {
 
   getAllEmployees = async (req: Request, res: Response) => {
     try {
-      const employees = await this.branchAdminService.getAllEmployees(req.query);
-      return sendSuccess(res, employees, "Employees fetched");
+      const result = await this.branchAdminService.getAllEmployees(req.query);
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      
+      return sendSuccess(res, {
+        employees: result.data,
+        meta: {
+          total: result.total,
+          page,
+          limit,
+          totalPages: Math.ceil(result.total / limit)
+        }
+      }, "Employees fetched");
     } catch (error: any) {
       return sendError(res, error.message);
     }
@@ -146,6 +157,15 @@ export class BranchAdminController {
     try {
       const employee = await this.branchAdminService.createEmployee(req.body);
       return sendSuccess(res, employee, "Employee created", 201);
+    } catch (error: any) {
+      return sendError(res, error.message);
+    }
+  };
+
+  unassignEmployee = async (req: Request, res: Response) => {
+    try {
+      const employee = await this.branchAdminService.unassignEmployee(req.params.employeeId as string);
+      return sendSuccess(res, employee, "Employee unassigned successfully");
     } catch (error: any) {
       return sendError(res, error.message);
     }

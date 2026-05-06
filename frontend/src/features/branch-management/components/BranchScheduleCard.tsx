@@ -3,7 +3,7 @@
 import React from "react";
 import { CalendarDaysIcon } from "@heroicons/react/24/outline";
 import { cn } from "@/lib/utils";
-import { BranchSchedule } from "../types/branch-admin.types";
+import { BranchSchedule } from "../types/branch-admin.type";
 
 interface BranchScheduleCardProps {
   schedules: BranchSchedule[];

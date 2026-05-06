@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/select";
 import { useFormik } from "formik";
 import { branchValidationSchema } from "../validations/branch-admin.schema";
-import { Branch, CreateBranchPayload, UpdateBranchPayload } from "../types/branch-admin.types";
+import { Branch, CreateBranchPayload, UpdateBranchPayload } from "../types/branch-admin.type";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import dynamic from "next/dynamic";
 import { useRegions } from "@/hooks/useRegions";

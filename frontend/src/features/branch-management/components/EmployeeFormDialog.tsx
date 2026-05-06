@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Branch } from "../types/branch-admin.types";
+import { Branch } from "../types/branch-admin.type";
 
 interface EmployeeFormDialogProps {
   open: boolean;
