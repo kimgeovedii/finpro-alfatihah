@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Swal from "sweetalert2";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/features/auth/store/useAuthStore";
 import { useCreateCart } from "./useCart";
 import { useDeleteCartItem } from "./useCartItem";
 import { ProductDetailData } from "../types/product.type";
@@ -12,6 +14,8 @@ export const useProductActions = (
   const [currentCartQty, setCurrentCartQty] = useState(0);
   const { createCart, isCreating } = useCreateCart();
   const { deleteCartItem, isDeletingItem } = useDeleteCartItem();
+  const user = useAuthStore((state) => state.user);
+  const router = useRouter();
 
   useEffect(() => {
     setCurrentCartQty(
@@ -93,10 +97,15 @@ export const useProductActions = (
     discountedPrice: activeDiscount ? discountedPrice : undefined,
     totalPrice: discountedPrice * qty,
     isCreating,
-    onAddToCart: () =>
-      isAvailable &&
-      product &&
-      handleCreateCart(branchInventory.branchId, product.id, qty),
+    onAddToCart: () => {
+      if (!user) {
+        router.push("/login");
+        return;
+      }
+      if (isAvailable && product) {
+        handleCreateCart(branchInventory.branchId, product.id, qty);
+      }
+    },
     currentCartQty,
     onRemoveFromCart: () =>
       handleRemoveCartItem(

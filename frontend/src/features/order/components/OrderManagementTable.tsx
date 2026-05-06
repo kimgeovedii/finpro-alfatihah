@@ -15,16 +15,16 @@ import { UserIcon } from "@heroicons/react/20/solid"
 import { PaymentConfirmationDialog } from "./PaymentConfirmationDialog"
 
 export type OrderTableItem = {
-    id: string
-    storeName: string
-    orderNumber: string
-    customerName: string
-    customerEmail: string
-    createdAt: string
-    finalPrice: number
-    status: OrderStatus
-    payments: PaymentData[]
-}
+  id: string;
+  storeName: string;
+  orderNumber: string;
+  customerName: string;
+  customerEmail: string;
+  createdAt: string;
+  finalPrice: number;
+  status: OrderStatus;
+  payments: PaymentData[];
+};
 
 type Props = {
     orders: OrderTableItem[]
@@ -155,6 +155,7 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
             }
             </div>
         </div>
-    )
-}
-
+      )}
+    </div>
+  );
+};

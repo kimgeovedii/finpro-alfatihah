@@ -36,9 +36,10 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const isProtectedRoute = protectedRoutes.some(
-    (route) => pathname === route || pathname.startsWith(route + "/"),
-  );
+  const isProtectedRoute =
+    protectedRoutes.some(
+      (route) => pathname === route || pathname.startsWith(route + "/"),
+    ) || isDynamicProductRoute;
 
   // 1. If not logged in and trying to access protected route, redirect
   if (isProtectedRoute && !hasToken) {

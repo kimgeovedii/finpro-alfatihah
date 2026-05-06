@@ -173,14 +173,14 @@ export const MainNavbar = () => {
                 onClick={() =>
                   setIsCategoryDropdownOpen(!isCategoryDropdownOpen)
                 }
-                className="flex items-center gap-2 px-3 py-2 bg-slate-50 dark:bg-slate-800 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-slate-50 dark:bg-slate-800 rounded-full border border-slate-100 dark:border-slate-700 hover:border-primary/30 transition-all group"
               >
-                <Squares2X2Icon className="h-5 w-5 text-slate-500" />
+                <Squares2X2Icon className="h-3.5 w-3.5 text-primary" />
                 <span className="text-xs font-bold text-slate-700 dark:text-slate-200">
                   Categories
                 </span>
                 <ChevronDownIcon
-                  className={`h-3 w-3 text-slate-400 transition-transform ${isCategoryDropdownOpen ? "rotate-180" : ""}`}
+                  className={`h-3.5 w-3.5 text-slate-400 transition-transform ml-1 ${isCategoryDropdownOpen ? "rotate-180" : ""}`}
                 />
               </button>
 
