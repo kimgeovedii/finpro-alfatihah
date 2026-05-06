@@ -2,7 +2,6 @@
 import { OrderDetailBranchCard } from '@/features/order/components/OrderDetailBranchCard';
 import { OrderDetailItemListCard } from '@/features/order/components/OrderDetailItemListCard';
 import { PaymentSummaryCard } from '@/features/order/components/PaymentSummary';
-import { Check, Package, Truck, Home } from "lucide-react"
 import { OrderStatusStepsCard } from '@/features/order/components/OrderStatusStepsCard';
 import { useOrderDetailData } from '@/features/order/hooks/useOrder';
 import { SkeletonBox } from '@/components/layout/SkeletonBox';
@@ -10,6 +9,7 @@ import { MessageBox } from '@/components/layout/MessageBox';
 import { BackButton } from '@/components/button/BackButton';
 import { HeadingText } from '@/components/layout/HeadingText';
 import { useOrderActions } from '@/features/order/hooks/useOrderAction';
+import { ArchiveBoxIcon, CheckIcon, HomeIcon, TruckIcon } from '@heroicons/react/24/outline';
 
 type Props = {
     orderNumber: string
@@ -29,25 +29,25 @@ export function OrderDetailLayout({ orderNumber }: Props) {
             key: "WAITING_PAYMENT",
             label: "Order Placed",
             sub: "Waiting for payment",
-            icon: <Check className="w-4 h-4"/>
+            icon: <CheckIcon className="w-4 h-4"/>
         },
         {
             key: "PROCESSING",
             label: "Processed",
             sub: "Preparing your order",
-            icon: <Package className="w-4 h-4"/>
+            icon: <ArchiveBoxIcon className="w-4 h-4"/>
         },
         {
             key: "SHIPPED",
             label: "Shipped",
             sub: "On the way",
-            icon: <Truck className="w-4 h-4"/>
+            icon: <TruckIcon className="w-4 h-4"/>
         },
         {
             key: "CONFIRMED",
             label: "Delivered",
             sub: "Order completed",
-            icon: <Home className="w-4 h-4"/>
+            icon: <HomeIcon className="w-4 h-4"/>
         }
     ]
 

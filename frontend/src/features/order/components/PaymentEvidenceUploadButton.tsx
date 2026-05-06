@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button"
 import { formatDate } from "@/utils/converter.util"
-import { UploadIcon } from "lucide-react"
 import React, { useRef } from "react"
 import { useUploadPaymentEvidence } from "../hooks/usePayment"
 import Swal from "sweetalert2"
 import { allowedMimeTypesPaymentEvidence, maxSizePaymentEvidence } from "@/constants/business.const"
 import { showPopUp } from "@/utils/message.util"
+import { CloudIcon } from "@heroicons/react/24/outline"
 
 type Props = {
     orderId: string
@@ -58,7 +58,7 @@ export const PaymentEvidenceUploadButton: React.FC<Props> = ({ orderId, paymentD
                 </div>
                 <input ref={fileInputRef} type="file" accept="image/jpg,image/jpeg,image/png" className="hidden" onChange={handleEvidenceChange}/>
                 <Button variant="outline" disabled={isUploading} onClick={handleClickUpload}>
-                    <UploadIcon className="w-4 h-4"/> {isUploading ? "Uploading..." : "Confirm Payment"}
+                    <CloudIcon className="w-4 h-4"/> {isUploading ? "Uploading..." : "Confirm Payment"}
                 </Button>
             </div>
         </div>

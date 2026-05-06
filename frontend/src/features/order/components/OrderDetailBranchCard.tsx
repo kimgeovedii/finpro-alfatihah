@@ -3,7 +3,7 @@ import { BranchInfoCard } from "@/components/layout/BranchInfoCard"
 import { DividerLine } from "@/components/layout/DividerLine"
 import { BranchData } from "@/types/address.type"
 import { formatDate } from "@/utils/converter.util"
-import { CalendarDays, Clock } from "lucide-react"
+import { CalendarDaysIcon, ClockIcon } from "@heroicons/react/24/outline"
 import React from "react"
 
 type OrderInfo = {
@@ -75,7 +75,7 @@ export const OrderDetailBranchCard: React.FC<Props> = ({ branch, orderInfo }) =>
             <div className="flex flex-wrap gap-5 w-full px-4 pb-4">
                 <div className="flex items-center gap-3 flex-1">
                     <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500">
-                        <CalendarDays className="w-4 h-4" />
+                        <CalendarDaysIcon className="w-4 h-4" />
                     </div>
                     <div>
                         <p className="text-sm text-slate-400">Created at</p>
@@ -90,7 +90,7 @@ export const OrderDetailBranchCard: React.FC<Props> = ({ branch, orderInfo }) =>
                                 <p className="text-sm font-semibold text-slate-700">{orderInfo.paymentDeadline ? formatDate(orderInfo.paymentDeadline, true) : <>-</>}</p>
                             </div>
                             <div className="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center text-red-400">
-                                <Clock className="w-4 h-4" />
+                                <ClockIcon className="w-4 h-4" />
                             </div>
                         </div>
                 }
