@@ -10,7 +10,6 @@ type Props = {
     addressList: AddressData[]
     selectedAddressId: string | null
     maxDeliveryDistance: number
-    
     onSelect: (addressId: string) => void
 }
 

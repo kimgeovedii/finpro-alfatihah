@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button"
 import { formatDate } from "@/utils/converter.util"
-import { UploadIcon } from "lucide-react"
 import React, { useRef } from "react"
 import { useUploadPaymentEvidence } from "../hooks/usePayment"
 import Swal from "sweetalert2"
 import { allowedMimeTypesPaymentEvidence, maxSizePaymentEvidence } from "@/constants/business.const"
 import { showPopUp } from "@/utils/message.util"
+import { CloudIcon } from "@heroicons/react/24/outline"
 
 type Props = {
     orderId: string
@@ -35,16 +35,10 @@ export const PaymentEvidenceUploadButton: React.FC<Props> = ({ orderId, paymentD
         }
 
         Swal.fire({ title: "Uploading...", allowOutsideClick: false, didOpen: () => Swal.showLoading() })
+        
+        // Handle hook (action)
         const result = await uploadEvidence(orderId, file)
-
-        Swal.fire({ 
-            icon: result.success ? "success" : "error", 
-            title: result.success ? result.message : "Upload failed", 
-            text: result.message, 
-            confirmButtonColor: result.success ? "#10b981" : "#ef4444" 
-        }).then(() => {
-            if (result.success) onSuccess()
-        })
+        showPopUp(result.success ? result.message : "Upload failed", result.message, result.success ? "success" : "error", result.success ? "#10b981" : "#ef4444", onSuccess)
     }
 
     const handleClickUpload = () => fileInputRef.current?.click()
@@ -58,7 +52,7 @@ export const PaymentEvidenceUploadButton: React.FC<Props> = ({ orderId, paymentD
                 </div>
                 <input ref={fileInputRef} type="file" accept="image/jpg,image/jpeg,image/png" className="hidden" onChange={handleEvidenceChange}/>
                 <Button variant="outline" disabled={isUploading} onClick={handleClickUpload}>
-                    <UploadIcon className="w-4 h-4"/> {isUploading ? "Uploading..." : "Confirm Payment"}
+                    <CloudIcon className="w-4 h-4"/> {isUploading ? "Uploading..." : "Confirm Payment"}
                 </Button>
             </div>
         </div>

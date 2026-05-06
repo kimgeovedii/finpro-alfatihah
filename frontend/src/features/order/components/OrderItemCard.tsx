@@ -59,7 +59,7 @@ export const OrderItemCard: React.FC<Props> = ({ orderId, orderNumber, status, t
                     <Badge className={`capitalize font-semibold ${statusClass}`}>{finalStatus}</Badge>
                 </div>
                 <DividerLine/>
-                <p className="text-slate-500 text-sm mb-1 font-semibold"><span>({totalItems})</span> Product{totalItems > 1 ? <>s</> : <></>} Purchased</p>
+                <p className="text-slate-500 text-sm mb-1 font-semibold"><span>({totalItems})</span> Item{totalItems > 1 ? <>s</> : <></>} Purchased</p>
                 <p className="text-slate-500 text-sm line-clamp-3">{productList}</p>
                 { 
                     status === 'WAITING_PAYMENT' && paymentEvidence === null && paymentMethod === "MANUAL" && 

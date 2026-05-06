@@ -9,7 +9,6 @@ interface Props {
     address: AddressData[]
     appliedAddress?: string | null
     maxDeliveryDistance: number
-    
     onSelect: (id: string) => void
 }
 

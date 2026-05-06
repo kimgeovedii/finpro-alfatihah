@@ -11,7 +11,6 @@ import { HeadingText } from "@/components/layout/HeadingText"
 interface Props {
     appliedVoucher?: string | null
     totalBasePrice: number
-
     onApply: (voucher: VoucherData) => void
     onRemove?: () => void
 }
@@ -20,11 +19,11 @@ export const VouchersSelectionCard: React.FC<Props> = ({ appliedVoucher, totalBa
     const [search, setSearch] = useState("")
     const observerRef = useRef<IntersectionObserver | null>(null)
 
-    // Handle hook
+    // Handle hook (fetch)
     const { vouchers, meta, isLoadingVoucher, fetchAllVouchers } = useAllVoucherData()
     const debounceRef = useRef<NodeJS.Timeout | null>(null)
 
-    // Handle action
+    // Handle hook (action)
     const handleSearch = (value: string) => {
         setSearch(value)
 

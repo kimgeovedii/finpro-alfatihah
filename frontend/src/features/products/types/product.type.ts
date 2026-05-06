@@ -71,6 +71,7 @@ export type ProductDetailInfoContentProps = {
 };
 
 export type ProductDetailCartActionProps = {
+  role: string;
   qty: number;
   setQty: (qty: number) => void;
   price: number;

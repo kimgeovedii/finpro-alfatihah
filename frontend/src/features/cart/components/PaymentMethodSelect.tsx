@@ -8,7 +8,6 @@ import { HeadingText } from "@/components/layout/HeadingText"
 
 interface Props {
     selectedMethod: PaymentMethodType
-    
     onSelectMethod: (method: PaymentMethodType) => void
 }
 

@@ -9,7 +9,6 @@ import React from "react"
 type Props = {
     isSelected?: boolean
     maxDeliveryDistance: number
-    
     action?: () => void
 }
 

@@ -3,7 +3,7 @@ import { HeadingText } from "@/components/layout/HeadingText"
 import { ShippingSummaryCard } from "@/components/layout/ShippingSummaryCard"
 import { Button } from "@/components/ui/button"
 import { currencyFormat } from "@/constants/business.const"
-import { ArrowRight } from "lucide-react"
+import { ArrowRightIcon } from "@heroicons/react/24/outline"
 import React from "react"
 
 type Props = {
@@ -14,7 +14,6 @@ type Props = {
     totalDiscountProduct: number
     totalDiscountVoucher: number
     finalPrice: number
-    
     onCheckout: () => void
 }
 
@@ -59,7 +58,7 @@ export const CartPaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCos
             <DividerLine/>
             <div className="flex gap-5 w-full">
                 <Button className="flex-1 h-10 bg-teal-700 hover:bg-[#00767a] text-white font-bold rounded-[8px] shadow-lg shadow-primary-teal/20 transition-all duration-300 active:scale-[0.97] disabled:opacity-70" onClick={onCheckout}>
-                    <ArrowRight/> Continue Payment
+                    <ArrowRightIcon/> Continue Payment
                 </Button>
             </div>
         </div>

@@ -23,38 +23,36 @@ export function CartDetailLayout({ cartId }: Props) {
     const router = useRouter()
     const { cart, isLoading, error, fetchCartDetail } = useCartDetailData(cartId)
 
-    // Call hook (action)
+    // Handle hook (action)
     const onSuccess = () => fetchCartDetail(cartId)
     const {
         selectedVoucher, selectedAddressId, setSelectedAddressId, paymentMethod, setPaymentMethod,
-        handleApply, handleRemove,
-        handleRemoveCartItem, handleIncrease, handleDecrease,
-        handleCheckout,
+        handleApply, handleRemove, handleRemoveCartItem, handleIncrease, handleDecrease, handleCheckout,
     } = useCartActions(onSuccess, cartId)
 
-    // Handle hook fetching
+    // Handle hook (fetch)
     useEffect(() => {
         if (!isLoading && !cart && error) {
-        Swal.fire({
-            icon: "error",
-            title: actionMessages.cartFailedOpen,
-            text: error,
-            confirmButtonText: actionMessages.cartAskBack,
-            allowOutsideClick: false,
-            allowEscapeKey: false,
-        }).then((result) => {
-            if (result.isConfirmed) router.push('/cart')
-        })
+            Swal.fire({
+                icon: "error",
+                title: actionMessages.cartFailedOpen,
+                text: error,
+                confirmButtonText: actionMessages.cartAskBack,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+            }).then((result) => {
+                if (result.isConfirmed) router.push('/cart')
+            })
         }
 
         if (cart?.user?.addresses?.length) {
-        const selectedAddress = (() => {
-            const primary = cart?.user?.addresses?.find(dt => dt.isPrimary && dt.isWithinRange)
-            if (primary) return primary
-            return cart?.user?.addresses?.find(dt => dt.isWithinRange) ?? cart.user.addresses[0]
-        })()
+            const selectedAddress = (() => {
+                const primary = cart?.user?.addresses?.find(dt => dt.isPrimary && dt.isWithinRange)
+                if (primary) return primary
+                return cart?.user?.addresses?.find(dt => dt.isWithinRange) ?? cart.user.addresses[0]
+            })()
 
-        setSelectedAddressId(selectedAddress.id)
+            setSelectedAddressId(selectedAddress.id)
         }
     }, [cart, isLoading, error, router])
 
@@ -139,32 +137,35 @@ export function CartDetailLayout({ cartId }: Props) {
                 </div>
                 <div className='w-full lg:flex-1 flex flex-col space-y-5'>
                     <CartDetailItemListCard
-                    cartId={cartId}
-                    branchName={cart.branch.storeName}
-                    items={
-                        cart.items.map(dt => ({
-                        id: dt.id,
-                        cartId: cartId,
-                        slugName: dt.product.product.slugName,
-                        productName: dt.product.product.productName,
-                        productDiscounts: dt.product.product.productDiscounts,
-                        category: dt.product.product.category,
-                        productImages: dt.product.product.productImages,
-                        quantity: dt.quantity,
-                        currentStock: dt.product.currentStock,
-                        weight: dt.product.product.weight * dt.quantity,
-                        basePrice: dt.product.product.basePrice,
-                        totalPrice: dt.product.product.basePrice * dt.quantity,
-                        discountAmount: dt.product.product.discountAmount,
-                        finalTotalPrice: dt.product.product.finalTotalPrice,
-                        finalPricePerItem: dt.product.product.finalPricePerItem
-                        }))
-                    }
-                    onIncrease={handleIncrease}
-                    onDecrease={handleDecrease}
-                    onRemove={handleRemoveCartItem}
+                        cartId={cartId}
+                        branchName={cart.branch.storeName}
+                        items={
+                            cart.items.map(dt => ({
+                            id: dt.id,
+                            cartId: cartId,
+                            slugName: dt.product.product.slugName,
+                            productName: dt.product.product.productName,
+                            productDiscounts: dt.product.product.productDiscounts,
+                            category: dt.product.product.category,
+                            productImages: dt.product.product.productImages,
+                            quantity: dt.quantity,
+                            currentStock: dt.product.currentStock,
+                            weight: dt.product.product.weight * dt.quantity,
+                            basePrice: dt.product.product.basePrice,
+                            totalPrice: dt.product.product.basePrice * dt.quantity,
+                            discountAmount: dt.product.product.discountAmount,
+                            finalTotalPrice: dt.product.product.finalTotalPrice,
+                            finalPricePerItem: dt.product.product.finalPricePerItem
+                            }))
+                        }
+                        onIncrease={handleIncrease}
+                        onDecrease={handleDecrease}
+                        onRemove={handleRemoveCartItem}
+                    />
+                <PaymentMethodSelect 
+                    selectedMethod={paymentMethod} 
+                    onSelectMethod={setPaymentMethod}
                 />
-                <PaymentMethodSelect selectedMethod={paymentMethod} onSelectMethod={setPaymentMethod}/>
                 <CartPaymentSummaryCard
                     totalItem={cart.totalQty}
                     shippingWeight={cart.totalWeight}

@@ -7,7 +7,6 @@ interface Props {
     item: VoucherData
     isApplied: boolean
     totalBasePrice: number
-
     onApply: (voucher: VoucherData) => void
     onRemove?: () => void
 }

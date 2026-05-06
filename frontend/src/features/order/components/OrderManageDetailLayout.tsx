@@ -12,10 +12,10 @@ type Props = {
 }
   
 export function OrderManageDetailLayout({ orderNumber }: Props) {
-    // Handle hook
+    // Handle hook (fetch)
     const { order, isLoading, fetchOrderDetail } = useOrderDetailData(orderNumber)
     
-    // Call hook (action)
+    // Handle hook (action)
     const onSuccess = () => fetchOrderDetail(orderNumber)
     const { handleShippingOrder, handleCancelOrder } = useManageOrderActions(onSuccess)
 
@@ -45,8 +45,10 @@ export function OrderManageDetailLayout({ orderNumber }: Props) {
                         stockBefore: dt.product.currentStock,
                         stockAfter: dt.product.currentStock - dt.quantity,
                         product: { 
-                        productName: dt.product.product.productName, 
-                        imageUrl: dt.product.product.productImages[0].imageUrl 
+                            productName: dt.product.product.productName, 
+                            slugName: dt.product.product.slugName,
+                            category: dt.product.product.category,
+                            imageUrl: dt.product.product.productImages[0].imageUrl 
                         },
                     })) ?? []
                     }
