@@ -1,11 +1,11 @@
 import React from "react"
 
-type CartSummaryProps = {
+type Props = {
     totalQty: number
     totalItems: number
 }
 
-export const CartSummary: React.FC<CartSummaryProps> = ({ totalQty, totalItems }) => {
+export const CartSummary: React.FC<Props> = ({ totalQty, totalItems }) => {
     if (totalItems === 0) return <p className="text-slate-500 mt-1">Your basket is empty</p>
 
     return (

@@ -35,16 +35,10 @@ export const PaymentEvidenceUploadButton: React.FC<Props> = ({ orderId, paymentD
         }
 
         Swal.fire({ title: "Uploading...", allowOutsideClick: false, didOpen: () => Swal.showLoading() })
+        
+        // Handle hook (action)
         const result = await uploadEvidence(orderId, file)
-
-        Swal.fire({ 
-            icon: result.success ? "success" : "error", 
-            title: result.success ? result.message : "Upload failed", 
-            text: result.message, 
-            confirmButtonColor: result.success ? "#10b981" : "#ef4444" 
-        }).then(() => {
-            if (result.success) onSuccess()
-        })
+        showPopUp(result.success ? result.message : "Upload failed", result.message, result.success ? "success" : "error", result.success ? "#10b981" : "#ef4444", onSuccess)
     }
 
     const handleClickUpload = () => fileInputRef.current?.click()

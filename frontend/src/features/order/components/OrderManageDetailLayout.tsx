@@ -12,10 +12,10 @@ type Props = {
 }
   
 export function OrderManageDetailLayout({ orderNumber }: Props) {
-    // Handle hook
+    // Handle hook (fetch)
     const { order, isLoading, fetchOrderDetail } = useOrderDetailData(orderNumber)
     
-    // Call hook (action)
+    // Handle hook (action)
     const onSuccess = () => fetchOrderDetail(orderNumber)
     const { handleShippingOrder, handleCancelOrder } = useManageOrderActions(onSuccess)
 

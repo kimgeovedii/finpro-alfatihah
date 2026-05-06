@@ -23,8 +23,12 @@ export const OrderSummaryCard: React.FC<Props> = ({ totalPrice, totalFinalPrice,
     if (totalCancelledOrder > 0) summaryParts.push(<><b>{totalCancelledOrder}</b> cancelled</>)
 
     const summaryText = summaryParts.length === 0 ? <>So far you have no orders yet.</> : <>So far you have {
-        summaryParts.map((dt, idx) => <React.Fragment key={idx}>{dt}{idx < summaryParts.length - 1 ? (idx === summaryParts.length - 2 ? " and " : ", ") : ""}</React.Fragment>)
-        }.</>
+        summaryParts.map((dt, idx) => 
+            <React.Fragment key={idx}>
+                {dt}{idx < summaryParts.length - 1 ? (idx === summaryParts.length - 2 ? " and " : ", ") : ""}
+            </React.Fragment>
+        )
+    }.</>
 
     return (
         <>

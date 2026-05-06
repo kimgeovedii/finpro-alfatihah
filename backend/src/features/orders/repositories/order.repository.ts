@@ -134,6 +134,9 @@ export class OrderRepository {
             }
           },
           items: {
+            orderBy: {
+              quantity: 'desc'
+            },
             select: {
               id: true, quantity: true, price: true, product: {
                 select: {

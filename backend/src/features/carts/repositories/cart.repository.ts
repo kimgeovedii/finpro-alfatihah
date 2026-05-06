@@ -41,9 +41,7 @@ export class CartRepository {
         },
         items: {
           orderBy: {
-            product: {
-              product: { productName: 'asc' }
-            }
+            quantity: 'desc'
           },
           select: {
             id: true, quantity: true, product: {
@@ -148,7 +146,9 @@ export class CartRepository {
         select: {
           id: true, branchId: true, 
           items: {
-            orderBy: { createdAt: 'desc' },
+            orderBy: {
+              quantity: 'desc'
+            },
             select: {
               id: true, quantity: true, 
               product: {                         

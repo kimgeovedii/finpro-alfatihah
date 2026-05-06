@@ -16,10 +16,10 @@ type Props = {
 }
   
 export function OrderDetailLayout({ orderNumber }: Props) {
-    // For repo (fetch)
+    // Handle hook (fetch)
     const { order, isLoading, fetchOrderDetail } = useOrderDetailData(orderNumber)
     
-    // Call hook (action)
+    // Handle hook (action)
     const onSuccess = () => fetchOrderDetail(orderNumber)
     const { handleCancelOrder, handleConfirmOrder } = useOrderActions(() => {}, onSuccess)
 

@@ -10,7 +10,6 @@ interface Props {
     icon: React.ReactNode
     title: string
     description: string
-
     onSelect: (method: PaymentMethodType) => void
 }
 

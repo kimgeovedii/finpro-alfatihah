@@ -14,7 +14,6 @@ type Props = {
     totalDiscountProduct: number
     totalDiscountVoucher: number
     finalPrice: number
-    
     onCheckout: () => void
 }
 

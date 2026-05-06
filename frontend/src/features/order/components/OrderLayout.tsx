@@ -13,11 +13,11 @@ import { useOrderActions } from "@/features/order/hooks/useOrderAction";
 import { CloudArrowDownIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 export function OrderLayout() {
-    // Handle hook
+    // Handle hook (fetch)
     const { summary, isLoadingSummary } = useOrderSummary()
     const { orders, meta, isLoading, fetchAllOrders } = useAllOrderData()
     
-    // Call hook : actions
+    // Handle hook (action)
     const { orderNumber, setOrderNumber, dateStart, setDateStart, dateEnd, setDateEnd, handleSearch, downloadTransactionHistory } = useOrderActions(fetchAllOrders)
 
     return (
@@ -85,8 +85,7 @@ export function OrderLayout() {
                         }
                         {
                             !isLoading && orders.map((dt, idx) => (
-                                <OrderItemCard
-                                    key={idx}
+                                <OrderItemCard key={idx}
                                     orderId={dt.id} orderNumber={dt.orderNumber} status={dt.status} totalPrice={dt.totalPrice} finalPrice={dt.finalPrice} shippingCost={dt.shippingCost}
                                     paymentDeadline={dt.paymentDeadline} totalItems={dt.totalItems} productList={dt.productList} createdAt={dt.createdAt} paymentMethod={dt.payments[0]?.method}
                                     paymentStatus={dt.payments[0]?.status} paymentEvidence={dt.payments[0]?.evidence} onSuccess={fetchAllOrders}
