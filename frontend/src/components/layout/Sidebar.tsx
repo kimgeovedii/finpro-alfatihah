@@ -1,21 +1,17 @@
 "use client";
-import React, { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import {
   HomeIcon,
   TagIcon,
   ClipboardDocumentCheckIcon,
   Cog6ToothIcon,
   GlobeAmericasIcon,
-  ArrowsRightLeftIcon,
   CubeIcon,
   UsersIcon,
   ChevronRightIcon,
   PercentBadgeIcon,
   Square2StackIcon,
   DocumentChartBarIcon,
-  ShoppingCartIcon,
   BriefcaseIcon,
   ServerStackIcon,
 } from "@heroicons/react/24/outline";
@@ -56,7 +52,7 @@ const NAV_ITEMS = [
   },
   {
     title: "Manage Order",
-    href: "/manage-order",
+    href: "/dashboard/manage-order",
     icon: ClipboardDocumentCheckIcon,
   },
   {

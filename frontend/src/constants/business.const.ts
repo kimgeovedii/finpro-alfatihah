@@ -4,9 +4,9 @@ export const statusColorMap: Record<string, string> = {
     CANCELLED: "bg-red-400",
     WAITING_PAYMENT: "bg-orange-400",
     WAITING_PAYMENT_CONFIRMATION: "bg-orange-400",
-    PROCESSING: "bg-blue-400",
+    PROCESSING: "bg-blue-500",
     SHIPPED: "bg-purple-400",
-    CONFIRMED: "bg-emerald-400",
+    CONFIRMED: "bg-emerald-500",
 }
 
 // Multer & Cloudinary : File handling

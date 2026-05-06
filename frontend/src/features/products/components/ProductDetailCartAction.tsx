@@ -124,7 +124,7 @@ export const ProductDetailCartAction = ({
         <span className="text-4xl font-extrabold text-slate-900 tracking-tight">
           {formatMoney(price)}
         </span>
-        <span className="text-slate-500 text-sm ml-1">/ piece</span>
+        <span className="text-slate-500 text-sm ml-1">/ item</span>
       </div>
 
       <div className="space-y-8">

@@ -6,7 +6,7 @@ import { ProductDetailImageGallery } from "./ProductDetailImageGallery";
 import { ProductDetailInfoContent } from "./ProductDetailInfoContent";
 import { ProductDetailCartAction } from "./ProductDetailCartAction";
 import { ProductBreadcrumb } from "./ProductBreadCrumb";
-import { ProductBranchInfoCard } from "./ProductBranchInfo";
+import { BranchInfoCard } from "../../../components/layout/BranchInfoCard";
 import { useProductActions } from "../hooks/useProductActions";
 import { useStoreSelection } from "../hooks/useStoreSelection";
 
@@ -60,13 +60,7 @@ export const ProductDetail = ({ slugName, storeName: storeNameProp }: { slugName
               price={product.basePrice}
             />
             {branchInventory ? (
-              <ProductBranchInfoCard
-                branch={{
-                  storeName: branchInventory.branch.storeName,
-                  address: branchInventory.branch.address,
-                  schedules: branchInventory.branch.schedules,
-                }}
-              />
+              <BranchInfoCard branch={branchInventory.branch}/>
             ) : (
               <div className="bg-orange-50 border border-orange-100 p-6 rounded-[2rem]">
                 <p className="text-orange-800 font-bold text-sm">
@@ -101,13 +95,7 @@ export const ProductDetail = ({ slugName, storeName: storeNameProp }: { slugName
                 price={product.basePrice}
               />
               {branchInventory ? (
-                <ProductBranchInfoCard
-                  branch={{
-                    storeName: branchInventory.branch.storeName,
-                    address: branchInventory.branch.address,
-                    schedules: branchInventory.branch.schedules,
-                  }}
-                />
+                <BranchInfoCard branch={branchInventory.branch}/>
               ) : (
                 <div className="bg-orange-50 border border-orange-100 p-6 rounded-[2rem]">
                   <p className="text-orange-800 font-bold text-sm">

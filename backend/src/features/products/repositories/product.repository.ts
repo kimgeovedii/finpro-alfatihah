@@ -1,4 +1,5 @@
 import { prisma } from "../../../config/prisma";
+import { getStoreOpenStatus } from "../../../utils/business";
 
 export class ProductRepository {
   public findAllProducts = async (
@@ -129,10 +130,24 @@ export class ProductRepository {
       };
     }
   
-    return prisma.products.findFirst({
+    const product = await prisma.products.findFirst({
       where: { slugName, deletedAt: null },
       include,
-    });
+    })
+  
+    if (!product) return null
+  
+    product.branchInventories = product.branchInventories.map((inv: any) => {
+      const schedules = inv.branch?.schedules ?? []
+    
+      return {
+        ...inv, branch: {
+          ...inv.branch, openStatus: getStoreOpenStatus(schedules),
+        },
+      }
+    })
+  
+    return product
   };
 
   public createProduct = async (data: any) => {

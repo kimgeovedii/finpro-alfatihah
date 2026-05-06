@@ -1,5 +1,7 @@
 import React from "react"
 import { OrderConfirmButton } from "./OrderConfirmButton"
+import { HeadingText } from "@/components/layout/HeadingText"
+import { DividerLine } from "@/components/layout/DividerLine"
 
 export type StatusInfo = {
     key: string 
@@ -29,7 +31,8 @@ export const OrderStatusStepsCard: React.FC<Props> = ({ statusSteps, currentStat
 
     return (
         <div className="bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-            <p className="text-slate-800 font-bold mb-5">Order Progress</p>
+            <HeadingText children="Order Progress" level={2}/>
+            <DividerLine/>
             <div className="flex flex-col gap-0">
                 {
                     statusSteps.map((dt, idx) => {

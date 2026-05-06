@@ -4,10 +4,10 @@ import React from "react"
 import { PaymentEvidenceUploadButton } from "./PaymentEvidenceUploadButton"
 import { OrderCancelButton } from "./OrderCancelButton"
 import { useDownloadInvoice } from "../hooks/useExport"
-import { InfoBoxShippingWeightToolTip } from "@/components/layout/InfoBoxShippingWeightToolTip"
-import { courierShippingDefault, currencyFormat } from "@/constants/business.const"
+import { currencyFormat } from "@/constants/business.const"
 import { ShippingSummaryCard } from "@/components/layout/ShippingSummaryCard"
 import { DividerLine } from "@/components/layout/DividerLine"
+import { HeadingText } from "@/components/layout/HeadingText"
 
 type Props = {
     orderId: string
@@ -23,36 +23,37 @@ type Props = {
     finalPrice: number
     paymentMethod?: string | null
     onCancel: (orderNumber: string) => void
+    onSuccess: () => void
 }
 
-export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, totalPrice, totalSaving, finalPrice, orderId, status, paymentDeadline, paymentEvidence, orderNumber, onCancel, paymentMethod, shippingWeight }) => {
+export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, totalPrice, totalSaving, finalPrice, orderId, status, paymentDeadline, paymentEvidence, orderNumber, onCancel, paymentMethod, shippingWeight, onSuccess }) => {
     const { downloadInvoiceOrder } = useDownloadInvoice()
     
     return (
         <div className="bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 mb-4">
-            <h5 className="font-bold mb-3">Payment Summary</h5>
+            <HeadingText children="Payment Summary" level={2}/>
             <DividerLine/>
             <div className="flex justify-between">
                 <p>Total Items <b>({totalItem})</b></p>
-                <h6 className="font-bold">Rp. {totalPrice.toLocaleString(currencyFormat)}</h6>
+                <p className="font-bold">Rp. {totalPrice.toLocaleString(currencyFormat)}</p>
             </div>
             {
                 totalSaving > 0 && 
                     <div className="flex justify-between">
                         <p>Total Saving</p>
-                        <h6 className="font-bold">Rp. {totalSaving.toLocaleString(currencyFormat)}</h6>
+                        <p className="font-bold">Rp. {totalSaving.toLocaleString(currencyFormat)}</p>
                     </div>
             }
             <DividerLine/>
             <ShippingSummaryCard shippingWeight={shippingWeight} shippingCost={shippingCost}/>
             <DividerLine/>
             <div className="flex justify-between">
-                <h6 className="font-bold">Final Price</h6>
-                <h4 className="font-bold text-xl">Rp. {Math.ceil(finalPrice + shippingCost).toLocaleString(currencyFormat)}</h4>
+                <HeadingText children="Discount" level={3}/>
+                <p className="font-bold text-xl">Rp. {Math.ceil(finalPrice + shippingCost).toLocaleString(currencyFormat)}</p>
             </div>
             <DividerLine/>
             <div className="flex flex-col gap-3">
-                { status === 'WAITING_PAYMENT' && paymentEvidence === null && paymentMethod === "MANUAL" && <PaymentEvidenceUploadButton orderId={orderId} paymentDeadline={paymentDeadline}/> }
+                { status === 'WAITING_PAYMENT' && paymentEvidence === null && paymentMethod === "MANUAL" && <PaymentEvidenceUploadButton orderId={orderId} paymentDeadline={paymentDeadline} onSuccess={onSuccess}/> }
                 { status === 'WAITING_PAYMENT' && <OrderCancelButton orderNumber={orderNumber} onCancel={onCancel}/> }
             </div>
             <div className="flex gap-5 w-full mt-3">

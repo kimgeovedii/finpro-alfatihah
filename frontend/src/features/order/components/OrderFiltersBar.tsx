@@ -3,6 +3,8 @@ import { BranchData } from "../repositories/branch.type"
 import { Input } from "@/components/ui/input"
 import { OrderBranchSelect } from "./OrderBranchSelect"
 import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { statusFilter } from "@/constants/feature.const"
 
 type Props = {
     branchId: string
@@ -16,36 +18,37 @@ type Props = {
     onSearchChange: (val: string) => void
 }
 
-const STATUS_FILTERS: { label: string; value: OrderStatus | "ALL" }[] = [
-    { label: "All Orders", value: "ALL" },
-    { label: "Waiting Payment", value: "WAITING_PAYMENT" },
-    { label: "Processing", value: "PROCESSING" },
-    { label: "Shipped", value: "SHIPPED" },
-    { label: "Confirmed", value: "CONFIRMED" },
-    { label: "Cancelled", value: "CANCELLED" },
-]
-
 export const OrderFiltersBar: React.FC<Props> = ({ branchId, branches, isBranchLoading, activeStatus, search, onSearchChange, onStatusChange, onBranchChange }) => {
     return (
-        <>
-            <div className="flex justify-between items-center my-3">
-                <Input placeholder="e.g. ORD-123" value={search} onChange={(e) => onSearchChange(e.target.value)} className="w-52 h-9 text-sm w-full md:w-[300px] bg-white rounded-xl"/>
-                <OrderBranchSelect
-                    branches={branches}
-                    value={branchId}
-                    onValueChange={onBranchChange}
-                    isLoading={isBranchLoading}
-                />
+        <div className="flex flex-wrap items-center gap-3 mb-5 bg-white p-4 rounded-xl justify-between">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 my-3 w-full lg:w-auto">
+                <div className="flex flex-col gap-2">
+                    <Label>Search By Order Number</Label>
+                    <Input placeholder="e.g. ORD-123" value={search} onChange={(e) => onSearchChange(e.target.value)} className="w-52 h-9 text-sm w-full lg:w-[300px] bg-white rounded-xl"/>
+                </div>
+                <div className="flex flex-col gap-2 w-full">
+                    <Label>Filter By Branch</Label>
+                    <OrderBranchSelect
+                        branches={branches}
+                        value={branchId}
+                        onValueChange={onBranchChange}
+                        isLoading={isBranchLoading}
+                    />
+                </div>
             </div>
-            <div className="flex gap-2 mb-5 flex-wrap">
-                {
-                    STATUS_FILTERS.map((dt) => (
-                        <Button key={dt.value} onClick={() => onStatusChange(dt.value)} className={`px-3 py-2 rounded-full text-xs font-medium transition-all ${activeStatus === dt.value ? "bg-teal-700 text-white" : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"}`}>
-                            {dt.label}
-                        </Button>
-                    ))
-                }
+            <div>
+                <Label>Filter By Status</Label>
+                <div className="flex gap-2 flex-wrap items-center mt-2">
+                    {
+                        statusFilter.map((dt) => (
+                            <Button key={dt.value} onClick={() => onStatusChange(dt.value)} className={`px-3 py-2 rounded-full text-xs font-medium transition-all ${activeStatus === dt.value ? "bg-teal-700 text-white" : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"}`}>
+                                {dt.label}
+                            </Button>
+                        ))
+                    }
+                </div>
             </div>
-        </>
+            
+        </div>
     )
 }
