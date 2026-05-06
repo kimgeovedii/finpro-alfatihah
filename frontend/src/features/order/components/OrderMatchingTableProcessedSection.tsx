@@ -28,18 +28,18 @@ export const OrderMatchingProcessedSection: React.FC<Props> = ({ items, status, 
             <Table className="table-center">
                 <TableHeader>
                     <TableRow className="uppercase text-xs tracking-wider text-slate-400">
-                        <TableHead>Requested Product</TableHead>
-                        <TableHead>Requested Qty</TableHead>
+                        <TableHead className="font-semibold">Requested Product</TableHead>
+                        <TableHead className="font-semibold">Requested Qty</TableHead>
                         {
                             status === "PROCESSING" && 
                                 <>
-                                    <TableHead>Stock Before</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>Stock After</TableHead>
+                                    <TableHead className="font-semibold">Stock Before</TableHead>
+                                    <TableHead className="font-semibold">Status</TableHead>
+                                    <TableHead className="font-semibold">Stock After</TableHead>
                                 </>
                         }
-                        <TableHead>Price</TableHead>
-                        <TableHead>Total</TableHead>
+                        <TableHead className="font-semibold">Price</TableHead>
+                        <TableHead className="font-semibold">Total</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -65,7 +65,7 @@ export const OrderMatchingProcessedSection: React.FC<Props> = ({ items, status, 
                                             <>
                                                 <TableCell>{dt.stockBefore}</TableCell>
                                                 <TableCell>
-                                                    <Badge className={matched ? "bg-teal-100 text-teal-500" : "bg-red-100 text-red-500"}>
+                                                    <Badge className={matched ? "bg-emerald-100 text-emerald-500" : "bg-red-100 text-red-500"}>
                                                         {matched ? "Matched" : "Insufficient"}
                                                     </Badge>
                                                 </TableCell>

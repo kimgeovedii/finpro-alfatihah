@@ -2,6 +2,7 @@ import { DocumentDuplicateIcon } from "@heroicons/react/24/outline"
 import React from "react"
 import Swal from "sweetalert2"
 import { Button } from "../ui/button"
+import { showPopUp } from "@/utils/message.util"
 
 type Props = {
     label: string
@@ -22,11 +23,7 @@ export const CopyFieldButton: React.FC<Props> = ({ label, value, customClass = "
                 showConfirmButton: false,
             })
         } catch (err) {
-            Swal.fire({
-                icon: "error",
-                title: "Failed",
-                text: "Failed to copy",
-            })
+            showPopUp("Failed", "Failed to copy", "error")
         }
     }
 

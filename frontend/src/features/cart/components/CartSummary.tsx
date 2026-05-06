@@ -10,8 +10,8 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ totalQty, totalItems }
 
     return (
         <p className="text-slate-500 mt-1">
-            You've chosen <b>{totalItems} Product{totalItems > 1 ? "s" : ""}</b> 
-            {" "}with total <b>{totalQty} Piece{totalQty > 1 ? "s" : ""}</b>
+            You've chosen <b>{totalItems} product{totalItems > 1 ? "s" : ""}</b> 
+            {" "}with total <b>{totalQty} item{totalQty > 1 ? "s" : ""}</b>
         </p>
     )
 }

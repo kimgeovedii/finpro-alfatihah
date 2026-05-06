@@ -22,6 +22,7 @@ export type BranchSchedule = {
 export type BranchDetail = {
   storeName: string;
   address: string;
+  openStatus: string;
   schedules: BranchSchedule[];
 };
 

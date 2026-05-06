@@ -2,7 +2,7 @@ import { DiscountType, OrderStatus, Prisma, UserRole } from "@prisma/client";
 import { prisma } from "../../../config/prisma";
 import { orderAutoConfirmLimitHour, orderCode, paymentDeadline } from "../../../constants/business.const";
 import { getDistanceInKm } from "../../../utils/location";
-import { calculateDiscount } from "../../../utils/business";
+import { calculateDiscount, getStoreOpenStatus } from "../../../utils/business";
 
 export class OrderRepository {
   async findRandomOrder() {
@@ -173,7 +173,9 @@ export class OrderRepository {
         return ord
       }, { totalBasePrice: 0, totalQty: 0, totalWeight: 0 })
 
-      return { ...order, totalWeight }
+      const openStatus = getStoreOpenStatus(order.branch.schedules)
+
+      return { ...order, totalWeight, branch: { ...order.branch, openStatus } }
     } else {
       const order = await prisma.orders.findFirst({
         where: { orderNumber },

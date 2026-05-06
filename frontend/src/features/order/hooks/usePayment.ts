@@ -7,7 +7,6 @@ export const useUploadPaymentEvidence = () => {
     const uploadEvidence = async (orderId: string, img: File): Promise<{ message: string, success: boolean }> => {
         setIsUploading(true)
         try {
-            console.log(img)
             const res = await paymentRepository.uploadPaymentEvidence(orderId, img)
             return { message: res.message, success: true }
         } catch (err: any) {
