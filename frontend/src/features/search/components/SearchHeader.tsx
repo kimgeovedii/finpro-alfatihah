@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { usePathname } from "next/navigation";
 import {
   FunnelIcon,
   ChevronDownIcon,
@@ -38,6 +39,8 @@ export const SearchHeader = () => {
   } = useSearchStore();
   const { updateFilters } = useSearchFilters();
   const { localMin, localMax, handlePriceChange } = usePriceFilter();
+  const pathname = usePathname();
+  const isCategoryPage = pathname.startsWith("/categories/");
 
   return (
     <div className="flex flex-col gap-6">
@@ -66,16 +69,18 @@ export const SearchHeader = () => {
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent className="rounded-xl border-slate-100 dark:border-slate-800">
-                <SelectItem
-                  value="all"
-                  className={cn(
-                    "text-xs font-bold py-3 transition-colors hover:bg-[#f8fafc] focus:bg-[#f8fafc] cursor-pointer",
-                    !categoryId &&
-                      "text-[#006666] bg-[#f0fdfa] focus:bg-[#f0fdfa] focus:text-[#006666]",
-                  )}
-                >
-                  All Categories
-                </SelectItem>
+                {!isCategoryPage && (
+                  <SelectItem
+                    value="all"
+                    className={cn(
+                      "text-xs font-bold py-3 transition-colors hover:bg-[#f8fafc] focus:bg-[#f8fafc] cursor-pointer",
+                      !categoryId &&
+                        "text-[#006666] bg-[#f0fdfa] focus:bg-[#f0fdfa] focus:text-[#006666]",
+                    )}
+                  >
+                    All Categories
+                  </SelectItem>
+                )}
                 {categories.map((cat) => (
                   <SelectItem
                     key={cat.id}

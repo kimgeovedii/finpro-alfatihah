@@ -11,6 +11,7 @@ export type ProductImage = {
 export type ProductCategory = {
   id: string;
   name: string;
+  slugName: string;
 };
 
 export type BranchSchedule = {

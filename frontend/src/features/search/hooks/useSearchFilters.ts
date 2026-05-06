@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useSearchStore } from "../service/search.service";
 
-export const useSearchFilters = () => {
+export const useSearchFilters = (autoSync: boolean = false) => {
   const {
     setFilters,
     fetchProducts,
@@ -15,18 +15,35 @@ export const useSearchFilters = () => {
     sortBy,
     sortOrder,
     products,
+    meta,
     isLoading,
   } = useSearchStore();
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  useEffect(() => {
-    useSearchStore.getState().fetchCategories();
-  }, []);
+  const pathname = usePathname();
 
   useEffect(() => {
+    if (autoSync) {
+      useSearchStore.getState().fetchCategories();
+    }
+  }, [autoSync]);
+
+  useEffect(() => {
+    if (!autoSync) return;
+
     const q = searchParams.get("q") || "";
-    const catId = searchParams.get("categoryId") || "";
+    let catId = searchParams.get("categoryId") || "";
+
+    // If we are on a category page, the categoryId comes from the slug in the pathname
+    if (pathname.startsWith("/categories/")) {
+      const slug = pathname.split("/").pop();
+      const cat = useSearchStore.getState().categories.find((c) => c.slugName === slug);
+      if (cat) {
+        catId = cat.id;
+      }
+    }
+
     const minP = searchParams.get("minPrice")
       ? Number(searchParams.get("minPrice"))
       : undefined;
@@ -45,6 +62,7 @@ export const useSearchFilters = () => {
       order !== sortOrder;
 
     if (hasChanged) {
+      // Small delay to ensure categories are loaded before we set filters if we depend on them
       setFilters({
         query: q,
         categoryId: catId,
@@ -53,10 +71,10 @@ export const useSearchFilters = () => {
         sortBy: sort,
         sortOrder: order,
       });
-    } else if (!products.length && !isLoading) {
+    } else if (!meta && !isLoading) {
       fetchProducts();
     }
-  }, [searchParams, setFilters, fetchProducts]);
+  }, [autoSync, searchParams, pathname, setFilters, fetchProducts, query, categoryId, minPrice, maxPrice, sortBy, sortOrder, meta, isLoading]);
 
   const updateFilters = (newFilters: {
     query?: string;
@@ -78,7 +96,28 @@ export const useSearchFilters = () => {
     });
 
     params.delete("page");
-    router.push(`/search?${params.toString()}`);
+
+    let targetPathname = pathname;
+    
+    // Smooth URL navigation for categories
+    if (newFilters.categoryId !== undefined) {
+      params.delete("categoryId"); // Always remove from query if we handle it via slug
+      
+      if (newFilters.categoryId === "") {
+        targetPathname = "/search";
+      } else {
+        const cat = useSearchStore.getState().categories.find(c => c.id === newFilters.categoryId);
+        if (cat) {
+          targetPathname = `/categories/${cat.slugName}`;
+        } else {
+          // Fallback if category not found in store yet
+          params.set("categoryId", newFilters.categoryId);
+          targetPathname = "/search";
+        }
+      }
+    }
+
+    router.push(`${targetPathname}?${params.toString()}`);
   };
 
   return { updateFilters };

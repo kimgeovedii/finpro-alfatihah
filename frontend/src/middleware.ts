@@ -80,7 +80,9 @@ export function middleware(request: NextRequest) {
       }
 
       // Employee trying to access customer routes
-      const isCustomerRoute = !employeeOnlyRoutes.some((route) => pathname.startsWith(route));
+      const isCustomerRoute = !employeeOnlyRoutes.some((route) =>
+        pathname.startsWith(route),
+      );
 
       if (role === "EMPLOYEE" && isCustomerRoute) {
         return NextResponse.redirect(new URL("/unauthorized", request.url));

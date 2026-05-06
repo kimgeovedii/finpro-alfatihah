@@ -16,6 +16,7 @@ import {
   ChevronDownIcon,
   MapIcon,
   XMarkIcon,
+  Squares2X2Icon,
 } from "@heroicons/react/24/outline";
 import {
   HomeIcon as HomeIconSolid,
@@ -27,17 +28,22 @@ import {
 import { useNavbar } from "@/hooks/useNavbar";
 import { useHomeStore } from "@/features/home/service/home.service";
 import { addressService } from "@/features/profile/service/address.service";
+import { useSearchStore } from "@/features/search/service/search.service";
 
 export const MainNavbar = () => {
   const pathname = usePathname();
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
 
   const userDropdownRef = useRef<HTMLDivElement>(null);
   const locationDropdownRef = useRef<HTMLDivElement>(null);
   const mobileSearchRef = useRef<HTMLDivElement>(null);
   const mobileSearchInputRef = useRef<HTMLInputElement>(null);
+  const categoryDropdownRef = useRef<HTMLDivElement>(null);
+
+  const { categories, fetchCategories } = useSearchStore();
 
   const {
     user,
@@ -63,15 +69,26 @@ export const MainNavbar = () => {
     selectedAddressId,
   } = useHomeStore();
 
-  // Fetch addresses on mount if logged in
+  // Fetch addresses and categories on mount
   useEffect(() => {
-    if (mounted && isAuthenticated()) {
-      addressService
-        .getAddresses()
-        .then((data) => setAddresses(Array.isArray(data) ? data : []))
-        .catch(console.error);
+    if (mounted) {
+      if (categories.length === 0) {
+        fetchCategories();
+      }
+      if (isAuthenticated()) {
+        addressService
+          .getAddresses()
+          .then((data) => setAddresses(Array.isArray(data) ? data : []))
+          .catch(console.error);
+      }
     }
-  }, [mounted, isAuthenticated, setAddresses]);
+  }, [
+    mounted,
+    isAuthenticated,
+    setAddresses,
+    fetchCategories,
+    categories.length,
+  ]);
 
   // Close dropdowns on click outside
   useEffect(() => {
@@ -93,6 +110,12 @@ export const MainNavbar = () => {
         !mobileSearchRef.current.contains(event.target as Node)
       ) {
         setIsMobileSearchOpen(false);
+      }
+      if (
+        categoryDropdownRef.current &&
+        !categoryDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsCategoryDropdownOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -143,6 +166,58 @@ export const MainNavbar = () => {
                 src="https://res.cloudinary.com/dvfywdxnt/image/upload/v1777146483/logo-apps_opuem6.png"
               />
             </Link>
+
+            {/* Category Dropdown */}
+            <div className="hidden lg:block relative" ref={categoryDropdownRef}>
+              <button
+                onClick={() =>
+                  setIsCategoryDropdownOpen(!isCategoryDropdownOpen)
+                }
+                className="flex items-center gap-2 px-3 py-2 bg-slate-50 dark:bg-slate-800 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+              >
+                <Squares2X2Icon className="h-5 w-5 text-slate-500" />
+                <span className="text-xs font-bold text-slate-700 dark:text-slate-200">
+                  Categories
+                </span>
+                <ChevronDownIcon
+                  className={`h-3 w-3 text-slate-400 transition-transform ${isCategoryDropdownOpen ? "rotate-180" : ""}`}
+                />
+              </button>
+
+              <AnimatePresence>
+                {isCategoryDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    className="absolute left-0 mt-3 w-64 bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden z-[60]"
+                  >
+                    <div className="max-h-[400px] overflow-y-auto p-2 custom-scrollbar">
+                      {categories.length > 0 ? (
+                        categories.map((cat) => (
+                          <Link
+                            key={cat.id}
+                            href={`/categories/${cat.slugName}`}
+                            onClick={() => setIsCategoryDropdownOpen(false)}
+                            className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-2xl transition-colors group"
+                          >
+                            <span className="text-xs font-bold text-slate-700 dark:text-slate-200 group-hover:text-primary transition-colors">
+                              {cat.name}
+                            </span>
+                          </Link>
+                        ))
+                      ) : (
+                        <div className="p-4 text-center">
+                          <p className="text-xs text-slate-400 font-medium">
+                            No categories found.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
             {/* Search Bar */}
             <form
@@ -307,7 +382,10 @@ export const MainNavbar = () => {
                   className="sm:hidden p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
                   onClick={() => {
                     setIsMobileSearchOpen((prev) => !prev);
-                    setTimeout(() => mobileSearchInputRef.current?.focus(), 150);
+                    setTimeout(
+                      () => mobileSearchInputRef.current?.focus(),
+                      150,
+                    );
                   }}
                 >
                   {isMobileSearchOpen ? (

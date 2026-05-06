@@ -48,6 +48,7 @@ export class ProductRepository {
           select: {
             id: true,
             name: true,
+            slugName: true,
           },
         },
         productImages: {
@@ -84,6 +85,7 @@ export class ProductRepository {
         select: {
           id: true,
           name: true,
+          slugName: true,
         },
       },
       productImages: {
