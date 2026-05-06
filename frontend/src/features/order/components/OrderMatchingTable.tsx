@@ -55,7 +55,7 @@ export const OrderMatchingTable: React.FC<Props> = ({ orderNumber, items, isLoad
                         <div className="w-0.5 flex-1 my-1 min-h-[20px] bg-slate-200"/>
                     </div>
                     <div className="pb-4 w-full">
-                        <HeadingText level={2} children="Order Placed" className="text-emerald-600 mb-2"/>
+                        <HeadingText level={2} children="Order Placed" className={`${status !== "WAITING_PAYMENT_CONFIRMATION" && status !== "WAITING_PAYMENT" ? "text-emerald-600" : "text-gray-400"} mb-2`}/>
                         { !isLoading && payments[0] ? <OrderManagementTableOrderPlacedSection method={payments[0].method} status={payments[0].status} shippingCost={shippingCost} finalPrice={finalPrice}/> : <>Loading...</> }
                     </div>
                 </div>
@@ -67,7 +67,9 @@ export const OrderMatchingTable: React.FC<Props> = ({ orderNumber, items, isLoad
                         <div className="w-0.5 flex-1 my-1 min-h-[20px] bg-slate-200"/>
                     </div>
                     <div className="pb-4 w-full">
-                        <HeadingText level={2} children="Processed" className="text-emerald-600 mb-2"/>
+                        <HeadingText level={2} children="Processed" className={`${
+                            status && ["PROCESSING","SHIPPED","CONFIRMED","CANCELLED"].includes(status) ? "text-emerald-600" : "text-gray-400"} mb-2`}
+                        />
                         <OrderMatchingProcessedSection items={items} status={status} isLoading={isLoading} onShipping={onShipping} onCancel={onCancel} onSearch={onSearch} orderNumber={orderNumber}/>
                     </div>
                 </div>
@@ -79,7 +81,7 @@ export const OrderMatchingTable: React.FC<Props> = ({ orderNumber, items, isLoad
                         <div className="w-0.5 flex-1 my-1 min-h-[20px] bg-slate-200"/>
                     </div>
                     <div className="pb-4 w-full">
-                        <HeadingText level={2} children="Shipped" className="text-emerald-600 mb-2"/>
+                        <HeadingText level={2} children="Shipped" className={`${status && ["SHIPPED","CONFIRMED","CANCELLED"].includes(status) ? "text-emerald-600" : "text-gray-400"} mb-2`}/>
                         {
                             status === "SHIPPED" || status === "CONFIRMED" ?
                                 <OrderManagementTableShippedSection 
@@ -105,7 +107,7 @@ export const OrderMatchingTable: React.FC<Props> = ({ orderNumber, items, isLoad
                         </div>
                     </div>
                     <div className="pb-4 w-full">
-                        <HeadingText level={2} children="Delivered" className="text-emerald-600 mb-2"/>
+                        <HeadingText level={2} children="Delivered" className={`${status && ["CONFIRMED","CANCELLED"].includes(status) ? "text-emerald-600" : "text-gray-400"} mb-2`}/>
                         { status === "CONFIRMED" ? <OrderManagementTableOrderDeliveredSection confirmedAt={confirmedAt}/> : <p className="text-xs text-slate-400">Order delivered</p> }
                     </div>
                 </div>

@@ -26,7 +26,8 @@ export function OrderManageLayout() {
             <div className="flex items-center justify-between">
                 <div className="w-full">
                     <HeadingText level={1} children="Manage Order"/>
-                    <div className="mt-2">
+                    <p className="text-slate-500 mt-1">You can manage all customer transactions on this page, including viewing incoming orders, accepting or rejecting payments, validating shipping, and tracking completion.</p>
+                    <div className="mt-4">
                     {
                         isLoadingSummaryByBranchId ?
                             <>
