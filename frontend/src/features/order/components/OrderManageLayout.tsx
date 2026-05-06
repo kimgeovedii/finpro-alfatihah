@@ -11,14 +11,14 @@ import { useOrderSummaryByBranchId } from "@/features/order/hooks/useManageOrder
 import { useManageOrderActions } from "@/features/order/hooks/useManageOrderAction"
 
 export function OrderManageLayout() {
-    // Call hook : data
+    // Call hook (fetch)
     const role = useAuthStore((state) => state.user?.role)
     const { branchs, isBranchLoading } = useAllBranchData()
 
-    // Call hook : actions
+    // Call hook (action)
     const { branchId, setBranchId, search, setSearch, tableOrders, meta, isLoading, status, handlePageChange, handleStatusChange, handleValidatePaymentEvidence } = useManageOrderActions()
 
-    // Call hook : summary (depends on branchId from actions)
+    // Call hook (fetch)
     const { summaryByBranchId, isLoadingSummaryByBranchId } = useOrderSummaryByBranchId(branchId)
 
     return (

@@ -12,7 +12,6 @@ type Props = {
     isBranchLoading: boolean
     activeStatus: OrderStatus | "ALL"
     search: string
-
     onStatusChange: (status: OrderStatus | "ALL") => void
     onBranchChange: (id: string) => void
     onSearchChange: (val: string) => void
@@ -41,14 +40,14 @@ export const OrderFiltersBar: React.FC<Props> = ({ branchId, branches, isBranchL
                 <div className="flex gap-2 flex-wrap items-center mt-2">
                     {
                         statusFilter.map((dt) => (
-                            <Button key={dt.value} onClick={() => onStatusChange(dt.value)} className={`px-3 py-2 rounded-full text-xs font-medium transition-all ${activeStatus === dt.value ? "bg-teal-700 text-white" : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"}`}>
+                            <Button key={dt.value} 
+                                onClick={() => onStatusChange(dt.value)} className={`px-3 py-2 rounded-full text-xs font-medium transition-all ${activeStatus === dt.value ? "bg-teal-700 text-white" : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"}`}>
                                 {dt.label}
                             </Button>
                         ))
                     }
                 </div>
             </div>
-            
         </div>
     )
 }

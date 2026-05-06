@@ -8,7 +8,6 @@ type Props = {
     cartId: string
     branchName: string
     items: ProductOrderCartItem[]
-
     onIncrease: (itemId: string, qty: number, stock: number) => void
     onDecrease: (cartItemId: string, qty: number, productName: string) => void
     onRemove: (cartItemId: string, productName: string) => void
@@ -27,8 +26,7 @@ export const CartDetailItemListCard: React.FC<Props> = ({ items, branchName, onI
             <div className="flex flex-col divide-y divide-slate-100 max-h-[50vh] overflow-y-auto pr-3">
                 {
                     items.map((dt, idx) => 
-                        <ProductOrderCartItemCard
-                            key={idx}
+                        <ProductOrderCartItemCard key={idx}
                             item={dt}
                             variant="cart"
                             branchName={branchName}

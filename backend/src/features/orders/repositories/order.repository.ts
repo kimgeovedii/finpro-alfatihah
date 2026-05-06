@@ -134,6 +134,9 @@ export class OrderRepository {
             }
           },
           items: {
+            orderBy: {
+              quantity: 'desc'
+            },
             select: {
               id: true, quantity: true, price: true, product: {
                 select: {
@@ -190,14 +193,21 @@ export class OrderRepository {
             }
           },
           items: {
+            orderBy: {
+              quantity: 'desc'
+            },
             select: {
               id: true, quantity: true, product: {
                 select: {
                   currentStock: true, product: {
                     select: {
-                      productName: true, description: true, basePrice: true, weight: true, productImages: {
+                      productName: true, slugName: true, productImages: {
                         select: { imageUrl: true },
-                        where: { isPrimary: true }
+                        where: { isPrimary: true },
+                        take: 1
+                      },
+                      category: {
+                        select: { name: true }
                       }
                     }
                   }

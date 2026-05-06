@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button"
-import { Headset, Receipt } from "lucide-react"
 import React from "react"
 import { PaymentEvidenceUploadButton } from "./PaymentEvidenceUploadButton"
 import { OrderCancelButton } from "./OrderCancelButton"
@@ -8,6 +7,7 @@ import { currencyFormat } from "@/constants/business.const"
 import { ShippingSummaryCard } from "@/components/layout/ShippingSummaryCard"
 import { DividerLine } from "@/components/layout/DividerLine"
 import { HeadingText } from "@/components/layout/HeadingText"
+import { DocumentIcon, QuestionMarkCircleIcon } from "@heroicons/react/24/outline"
 
 type Props = {
     orderId: string
@@ -60,10 +60,10 @@ export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, t
                 { 
                     status && ["SHIPPED","CONFIRMED"].includes(status) && 
                         <Button variant='outline' onClick={() => downloadInvoiceOrder(orderNumber)} className="flex-1 h-10 bg-white hover:bg-[#00767a] text-teal-700 hover:text-white font-bold rounded-[8px] shadow-lg border-teal-700 border-1 transition-all duration-300 active:scale-[0.97] disabled:opacity-70">
-                            <Receipt/>Download Invoice
+                            <DocumentIcon/>Download Invoice
                         </Button> 
                 }
-                <Button className="flex-1 h-10 bg-teal-700 hover:bg-[#00767a] text-white font-bold rounded-[8px] shadow-lg shadow-primary-teal/20 transition-all duration-300 active:scale-[0.97] disabled:opacity-70"><Headset/> Help Center</Button>
+                <Button className="flex-1 h-10 bg-teal-700 hover:bg-[#00767a] text-white font-bold rounded-[8px] shadow-lg shadow-primary-teal/20 transition-all duration-300 active:scale-[0.97] disabled:opacity-70"><QuestionMarkCircleIcon/> Help Center</Button>
             </div>
         </div>
     )

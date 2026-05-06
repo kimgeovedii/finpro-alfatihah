@@ -1,4 +1,4 @@
-import React from "react"
+import React, { ReactNode } from "react"
 import { OrderConfirmButton } from "./OrderConfirmButton"
 import { HeadingText } from "@/components/layout/HeadingText"
 import { DividerLine } from "@/components/layout/DividerLine"
@@ -7,7 +7,7 @@ export type StatusInfo = {
     key: string 
     label: string 
     sub: string 
-    icon: any
+    icon: ReactNode
 }
 
 type Props = {

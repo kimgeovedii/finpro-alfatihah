@@ -32,7 +32,6 @@ type Props = {
     meta: PaginationMeta | null
     activeStatus: string
     isLoading: boolean
-
     onPageChange: (page: number) => void
     onValidatePaymentEvidence: (paymentId: string, isConfirm: boolean) => void
 }
@@ -85,7 +84,9 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
                                     return (
                                         <TableRow key={dt.id} className="hover:bg-slate-50">
                                             <TableCell className="font-semibold text-slate-800">
-                                                <MiniTagBox val={dt.storeName}/>
+                                                <Link href={`/${dt.storeName}`} className="cursor-pointer">
+                                                    <MiniTagBox val={dt.storeName}/>
+                                                </Link>
                                                 <CopyFieldButton label="Order number" value={dt.orderNumber} customClass="text-sm font-semibold"/>
                                             </TableCell>
                                             <TableCell>
@@ -160,7 +161,13 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
                         <p className="text-sm text-slate-400">Showing {startItem} to {endItem} of {totalOrders.toLocaleString(currencyFormat)} orders</p>
                         <div className="flex items-center gap-1">
                             <Button variant="outline" size="sm" onClick={() => onPageChange(currentPage - 1)} disabled={currentPage <= 1} className="h-8 w-8 p-0">‹</Button>
-                            { pageNumbers.map((p) => <Button key={p} variant={p === currentPage ? "default" : "outline"} size="sm" onClick={() => onPageChange(p)} className={`h-8 w-8 p-0 ${p === currentPage ? "bg-teal-700 border-teal-700 hover:bg-teal-800" : ""}`}>{p}</Button>) }
+                            { 
+                                pageNumbers.map((p) => 
+                                    <Button key={p} variant={p === currentPage ? "default" : "outline"} size="sm" onClick={() => onPageChange(p)} className={`h-8 w-8 p-0 ${p === currentPage ? "bg-teal-700 border-teal-700 hover:bg-teal-800" : ""}`}>
+                                        {p}
+                                    </Button>
+                                ) 
+                            }
                             <Button variant="outline" size="sm" onClick={() => onPageChange(currentPage + 1)} disabled={currentPage >= totalPages} className="h-8 w-8 p-0">›</Button>
                         </div>
                     </div>
