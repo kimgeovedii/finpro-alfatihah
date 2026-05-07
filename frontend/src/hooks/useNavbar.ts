@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { useAuthService } from "@/features/auth/hooks/useAuthService";
 import { useProductSearch } from "@/hooks/useProductSearch";
 import { useHomeStore } from "@/features/home/service/home.service";
@@ -6,6 +7,7 @@ import { useCartService } from "@/features/cart/services/cart.service";
 import toast from "react-hot-toast";
 
 export const useNavbar = () => {
+  const router = useRouter();
   const { user, fetchUser, isVerified, isAuthenticated, logout } = useAuthService();
   const { handleSearch: executeSearch, isSearching } = useProductSearch();
   const { summary, fetchCartSummary } = useCartService();
@@ -31,8 +33,8 @@ export const useNavbar = () => {
   const onSearchSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     if (!searchTerm.trim()) return;
-    window.location.href = `/search?q=${encodeURIComponent(searchTerm)}`;
-  }, [searchTerm]);
+    router.push(`/search?q=${encodeURIComponent(searchTerm)}`);
+  }, [searchTerm, router]);
 
   const handleProtectedAction = useCallback((action: string) => {
     if (!isAuthenticated()) {

@@ -20,7 +20,7 @@ export const BranchProductGrid = ({ products, meta, onPageChange }: BranchProduc
         <div className="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
           {products.map((product, index) => (
             <ProductCardItem 
-              key={product.id} 
+              key={`${product.id}-${index}`} 
               product={product} 
               index={index}
               branchName={product.branchName}

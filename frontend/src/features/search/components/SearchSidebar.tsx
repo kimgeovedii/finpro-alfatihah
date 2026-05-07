@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { usePathname } from "next/navigation";
 import { useSearchFilters } from "../hooks/useSearchFilters";
 import { usePriceFilter } from "../hooks/usePriceFilter";
 import { useCategoryList } from "../hooks/useCategoryList";
@@ -25,6 +26,8 @@ export const SearchSidebar = () => {
 
   const [isCategoryExpanded, setIsCategoryExpanded] = useState(false);
   const [isPriceExpanded, setIsPriceExpanded] = useState(false);
+  const pathname = usePathname();
+  const isCategoryPage = pathname.startsWith("/categories/");
 
   return (
     <aside className="hidden lg:block w-72 shrink-0 space-y-6">
@@ -51,18 +54,20 @@ export const SearchSidebar = () => {
             !isCategoryExpanded && "hidden lg:block",
           )}
         >
-          <button
-            onClick={() => updateFilters({ categoryId: "" })}
-            className={cn(
-              "w-full flex items-center justify-between px-4 py-3 rounded-2xl transition-all duration-300 font-bold text-xs group",
-              !categoryId
-                ? "bg-primary text-white shadow-lg shadow-primary/20"
-                : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-primary",
-            )}
-          >
-            <span>All Products</span>
-            {!categoryId && <ChevronRightIcon className="w-3 h-3" />}
-          </button>
+          {!isCategoryPage && (
+            <button
+              onClick={() => updateFilters({ categoryId: "" })}
+              className={cn(
+                "w-full flex items-center justify-between px-4 py-3 rounded-2xl transition-all duration-300 font-bold text-xs group",
+                !categoryId
+                  ? "bg-primary text-white shadow-lg shadow-primary/20"
+                  : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-primary",
+              )}
+            >
+              <span>All Products</span>
+              {!categoryId && <ChevronRightIcon className="w-3 h-3" />}
+            </button>
+          )}
 
           {isCategoriesLoading
             ? [...Array(5)].map((_, i) => (

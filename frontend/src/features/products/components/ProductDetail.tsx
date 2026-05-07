@@ -10,13 +10,24 @@ import { BranchInfoCard } from "../../../components/layout/BranchInfoCard";
 import { useProductActions } from "../hooks/useProductActions";
 import { useStoreSelection } from "../hooks/useStoreSelection";
 import { useAuthStore } from "@/features/auth/store/useAuthStore";
-import { BackButton } from "@/components/button/BackButton";
 
-export const ProductDetail = ({ slugName, storeName: storeNameProp }: { slugName: string, storeName?: string }) => {
+export const ProductDetail = ({
+  slugName,
+  storeName: storeNameProp,
+}: {
+  slugName: string;
+  storeName?: string;
+}) => {
   const user = useAuthStore((state) => state.user);
   const { storeName } = useStoreSelection(storeNameProp);
-  const { product, isLoading, error, fetchProduct } = useProductDetail(slugName, storeName);
-  const { cartProps, isAvailable, branchInventory } = useProductActions(product, fetchProduct);
+  const { product, isLoading, error, fetchProduct } = useProductDetail(
+    slugName,
+    storeName,
+  );
+  const { cartProps, isAvailable, branchInventory } = useProductActions(
+    product,
+    fetchProduct,
+  );
 
   if (isLoading) {
     return (
@@ -46,7 +57,12 @@ export const ProductDetail = ({ slugName, storeName: storeNameProp }: { slugName
 
   return (
     <AnimatePresence mode="wait">
-      <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="w-full bg-slate-50 min-h-screen text-slate-900">
+      <motion.section
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="w-full bg-slate-50 min-h-screen text-slate-900"
+      >
         {/* Mobile Layout */}
         <div className="lg:hidden flex flex-col pb-12 p-4">
           <div className="w-full overflow-hidden">
@@ -61,9 +77,10 @@ export const ProductDetail = ({ slugName, storeName: storeNameProp }: { slugName
               categoryName={product.category.name}
               description={product.description}
               price={product.basePrice}
+              discountedPrice={cartProps.discountedPrice}
             />
             {branchInventory ? (
-              <BranchInfoCard branch={branchInventory.branch}/>
+              <BranchInfoCard branch={branchInventory.branch} />
             ) : (
               <div className="bg-orange-50 border border-orange-100 p-6 rounded-[2rem]">
                 <p className="text-orange-800 font-bold text-sm">
@@ -74,15 +91,22 @@ export const ProductDetail = ({ slugName, storeName: storeNameProp }: { slugName
                 </p>
               </div>
             )}
-            <ProductDetailCartAction {...cartProps} variant="mobile" role={user?.role ?? 'GUEST'}/>
+            <ProductDetailCartAction
+              {...cartProps}
+              variant="mobile"
+              role={user?.role ?? "GUEST"}
+            />
           </div>
         </div>
 
         {/* Desktop Layout */}
         <div className="hidden lg:block pt-10 pb-24 px-8 xl:px-12 max-w-[1600px] mx-auto">
-          <div className='mb-8 flex gap-5 items-center'>
-            <BackButton url={branchInventory?.branch.storeName??""}/>
-            <ProductBreadcrumb name={product.productName} />
+          <div className="mb-8 flex gap-5 items-center">
+            <ProductBreadcrumb
+              productName={product.productName}
+              categoryName={product.category.name}
+              categorySlug={product.category.slugName}
+            />
           </div>
           <div className="grid grid-cols-[1.2fr_1fr_0.8fr] gap-8 xl:gap-14 items-start">
             <div>
@@ -97,9 +121,10 @@ export const ProductDetail = ({ slugName, storeName: storeNameProp }: { slugName
                 categoryName={product.category.name}
                 description={product.description}
                 price={product.basePrice}
+                discountedPrice={cartProps.discountedPrice}
               />
               {branchInventory ? (
-                <BranchInfoCard branch={branchInventory.branch}/>
+                <BranchInfoCard branch={branchInventory.branch} />
               ) : (
                 <div className="bg-orange-50 border border-orange-100 p-6 rounded-[2rem]">
                   <p className="text-orange-800 font-bold text-sm">
@@ -113,7 +138,11 @@ export const ProductDetail = ({ slugName, storeName: storeNameProp }: { slugName
             </div>
 
             <div className="relative">
-              <ProductDetailCartAction {...cartProps} variant="desktop" role={user?.role ?? 'GUEST'} />
+              <ProductDetailCartAction
+                {...cartProps}
+                variant="desktop"
+                role={user?.role ?? "GUEST"}
+              />
             </div>
           </div>
         </div>
