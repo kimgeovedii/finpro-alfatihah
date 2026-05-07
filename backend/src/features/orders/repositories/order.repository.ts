@@ -2,7 +2,7 @@ import { DiscountType, OrderStatus, Prisma, UserRole } from "@prisma/client";
 import { prisma } from "../../../config/prisma";
 import { orderAutoConfirmLimitHour, orderCode, paymentDeadline } from "../../../constants/business.const";
 import { getDistanceInKm } from "../../../utils/location";
-import { calculateDiscount } from "../../../utils/business";
+import { calculateDiscount, getStoreOpenStatus } from "../../../utils/business";
 
 export class OrderRepository {
   async findRandomOrder() {
@@ -134,6 +134,9 @@ export class OrderRepository {
             }
           },
           items: {
+            orderBy: {
+              quantity: 'desc'
+            },
             select: {
               id: true, quantity: true, price: true, product: {
                 select: {
@@ -173,7 +176,9 @@ export class OrderRepository {
         return ord
       }, { totalBasePrice: 0, totalQty: 0, totalWeight: 0 })
 
-      return { ...order, totalWeight }
+      const openStatus = getStoreOpenStatus(order.branch.schedules)
+
+      return { ...order, totalWeight, branch: { ...order.branch, openStatus } }
     } else {
       const order = await prisma.orders.findFirst({
         where: { orderNumber },
@@ -188,14 +193,21 @@ export class OrderRepository {
             }
           },
           items: {
+            orderBy: {
+              quantity: 'desc'
+            },
             select: {
               id: true, quantity: true, product: {
                 select: {
                   currentStock: true, product: {
                     select: {
-                      productName: true, description: true, basePrice: true, weight: true, productImages: {
+                      productName: true, slugName: true, productImages: {
                         select: { imageUrl: true },
-                        where: { isPrimary: true }
+                        where: { isPrimary: true },
+                        take: 1
+                      },
+                      category: {
+                        select: { name: true }
                       }
                     }
                   }

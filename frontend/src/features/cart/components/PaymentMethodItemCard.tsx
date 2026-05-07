@@ -1,3 +1,4 @@
+import { HeadingText } from "@/components/layout/HeadingText"
 import { Button } from "@/components/ui/button"
 import { cardBaseClass, cardSelectedClass, cardUnselectedClass } from "@/constants/style.const"
 import { PaymentMethodType } from "@/types/global.type"
@@ -9,7 +10,6 @@ interface Props {
     icon: React.ReactNode
     title: string
     description: string
-
     onSelect: (method: PaymentMethodType) => void
 }
 
@@ -26,7 +26,7 @@ export const PaymentMethodItemCard: React.FC<Props> = ({ value, selected, onSele
             }
             <div className={isSelected ? "text-emerald-700" : "text-slate-400"}>{icon}</div>
             <div>
-                <p className={`font-bold text-sm mb-0 ${isSelected ? "text-slate-800" : "text-slate-500"}`}>{title}</p>
+                <HeadingText level={4} children={<span className={isSelected ? "text-slate-800" : "text-slate-500"}>{title}</span>}/>
                 <p className={`text-xs ${isSelected ? "text-slate-500" : "text-slate-400"}`}>{description}</p>
             </div>
         </Button>

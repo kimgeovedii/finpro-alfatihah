@@ -92,4 +92,8 @@ export class BranchAdminRepository {
   public unassignEmployee = async (employeeId: string): Promise<void> => {
     await apiFetch<void>(`/admin/branches/employees/${employeeId}/unassign`, "patch");
   };
+
+  public setDefaultBranch = async (id: string): Promise<Branch> => {
+    return await apiFetch<Branch>(`/admin/branches/${id}/set-default`, "patch");
+  };
 }

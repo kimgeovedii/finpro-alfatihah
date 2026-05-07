@@ -137,7 +137,7 @@ export const ProductList = ({ products, isLoading }: ProductListProps) => {
           </p>
         </div>
         <Link
-          href="/products"
+          href="/search"
           className="group flex items-center gap-2 text-primary font-bold hover:text-primary-hover transition-all self-start sm:self-auto bg-primary/5 px-6 py-3 rounded-full hover:bg-primary/10"
         >
           See All
@@ -153,6 +153,7 @@ export const ProductList = ({ products, isLoading }: ProductListProps) => {
             index={index}
             branchName={product.branchName}
             branchId={product.branchId}
+            branchSlug={product.branchSlug}
             branchCity={product.branchCity}
           />
         ))}

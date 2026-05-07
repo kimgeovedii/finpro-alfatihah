@@ -50,12 +50,14 @@ model Token {
 
 model Branch {
   id                   String               @id @default(uuid())
-  storeName            String               @map("store_name")
+  storeName            String               @unique @map("store_name")
+  slug                 String               @unique
   address              String
   latitude             Float
   longitude            Float
   maxDeliveryDistance  Float                @map("max_delivery_distance")
   isActive             Boolean              @default(true) @map("is_active")
+  isDefault            Boolean              @default(false) @map("is_default")
   city                 String
   province             String
   createdAt            DateTime             @default(now()) @map("created_at")

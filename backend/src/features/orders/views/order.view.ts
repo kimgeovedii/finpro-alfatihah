@@ -1,5 +1,5 @@
 import { currencyFormat } from "../../../constants/business.const"
-import { mailTemplateStyle } from "../../../utils/template"
+import { getMailBodyTemplate, mailTemplateStyle } from "../../../utils/template"
 
 type Schedule = {
     dayName: string
@@ -40,50 +40,40 @@ export const getBranchOrderBroadcastTemplate = (data: Payload) => {
         `
     }).join("")
 
+    const body = getMailBodyTemplate('Branch Order Report', data.username, `
+        <p>looks like your store has some transaction need to be process</p>
+        <h3>${data.storeName}</h3>
+        <h4>Opening Hours</h4>
+        <p>${scheduleHtml}</p>
+        <div class="context-box" style="margin-top:20px;">
+            <h4>Orders (Need Attention)</h4>
+            <table style="width:100%; font-size:11px;">
+                <thead>
+                    <tr>
+                        <th align="left">Order</th>
+                        <th align="left">Status</th>
+                        <th align="right">Last Update</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${ordersHtml}
+                </tbody>
+            </table>
+        </div>
+        <p style="margin-top:20px;">
+            Please review and process these orders.
+        </p>
+    `)
+
     return `
         <!DOCTYPE html>
         <html>
-        <head>
-            ${mailTemplateStyle()}
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1>Branch Order Report</h1>
-                </div>
-                <div class="content">
-                    <p>Hello <strong>${data.username}</strong>, looks like your store has some transaction need to be process</p>
-                    <h3>${data.storeName}</h3>
-                    <h4>Opening Hours</h4>
-                    <p>${scheduleHtml}</p>
-                    <div class="context-box" style="margin-top:20px;">
-                        <h4>Orders (Need Attention)</h4>
-                        <table style="width:100%; font-size:11px;">
-                            <thead>
-                                <tr>
-                                    <th align="left">Order</th>
-                                    <th align="left">Status</th>
-                                    <th align="right">Last Update</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${ordersHtml}
-                            </tbody>
-                        </table>
-                    </div>
-                    <p style="margin-top:20px;">
-                        Please review and process these orders.
-                    </p>
-                    <p>
-                        Best regards,<br/>
-                        <strong>Alfatihah</strong>
-                    </p>
-                </div>
-                <div class="footer">
-                    © ${new Date().getFullYear()} Alfatihah. All rights reserved.
-                </div>
-            </div>
-        </body>
+            <head>
+                ${mailTemplateStyle()}
+            </head>
+            <body>
+                ${body}
+            </body>
         </html>
     `
 }
@@ -97,44 +87,33 @@ type OrderCreated = {
 }
 
 export const getOrderCreatedPaymentTemplate = (data: OrderCreated, isManual: boolean) => {
+    const body = getMailBodyTemplate('Complete Your Payment', data.username, `
+        <p>Your order has been successfully created. Please complete your payment before the deadline to avoid cancellation.</p>
+        <div class="context-box" style="margin-top:16px;">
+            <p style="margin:0 0 6px 0;"><strong>Order ID:</strong> ${data.orderNumber}</p>
+            <p style="margin:0 0 6px 0; color:#059669; font-weight:600;">Payment Amount: Rp ${data.amount.toLocaleString(currencyFormat)}</p>
+            <p style="margin:0;">
+                Payment Deadline: <strong>${new Date(data.paymentDeadline).toLocaleString(currencyFormat)}</strong>
+            </p>
+        </div>
+        ${
+            isManual ? `
+                <p style="margin-top:16px;">
+                    After completing the payment, please upload your payment evidence from the <strong>Order Menu</strong> in the application.
+                    Make sure to upload the evidence before the deadline so your order can be processed.
+                </p>` : ''
+        }
+    `)
+
     return `
         <!DOCTYPE html>
         <html>
-        <head>
-            ${mailTemplateStyle()}
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1>Complete Your Payment</h1>
-                </div>
-                <div class="content">
-                    <p>Hello <strong>${data.username}</strong>,</p>
-                    <p>Your order has been successfully created. Please complete your payment before the deadline to avoid cancellation.</p>
-                    <div class="context-box" style="margin-top:16px;">
-                        <p style="margin:0 0 6px 0;"><strong>Order ID:</strong> ${data.orderNumber}</p>
-                        <p style="margin:0 0 6px 0; color:#059669; font-weight:600;">Payment Amount: Rp ${data.amount.toLocaleString(currencyFormat)}</p>
-                        <p style="margin:0;">
-                            Payment Deadline: <strong>${new Date(data.paymentDeadline).toLocaleString(currencyFormat)}</strong>
-                        </p>
-                    </div>
-                    ${
-                        isManual ? `
-                        <p style="margin-top:16px;">
-                            After completing the payment, please upload your payment evidence from the <strong>Order Menu</strong> in the application.
-                            Make sure to upload the evidence before the deadline so your order can be processed.
-                        </p>` : ''
-                    }
-                    <p>
-                        Best regards,<br/>
-                        <strong>Alfatihah</strong>
-                    </p>
-                </div>
-                <div class="footer">
-                    © ${new Date().getFullYear()} Alfatihah. All rights reserved.
-                </div>
-            </div>
-        </body>
+            <head>
+                ${mailTemplateStyle()}
+            </head>
+            <body>
+                ${body}
+            </body>
         </html>
     `
 }

@@ -63,6 +63,7 @@ export class CartController {
 
             // Validate the UUID format
             if (!uuidRegex.test(cartId)) throw { code: 400, message: 'cartId is not valid UUID' }
+            if (addressId && !uuidRegex.test(addressId)) throw { code: 400, message: 'addressId is not valid UUID' }
             
             // Service
             const result = await this.cartService.getCartDetailById(userId, cartId, addressId)

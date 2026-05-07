@@ -22,6 +22,7 @@ export type BranchSchedule = {
 export type BranchDetail = {
   storeName: string;
   address: string;
+  openStatus: string;
   schedules: BranchSchedule[];
 };
 
@@ -70,6 +71,7 @@ export type ProductDetailInfoContentProps = {
 };
 
 export type ProductDetailCartActionProps = {
+  role: string;
   qty: number;
   setQty: (qty: number) => void;
   price: number;

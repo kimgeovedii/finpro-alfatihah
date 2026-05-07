@@ -18,10 +18,11 @@ interface ProductCardItemProps {
   index: number;
   branchName?: string;
   branchId: string;
+  branchSlug?: string;
   branchCity?: string;
 }
 
-export const ProductCardItem = ({ product, index, branchName, branchId, branchCity }: ProductCardItemProps) => {
+export const ProductCardItem = ({ product, index, branchName, branchId, branchSlug, branchCity }: ProductCardItemProps) => {
   const router = useRouter();
 
   // Handle hook
@@ -45,8 +46,10 @@ export const ProductCardItem = ({ product, index, branchName, branchId, branchCi
   }
 
   const handleCardClick = () => {
-    router.push(`/products/${product.slugName}`)
-  }
+    // If we're clicking the actual card, redirect to product details
+    const storeIdentifier = branchSlug || branchId || "default-store";
+    router.push(`/${storeIdentifier}/${product.slugName}`);
+  };
 
   return (
     <motion.div 
@@ -122,7 +125,7 @@ export const ProductCardItem = ({ product, index, branchName, branchId, branchCi
             {/* Branch Info - Glassy Footer */}
             {branchName && (
               <Link 
-                href={branchId ? `/branches/${branchId}` : "#"} 
+                href={branchSlug ? `/${branchSlug}` : branchId ? `/${branchId}` : "#"} 
                 onClick={(e) => e.stopPropagation()}
                 className="flex items-center gap-2 py-2 px-3 bg-slate-100/50 dark:bg-slate-800/30 rounded-xl border border-slate-200/50 dark:border-slate-700/30 hover:bg-primary/10 transition-colors group/branch"
               >

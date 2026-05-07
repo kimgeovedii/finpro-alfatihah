@@ -23,17 +23,21 @@ export const OrderSummaryCard: React.FC<Props> = ({ totalPrice, totalFinalPrice,
     if (totalCancelledOrder > 0) summaryParts.push(<><b>{totalCancelledOrder}</b> cancelled</>)
 
     const summaryText = summaryParts.length === 0 ? <>So far you have no orders yet.</> : <>So far you have {
-        summaryParts.map((dt, idx) => <React.Fragment key={idx}>{dt}{idx < summaryParts.length - 1 ? (idx === summaryParts.length - 2 ? " and " : ", ") : ""}</React.Fragment>)
-        }.</>
+        summaryParts.map((dt, idx) => 
+            <React.Fragment key={idx}>
+                {dt}{idx < summaryParts.length - 1 ? (idx === summaryParts.length - 2 ? " and " : ", ") : ""}
+            </React.Fragment>
+        )
+    }.</>
 
     return (
         <>
             <p className="text-slate-500 mt-1 mb-4">{summaryText}</p>
             <div className="flex flex-col md:flex-row items-center gap-5 w-full">
-                <div className="w-full bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300 group cursor-default">
+                <div className="w-full bg-white/60 backdrop-blur-xl p-6 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300 group cursor-default border border-slate-200">
                     <StatsTitleValueText title="Total Spending" val={<>Rp. {totalPrice.toLocaleString(currencyFormat)}</>}/>
                 </div>
-                <div className="w-full bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300 group cursor-default">
+                <div className="w-full bg-white/60 backdrop-blur-xl p-6 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300 group cursor-default border border-slate-200">
                     <div className="flex gap-5 items-end justify-between">
                         <div>
                             <StatsTitleValueText title="Total Saving" val={<>Rp. {totalSaving.toLocaleString(currencyFormat)}</>}/>

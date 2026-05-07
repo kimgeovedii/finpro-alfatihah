@@ -24,12 +24,30 @@ export class BranchAdminService {
   }
 
   async createBranch(data: any) {
-    return this.branchRepo.create(data);
+    const slug = data.storeName
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+
+    return this.branchRepo.create({ ...data, slug });
   }
 
   async updateBranch(id: string, data: any) {
     const branch = await this.branchRepo.findById(id);
     if (!branch) throw new Error("Branch not found");
+
+    // If storeName is changing, regenerate slug
+    if (data.storeName && data.storeName !== branch.storeName) {
+      data.slug = data.storeName
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
+    }
+
     return this.branchRepo.update(id, data);
   }
 
@@ -110,5 +128,20 @@ export class BranchAdminService {
 
   async unassignEmployee(employeeId: string) {
     return this.adminRepo.unassignEmployee(employeeId);
+  }
+
+  async setDefaultBranch(id: string) {
+    const branch = await this.branchRepo.findById(id);
+    if (!branch) throw new Error("Branch not found");
+
+    // Validate: branch must have products
+    const { total } = await this.branchRepo.findProductsByBranch(id, 0, 1);
+    if (total === 0) {
+      throw new Error("Cannot set as default: this branch has no products. Please add products to this branch first.");
+    }
+
+    // Reset all defaults first, then set the target
+    await this.branchRepo.resetAllDefaults();
+    return this.branchRepo.setDefault(id);
   }
 }

@@ -18,8 +18,10 @@ export class BranchAdminController {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
       
+      const sorted = [...result.data].sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
+
       return sendSuccess(res, {
-        branches: result.data,
+        branches: sorted,
         meta: {
           total: result.total,
           page,
@@ -48,6 +50,7 @@ export class BranchAdminController {
       return sendSuccess(res, branch, "Branch created", 201);
     } catch (error: any) {
       if (error.errors) return sendError(res, "Validation error", 400, error.errors);
+      if (error.code === "P2002") return sendError(res, "Store name is already taken. Please choose another name.", 400);
       return sendError(res, error.message);
     }
   };
@@ -59,6 +62,7 @@ export class BranchAdminController {
       return sendSuccess(res, branch, "Branch updated");
     } catch (error: any) {
       if (error.errors) return sendError(res, "Validation error", 400, error.errors);
+      if (error.code === "P2002") return sendError(res, "Store name is already taken. Please choose another name.", 400);
       return sendError(res, error.message);
     }
   };
@@ -166,6 +170,15 @@ export class BranchAdminController {
     try {
       const employee = await this.branchAdminService.unassignEmployee(req.params.employeeId as string);
       return sendSuccess(res, employee, "Employee unassigned successfully");
+    } catch (error: any) {
+      return sendError(res, error.message);
+    }
+  };
+
+  setDefaultBranch = async (req: Request, res: Response) => {
+    try {
+      const branch = await this.branchAdminService.setDefaultBranch(req.params.id as string);
+      return sendSuccess(res, branch, "Branch set as default");
     } catch (error: any) {
       return sendError(res, error.message);
     }
