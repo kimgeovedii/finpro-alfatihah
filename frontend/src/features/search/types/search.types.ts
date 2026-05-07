@@ -8,6 +8,7 @@ export interface SearchFilters {
   maxPrice?: number;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
+  branchId?: string;
   page?: number;
   limit?: number;
 }

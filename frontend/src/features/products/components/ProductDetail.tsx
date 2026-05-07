@@ -10,7 +10,6 @@ import { BranchInfoCard } from "../../../components/layout/BranchInfoCard";
 import { useProductActions } from "../hooks/useProductActions";
 import { useStoreSelection } from "../hooks/useStoreSelection";
 import { useAuthStore } from "@/features/auth/store/useAuthStore";
-import { BackButton } from "@/components/button/BackButton";
 
 export const ProductDetail = ({
   slugName,
@@ -103,7 +102,6 @@ export const ProductDetail = ({
         {/* Desktop Layout */}
         <div className="hidden lg:block pt-10 pb-24 px-8 xl:px-12 max-w-[1600px] mx-auto">
           <div className="mb-8 flex gap-5 items-center">
-            <BackButton url={branchInventory?.branch.storeName ?? ""} />
             <ProductBreadcrumb
               productName={product.productName}
               categoryName={product.category.name}

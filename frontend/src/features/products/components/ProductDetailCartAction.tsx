@@ -22,6 +22,7 @@ export const ProductDetailCartAction = ({
   qty,
   setQty,
   price,
+  discountedPrice,
   totalPrice,
   variant,
   onAddToCart,
@@ -138,10 +139,29 @@ export const ProductDetailCartAction = ({
         <></>
       )}
       <div className={role === "CUSTOMER" ? "mb-8" : ""}>
-        <span className="text-4xl font-extrabold text-slate-900 tracking-tight">
-          {formatMoney(price)}
-        </span>
-        <span className="text-slate-500 text-sm ml-1">/ item</span>
+        {discountedPrice ? (
+          <div className="flex flex-col gap-1">
+            <div className="flex items-baseline gap-2">
+              <span className="text-4xl font-extrabold text-slate-900 tracking-tight">
+                {formatMoney(discountedPrice)}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-slate-400 text-lg font-bold line-through">
+                {formatMoney(price)}
+              </span>
+              <span className="bg-red-50 text-red-600 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider border border-red-100">
+                {Math.round(((price - discountedPrice) / price) * 100)}% OFF
+              </span>
+            </div>
+          </div>
+        ) : (
+          <>
+            <span className="text-4xl font-extrabold text-slate-900 tracking-tight">
+              {formatMoney(price)}
+            </span>
+          </>
+        )}
       </div>
       <div className="space-y-8">
         <div className={disabled ? "opacity-50 pointer-events-none" : ""}>

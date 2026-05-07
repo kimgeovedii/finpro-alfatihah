@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useSearchStore } from "../service/search.service";
+import { useHomeStore } from "@/features/home/service/home.service";
 
 export const useSearchFilters = (autoSync: boolean = false) => {
   const {
@@ -14,10 +15,12 @@ export const useSearchFilters = (autoSync: boolean = false) => {
     maxPrice,
     sortBy,
     sortOrder,
+    branchId,
     products,
     meta,
     isLoading,
   } = useSearchStore();
+  const { nearestBranch } = useHomeStore();
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -52,6 +55,9 @@ export const useSearchFilters = (autoSync: boolean = false) => {
       : undefined;
     const sort = searchParams.get("sortBy") || "createdAt";
     const order = (searchParams.get("sortOrder") as "asc" | "desc") || "desc";
+    
+    // Branch ID comes from the global home store (nearest branch)
+    const bId = nearestBranch?.id || "";
 
     const hasChanged =
       q !== query ||
@@ -59,7 +65,8 @@ export const useSearchFilters = (autoSync: boolean = false) => {
       minP !== minPrice ||
       maxP !== maxPrice ||
       sort !== sortBy ||
-      order !== sortOrder;
+      order !== sortOrder ||
+      bId !== branchId;
 
     if (hasChanged) {
       // Small delay to ensure categories are loaded before we set filters if we depend on them
@@ -70,11 +77,12 @@ export const useSearchFilters = (autoSync: boolean = false) => {
         maxPrice: maxP,
         sortBy: sort,
         sortOrder: order,
+        branchId: bId,
       });
     } else if (!meta && !isLoading) {
       fetchProducts();
     }
-  }, [autoSync, searchParams, pathname, setFilters, fetchProducts, query, categoryId, minPrice, maxPrice, sortBy, sortOrder, meta, isLoading]);
+  }, [autoSync, searchParams, pathname, setFilters, fetchProducts, query, categoryId, minPrice, maxPrice, sortBy, sortOrder, branchId, nearestBranch?.id, meta, isLoading]);
 
   const updateFilters = (newFilters: {
     query?: string;

@@ -36,7 +36,7 @@ export const useSearchStore = create<SearchState>((set, get) => ({
   },
 
   fetchProducts: async (replace = true) => {
-    const { query, categoryId, minPrice, maxPrice, sortBy, sortOrder, page, limit } = get();
+    const { query, categoryId, minPrice, maxPrice, sortBy, sortOrder, branchId, page, limit } = get();
     
     if (replace) set({ isLoading: true, error: null });
     else set({ isLoadingMore: true });
@@ -49,6 +49,7 @@ export const useSearchStore = create<SearchState>((set, get) => ({
         maxPrice,
         sortBy,
         sortOrder,
+        branchId,
         page,
         limit,
       });

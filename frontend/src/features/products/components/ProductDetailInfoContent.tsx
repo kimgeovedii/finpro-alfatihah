@@ -20,11 +20,11 @@ export const ProductDetailInfoContent = ({
   discountedPrice,
 }: ProductDetailInfoContentProps) => {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 mb-4">
       {/* Mobile Header */}
       <div className="lg:hidden flex justify-between items-start gap-4">
         <div className="flex-1 min-w-0">
-          <HeadingText level={1} children={productName}/>
+          <HeadingText level={1} children={productName} />
           <p className="text-slate-500 font-medium mt-1 text-sm">
             Sold by weight • ~100g each
           </p>
@@ -69,7 +69,6 @@ export const ProductDetailInfoContent = ({
         transition={{ duration: 0.5, delay: 0.1 }}
         className="flex items-center gap-3"
       >
-        <div className="h-[2px] w-6 bg-emerald-700"></div>
         <span className="text-xs font-black uppercase tracking-[0.2em] text-emerald-700">
           {categoryName}
         </span>

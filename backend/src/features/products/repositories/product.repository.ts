@@ -8,6 +8,7 @@ export class ProductRepository {
     take?: number,
     orderBy: string = "createdAt",
     orderDir: "asc" | "desc" = "desc",
+    branchId?: string, // Add branchId parameter
   ) => {
     const [data, total] = await prisma.$transaction([
       prisma.products.findMany({
@@ -30,6 +31,22 @@ export class ProductRepository {
               imageUrl: true,
             },
           },
+          branchInventories: {
+            where: branchId ? { branchId } : undefined, // Filter by specific branch if provided
+            select: {
+              id: true,
+              currentStock: true,
+              branch: {
+                select: {
+                  id: true,
+                  storeName: true,
+                  slug: true,
+                  city: true,
+                },
+              },
+            },
+            take: 1,
+          },
         },
       }),
       prisma.products.count({
@@ -37,7 +54,19 @@ export class ProductRepository {
       }),
     ]);
 
-    return { data, total };
+    const mappedData = data.map((product) => {
+      const inventory = product.branchInventories?.[0];
+      return {
+        ...product,
+        currentStock: inventory?.currentStock ?? 0,
+        branchId: inventory?.branch?.id,
+        branchName: inventory?.branch?.storeName,
+        branchSlug: inventory?.branch?.slug,
+        branchCity: inventory?.branch?.city,
+      };
+    });
+
+    return { data: mappedData, total };
   };
 
   public getProductById = async (id: string) => {
@@ -98,7 +127,7 @@ export class ProductRepository {
       branchInventories: {
         where: {
           branch: {
-            storeName: branchName,
+            slug: branchName,
             schedules: {
               some: {},
             },
@@ -110,6 +139,7 @@ export class ProductRepository {
           branch: {
             select: {
               storeName: true,
+              slug: true,
               address: true,
               schedules: {
                 select: {
@@ -129,7 +159,7 @@ export class ProductRepository {
             startDate: { lte: new Date() },
             endDate: { gte: new Date() },
             branch: {
-              storeName: branchName,
+              slug: branchName,
             },
             deletedAt: null,
           },
@@ -146,7 +176,7 @@ export class ProductRepository {
           cart: {
             userId,
             branch: {
-              storeName: branchName,
+              slug: branchName,
             },
           },
         },
