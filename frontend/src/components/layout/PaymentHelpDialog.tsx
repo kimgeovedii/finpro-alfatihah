@@ -5,6 +5,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Button } from "@/components/ui/button";
 import { BuildingLibraryIcon, DevicePhoneMobileIcon, QrCodeIcon, CreditCardIcon, QuestionMarkCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { HeadingText } from "./HeadingText";
+import { BankInformationCard } from "./BankInformationCard";
 
 export const PaymentHelpDialog: React.FC = () => {
     return (
@@ -66,14 +67,9 @@ export const PaymentHelpDialog: React.FC = () => {
                                         </div>
                                     </div>
                                 </AccordionTrigger>
-                                <AccordionContent className="pb-5 text-sm text-slate-600 leading-7">
+                                <AccordionContent className="pb-5 text-sm text-slate-600">
                                     <div className="bg-slate-100 rounded-2xl p-4 mb-4">
-                                        <p className="text-xs uppercase tracking-widest font-black text-slate-500 mb-2">Bank Information</p>
-                                        <div className="space-y-1">
-                                            <p><span className="font-semibold text-slate-900">Bank: </span>Bank Mandiri</p>
-                                            <p><span className="font-semibold text-slate-900">Account Number: </span> 1370012345678</p>
-                                            <p><span className="font-semibold text-slate-900">Account Name: </span>PT Alfatihah Indonesia</p>
-                                        </div>
+                                        <BankInformationCard/>
                                     </div>
                                     <ol className="list-decimal pl-5 space-y-2">
                                         <li>Open your banking application.</li>

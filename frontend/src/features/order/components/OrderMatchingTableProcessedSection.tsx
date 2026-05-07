@@ -116,8 +116,8 @@ export const OrderMatchingProcessedSection: React.FC<Props> = ({ branchName, ite
                     <div className={`w-full bg-${status === "SHIPPED" || status === "CONFIRMED" ? 'green' : 'red'}-100 text-${status === "SHIPPED" || status === "CONFIRMED" ? 'green' : 'red'}-500 p-3 rounded-lg my-2 font-bold text-md text-center`}>{status}!</div>
                 :
                     <div className="mt-5 flex gap-2">
-                        <Button className="flex-1 py-5 bg-red-400 hover:bg-red-500 hover:shadow" onClick={(e) => onCancel(orderNumber)}><XMarkIcon/> Cancel Order!</Button>
-                        <Button className="flex-1 py-5 bg-teal-700 hover:shadow" onClick={(e) => onShipping(orderNumber)}><ArchiveBoxIcon/> Shipping Now!</Button>
+                        <Button className="flex-1 bg-red-400 hover:bg-red-500 hover:shadow" onClick={(e) => onCancel(orderNumber)}><XMarkIcon/> Cancel Order!</Button>
+                        <Button className="flex-1 bg-teal-700 hover:shadow" onClick={(e) => onShipping(orderNumber)}><ArchiveBoxIcon/> Shipping Now!</Button>
                     </div>
             }
             </div>

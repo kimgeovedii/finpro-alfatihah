@@ -9,6 +9,7 @@ import { DividerLine } from "@/components/layout/DividerLine"
 import { HeadingText } from "@/components/layout/HeadingText"
 import { DocumentIcon, QuestionMarkCircleIcon } from "@heroicons/react/24/outline"
 import { PaymentHelpDialog } from "@/components/layout/PaymentHelpDialog"
+import { InfoBoxSavingToolTip } from "@/components/layout/InfoBoxSavingToolTip"
 
 type Props = {
     orderId: string
@@ -45,19 +46,22 @@ export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, t
                 totalSaving > 0 && 
                     <div className="flex justify-between">
                         <p>Total Saving</p>
-                        <p className="font-bold">Rp. {totalSaving.toLocaleString(currencyFormat)}</p>
+                        <div className="flex gap-2 items-center relative group">
+                            <p className="font-bold">Rp. {totalSaving.toLocaleString(currencyFormat)}</p>
+                            <InfoBoxSavingToolTip/>
+                        </div>
                     </div>
             }
             <DividerLine/>
             <ShippingSummaryCard shippingWeight={shippingWeight} shippingCost={shippingCost}/>
             <DividerLine/>
             <div className="flex justify-between">
-                <HeadingText children="Discount" level={3}/>
+                <HeadingText children="Final Price" level={3}/>
                 <p className="font-bold text-xl">Rp. {Math.ceil(finalPrice + shippingCost).toLocaleString(currencyFormat)}</p>
             </div>
-            <DividerLine/>
+            { status !== 'WAITING_PAYMENT_CONFIRMATION' && <DividerLine/> }
             <div className="flex flex-col gap-3">
-                { status === 'WAITING_PAYMENT' && paymentEvidence === null && paymentMethod === "MANUAL" && <PaymentEvidenceUploadButton orderId={orderId} paymentDeadline={paymentDeadline} onSuccess={onSuccess}/> }
+                { status === 'WAITING_PAYMENT' && paymentEvidence === null && paymentMethod === "MANUAL" && <PaymentEvidenceUploadButton orderId={orderId} paymentDeadline={paymentDeadline} onSuccess={onSuccess} isShowDestinationAccount={true}/> }
                 { status === 'WAITING_PAYMENT' && <OrderCancelButton orderNumber={orderNumber} onCancel={onCancel}/> }
             </div>
             <div className="flex gap-5 w-full mt-3">

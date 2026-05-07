@@ -77,37 +77,42 @@ export function CartDetailLayout({ cartId }: Props) {
 
     // Calculate price
     const shippingCost = cart.shipping?.shippingCost ?? 0
-    const finalTotalPrice = cart.finalTotalPrice
+    const productFinalPrice = cart.finalTotalPrice
     
     const voucherDiscount = (() => {
         if (!selectedVoucher) return 0
     
         // min purchase validation
-        if (
-        selectedVoucher.minPurchaseAmount &&
-        finalTotalPrice < selectedVoucher.minPurchaseAmount
-        ) {
-        return 0
+        if (selectedVoucher.minPurchaseAmount && productFinalPrice < selectedVoucher.minPurchaseAmount) {
+            return 0
         }
+
+        const voucherTargetPrice = selectedVoucher.type === "SHIPPING_COST" ? shippingCost : productFinalPrice
     
         let discount = 0
+        // Percentage calculation
         if (selectedVoucher.discountValueType === "PERCENTAGE") {
-        const percentage = Math.min(Math.max(selectedVoucher.discountValue, 0), 100)
-        discount = (finalTotalPrice * percentage) / 100
+            const percentage = Math.min(Math.max(selectedVoucher.discountValue, 0), 100)
+
+            discount = (voucherTargetPrice * percentage) / 100
         } else {
-        discount = Math.max(selectedVoucher.discountValue, 0)
+            discount = Math.max(selectedVoucher.discountValue, 0)
         }
     
-        // max discount cap
         if (selectedVoucher.maxDiscountAmount) discount = Math.min(discount, selectedVoucher.maxDiscountAmount)
+    
+        // Prevent over-discount
+        discount = Math.min(discount, voucherTargetPrice)
     
         return Math.ceil(discount)
     })()
 
-    let finalProductPrice = finalTotalPrice
+    // Final calculation
+    let finalProductPrice = productFinalPrice
     let finalShipping = shippingCost
+
     if (selectedVoucher) {
-        if (selectedVoucher.type === "ORDER") finalProductPrice = finalTotalPrice - voucherDiscount
+        if (selectedVoucher.type === "ORDER") finalProductPrice = Math.max(0, productFinalPrice - voucherDiscount)
         if (selectedVoucher.type === "SHIPPING_COST") finalShipping = Math.max(0, shippingCost - voucherDiscount)
     }
 
@@ -132,7 +137,7 @@ export function CartDetailLayout({ cartId }: Props) {
                     appliedVoucher={selectedVoucher?.voucherCode}
                     onApply={handleApply}
                     onRemove={handleRemove}
-                    totalBasePrice={finalTotalPrice}
+                    totalBasePrice={productFinalPrice}
                 />
                 </div>
                 <div className='w-full lg:flex-1 flex flex-col space-y-5'>
