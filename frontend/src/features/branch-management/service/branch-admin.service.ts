@@ -5,8 +5,6 @@ import {
   BranchSchedule,
   Employee,
   PaginationMeta,
-  BranchListResponse,
-  EmployeeListResponse,
   CreateBranchPayload,
   UpdateBranchPayload,
   CreateSchedulePayload,
@@ -48,6 +46,7 @@ interface BranchAdminState {
   viewAdminsDialogOpen: boolean;
   employeeDialogOpen: boolean;
   assignEmployeeDialogOpen: boolean;
+  setDefaultDialogOpen: boolean;
 
   // Setters
   setBranches: (branches: Branch[]) => void;
@@ -73,6 +72,7 @@ interface BranchAdminState {
   setViewAdminsDialogOpen: (open: boolean) => void;
   setEmployeeDialogOpen: (open: boolean) => void;
   setAssignEmployeeDialogOpen: (open: boolean) => void;
+  setSetDefaultDialogOpen: (open: boolean) => void;
 
   // Actions (async, calling repository)
   fetchBranches: (page?: number) => Promise<void>;
@@ -92,6 +92,7 @@ interface BranchAdminState {
   createEmployee: (payload: { fullName: string; email: string; role: string; branchId?: string }) => Promise<void>;
   assignAdmin: (branchId: string, employeeId: string) => Promise<void>;
   unassignEmployee: (employeeId: string) => Promise<void>;
+  setDefaultBranch: (id: string) => Promise<void>;
 }
 
 export const useBranchAdminStore = create<BranchAdminState>()((set, get) => ({
@@ -123,6 +124,7 @@ export const useBranchAdminStore = create<BranchAdminState>()((set, get) => ({
   viewAdminsDialogOpen: false,
   employeeDialogOpen: false,
   assignEmployeeDialogOpen: false,
+  setDefaultDialogOpen: false,
 
   // Setters
   setBranches: (branches) => set({ branches }),
@@ -148,6 +150,7 @@ export const useBranchAdminStore = create<BranchAdminState>()((set, get) => ({
   setViewAdminsDialogOpen: (open) => set({ viewAdminsDialogOpen: open }),
   setEmployeeDialogOpen: (open) => set({ employeeDialogOpen: open }),
   setAssignEmployeeDialogOpen: (open) => set({ assignEmployeeDialogOpen: open }),
+  setSetDefaultDialogOpen: (open) => set({ setDefaultDialogOpen: open }),
 
   // Async actions
   fetchBranches: async (page = 1) => {
@@ -297,5 +300,17 @@ export const useBranchAdminStore = create<BranchAdminState>()((set, get) => ({
 
   unassignEmployee: async (employeeId) => {
     await repo.unassignEmployee(employeeId);
+  },
+
+  setDefaultBranch: async (id) => {
+    set({ isSubmitting: true });
+    try {
+      await repo.setDefaultBranch(id);
+    } catch (err) {
+      set({ isSubmitting: false });
+      throw err;
+    } finally {
+      set({ isSubmitting: false });
+    }
   },
 }));

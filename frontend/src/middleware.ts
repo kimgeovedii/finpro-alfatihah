@@ -12,6 +12,7 @@ const publicRoutes = [
   "/products",
   "/search",
   "/login/employee",
+  "/branches",
 ];
 
 // Routes that require verification (must be verified to access)

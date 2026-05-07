@@ -34,17 +34,21 @@ export class BranchService {
         throw new Error("No active branches found");
       }
 
-      let nearestBranch = branches[0];
+      // Determine the default branch (isDefault=true, or fallback to first)
+      const defaultBranch = branches.find(b => b.isDefault) || branches[0];
+
+      let targetBranch = defaultBranch;
       let minDistance: number | null = null;
-      let isInRange = true;
+      let isInRange = false;
 
       if (lat !== undefined && lng !== undefined) {
-        // Find nearest
-        let nearestDist = Infinity;
+        // Find all branches within delivery range
+        const inRangeBranches: { branch: typeof branches[0]; distance: number }[] = [];
+
         for (const branch of branches) {
           if (!branch.latitude || !branch.longitude) continue;
-          
-          const { distance } = isWithinDeliveryRange(
+
+          const { isInsideRange, distance } = isWithinDeliveryRange(
             lat,
             lng,
             branch.latitude,
@@ -52,52 +56,58 @@ export class BranchService {
             branch.maxDeliveryDistance
           );
 
-          if (distance < nearestDist) {
-            nearestDist = distance;
-            nearestBranch = branch;
+          if (isInsideRange) {
+            inRangeBranches.push({ branch, distance });
           }
         }
-        
-        minDistance = nearestDist;
-        
-        if (nearestBranch.latitude && nearestBranch.longitude) {
-          const checkRange = isWithinDeliveryRange(
-            lat,
-            lng,
-            nearestBranch.latitude,
-            nearestBranch.longitude,
-            nearestBranch.maxDeliveryDistance
-          );
-          isInRange = checkRange.isInsideRange;
+
+        if (inRangeBranches.length > 0) {
+          // Sort by distance, pick the nearest in-range branch
+          inRangeBranches.sort((a, b) => a.distance - b.distance);
+          targetBranch = inRangeBranches[0].branch;
+          minDistance = inRangeBranches[0].distance;
+          isInRange = true;
+        } else {
+          // No branch in range — use default branch
+          // Calculate distance to default branch for info
+          if (defaultBranch.latitude && defaultBranch.longitude) {
+            const { distance } = isWithinDeliveryRange(
+              lat,
+              lng,
+              defaultBranch.latitude,
+              defaultBranch.longitude,
+              defaultBranch.maxDeliveryDistance
+            );
+            minDistance = distance;
+          }
+          targetBranch = defaultBranch;
+          isInRange = false;
         }
       }
 
-      // Fetch products for the nearest branch
+      // Fetch products for the target branch
       const skip = (page - 1) * limit;
       let { data: productsData, total } = await this.branchRepository.findProductsByBranch(
-        nearestBranch.id,
+        targetBranch.id,
         skip,
         limit
       );
 
-      // Fallback: If nearest branch has no products, fetch from the default (first) branch
-      if (productsData.length === 0 && branches.length > 1) {
-        const defaultBranch = branches[0];
-        if (defaultBranch.id !== nearestBranch.id) {
-          const fallback = await this.branchRepository.findProductsByBranch(
-            defaultBranch.id,
-            skip,
-            limit
-          );
-          if (fallback.data.length > 0) {
-            productsData = fallback.data;
-            total = fallback.total;
-          }
-        }
+      // Fallback: if target branch has no products, use default branch
+      if (productsData.length === 0 && targetBranch.id !== defaultBranch.id) {
+        const fallback = await this.branchRepository.findProductsByBranch(
+          defaultBranch.id,
+          skip,
+          limit
+        );
+        productsData = fallback.data;
+        total = fallback.total;
+        targetBranch = defaultBranch;
+        isInRange = false;
       }
 
       return {
-        branch: nearestBranch,
+        branch: targetBranch,
         distance: minDistance,
         isInRange,
         products: {

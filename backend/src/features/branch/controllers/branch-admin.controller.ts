@@ -18,8 +18,10 @@ export class BranchAdminController {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
       
+      const sorted = [...result.data].sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
+
       return sendSuccess(res, {
-        branches: result.data,
+        branches: sorted,
         meta: {
           total: result.total,
           page,
@@ -166,6 +168,15 @@ export class BranchAdminController {
     try {
       const employee = await this.branchAdminService.unassignEmployee(req.params.employeeId as string);
       return sendSuccess(res, employee, "Employee unassigned successfully");
+    } catch (error: any) {
+      return sendError(res, error.message);
+    }
+  };
+
+  setDefaultBranch = async (req: Request, res: Response) => {
+    try {
+      const branch = await this.branchAdminService.setDefaultBranch(req.params.id as string);
+      return sendSuccess(res, branch, "Branch set as default");
     } catch (error: any) {
       return sendError(res, error.message);
     }

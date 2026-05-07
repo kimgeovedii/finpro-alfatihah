@@ -36,6 +36,7 @@ export class BranchAdminRouter {
     this.router.get("/:id", this.branchAdminController.getBranchById);
     this.router.put("/:id", this.branchAdminController.updateBranch);
     this.router.delete("/:id", this.branchAdminController.deleteBranch);
+    this.router.patch("/:id/set-default", this.branchAdminController.setDefaultBranch);
 
     // Branch Schedules
     this.router.get("/:branchId/schedules", this.branchAdminController.getSchedules);

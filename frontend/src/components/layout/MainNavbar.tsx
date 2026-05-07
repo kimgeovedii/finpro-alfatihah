@@ -15,6 +15,7 @@ import {
   ClipboardDocumentListIcon,
   ChevronDownIcon,
   MapIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 import {
   HomeIcon as HomeIconSolid,
@@ -31,9 +32,12 @@ export const MainNavbar = () => {
   const pathname = usePathname();
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
 
   const userDropdownRef = useRef<HTMLDivElement>(null);
   const locationDropdownRef = useRef<HTMLDivElement>(null);
+  const mobileSearchRef = useRef<HTMLDivElement>(null);
+  const mobileSearchInputRef = useRef<HTMLInputElement>(null);
 
   const {
     user,
@@ -84,6 +88,12 @@ export const MainNavbar = () => {
       ) {
         setIsLocationDropdownOpen(false);
       }
+      if (
+        mobileSearchRef.current &&
+        !mobileSearchRef.current.contains(event.target as Node)
+      ) {
+        setIsMobileSearchOpen(false);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -92,8 +102,8 @@ export const MainNavbar = () => {
   const navItems = [
     { name: "Home", href: "/", icon: HomeIcon, activeIcon: HomeIconSolid },
     {
-      name: "Promo",
-      href: "/promo",
+      name: "Product",
+      href: "/search",
       icon: TicketIcon,
       activeIcon: TicketIconSolid,
     },
@@ -104,7 +114,7 @@ export const MainNavbar = () => {
       activeIcon: ClipboardDocumentListIconSolid,
     },
     {
-      name: "Akun",
+      name: "Profile",
       href: "/profile",
       icon: UserIcon,
       activeIcon: UserIconSolid,
@@ -114,11 +124,10 @@ export const MainNavbar = () => {
   const userMenuItems = [
     { name: "My Profile", href: "/profile", icon: UserIcon },
     {
-      name: "Transactions",
+      name: "Transaction",
       href: "/transaction",
       icon: ClipboardDocumentListIcon,
     },
-    { name: "Vouchers & Promo", href: "/promo", icon: TicketIcon },
   ];
 
   return (
@@ -294,8 +303,18 @@ export const MainNavbar = () => {
             {mounted && (
               <div className="flex items-center gap-4 md:gap-5 text-slate-700 dark:text-slate-200">
                 {/* Search Toggle Mobile Only */}
-                <button className="sm:hidden p-2 hover:bg-slate-100 rounded-full transition-colors">
-                  <MagnifyingGlassIcon className="h-5 w-5" />
+                <button
+                  className="sm:hidden p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
+                  onClick={() => {
+                    setIsMobileSearchOpen((prev) => !prev);
+                    setTimeout(() => mobileSearchInputRef.current?.focus(), 150);
+                  }}
+                >
+                  {isMobileSearchOpen ? (
+                    <XMarkIcon className="h-5 w-5" />
+                  ) : (
+                    <MagnifyingGlassIcon className="h-5 w-5" />
+                  )}
                 </button>
 
                 {/* Cart button */}
@@ -428,6 +447,52 @@ export const MainNavbar = () => {
           </div>
         </div>
       </nav>
+
+      {/* Mobile Search Panel */}
+      <AnimatePresence>
+        {isMobileSearchOpen && (
+          <motion.div
+            ref={mobileSearchRef}
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="sm:hidden sticky top-[57px] z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800 shadow-lg overflow-hidden"
+          >
+            <form
+              onSubmit={(e) => {
+                onSearchSubmit(e);
+                setIsMobileSearchOpen(false);
+              }}
+              className="flex items-center gap-3 px-4 py-3 max-w-7xl mx-auto"
+            >
+              <div className="relative flex-1">
+                <input
+                  ref={mobileSearchInputRef}
+                  type="text"
+                  placeholder="All your daily needs..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full bg-slate-100 dark:bg-slate-800 text-sm rounded-2xl pl-5 pr-10 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all border border-transparent focus:border-primary/30"
+                />
+                <button
+                  type="submit"
+                  disabled={isSearching}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors p-1"
+                >
+                  <MagnifyingGlassIcon className="h-4 w-4" />
+                </button>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsMobileSearchOpen(false)}
+                className="text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors px-2 py-1"
+              >
+                Batal
+              </button>
+            </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Bottom Navigation (Mobile Only) */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800 pb-safe shadow-[0_-4px_16px_rgba(0,0,0,0.04)]">

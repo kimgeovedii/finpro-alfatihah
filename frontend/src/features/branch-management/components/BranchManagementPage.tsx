@@ -12,6 +12,7 @@ import { BranchAdminsDialog } from "./BranchAdminsDialog";
 import { EmployeeFormDialog } from "./EmployeeFormDialog";
 import { EmployeeList } from "./EmployeeList";
 import { AssignEmployeeDialog } from "./AssignEmployeeDialog";
+import { SetDefaultBranchDialog } from "./SetDefaultBranchDialog";
 import {
   Pagination,
   PaginationContent,
@@ -86,6 +87,10 @@ export const BranchManagementPage = () => {
     selectedEmployee,
     handleAssignEmployeeClick,
     handleAssignEmployeeSubmit,
+    setDefaultDialogOpen,
+    setSetDefaultDialogOpen,
+    handleSetDefaultClick,
+    handleSetDefaultConfirm,
   } = useBranchManagement();
 
   React.useEffect(() => {
@@ -160,6 +165,7 @@ export const BranchManagementPage = () => {
                 onManageSchedules={handleManageSchedules}
                 onAssignAdmin={handleAssignAdminClick}
                 onViewAdmins={handleViewAdmins}
+                onSetDefault={handleSetDefaultClick}
             />
 
             {meta.totalPages > 1 && (
@@ -274,6 +280,14 @@ export const BranchManagementPage = () => {
         branches={branches}
         isSubmitting={isSubmitting}
         onAssign={handleAssignEmployeeSubmit}
+      />
+
+      <SetDefaultBranchDialog
+        open={setDefaultDialogOpen}
+        onOpenChange={setSetDefaultDialogOpen}
+        branchName={selectedBranch?.storeName || ""}
+        onConfirm={handleSetDefaultConfirm}
+        isSubmitting={isSubmitting}
       />
     </div>
   );

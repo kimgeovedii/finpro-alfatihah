@@ -8,7 +8,7 @@ import {
   UpdateSchedulePayload,
   Employee,
 } from "../types/branch-admin.type";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 
 export const useBranchManagement = () => {
@@ -40,6 +40,7 @@ export const useBranchManagement = () => {
   const viewAdminsDialogOpen = useBranchAdminStore((s) => s.viewAdminsDialogOpen);
   const employeeDialogOpen = useBranchAdminStore((s) => s.employeeDialogOpen);
   const assignEmployeeDialogOpen = useBranchAdminStore((s) => s.assignEmployeeDialogOpen);
+  const setDefaultDialogOpen = useBranchAdminStore((s) => s.setDefaultDialogOpen);
 
   // ── Stable action references (never change) ──
   const actions = useBranchAdminStore.getState;
@@ -263,6 +264,25 @@ export const useBranchManagement = () => {
     }
   }, [actions, fetchEmployees]);
 
+  const handleSetDefaultClick = useCallback((branch: Branch) => {
+    actions().setSelectedBranch(branch);
+    actions().setSetDefaultDialogOpen(true);
+  }, [actions]);
+
+  const handleSetDefaultConfirm = useCallback(async () => {
+    const s = actions();
+    if (!s.selectedBranch) return;
+    try {
+      await s.setDefaultBranch(s.selectedBranch.id);
+      toast.success(`${s.selectedBranch.storeName} set as default branch`);
+      s.setSetDefaultDialogOpen(false);
+      fetchBranches(s.meta.page);
+    } catch (err: any) {
+      s.setSetDefaultDialogOpen(false);
+      toast.error(err.message || "Failed to set default branch");
+    }
+  }, [actions, fetchBranches]);
+
   return {
     // State
     branches,
@@ -299,6 +319,8 @@ export const useBranchManagement = () => {
     setAssignEmployeeDialogOpen: actions().setAssignEmployeeDialogOpen,
     setSelectedBranch: actions().setSelectedBranch,
     setSelectedEmployee: actions().setSelectedEmployee,
+    setDefaultDialogOpen,
+    setSetDefaultDialogOpen: actions().setSetDefaultDialogOpen,
 
     // Actions
     fetchBranches,
@@ -325,5 +347,7 @@ export const useBranchManagement = () => {
     handleAssignEmployeeClick,
     handleAssignEmployeeSubmit,
     handleRemoveEmployee,
+    handleSetDefaultClick,
+    handleSetDefaultConfirm,
   };
 };
