@@ -1,0 +1,3 @@
+export const closeAllDialogs = () => {
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))
+}

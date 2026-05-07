@@ -2,6 +2,7 @@ import { DividerLine } from "@/components/layout/DividerLine"
 import { HeadingText } from "@/components/layout/HeadingText"
 import { cardBaseClass, cardSelectedClass, cardUnselectedClass } from "@/constants/style.const"
 import { AddressData } from "@/types/address.type"
+import { closeAllDialogs } from "@/utils/dialog"
 import { showPopUp } from "@/utils/message.util"
 import { CheckIcon, ExclamationCircleIcon, HomeIcon, MapIcon, PhoneIcon, UserIcon } from "@heroicons/react/24/outline"
 import React from "react"
@@ -15,12 +16,19 @@ type Props = {
 export const AddressAdditionalInfoSection: React.FC<Props & AddressData> = ({ label, address, receiptName, phone, distance, isSelected = false, maxDeliveryDistance, action }) => {
     // Determine if the address is select able based on branch max distance
     const isSelectAble = distance && distance < maxDeliveryDistance
-    const handleClick = () => isSelectAble ? action?.() : showPopUp('Failed',`Choose another address who is within range ${maxDeliveryDistance} Km`,'error')
-    
+    const handleClick = () => {
+        if (isSelectAble) {
+            action?.()
+            return
+        }
+      
+        closeAllDialogs()
+        showPopUp("Failed", `Choose another address who is within range ${maxDeliveryDistance} Km`, "error")
+    }
+
     return (
         <div onClick={handleClick} className={`${cardBaseClass} ${isSelected ? cardSelectedClass : cardUnselectedClass}`}>
             <div className="flex items-center gap-3 w-full">
-                
                 <div className="w-full">
                     <div className="flex flex-row items-center justify-between w-full relative">
                         <div className="flex gap-2">

@@ -1,5 +1,5 @@
 import React from "react"
-import { AddressSelectionModal } from "./AddressSelectionModal"
+import { AddressSelectionDialog } from "./AddressSelectionDialog"
 import { AddressAdditionalInfoSection } from "./AddressAdditionalInfoSection"
 import { HeadingText } from "@/components/layout/HeadingText"
 import { BranchInfoCard } from "@/components/layout/BranchInfoCard"
@@ -27,7 +27,7 @@ export const AddressSelectionCard: React.FC<Props> = ({ branch, addressList, sel
             <div className="p-4">
                 <div className="flex justify-between items-center mb-2">
                     <HeadingText children="Delivery Address" level={2}/>
-                    <AddressSelectionModal
+                    <AddressSelectionDialog
                         address={addressList}
                         appliedAddress={selectedAddressId}
                         onSelect={onSelect}
