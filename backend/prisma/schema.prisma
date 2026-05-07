@@ -50,7 +50,8 @@ model Token {
 
 model Branch {
   id                   String               @id @default(uuid())
-  storeName            String               @map("store_name")
+  storeName            String               @unique @map("store_name")
+  slug                 String               @unique
   address              String
   latitude             Float
   longitude            Float

@@ -3,14 +3,15 @@ import { useParams } from "next/navigation";
 import { useBranchStore } from "../service/branch.service";
 
 export const useBranchDetail = () => {
-  const { id } = useParams();
+  const params = useParams();
+  const branchIdentifier = params["store-name"] || params.slug || params.id;
   const { detail, isLoading, error, fetchBranchDetail, reset } = useBranchStore();
 
   const loadDetail = useCallback((page?: number) => {
-    if (id) {
-      fetchBranchDetail(id as string, page);
+    if (branchIdentifier) {
+      fetchBranchDetail(branchIdentifier as string, page);
     }
-  }, [id, fetchBranchDetail]);
+  }, [branchIdentifier, fetchBranchDetail]);
 
   useEffect(() => {
     loadDetail();

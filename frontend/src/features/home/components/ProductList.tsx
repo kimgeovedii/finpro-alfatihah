@@ -153,6 +153,7 @@ export const ProductList = ({ products, isLoading }: ProductListProps) => {
             index={index}
             branchName={product.branchName}
             branchId={product.branchId}
+            branchSlug={product.branchSlug}
             branchCity={product.branchCity}
           />
         ))}
