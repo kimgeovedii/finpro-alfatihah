@@ -14,13 +14,12 @@ export const useOrderSummaryByBranchId = (branchId: string) => {
     return { summaryByBranchId, isLoadingSummaryByBranchId, error }
 }
 
-export const useOrderManagement = () => {
-    const [orders, setOrders] = useState<ManagementOrderItem[]>([])
+export const useOrderManagement = (defaultBranchId: string = "ALL") => {    const [orders, setOrders] = useState<ManagementOrderItem[]>([])
     const [meta, setMeta] = useState<ManagementOrderResponse["meta"] | null>(null)
     const [isLoading, setIsLoading] = useState(false)
     const [status, setStatus] = useState<OrderStatus | "ALL">("ALL")
     const [page, setPage] = useState(1)
-    const [branchId, setBranchId] = useState<string>("ALL")
+    const [branchId, setBranchId] = useState<string>(defaultBranchId)
     const [search, setSearch] = useState<string>("")
 
     const fetchOrders = async (nextPage: number, nextStatus: OrderStatus | "ALL", nextBranchId: string, nextSearch: string) => {
@@ -36,16 +35,5 @@ export const useOrderManagement = () => {
         }
     }
 
-    useEffect(() => {
-        fetchOrders(page, status, branchId, search)
-    }, [page, status, branchId, search])
-
-    return { 
-        orders, meta, isLoading, 
-        status, setStatus,
-        page, setPage,
-        branchId, setBranchId,
-        search, setSearch,
-        fetchOrders
-    }
+    return { orders, meta, isLoading, status, setStatus, page, setPage, branchId, setBranchId, search, setSearch, fetchOrders }
 }

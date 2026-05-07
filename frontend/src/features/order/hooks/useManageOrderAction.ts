@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import { OrderStatus } from "@/constants/business.const"
 import { useUpdatePaymentStatusById } from "@/features/order/hooks/usePayment"
 import { useOrderManagement } from "@/features/order/hooks/useManageOrder"
@@ -7,9 +8,11 @@ import Swal from "sweetalert2"
 import { useCancelOrderStatusById, useUpdateOrderStatusById } from "./useOrder"
 import { closeAllDialogs } from "@/utils/dialog"
 
-export const useManageOrderActions = (onSuccess?: () => void) => {
+export const useManageOrderActions = (employeeRole?: string, employeeBranchId?: string, onSuccess?: () => void) => {
     // Call hook
-    const { orders, meta, isLoading, status, setStatus, setPage, branchId, setBranchId, search, setSearch, fetchOrders } = useOrderManagement()
+    const { orders, meta, isLoading, status, setStatus, page, setPage, branchId, setBranchId, search, setSearch, fetchOrders } = useOrderManagement(
+        employeeRole === "SUPER_ADMIN" ? "ALL" : employeeBranchId ?? "ALL"
+    )
     const { updatePayment, isUpdatingPayment } = useUpdatePaymentStatusById()
     const { updateOrder, isUpdatingOrder } = useUpdateOrderStatusById()
     const { cancelOrder, isCancellingOrder } = useCancelOrderStatusById()
@@ -114,12 +117,8 @@ export const useManageOrderActions = (onSuccess?: () => void) => {
     }))
 
     return {
-        branchId, setBranchId: handleBranchChange,
-        search, setSearch: handleSearchChange,
-        tableOrders, meta, isLoading,
-        status, handlePageChange, handleStatusChange,
-        isUpdatingPayment, isUpdatingOrder, isCancellingOrder,
-        handleValidatePaymentEvidence,
-        handleShippingOrder, handleCancelOrder,
+        page, fetchOrders, branchId, setBranchId: handleBranchChange, search, setSearch: handleSearchChange,
+        tableOrders, meta, isLoading, status, handlePageChange, handleStatusChange, isUpdatingPayment, 
+        isUpdatingOrder, isCancellingOrder, handleValidatePaymentEvidence, handleShippingOrder, handleCancelOrder,
     }
 }

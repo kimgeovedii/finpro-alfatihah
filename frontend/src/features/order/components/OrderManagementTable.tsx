@@ -31,11 +31,12 @@ type Props = {
     meta: PaginationMeta | null
     activeStatus: string
     isLoading: boolean
+    role: string
     onPageChange: (page: number) => void
     onValidatePaymentEvidence: (paymentId: string, isConfirm: boolean) => void
 }
 
-export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading, activeStatus, onPageChange, onValidatePaymentEvidence }) => {
+export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading, activeStatus, onPageChange, onValidatePaymentEvidence, role }) => {
     // Pagination 
     const currentPage = meta?.page ?? 1
     const totalPages = meta?.totalPages ?? 1
@@ -56,7 +57,7 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
                             <TableHead className="font-semibold text-white">Date</TableHead>
                             <TableHead className="font-semibold text-white">Total Price</TableHead>
                             <TableHead className="font-semibold text-white">Status</TableHead>
-                            <TableHead className="font-semibold text-white">Payment</TableHead>
+                            { role === "SUPER_ADMIN" && <TableHead className="font-semibold text-white">Payment</TableHead> }
                             <TableHead className="font-semibold text-white">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -101,18 +102,21 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
                                             <TableCell className="max-w-[140px]">
                                                 <Badge className={`capitalize px-2 font-semibold whitespace-normal break-words text-center h-auto mx-auto block rounded-lg ${statusClass}`}>{finalStatus}</Badge>
                                             </TableCell>
-                                            <TableCell>
-                                                {
-                                                    dt.status !== "WAITING_PAYMENT" && dt.payments.length > 0 && dt.payments[0].method === "MANUAL" && dt.payments[0].evidence !== null ?        
-                                                        <PaymentConfirmationDialog imageUrl={dt.payments[0].evidence ?? ""} finalPrice={dt.finalPrice} paymentId={dt.payments[0].id} status={dt.status} onValidatePaymentEvidence={onValidatePaymentEvidence}/>
-                                                    : dt.status === "CANCELLED" || dt.status === "WAITING_PAYMENT" ? 
-                                                        <>-</> 
-                                                    : 
-                                                        <div className="bg-green-100 text-green-600 rounded-lg w-8 h-8 p-[5px] mx-auto">
-                                                            <CheckIcon className="w-5 h-5"/>
-                                                        </div>
-                                                }
-                                            </TableCell>
+                                            {
+                                                role === "SUPER_ADMIN" &&
+                                                    <TableCell>
+                                                        {
+                                                            dt.status !== "WAITING_PAYMENT" && dt.payments.length > 0 && dt.payments[0].method === "MANUAL" && dt.payments[0].evidence !== null ?        
+                                                                <PaymentConfirmationDialog imageUrl={dt.payments[0].evidence ?? ""} finalPrice={dt.finalPrice} paymentId={dt.payments[0].id} status={dt.status} onValidatePaymentEvidence={onValidatePaymentEvidence}/>
+                                                            : dt.status === "CANCELLED" || dt.status === "WAITING_PAYMENT" ? 
+                                                                <>-</> 
+                                                            : 
+                                                                <div className="bg-green-100 text-green-600 rounded-lg w-8 h-8 p-[5px] mx-auto">
+                                                                    <CheckIcon className="w-5 h-5"/>
+                                                                </div>
+                                                        }
+                                                    </TableCell>
+                                            }
                                             <TableCell>
                                                 {
                                                     dt.status !== "WAITING_PAYMENT" && dt.status !== "WAITING_PAYMENT_CONFIRMATION" ?

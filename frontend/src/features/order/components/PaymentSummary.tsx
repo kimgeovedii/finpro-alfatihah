@@ -59,7 +59,7 @@ export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, t
                 <HeadingText children="Final Price" level={3}/>
                 <p className="font-bold text-xl">Rp. {Math.ceil(finalPrice + shippingCost).toLocaleString(currencyFormat)}</p>
             </div>
-            { status !== 'WAITING_PAYMENT_CONFIRMATION' && <DividerLine/> }
+            { status !== 'WAITING_PAYMENT_CONFIRMATION' && status !== "PROCESSING" && <DividerLine/> }
             <div className="flex flex-col gap-3">
                 { status === 'WAITING_PAYMENT' && paymentEvidence === null && paymentMethod === "MANUAL" && <PaymentEvidenceUploadButton orderId={orderId} paymentDeadline={paymentDeadline} onSuccess={onSuccess} isShowDestinationAccount={true}/> }
                 { status === 'WAITING_PAYMENT' && <OrderCancelButton orderNumber={orderNumber} onCancel={onCancel}/> }

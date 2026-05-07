@@ -19,9 +19,10 @@ type Props = {
     onCancel: (orderNumber: string) => void
     orderNumber: string
     branchName: string
+    role: string
 }
   
-export const OrderMatchingProcessedSection: React.FC<Props> = ({ branchName, items, status, isLoading, onShipping, onSearch, onCancel, orderNumber}) => {
+export const OrderMatchingProcessedSection: React.FC<Props> = ({ branchName, items, status, isLoading, onShipping, onSearch, onCancel, orderNumber, role }) => {
     const [search, setSearch] = useState("")
     const filteredItems = items.filter(dt => search === "" || dt.product.productName.toLowerCase().includes(search.toLowerCase()))
 
@@ -114,11 +115,13 @@ export const OrderMatchingProcessedSection: React.FC<Props> = ({ branchName, ite
             {
                 status && ["SHIPPED", "CANCELLED", "CONFIRMED"].includes(status) ?
                     <div className={`w-full bg-${status === "SHIPPED" || status === "CONFIRMED" ? 'green' : 'red'}-100 text-${status === "SHIPPED" || status === "CONFIRMED" ? 'green' : 'red'}-500 p-3 rounded-lg my-2 font-bold text-md text-center`}>{status}!</div>
-                :
+                : role === "SUPER_ADMIN" ?
                     <div className="mt-5 flex gap-2">
                         <Button className="flex-1 bg-red-400 hover:bg-red-500 hover:shadow" onClick={(e) => onCancel(orderNumber)}><XMarkIcon/> Cancel Order!</Button>
                         <Button className="flex-1 bg-teal-700 hover:shadow" onClick={(e) => onShipping(orderNumber)}><ArchiveBoxIcon/> Shipping Now!</Button>
                     </div>
+                : 
+                    <></>
             }
             </div>
         </div>
