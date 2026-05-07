@@ -3,7 +3,10 @@ import * as Yup from "yup";
 const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
 export const branchValidationSchema = Yup.object().shape({
-  storeName: Yup.string().required("Store name is required").min(3, "Too short"),
+  storeName: Yup.string()
+    .required("Store name is required")
+    .min(3, "Too short")
+    .matches(/^[a-zA-Z0-9 ]+$/, "Only letters, numbers, and spaces are allowed"),
   address: Yup.string().required("Address is required").min(5, "Too short"),
   latitude: Yup.number().required("Latitude is required"),
   longitude: Yup.number().required("Longitude is required"),

@@ -20,7 +20,7 @@ export class BranchRouter {
       this.branchController.getNearestBranch
     );
     this.router.get("/", this.branchController.getAllBranches);
-    this.router.get("/:id", this.branchController.getBranchById);
+    this.router.get("/:slug", this.branchController.getBranchBySlug);
   }
 
   public getRouter(): Router {

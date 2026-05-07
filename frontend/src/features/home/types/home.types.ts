@@ -1,6 +1,7 @@
 export interface BranchData {
   id: string;
   storeName: string;
+  slug: string;
   address: string;
   city: string;
   province: string;
@@ -25,6 +26,7 @@ export interface ProductCard {
   productImages: { id: string; imageUrl: string }[];
   branchName?: string;
   branchId: string;
+  branchSlug?: string;
   branchCity?: string;
 }
 

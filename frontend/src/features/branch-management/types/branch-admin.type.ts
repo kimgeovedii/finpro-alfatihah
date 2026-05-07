@@ -30,6 +30,7 @@ export interface Employee {
 export interface Branch {
   id: string;
   storeName: string;
+  slug: string;
   address: string;
   latitude: number;
   longitude: number;

@@ -50,6 +50,7 @@ export class BranchAdminController {
       return sendSuccess(res, branch, "Branch created", 201);
     } catch (error: any) {
       if (error.errors) return sendError(res, "Validation error", 400, error.errors);
+      if (error.code === "P2002") return sendError(res, "Store name is already taken. Please choose another name.", 400);
       return sendError(res, error.message);
     }
   };
@@ -61,6 +62,7 @@ export class BranchAdminController {
       return sendSuccess(res, branch, "Branch updated");
     } catch (error: any) {
       if (error.errors) return sendError(res, "Validation error", 400, error.errors);
+      if (error.code === "P2002") return sendError(res, "Store name is already taken. Please choose another name.", 400);
       return sendError(res, error.message);
     }
   };

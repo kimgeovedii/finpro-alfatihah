@@ -24,12 +24,30 @@ export class BranchAdminService {
   }
 
   async createBranch(data: any) {
-    return this.branchRepo.create(data);
+    const slug = data.storeName
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+
+    return this.branchRepo.create({ ...data, slug });
   }
 
   async updateBranch(id: string, data: any) {
     const branch = await this.branchRepo.findById(id);
     if (!branch) throw new Error("Branch not found");
+
+    // If storeName is changing, regenerate slug
+    if (data.storeName && data.storeName !== branch.storeName) {
+      data.slug = data.storeName
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
+    }
+
     return this.branchRepo.update(id, data);
   }
 

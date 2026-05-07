@@ -25,6 +25,7 @@ export const BranchProductGrid = ({ products, meta, onPageChange }: BranchProduc
               index={index}
               branchName={product.branchName}
               branchId={product.branchId}
+              branchSlug={product.branchSlug}
               branchCity={product.branchCity}
             />
           ))}

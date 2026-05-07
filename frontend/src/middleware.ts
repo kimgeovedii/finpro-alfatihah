@@ -1,18 +1,14 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-// Routes that do not require authentication
-const publicRoutes = [
-  "/",
-  "/login",
-  "/register",
-  "/verify-email",
-  "/reset-password",
-  "/confirm-reset-password",
-  "/products",
-  "/search",
-  "/login/employee",
-  "/branches",
+// Routes that require authentication
+const protectedRoutes = [
+  "/profile",
+  "/cart",
+  "/transaction",
+  "/checkout",
+  "/dashboard",
+  "/manage-order",
 ];
 
 // Routes that require verification (must be verified to access)
@@ -40,12 +36,12 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const isPublicRoute = publicRoutes.some(
+  const isProtectedRoute = protectedRoutes.some(
     (route) => pathname === route || pathname.startsWith(route + "/"),
   );
 
   // 1. If not logged in and trying to access protected route, redirect
-  if (!isPublicRoute && !hasToken) {
+  if (isProtectedRoute && !hasToken) {
     if (
       pathname.startsWith("/dashboard") ||
       pathname.startsWith("/manage-order")
@@ -84,11 +80,7 @@ export function middleware(request: NextRequest) {
       }
 
       // Employee trying to access customer routes
-      const isCustomerRoute =
-        pathname === "/" ||
-        ["/products", "/cart", "/checkout", "/transaction", "/profile"].some(
-          (route) => pathname.startsWith(route),
-        );
+      const isCustomerRoute = !employeeOnlyRoutes.some((route) => pathname.startsWith(route));
 
       if (role === "EMPLOYEE" && isCustomerRoute) {
         return NextResponse.redirect(new URL("/unauthorized", request.url));

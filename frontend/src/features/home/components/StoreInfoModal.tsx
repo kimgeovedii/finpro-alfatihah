@@ -76,7 +76,7 @@ export const StoreInfoModal = ({ selectedStore, onClose }: StoreInfoModalProps) 
 
       <div className="flex flex-col gap-2 shrink-0">
         <a 
-          href={`/branches/${selectedStore.branchId}`}
+          href={`/${selectedStore.branchSlug}`}
           className="w-full py-3 bg-slate-900 text-white rounded-2xl font-bold text-sm text-center hover:bg-slate-800 transition-all active:scale-[0.98] shadow-xl shadow-slate-900/10 block"
         >
           View Branch Detail
