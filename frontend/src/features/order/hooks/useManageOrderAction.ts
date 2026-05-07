@@ -5,6 +5,7 @@ import { showPopUp } from "@/utils/message.util"
 import { OrderTableItem } from "@/features/order/components/OrderManagementTable"
 import Swal from "sweetalert2"
 import { useCancelOrderStatusById, useUpdateOrderStatusById } from "./useOrder"
+import { closeAllDialogs } from "@/utils/dialog"
 
 export const useManageOrderActions = (onSuccess?: () => void) => {
     // Call hook
@@ -36,6 +37,8 @@ export const useManageOrderActions = (onSuccess?: () => void) => {
 
     // Validate payment evidence
     const handleValidatePaymentEvidence = async (paymentId: string, isConfirm: boolean) => {
+        closeAllDialogs()
+
         const confirm = await Swal.fire({
             title: "Validate transaction?",
             text: `Are you sure want to ${isConfirm ? 'confirm' : 'reject'} this transaction?`,

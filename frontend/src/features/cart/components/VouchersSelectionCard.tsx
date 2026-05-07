@@ -46,7 +46,7 @@ export const VouchersSelectionCard: React.FC<Props> = ({ appliedVoucher, totalBa
     }, [isLoadingVoucher, meta, fetchAllVouchers, search])
 
     return (
-        <div className="bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 mb-4">
+        <div className="bg-white/60 backdrop-blur-xl border border-slate-200 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 mb-4">
             <HeadingText children="My Vouchers" level={2}/>
             <DividerLine/>
             <Input placeholder="Search voucher..." value={search} onChange={(e) => handleSearch(e.target.value)} className="mb-4 rounded-xl"/>

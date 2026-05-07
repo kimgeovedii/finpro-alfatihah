@@ -16,3 +16,6 @@ export const courierShippingDefault: string = 'jne'
 
 // Currency
 export const currencyFormat: string = "id-ID"
+
+// Stock
+export const lowStockAlertLimit: number = 10

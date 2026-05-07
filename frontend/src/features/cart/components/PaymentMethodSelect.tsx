@@ -13,7 +13,7 @@ interface Props {
 
 export const PaymentMethodSelect: React.FC<Props> = ({ selectedMethod, onSelectMethod }) => {
     return (
-        <div className="bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 mb-4">
+        <div className="bg-white/60 backdrop-blur-xl border border-slate-200 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 mb-4">
             <div className="flex justify-between items-center">
                 <HeadingText children="Payment Method" level={2}/>
                 <PaymentHelpDialog/>

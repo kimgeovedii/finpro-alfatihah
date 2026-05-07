@@ -8,6 +8,7 @@ import { ShippingSummaryCard } from "@/components/layout/ShippingSummaryCard"
 import { DividerLine } from "@/components/layout/DividerLine"
 import { HeadingText } from "@/components/layout/HeadingText"
 import { DocumentIcon, QuestionMarkCircleIcon } from "@heroicons/react/24/outline"
+import { PaymentHelpDialog } from "@/components/layout/PaymentHelpDialog"
 
 type Props = {
     orderId: string
@@ -30,8 +31,11 @@ export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, t
     const { downloadInvoiceOrder } = useDownloadInvoice()
     
     return (
-        <div className="bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 mb-4">
-            <HeadingText children="Payment Summary" level={2}/>
+        <div className="bg-white/60 backdrop-blur-xl border border-slate-200 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 mb-4">
+            <div className="flex justify-between items-center">
+                <HeadingText children="Payment Summary" level={2}/>
+                <PaymentHelpDialog/>
+            </div>
             <DividerLine/>
             <div className="flex justify-between">
                 <p>Total Items <b>({totalItem})</b></p>
@@ -63,7 +67,6 @@ export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, t
                             <DocumentIcon/>Download Invoice
                         </Button> 
                 }
-                <Button className="flex-1 h-10 bg-teal-700 hover:bg-[#00767a] text-white font-bold rounded-[8px] shadow-lg shadow-primary-teal/20 transition-all duration-300 active:scale-[0.97] disabled:opacity-70"><QuestionMarkCircleIcon/> Help Center</Button>
             </div>
         </div>
     )
