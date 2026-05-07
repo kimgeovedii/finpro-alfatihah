@@ -73,13 +73,37 @@ export function OrderDetailLayout({ orderNumber }: Props) {
                         </>
                         :
                         <>
-                            <OrderStatusStepsCard 
-                                statusSteps={statusSteps} 
-                                currentStatus={order?.status && order?.status === "WAITING_PAYMENT_CONFIRMATION" ? "WAITING_PAYMENT" : order?.status ?? ""}
-                                orderNumber={orderNumber}
-                                onConfirm={handleConfirmOrder}
-                                status={order?.status}
-                            />
+                            {
+                                // Payment summary comes first if waiting for payment / confirmation
+                                (order?.status === "WAITING_PAYMENT" || order?.status === "WAITING_PAYMENT_CONFIRMATION") &&
+                                    <PaymentSummaryCard
+                                        orderNumber={orderNumber}
+                                        totalItem={order?.items?.reduce((acc, item) => acc + item.quantity, 0) ?? 0}
+                                        shippingWeight={order?.totalWeight ?? 0}
+                                        shippingCost={order?.shippingCost ?? 0}
+                                        totalPrice={order?.totalPrice ?? 0}
+                                        totalSaving={(order?.totalPrice ?? 0) - (order?.finalPrice ?? 0)}
+                                        finalPrice={order?.finalPrice ?? 0} 
+                                        orderId={order?.id ?? '-'} 
+                                        status={order?.status ?? '-'} 
+                                        paymentDeadline={order?.paymentDeadline ?? '-'} 
+                                        paymentEvidence={order?.payments[0].evidence}
+                                        paymentMethod={order?.payments[0].method}
+                                        onCancel={handleCancelOrder} 
+                                        onSuccess={onSuccess}        
+                                    />
+                            }
+                            {
+                                // Order status comes first if payment has done
+                                order?.status !== "WAITING_PAYMENT" && order?.status !== "WAITING_PAYMENT_CONFIRMATION" &&
+                                    <OrderStatusStepsCard 
+                                        statusSteps={statusSteps} 
+                                        currentStatus={order?.status && order?.status === "WAITING_PAYMENT_CONFIRMATION" ? "WAITING_PAYMENT" : order?.status ?? ""}
+                                        orderNumber={orderNumber}
+                                        onConfirm={handleConfirmOrder}
+                                        status={order?.status}
+                                    />
+                            }
                             <OrderDetailBranchCard
                                 branch={{
                                     storeName: order?.branch?.storeName ?? "-",
@@ -110,6 +134,17 @@ export function OrderDetailLayout({ orderNumber }: Props) {
                             </>
                         :
                             <>
+                                {
+                                    // Order status comes second if waiting for payment / confirmation
+                                    (order?.status === "WAITING_PAYMENT" || order?.status === "WAITING_PAYMENT_CONFIRMATION") &&
+                                        <OrderStatusStepsCard 
+                                            statusSteps={statusSteps} 
+                                            currentStatus={order?.status && order?.status === "WAITING_PAYMENT_CONFIRMATION" ? "WAITING_PAYMENT" : order?.status ?? ""}
+                                            orderNumber={orderNumber}
+                                            onConfirm={handleConfirmOrder}
+                                            status={order?.status}
+                                        />
+                                }
                                 <OrderDetailItemListCard
                                     branchName={order?.branch.storeName ?? '-'}
                                     items={order?.items?.map(dt => ({
@@ -125,22 +160,26 @@ export function OrderDetailLayout({ orderNumber }: Props) {
                                         productImages: dt.product.product.productImages
                                     })) ?? []}
                                 />
-                                <PaymentSummaryCard
-                                    orderNumber={orderNumber}
-                                    totalItem={order?.items?.reduce((acc, item) => acc + item.quantity, 0) ?? 0}
-                                    shippingWeight={order?.totalWeight ?? 0}
-                                    shippingCost={order?.shippingCost ?? 0}
-                                    totalPrice={order?.totalPrice ?? 0}
-                                    totalSaving={(order?.totalPrice ?? 0) - (order?.finalPrice ?? 0)}
-                                    finalPrice={order?.finalPrice ?? 0} 
-                                    orderId={order?.id ?? '-'} 
-                                    status={order?.status ?? '-'} 
-                                    paymentDeadline={order?.paymentDeadline ?? '-'} 
-                                    paymentEvidence={order?.payments[0].evidence}
-                                    paymentMethod={order?.payments[0].method}
-                                    onCancel={handleCancelOrder} 
-                                    onSuccess={onSuccess}        
-                                />
+                                {
+                                    // Payment summary comes last if payment has done
+                                    order?.status !== "WAITING_PAYMENT" && order?.status !== "WAITING_PAYMENT_CONFIRMATION" &&
+                                        <PaymentSummaryCard
+                                            orderNumber={orderNumber}
+                                            totalItem={order?.items?.reduce((acc, item) => acc + item.quantity, 0) ?? 0}
+                                            shippingWeight={order?.totalWeight ?? 0}
+                                            shippingCost={order?.shippingCost ?? 0}
+                                            totalPrice={order?.totalPrice ?? 0}
+                                            totalSaving={(order?.totalPrice ?? 0) - (order?.finalPrice ?? 0)}
+                                            finalPrice={order?.finalPrice ?? 0} 
+                                            orderId={order?.id ?? '-'} 
+                                            status={order?.status ?? '-'} 
+                                            paymentDeadline={order?.paymentDeadline ?? '-'} 
+                                            paymentEvidence={order?.payments[0].evidence}
+                                            paymentMethod={order?.payments[0].method}
+                                            onCancel={handleCancelOrder} 
+                                            onSuccess={onSuccess}        
+                                        />
+                                }
                             </>
                         }
                     </div>

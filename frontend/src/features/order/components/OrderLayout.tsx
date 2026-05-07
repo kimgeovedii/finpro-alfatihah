@@ -50,18 +50,18 @@ export function OrderLayout() {
                             </>
                     }    
                     <DividerLine/>
-                    <div className="flex flex-wrap items-end gap-3 mb-5 bg-white p-4 rounded-xl justify-between">
+                    <div className="flex flex-wrap items-end gap-3 mb-5 bg-white p-4 rounded-xl justify-between border border-slate-200">
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 w-full lg:w-auto">
-                            <div className="col-span-2 md:col-span-2">
-                                <Label className="text-xs text-slate-500 mb-1">Order Number</Label>
+                            <div className="col-span-2 md:col-span-2 flex flex-col gap-2">
+                                <Label>Search Order Number</Label>
                                 <Input placeholder="e.g. ORD-123" value={orderNumber} onChange={(e) => setOrderNumber(e.target.value)} className="w-full" />
                             </div>
-                            <div className="col-span-1">
-                                <Label className="text-xs text-slate-500 mb-1">Start Date</Label>
+                            <div className="col-span-1 flex flex-col gap-2">
+                                <Label>Filter By Start Date</Label>
                                 <Input type="date" value={dateStart} onChange={(e) => setDateStart(e.target.value)} className="w-full" />
                             </div>
-                            <div className="col-span-1">
-                                <Label className="text-xs text-slate-500 mb-1">End Date</Label>
+                            <div className="col-span-1 flex flex-col gap-2">
+                                <Label>Filter By End Date</Label>
                                 <Input type="date" value={dateEnd} onChange={(e) => setDateEnd(e.target.value)} className="w-full" />
                             </div>
                         </div>
@@ -94,7 +94,7 @@ export function OrderLayout() {
                         }
                         { 
                             // Render failed fetching condition
-                            !isLoading && orders.length === 0 && <MessageBox context={'No orders found'} image={"/assets/empty.png"} urlButton={'/dashboard/products'} titleButton='Browse Now!' description={"It looks like you haven't made any transactions yet. Buy a product now and get an extra discount"}/>
+                            !isLoading && orders.length === 0 && <MessageBox context={'No orders found'} image={"/assets/empty.png"} urlButton={'/'} titleButton='Browse Now!' description={"It looks like you haven't made any transactions yet. Buy a product now and get an extra discount"}/>
                         }
                         {
                             // Pagination

@@ -30,7 +30,7 @@ export const OrderStatusStepsCard: React.FC<Props> = ({ statusSteps, currentStat
     }
 
     return (
-        <div className="bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+        <div className="bg-white/60 backdrop-blur-xl border border-slate-200 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
             <HeadingText children="Order Progress" level={2}/>
             <DividerLine/>
             <div className="flex flex-col gap-0">

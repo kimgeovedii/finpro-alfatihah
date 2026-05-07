@@ -38,12 +38,13 @@ type Props = {
     shippingCost: number 
     finalPrice: number
     distance?: number
+    role: string
     onSearch?: (query: string) => void
     onCancel: (orderNumber: string) => void
     onShipping: (orderNumber: string) => void
 }
 
-export const OrderMatchingTable: React.FC<Props> = ({ orderNumber, items, isLoading, payments, onSearch, shippingCost, finalPrice, onShipping, onCancel, status, branch, address, distance, confirmedAt, shippedAt }) => {    
+export const OrderMatchingTable: React.FC<Props> = ({ orderNumber, items, isLoading, payments, onSearch, shippingCost, finalPrice, onShipping, onCancel, status, branch, address, distance, confirmedAt, shippedAt, role }) => {    
     return (
         <div className="bg-white border border-slate-200 rounded-2xl p-6 w-full">
             <div className="flex items-center justify-between mb-5">
@@ -73,7 +74,7 @@ export const OrderMatchingTable: React.FC<Props> = ({ orderNumber, items, isLoad
                         <HeadingText level={2} children="Processed" className={`${
                             status && ["PROCESSING","SHIPPED","CONFIRMED","CANCELLED"].includes(status) ? "text-emerald-600" : "text-gray-400"} mb-2`}
                         />
-                        <OrderMatchingProcessedSection branchName={branch?.storeName??'-'} items={items} status={status} isLoading={isLoading} onShipping={onShipping} onCancel={onCancel} onSearch={onSearch} orderNumber={orderNumber}/>
+                        <OrderMatchingProcessedSection branchName={branch?.storeName??'-'} items={items} status={status} isLoading={isLoading} onShipping={onShipping} onCancel={onCancel} onSearch={onSearch} orderNumber={orderNumber} role={role}/>
                     </div>
                 </div>
                 {

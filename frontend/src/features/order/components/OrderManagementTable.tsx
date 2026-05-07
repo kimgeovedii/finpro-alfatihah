@@ -4,16 +4,15 @@ import { Button } from "@/components/ui/button"
 import { currencyFormat, OrderStatus, statusColorMap } from "@/constants/business.const"
 import { Badge } from "@/components/ui/badge"
 import { formatDate } from "@/utils/converter.util"
-import { ArrowRightIcon, BanknotesIcon, CheckIcon, EnvelopeIcon } from "@heroicons/react/24/outline"
+import { ArrowRightIcon, CheckIcon, ChevronLeftIcon, ChevronRightIcon, EnvelopeIcon } from "@heroicons/react/24/outline"
 import { CopyFieldButton } from "@/components/button/CopyFieldButton"
 import { PaymentData } from "@/types/payment.type"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import Image from "next/image"
 import Link from "next/link"
 import { PaginationMeta } from "@/types/global.type"
 import { MessageBox } from "@/components/layout/MessageBox"
 import { MiniTagBox } from "@/components/layout/MiniTagBox"
 import { UserIcon } from "@heroicons/react/20/solid"
+import { PaymentConfirmationDialog } from "./PaymentConfirmationDialog"
 
 export type OrderTableItem = {
     id: string
@@ -32,11 +31,12 @@ type Props = {
     meta: PaginationMeta | null
     activeStatus: string
     isLoading: boolean
+    role: string
     onPageChange: (page: number) => void
     onValidatePaymentEvidence: (paymentId: string, isConfirm: boolean) => void
 }
 
-export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading, activeStatus, onPageChange, onValidatePaymentEvidence }) => {
+export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading, activeStatus, onPageChange, onValidatePaymentEvidence, role }) => {
     // Pagination 
     const currentPage = meta?.page ?? 1
     const totalPages = meta?.totalPages ?? 1
@@ -47,18 +47,18 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
     const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1).slice(Math.max(0, currentPage - 2), Math.min(totalPages, currentPage + 1))
 
     return (
-        <div className="bg-white border border-slate-200 rounded-2xl p-4 md:p-6 w-full">
-            <div className="w-full overflow-x-auto max-w-[80vw] md:max-w-[87.5vw] lg:max-w-full">
-                <Table className="min-w-[700px]">
-                    <TableHeader>
-                        <TableRow className="uppercase text-xs tracking-wider text-slate-400">
-                            <TableHead className="font-semibold">Order Detail</TableHead>
-                            <TableHead className="font-semibold">Customer</TableHead>
-                            <TableHead className="font-semibold">Date</TableHead>
-                            <TableHead className="font-semibold">Total Price</TableHead>
-                            <TableHead className="font-semibold">Status</TableHead>
-                            <TableHead className="font-semibold">Payment</TableHead>
-                            <TableHead className="font-semibold">Actions</TableHead>
+        <div className="w-full rounded-xl overflow-hidden border border-emerald-700">
+            <div className="w-full overflow-x-auto">
+                <Table className="min-w-[700px] table-center rounded-lg">
+                    <TableHeader className="rounded-lg">
+                        <TableRow className="bg-emerald-700 uppercase hover:bg-emerald-700">
+                            <TableHead className="font-semibold text-white">Order Detail</TableHead>
+                            <TableHead className="font-semibold text-white">Customer</TableHead>
+                            <TableHead className="font-semibold text-white">Date</TableHead>
+                            <TableHead className="font-semibold text-white">Total Price</TableHead>
+                            <TableHead className="font-semibold text-white">Status</TableHead>
+                            { role === "SUPER_ADMIN" && <TableHead className="font-semibold text-white">Payment</TableHead> }
+                            <TableHead className="font-semibold text-white">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -83,7 +83,7 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
                                     
                                     return (
                                         <TableRow key={dt.id} className="hover:bg-slate-50">
-                                            <TableCell className="font-semibold text-slate-800">
+                                            <TableCell className="font-semibold text-slate-800 items-start flex flex-col">
                                                 <Link href={`/${dt.storeName}`} className="cursor-pointer">
                                                     <MiniTagBox val={dt.storeName}/>
                                                 </Link>
@@ -102,41 +102,21 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
                                             <TableCell className="max-w-[140px]">
                                                 <Badge className={`capitalize px-2 font-semibold whitespace-normal break-words text-center h-auto mx-auto block rounded-lg ${statusClass}`}>{finalStatus}</Badge>
                                             </TableCell>
-                                            <TableCell>
-                                                {
-                                                    dt.status !== "WAITING_PAYMENT" && dt.payments.length > 0 && dt.payments[0].method === "MANUAL" && dt.payments[0].evidence !== null ?        
-                                                        <Dialog>
-                                                            <DialogTrigger asChild>
-                                                                <Button className="bg-orange-400 text-white font-semibold text-xs px-3 mx-auto block">
-                                                                    <BanknotesIcon className="w-5 h-5"/>
-                                                                </Button>
-                                                            </DialogTrigger>
-                                                            <DialogContent className="w-full max-w-[700px] rounded-2xl">
-                                                                <DialogHeader>
-                                                                    <DialogTitle className="font-bold mb-3">Payment Evidence</DialogTitle>
-                                                                </DialogHeader>
-                                                                <div className="flex flex-col mt-2 text-center">
-                                                                    <Image src={dt.payments[0].evidence ?? ""} className="w-full mx-auto h-full mb-2 rounded-lg" alt={dt.payments[0].evidence ?? ""} width={100} height={100}/>
-                                                                    <p className="mb-0">Transaction Amount</p>
-                                                                    <p className="font-bold mb-4">Rp {dt.finalPrice.toLocaleString(currencyFormat)}</p>
-                                                                    {
-                                                                        dt.status === "WAITING_PAYMENT_CONFIRMATION" && 
-                                                                            <>
-                                                                                <Button className="w-full bg-green-100 text-green-500 border-1 border-green-500 hover:bg-green-500 hover:text-white cursor-pointer mb-2" onClick={(e) => onValidatePaymentEvidence(dt.payments[0].id, true)}>Confirm</Button>
-                                                                                <Button className="w-full bg-red-100 text-red-500 border-1 border-red-500 hover:bg-red-500 hover:text-white cursor-pointer" onClick={(e) => onValidatePaymentEvidence(dt.payments[0].id, false)}>Reject</Button>
-                                                                            </>
-                                                                    }
+                                            {
+                                                role === "SUPER_ADMIN" &&
+                                                    <TableCell>
+                                                        {
+                                                            dt.status !== "WAITING_PAYMENT" && dt.payments.length > 0 && dt.payments[0].method === "MANUAL" && dt.payments[0].evidence !== null ?        
+                                                                <PaymentConfirmationDialog imageUrl={dt.payments[0].evidence ?? ""} finalPrice={dt.finalPrice} paymentId={dt.payments[0].id} status={dt.status} onValidatePaymentEvidence={onValidatePaymentEvidence}/>
+                                                            : dt.status === "CANCELLED" || dt.status === "WAITING_PAYMENT" ? 
+                                                                <>-</> 
+                                                            : 
+                                                                <div className="bg-green-100 text-green-600 rounded-lg w-8 h-8 p-[5px] mx-auto">
+                                                                    <CheckIcon className="w-5 h-5"/>
                                                                 </div>
-                                                            </DialogContent>
-                                                        </Dialog>
-                                                    : dt.status === "CANCELLED" || dt.status === "WAITING_PAYMENT" ? 
-                                                        <>-</> 
-                                                    : 
-                                                        <div className="bg-green-100 text-green-600 rounded-lg w-8 h-8 p-[5px] mx-auto">
-                                                            <CheckIcon className="w-5 h-5"/>
-                                                        </div>
-                                                }
-                                            </TableCell>
+                                                        }
+                                                    </TableCell>
+                                            }
                                             <TableCell>
                                                 {
                                                     dt.status !== "WAITING_PAYMENT" && dt.status !== "WAITING_PAYMENT_CONFIRMATION" ?
@@ -155,23 +135,25 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
                     </TableBody>
                 </Table>
             </div>
+            <div className="p-4 bg-emerald-700">
             {
                 meta && 
-                    <div className="flex items-center justify-between mt-5 pt-4 border-t border-slate-100">
-                        <p className="text-sm text-slate-400">Showing {startItem} to {endItem} of {totalOrders.toLocaleString(currencyFormat)} orders</p>
+                    <div className="flex items-center justify-between">
+                        <p className="text-sm text-white">Showing {startItem} to {endItem} of {totalOrders.toLocaleString(currencyFormat)} orders</p>
                         <div className="flex items-center gap-1">
-                            <Button variant="outline" size="sm" onClick={() => onPageChange(currentPage - 1)} disabled={currentPage <= 1} className="h-8 w-8 p-0">‹</Button>
+                            <Button variant="outline" size="sm" onClick={() => onPageChange(currentPage - 1)} disabled={currentPage <= 1} className="h-8 w-8 p-0 border-0 bg-transparent text-white hover:bg-green-600 hover:text-white"><ChevronLeftIcon/></Button>
                             { 
                                 pageNumbers.map((p) => 
-                                    <Button key={p} variant={p === currentPage ? "default" : "outline"} size="sm" onClick={() => onPageChange(p)} className={`h-8 w-8 p-0 ${p === currentPage ? "bg-teal-700 border-teal-700 hover:bg-teal-800" : ""}`}>
+                                    <Button key={p} variant={p === currentPage ? "default" : "outline"} size="sm" onClick={() => onPageChange(p)} className={`h-8 w-8 p-0 border-0 bg-transparent text-white hover:bg-green-600 hover:text-white ${p === currentPage ? "bg-green-600 text-white" : ""}`}>
                                         {p}
                                     </Button>
                                 ) 
                             }
-                            <Button variant="outline" size="sm" onClick={() => onPageChange(currentPage + 1)} disabled={currentPage >= totalPages} className="h-8 w-8 p-0">›</Button>
+                            <Button variant="outline" size="sm" onClick={() => onPageChange(currentPage + 1)} disabled={currentPage >= totalPages} className="h-8 w-8 p-0 border-0 bg-transparent text-white hover:bg-green-600 hover:text-white"><ChevronRightIcon/></Button>
                         </div>
                     </div>
             }
+            </div>
         </div>
     )
 }
