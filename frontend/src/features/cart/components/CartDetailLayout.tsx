@@ -26,7 +26,7 @@ export function CartDetailLayout({ cartId }: Props) {
     // Handle hook (action)
     const onSuccess = () => fetchCartDetail(cartId)
     const {
-        selectedVoucher, selectedAddressId, setSelectedAddressId, paymentMethod, setPaymentMethod,
+        selectedVoucher, selectedAddressId, setSelectedAddressId, paymentMethod, setPaymentMethod, localQty,
         handleApply, handleRemove, handleRemoveCartItem, handleIncrease, handleDecrease, handleCheckout,
     } = useCartActions(onSuccess, cartId)
 
@@ -146,21 +146,21 @@ export function CartDetailLayout({ cartId }: Props) {
                         branchName={cart.branch.storeName}
                         items={
                             cart.items.map(dt => ({
-                            id: dt.id,
-                            cartId: cartId,
-                            slugName: dt.product.product.slugName,
-                            productName: dt.product.product.productName,
-                            productDiscounts: dt.product.product.productDiscounts,
-                            category: dt.product.product.category,
-                            productImages: dt.product.product.productImages,
-                            quantity: dt.quantity,
-                            currentStock: dt.product.currentStock,
-                            weight: dt.product.product.weight * dt.quantity,
-                            basePrice: dt.product.product.basePrice,
-                            totalPrice: dt.product.product.basePrice * dt.quantity,
-                            discountAmount: dt.product.product.discountAmount,
-                            finalTotalPrice: dt.product.product.finalTotalPrice,
-                            finalPricePerItem: dt.product.product.finalPricePerItem
+                                id: dt.id,
+                                cartId: cartId,
+                                slugName: dt.product.product.slugName,
+                                productName: dt.product.product.productName,
+                                productDiscounts: dt.product.product.productDiscounts,
+                                category: dt.product.product.category,
+                                productImages: dt.product.product.productImages,
+                                quantity: localQty[dt.id] ?? dt.quantity,
+                                currentStock: dt.product.currentStock,
+                                weight: dt.product.product.weight * (localQty[dt.id] ?? dt.quantity),
+                                basePrice: dt.product.product.basePrice,
+                                totalPrice: dt.product.product.basePrice * (localQty[dt.id] ?? dt.quantity),
+                                discountAmount: dt.product.product.discountAmount,
+                                finalTotalPrice: dt.product.product.finalTotalPrice,
+                                finalPricePerItem: dt.product.product.finalPricePerItem
                             }))
                         }
                         onIncrease={handleIncrease}

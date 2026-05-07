@@ -94,7 +94,7 @@ export function OrderLayout() {
                         }
                         { 
                             // Render failed fetching condition
-                            !isLoading && orders.length === 0 && <MessageBox context={'No orders found'} image={"/assets/empty.png"} urlButton={'/dashboard/products'} titleButton='Browse Now!' description={"It looks like you haven't made any transactions yet. Buy a product now and get an extra discount"}/>
+                            !isLoading && orders.length === 0 && <MessageBox context={'No orders found'} image={"/assets/empty.png"} urlButton={'/'} titleButton='Browse Now!' description={"It looks like you haven't made any transactions yet. Buy a product now and get an extra discount"}/>
                         }
                         {
                             // Pagination
