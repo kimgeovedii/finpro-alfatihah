@@ -10,6 +10,7 @@ import {
   UserGroupIcon,
   XMarkIcon 
 } from "@heroicons/react/24/outline";
+import { StarIcon } from "@heroicons/react/24/solid";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 
@@ -21,6 +22,7 @@ interface BranchTableRowProps {
   onManageSchedules: (branch: Branch) => void;
   onAssignAdmin: (branch: Branch) => void;
   onViewAdmins: (branch: Branch) => void;
+  onSetDefault: (branch: Branch) => void;
 }
 
 export const BranchTableRow: React.FC<BranchTableRowProps> = ({
@@ -31,6 +33,7 @@ export const BranchTableRow: React.FC<BranchTableRowProps> = ({
   onManageSchedules,
   onAssignAdmin,
   onViewAdmins,
+  onSetDefault,
 }) => {
   const router = useRouter();
 
@@ -38,7 +41,15 @@ export const BranchTableRow: React.FC<BranchTableRowProps> = ({
     <tr className="hover:bg-[#e6e8ea]/30 transition-colors group">
       <td className="py-4 px-6 font-medium text-slate-900">
         <div className="flex flex-col">
-          <span>{branch.storeName}</span>
+          <div className="flex items-center gap-2">
+            <span>{branch.storeName}</span>
+            {branch.isDefault && (
+              <span className="inline-flex items-center gap-1 text-[10px] bg-amber-50 text-amber-600 px-2 py-0.5 rounded-md font-bold uppercase tracking-wider border border-amber-100">
+                <StarIcon className="w-3 h-3" />
+                Default
+              </span>
+            )}
+          </div>
           <span className="text-xs text-slate-500 font-normal">{branch.id.slice(0, 8)}...</span>
         </div>
       </td>
@@ -135,6 +146,17 @@ export const BranchTableRow: React.FC<BranchTableRowProps> = ({
       </td>
       <td className="py-4 px-6 text-right">
         <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          {!branch.isDefault && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onSetDefault(branch)}
+              title="Set as Default Branch"
+              className="text-slate-500 hover:text-amber-500 hover:bg-amber-50 h-8 w-8"
+            >
+              <StarIcon className="w-4 h-4" />
+            </Button>
+          )}
           <Link href={`/dashboard/branches/${branch.id}`}>
             <Button
               variant="ghost"

@@ -111,4 +111,19 @@ export class BranchAdminService {
   async unassignEmployee(employeeId: string) {
     return this.adminRepo.unassignEmployee(employeeId);
   }
+
+  async setDefaultBranch(id: string) {
+    const branch = await this.branchRepo.findById(id);
+    if (!branch) throw new Error("Branch not found");
+
+    // Validate: branch must have products
+    const { total } = await this.branchRepo.findProductsByBranch(id, 0, 1);
+    if (total === 0) {
+      throw new Error("Cannot set as default: this branch has no products. Please add products to this branch first.");
+    }
+
+    // Reset all defaults first, then set the target
+    await this.branchRepo.resetAllDefaults();
+    return this.branchRepo.setDefault(id);
+  }
 }

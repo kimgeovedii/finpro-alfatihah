@@ -7,6 +7,7 @@ export interface BranchData {
   latitude: number;
   longitude: number;
   maxDeliveryDistance: number;
+  isDefault?: boolean;
   schedules?: {
     dayName: string;
     startTime: string;

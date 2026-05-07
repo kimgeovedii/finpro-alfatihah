@@ -99,6 +99,7 @@ export class BranchRepository {
         latitude: true,
         longitude: true,
         maxDeliveryDistance: true,
+        isDefault: true,
       },
       orderBy: { createdAt: "asc" },
     });
@@ -120,6 +121,7 @@ export class BranchRepository {
           latitude: true,
           longitude: true,
           maxDeliveryDistance: true,
+          isDefault: true,
         },
         orderBy: { createdAt: "asc" },
       }),
@@ -186,5 +188,25 @@ export class BranchRepository {
       console.error("Error mapping products in BranchRepository:", err);
       throw err;
     }
+  }
+
+  async resetAllDefaults() {
+    return prisma.branch.updateMany({
+      where: { isDefault: true },
+      data: { isDefault: false },
+    });
+  }
+
+  async setDefault(id: string) {
+    return prisma.branch.update({
+      where: { id },
+      data: { isDefault: true },
+      include: {
+        schedules: true,
+        employees: {
+          include: { user: true },
+        },
+      },
+    });
   }
 }

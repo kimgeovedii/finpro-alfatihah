@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { TicketIcon, TruckIcon, SparklesIcon } from "@heroicons/react/24/outline";
+import Link from "next/link";
 
 interface VoucherCardProps {
   title: string | React.ReactNode;
@@ -38,7 +39,7 @@ const VoucherCard = ({ title, subtitle, description, icon: Icon, gradient, shado
 
     <div className="w-24 md:w-32 flex flex-col justify-center items-center bg-white/10 backdrop-blur-md group-hover:bg-white/20 transition-colors shrink-0">
       <Icon className="h-8 w-8 md:h-10 md:w-10 mb-3 group-hover:scale-110 transition-transform duration-500" />
-      <span className="text-[10px] md:text-xs font-black tracking-widest uppercase">Collect</span>
+      <span className="text-[10px] md:text-xs font-black tracking-widest uppercase">Check Now</span>
     </div>
   </motion.div>
 );
@@ -81,15 +82,16 @@ export const ExclusiveVoucher = () => {
 
       <div className="flex overflow-x-auto lg:grid lg:grid-cols-2 gap-4 md:gap-8 -mx-4 px-4 snap-x snap-mandatory scrollbar-hide">
         {vouchers.map((voucher) => (
-          <VoucherCard 
-            key={voucher.id}
-            title={voucher.title as any}
-            subtitle={voucher.subtitle}
-            description={voucher.description}
-            icon={voucher.icon}
-            gradient={voucher.gradient}
-            shadowColor={voucher.shadowColor}
-          />
+          <Link key={voucher.id} href="/cart">
+            <VoucherCard 
+              title={voucher.title as any}
+              subtitle={voucher.subtitle}
+              description={voucher.description}
+              icon={voucher.icon}
+              gradient={voucher.gradient}
+              shadowColor={voucher.shadowColor}
+            />
+          </Link>
         ))}
       </div>
     </section>

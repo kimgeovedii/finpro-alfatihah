@@ -35,6 +35,7 @@ export interface Branch {
   longitude: number;
   maxDeliveryDistance: number;
   isActive: boolean;
+  isDefault: boolean;
   city: string;
   province: string;
   district?: string;
