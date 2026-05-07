@@ -10,13 +10,16 @@ export type AddressData = {
     notes: string
     phone: string   
     address: string
+    distance?: number 
+    isWithinRange?: boolean
     isPrimary: boolean
 }
 
 export type BranchData = {
-    id: string
+    id?: string
     storeName: string
     address: string
-    city: string
+    city?: string
     schedules: Schedule[]
+    openStatus?: string
 }

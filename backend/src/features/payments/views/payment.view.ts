@@ -1,5 +1,5 @@
 import { currencyFormat } from "../../../constants/business.const"
-import { mailTemplateStyle } from "../../../utils/template"
+import { getMailBodyTemplate, mailTemplateStyle } from "../../../utils/template"
 
 type Payment = {
     orderNumber: string
@@ -23,31 +23,21 @@ export const getPaymentConfirmationTemplate = (data: Payload) => {
         </div>
     `
 
+    const body = getMailBodyTemplate('Payment Confirmation Needed', data.username ?? 'Unknown User', `
+        <p>A customer has just uploaded payment evidence. Please review and confirm the payment.</p>
+        ${paymentsHtml}
+        <p style="margin-top:20px;">Please verify the payment to proceed with the order.</p>
+    `)
+
     return `
         <!DOCTYPE html>
         <html>
-        <head>
-            ${mailTemplateStyle()}
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1>Payment Confirmation Needed</h1>
-                </div>
-                <div class="content">
-                    <p>Hello <strong>${data.username}</strong>, A customer has just uploaded payment evidence. Please review and confirm the payment.</p>
-                    ${paymentsHtml}
-                    <p style="margin-top:20px;">Please verify the payment to proceed with the order.</p>
-                    <p>
-                        Best regards,<br/>
-                        <strong>Alfatihah</strong>
-                    </p>
-                </div>
-                <div class="footer">
-                    © ${new Date().getFullYear()} Alfatihah. All rights reserved.
-                </div>
-            </div>
-        </body>
+            <head>
+                ${mailTemplateStyle()}
+            </head>
+            <body>
+                ${body}
+            </body>
         </html>
     `
 }
@@ -58,32 +48,23 @@ type PaymentConfirmedPayload = {
 }
 
 export const getPaymentConfirmedTemplate = (data: PaymentConfirmedPayload) => {
+    const body = getMailBodyTemplate('Payment Confirmed! 🎉🎉🎉', data.username ?? 'Unknown User', `
+        <p>your payment evidence has been confirmed. Please wait while we process your order, and it will be shipped to your address as soon as possible.</p>
+        <div class="context-box" style="margin-bottom:16px;">
+            <p style="margin:0 0 6px 0;"><strong>Order ID:</strong> ${data.orderNumber}</p>
+        </div>
+    `)
+
+
     return `
         <!DOCTYPE html>
         <html>
-        <head>
-            ${mailTemplateStyle()}
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1>Payment Confirmed! 🎉🎉🎉</h1>
-                </div>
-                <div class="content">
-                    <p>Hello <strong>${data.username}</strong>, your payment evidence has been confirmed. Please wait while we process your order, and it will be shipped to your address as soon as possible.</p>
-                    <div class="context-box" style="margin-bottom:16px;">
-                        <p style="margin:0 0 6px 0;"><strong>Order ID:</strong> ${data.orderNumber}</p>
-                    </div>
-                    <p>
-                        Best regards,<br/>
-                        <strong>Alfatihah</strong>
-                    </p>
-                </div>
-                <div class="footer">
-                    © ${new Date().getFullYear()} Alfatihah. All rights reserved.
-                </div>
-            </div>
-        </body>
+            <head>
+                ${mailTemplateStyle()}
+            </head>
+            <body>
+                ${body}
+            </body>
         </html>
     `
 }

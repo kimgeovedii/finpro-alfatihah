@@ -6,11 +6,14 @@ import { ProductDetailImageGallery } from "./ProductDetailImageGallery";
 import { ProductDetailInfoContent } from "./ProductDetailInfoContent";
 import { ProductDetailCartAction } from "./ProductDetailCartAction";
 import { ProductBreadcrumb } from "./ProductBreadCrumb";
-import { ProductBranchInfoCard } from "./ProductBranchInfo";
+import { BranchInfoCard } from "../../../components/layout/BranchInfoCard";
 import { useProductActions } from "../hooks/useProductActions";
 import { useStoreSelection } from "../hooks/useStoreSelection";
+import { useAuthStore } from "@/features/auth/store/useAuthStore";
+import { BackButton } from "@/components/button/BackButton";
 
 export const ProductDetail = ({ slugName, storeName: storeNameProp }: { slugName: string, storeName?: string }) => {
+  const user = useAuthStore((state) => state.user);
   const { storeName } = useStoreSelection(storeNameProp);
   const { product, isLoading, error, fetchProduct } = useProductDetail(slugName, storeName);
   const { cartProps, isAvailable, branchInventory } = useProductActions(product, fetchProduct);
@@ -60,13 +63,7 @@ export const ProductDetail = ({ slugName, storeName: storeNameProp }: { slugName
               price={product.basePrice}
             />
             {branchInventory ? (
-              <ProductBranchInfoCard
-                branch={{
-                  storeName: branchInventory.branch.storeName,
-                  address: branchInventory.branch.address,
-                  schedules: branchInventory.branch.schedules,
-                }}
-              />
+              <BranchInfoCard branch={branchInventory.branch}/>
             ) : (
               <div className="bg-orange-50 border border-orange-100 p-6 rounded-[2rem]">
                 <p className="text-orange-800 font-bold text-sm">
@@ -77,13 +74,14 @@ export const ProductDetail = ({ slugName, storeName: storeNameProp }: { slugName
                 </p>
               </div>
             )}
-            <ProductDetailCartAction {...cartProps} variant="mobile" />
+            <ProductDetailCartAction {...cartProps} variant="mobile" role={user?.role ?? 'GUEST'}/>
           </div>
         </div>
 
         {/* Desktop Layout */}
         <div className="hidden lg:block pt-10 pb-24 px-8 xl:px-12 max-w-[1600px] mx-auto">
-          <div className="mb-8">
+          <div className='mb-8 flex gap-5 items-center'>
+            <BackButton url={branchInventory?.branch.storeName??""}/>
             <ProductBreadcrumb name={product.productName} />
           </div>
           <div className="grid grid-cols-[1.2fr_1fr_0.8fr] gap-8 xl:gap-14 items-start">
@@ -101,13 +99,7 @@ export const ProductDetail = ({ slugName, storeName: storeNameProp }: { slugName
                 price={product.basePrice}
               />
               {branchInventory ? (
-                <ProductBranchInfoCard
-                  branch={{
-                    storeName: branchInventory.branch.storeName,
-                    address: branchInventory.branch.address,
-                    schedules: branchInventory.branch.schedules,
-                  }}
-                />
+                <BranchInfoCard branch={branchInventory.branch}/>
               ) : (
                 <div className="bg-orange-50 border border-orange-100 p-6 rounded-[2rem]">
                   <p className="text-orange-800 font-bold text-sm">
@@ -121,7 +113,7 @@ export const ProductDetail = ({ slugName, storeName: storeNameProp }: { slugName
             </div>
 
             <div className="relative">
-              <ProductDetailCartAction {...cartProps} variant="desktop" />
+              <ProductDetailCartAction {...cartProps} variant="desktop" role={user?.role ?? 'GUEST'} />
             </div>
           </div>
         </div>

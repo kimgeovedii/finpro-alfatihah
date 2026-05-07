@@ -1,4 +1,5 @@
 import { DividerLine } from "@/components/layout/DividerLine"
+import { HeadingText } from "@/components/layout/HeadingText"
 import { currencyFormat } from "@/constants/business.const"
 
 type Props = {
@@ -27,7 +28,7 @@ export const OrderManagementTableOrderPlacedSection: React.FC<Props> = ({ method
             </div>
             <DividerLine/>
             <div className="flex justify-between">
-                <p className="font-bold text-lg">Final Price</p>
+                <HeadingText level={3} children="Final Price"/>
                 <p className="font-bold text-lg">Rp. {finalPrice.toLocaleString(currencyFormat)}</p>
             </div>
         </div>

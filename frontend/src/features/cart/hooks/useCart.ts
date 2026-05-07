@@ -147,7 +147,6 @@ export const useCheckoutCartItem = () => {
 
         try {
             const res = await cartRepository.postCheckout(cartId, addressId, paymentMethod, voucherId)
-            console.log("Checkout res:", res)
             return { success: true, redirectUrl: res.redirectUrl }
         } catch (err: any) {
             setError(err.message || "Failed to checkout cart item")

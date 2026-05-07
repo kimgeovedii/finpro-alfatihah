@@ -21,10 +21,13 @@ export const actionMessages = {
     cartAskRemoveTitle: "Remove cart?",
     cartAskRemoveDesc: "All items in this cart will be deleted.",
     cartAskBack: "Back to cart page",
+    cartAskCheckoutTitle: "Confirm Checkout",
+    cartAskCheckoutDesc: "Are you sure you want to place this order?",
     // Order - Negative Case
     orderCreateFailed: "Failed to create an order",
     orderAskAddress: "Please select an address",
     // General Case
-    confirmDeleteButton: "Yes, remove"
+    confirmDeleteButton: "Yes, remove",
+    confirmCheckout: "Yes, place order"
 }
   

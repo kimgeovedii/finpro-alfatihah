@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { currencyFormat, OrderStatus, statusColorMap } from "@/constants/business.const"
 import { Badge } from "@/components/ui/badge"
 import { formatDate } from "@/utils/converter.util"
-import { BanknotesIcon, CheckIcon } from "@heroicons/react/24/outline"
+import { ArrowRightIcon, BanknotesIcon, CheckIcon, EnvelopeIcon } from "@heroicons/react/24/outline"
 import { CopyFieldButton } from "@/components/button/CopyFieldButton"
 import { PaymentData } from "@/types/payment.type"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -13,6 +13,7 @@ import Link from "next/link"
 import { PaginationMeta } from "@/types/global.type"
 import { MessageBox } from "@/components/layout/MessageBox"
 import { MiniTagBox } from "@/components/layout/MiniTagBox"
+import { UserIcon } from "@heroicons/react/20/solid"
 
 export type OrderTableItem = {
     id: string
@@ -31,7 +32,6 @@ type Props = {
     meta: PaginationMeta | null
     activeStatus: string
     isLoading: boolean
-
     onPageChange: (page: number) => void
     onValidatePaymentEvidence: (paymentId: string, isConfirm: boolean) => void
 }
@@ -48,7 +48,7 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
 
     return (
         <div className="bg-white border border-slate-200 rounded-2xl p-4 md:p-6 w-full">
-            <div className="w-full overflow-x-auto max-w-[80vw] md:max-w-[57.5vw] lg:max-w-full">
+            <div className="w-full overflow-x-auto max-w-[80vw] md:max-w-[87.5vw] lg:max-w-full">
                 <Table className="min-w-[700px]">
                     <TableHeader>
                         <TableRow className="uppercase text-xs tracking-wider text-slate-400">
@@ -79,17 +79,23 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
                                 orders.map(dt => {
                                     // Color mapping
                                     const statusClass = statusColorMap[dt.status] || "bg-slate-400"
-                                    const finalStatus = dt.status.replaceAll('_',' ')
+                                    const finalStatus = dt.status !== "WAITING_PAYMENT_CONFIRMATION" ? dt.status.replaceAll('_',' ') : "NEED CONFIRMATION"
                                     
                                     return (
                                         <TableRow key={dt.id} className="hover:bg-slate-50">
                                             <TableCell className="font-semibold text-slate-800">
-                                                <MiniTagBox context={"Branch"} val={dt.storeName}/>
+                                                <Link href={`/${dt.storeName}`} className="cursor-pointer">
+                                                    <MiniTagBox val={dt.storeName}/>
+                                                </Link>
                                                 <CopyFieldButton label="Order number" value={dt.orderNumber} customClass="text-sm font-semibold"/>
                                             </TableCell>
                                             <TableCell>
-                                                <p className="font-medium text-slate-800">{dt.customerName}</p>
-                                                <p className="text-xs text-slate-400">{dt.customerEmail}</p>
+                                                <p className="font-medium text-slate-800 flex items-center gap-1">
+                                                    <UserIcon className="h-4 w-4"/> {dt.customerName}
+                                                </p>
+                                                <p className="text-xs text-slate-400 flex items-center gap-1">
+                                                    <EnvelopeIcon className="h-4 w-4"/> {dt.customerEmail}
+                                                </p>
                                             </TableCell>
                                             <TableCell className="text-slate-600">{formatDate(dt.createdAt,true)}</TableCell>
                                             <TableCell className="text-slate-800 font-medium">Rp {dt.finalPrice.toLocaleString(currencyFormat)}</TableCell>
@@ -101,7 +107,7 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
                                                     dt.status !== "WAITING_PAYMENT" && dt.payments.length > 0 && dt.payments[0].method === "MANUAL" && dt.payments[0].evidence !== null ?        
                                                         <Dialog>
                                                             <DialogTrigger asChild>
-                                                                <Button className="bg-transparent text-teal-700 font-semibold text-sm hover:underline border-teal-700 border-1 rounded-lg p-2 hover:bg-teal-700 hover:text-white cursor-pointer mx-auto block">
+                                                                <Button className="bg-orange-400 text-white font-semibold text-xs px-3 mx-auto block">
                                                                     <BanknotesIcon className="w-5 h-5"/>
                                                                 </Button>
                                                             </DialogTrigger>
@@ -134,8 +140,8 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
                                             <TableCell>
                                                 {
                                                     dt.status !== "WAITING_PAYMENT" && dt.status !== "WAITING_PAYMENT_CONFIRMATION" ?
-                                                        <Link href={`/manage-order/${dt.orderNumber}`}>
-                                                            <Button className="bg-transparent text-teal-700 font-semibold text-sm hover:underline">Manage</Button>
+                                                        <Link href={`/dashboard/manage-order/${dt.orderNumber}`}>
+                                                            <Button className="bg-teal-700 text-white font-semibold text-xs px-3"><ArrowRightIcon className="w-3 h-3"/> Manage</Button>
                                                         </Link>
                                                     :
                                                         <>-</>
@@ -155,7 +161,13 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
                         <p className="text-sm text-slate-400">Showing {startItem} to {endItem} of {totalOrders.toLocaleString(currencyFormat)} orders</p>
                         <div className="flex items-center gap-1">
                             <Button variant="outline" size="sm" onClick={() => onPageChange(currentPage - 1)} disabled={currentPage <= 1} className="h-8 w-8 p-0">‹</Button>
-                            { pageNumbers.map((p) => <Button key={p} variant={p === currentPage ? "default" : "outline"} size="sm" onClick={() => onPageChange(p)} className={`h-8 w-8 p-0 ${p === currentPage ? "bg-teal-700 border-teal-700 hover:bg-teal-800" : ""}`}>{p}</Button>) }
+                            { 
+                                pageNumbers.map((p) => 
+                                    <Button key={p} variant={p === currentPage ? "default" : "outline"} size="sm" onClick={() => onPageChange(p)} className={`h-8 w-8 p-0 ${p === currentPage ? "bg-teal-700 border-teal-700 hover:bg-teal-800" : ""}`}>
+                                        {p}
+                                    </Button>
+                                ) 
+                            }
                             <Button variant="outline" size="sm" onClick={() => onPageChange(currentPage + 1)} disabled={currentPage >= totalPages} className="h-8 w-8 p-0">›</Button>
                         </div>
                     </div>

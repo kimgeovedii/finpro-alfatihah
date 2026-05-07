@@ -1,10 +1,7 @@
 "use client";
 import { motion } from "framer-motion";
-import {
-  PlusIcon,
-  MinusIcon,
-  ShoppingBagIcon,
-} from "@heroicons/react/24/outline";
+import { useRouter } from "next/navigation"
+import { PlusIcon, MinusIcon, ShoppingBagIcon } from "@heroicons/react/24/outline";
 import { ProductDetailCartActionProps } from "@/features/products/types/product.type";
 import { ProductAddedInfoCard } from "./ProductAddedInfoCard";
 import { ProductRemoveButton } from "./ProductRemoveButton";
@@ -17,18 +14,18 @@ const formatMoney = (value: number) =>
     maximumFractionDigits: 0,
   }).format(value);
 
-export const ProductDetailCartAction = ({
-  qty,
-  setQty,
-  price,
-  totalPrice,
-  variant,
-  onAddToCart,
-  onRemoveFromCart,
-  isCreating,
-  currentCartQty,
-  disabled,
-}: ProductDetailCartActionProps) => {
+export const ProductDetailCartAction = ({ qty, setQty, price, totalPrice, variant, onAddToCart, onRemoveFromCart, isCreating, currentCartQty, disabled, role }: ProductDetailCartActionProps) => {
+  const router = useRouter()
+
+  const handleCartAction = () => {
+    if (role === "GUEST") {
+      router.push("/login")
+      return
+    }
+
+    onAddToCart()
+  }
+
   if (variant === "mobile") {
     // Mobile layout
     return (
@@ -44,28 +41,31 @@ export const ProductDetailCartAction = ({
           <div className="flex items-center gap-4">
             <button
               onClick={() => setQty(Math.max(1, qty - 1))}
-              disabled={disabled}
+              disabled={role === "CUSTOMER" ? disabled : true}
               className="w-11 h-11 flex items-center justify-center rounded-2xl bg-white text-emerald-700 shadow-sm hover:bg-emerald-700 hover:text-white transition-colors disabled:opacity-50"
             >
               <MinusIcon className="w-5 h-5 stroke-2" />
             </button>
-            <span className="font-extrabold text-xl w-6 text-center text-slate-900">
+            <span className={`font-extrabold text-xl w-6 text-center ${role === "CUSTOMER" ? 'text-slate-900' : 'text-gray-400'}`}>
               {qty}
             </span>
             <button
               onClick={() => setQty(qty + 1)}
-              disabled={disabled}
+              disabled={role === "CUSTOMER" ? disabled : true}
               className="w-11 h-11 flex items-center justify-center rounded-2xl bg-white text-emerald-700 shadow-sm hover:bg-emerald-700 hover:text-white transition-colors disabled:opacity-50"
             >
               <PlusIcon className="w-5 h-5 stroke-2" />
             </button>
           </div>
-          <div className="flex-1 text-right whitespace-nowrap">
-            <span className="text-slate-500 text-sm font-medium">Total:</span>
-            <span className="text-slate-900 font-extrabold text-xl ml-2 tracking-tighter">
-              {formatMoney(totalPrice)}
-            </span>
-          </div>
+          {
+            role === "CUSTOMER" &&
+              <div className="flex-1 text-right whitespace-nowrap">
+                <span className="text-slate-500 text-sm font-medium">Total:</span>
+                <span className="text-slate-900 font-extrabold text-xl ml-2 tracking-tighter">
+                  {formatMoney(totalPrice)}
+                </span>
+              </div>
+          }
         </div>
 
         <div>
@@ -75,7 +75,7 @@ export const ProductDetailCartAction = ({
             >
               <motion.button
                 whileTap={!disabled ? { scale: 0.96 } : {}}
-                onClick={onAddToCart}
+                onClick={handleCartAction}
                 disabled={isCreating || disabled}
                 className="w-full bg-linear-to-r from-emerald-800 to-emerald-600 text-white py-4 rounded-[1.5rem] font-bold text-lg flex items-center justify-center gap-3 shadow-lg shadow-emerald-700/20 disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed"
               >
@@ -84,13 +84,9 @@ export const ProductDetailCartAction = ({
                 ) : (
                   <ShoppingBagIcon className="w-6 h-6" />
                 )}
-                {isCreating
-                  ? "Adding..."
-                  : disabled
-                    ? "Not Available"
-                    : currentCartQty
-                      ? "Add More?"
-                      : "Add to Cart"}
+                {
+                  isCreating ? "Adding..." : disabled ? "Not Available" : currentCartQty ? "Add More?" : "Add to Cart"
+                }
               </motion.button>
               {currentCartQty ? (
                 <ProductRemoveButton
@@ -120,13 +116,12 @@ export const ProductDetailCartAction = ({
       ) : (
         <></>
       )}
-      <div className="mb-8">
+      <div className={role === "CUSTOMER" ? "mb-8" : ""}>
         <span className="text-4xl font-extrabold text-slate-900 tracking-tight">
           {formatMoney(price)}
         </span>
-        <span className="text-slate-500 text-sm ml-1">/ piece</span>
+        <span className="text-slate-500 text-sm ml-1">/ item</span>
       </div>
-
       <div className="space-y-8">
         <div className={disabled ? "opacity-50 pointer-events-none" : ""}>
           <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-4 block">
@@ -135,33 +130,34 @@ export const ProductDetailCartAction = ({
           <div className="flex items-center justify-between bg-white rounded-full border border-slate-200/60 px-4 py-1">
             <button
               onClick={() => setQty(Math.max(1, qty - 1))}
-              disabled={disabled}
+              disabled={role === "CUSTOMER" ? disabled : true}
               className="w-10 h-10 flex items-center justify-center rounded-full text-slate-700 hover:bg-slate-100 transition-colors disabled:opacity-50"
             >
               <MinusIcon className="w-5 h-5 stroke-2" />
             </button>
-            <span className="font-extrabold text-lg text-slate-900">{qty}</span>
+            <span className={`font-extrabold text-lg ${role === "CUSTOMER" ? 'text-slate-900' : 'text-gray-400'}`}>{qty}</span>
             <button
               onClick={() => setQty(qty + 1)}
-              disabled={disabled}
+              disabled={role === "CUSTOMER" ? disabled : true}
               className="w-10 h-10 flex items-center justify-center rounded-full text-slate-700 hover:bg-slate-100 transition-colors disabled:opacity-50"
             >
               <PlusIcon className="w-5 h-5 stroke-2" />
             </button>
           </div>
         </div>
-
         <div className="pt-2">
-          <div className="flex justify-between items-center mb-6 px-1">
-            <span className="text-slate-500 font-medium">Total</span>
-            <span className="text-slate-900 font-extrabold text-xl tracking-tighter">
-              {formatMoney(totalPrice)}
-            </span>
-          </div>
-
+          {
+            role === "CUSTOMER" &&
+              <div className="flex justify-between items-center mb-6 px-1">
+                <span className="text-slate-500 font-medium">Total</span>
+                <span className="text-slate-900 font-extrabold text-xl tracking-tighter">
+                  {formatMoney(totalPrice)}
+                </span>
+              </div>
+          }
           <div className="flex flex-col space-y-4">
             <motion.button
-              onClick={onAddToCart}
+              onClick={handleCartAction}
               disabled={isCreating || disabled}
               whileTap={!disabled ? { scale: 0.96 } : {}}
               className="w-full bg-linear-to-r from-emerald-800 to-emerald-600 text-white py-4 rounded-[1.5rem] font-bold text-lg flex items-center justify-center gap-3 shadow-lg shadow-emerald-700/20 disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed"

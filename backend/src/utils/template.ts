@@ -50,6 +50,24 @@ export const mailTemplateStyle = () => {
     `
 }
 
+export const getMailBodyTemplate = (heading: string, username: string, content: string) => {
+    return `
+        <div class="container">
+            <div class="header">
+                <h1>${heading}</h1>
+            </div>
+            <div class="content">
+                <p>Hello <strong>${username}</strong>,</p>
+                ${content}
+                <p>Best regards,<br/><strong>Alfatihah</strong></p>
+            </div>
+            <div class="footer">
+                © ${new Date().getFullYear()} Alfatihah. All rights reserved.
+            </div>
+        </div>
+    `
+}
+
 type EmailOrderPayload = {
     username: string | null
     orderNumber: string
@@ -58,32 +76,22 @@ type EmailOrderPayload = {
 }
 
 export const getOrderMailTemplate = (data: EmailOrderPayload) => {
+    const body = getMailBodyTemplate(data.title, data.username ?? 'Unknown User', `
+        <p>${data.content}</p>
+        <div class="context-box" style="margin-bottom:16px;">
+            <p style="margin:0 0 6px 0;"><strong>Order ID:</strong> ${data.orderNumber}</p>
+        </div>
+    `)
+
     return `
         <!DOCTYPE html>
         <html>
-        <head>
-            ${mailTemplateStyle()}
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1>${data.title}</h1>
-                </div>
-                <div class="content">
-                    <p>Hello <strong>${data.username}</strong>, ${data.content}</p>
-                    <div class="context-box" style="margin-bottom:16px;">
-                        <p style="margin:0 0 6px 0;"><strong>Order ID:</strong> ${data.orderNumber}</p>
-                    </div>
-                    <p>
-                        Best regards,<br/>
-                        <strong>Alfatihah</strong>
-                    </p>
-                </div>
-                <div class="footer">
-                    © ${new Date().getFullYear()} Alfatihah. All rights reserved.
-                </div>
-            </div>
-        </body>
+            <head>
+                ${mailTemplateStyle()}
+            </head>
+            <body>
+                ${body}
+            </body>
         </html>
     `
 }
