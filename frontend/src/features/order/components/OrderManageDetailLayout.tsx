@@ -6,6 +6,7 @@ import { MessageBox } from "@/components/layout/MessageBox"
 import { BackButton } from "@/components/button/BackButton"
 import { HeadingText } from "@/components/layout/HeadingText"
 import { useManageOrderActions } from "@/features/order/hooks/useManageOrderAction"
+import { useAuthStore } from "@/features/auth/store/useAuthStore"
 
 type Props = {
     orderNumber: string
@@ -13,6 +14,7 @@ type Props = {
   
 export function OrderManageDetailLayout({ orderNumber }: Props) {
     // Handle hook (fetch)
+    const employee = useAuthStore((state) => state.user?.employee)
     const { order, isLoading, fetchOrderDetail } = useOrderDetailData(orderNumber)
     
     // Handle hook (action)
@@ -64,6 +66,7 @@ export function OrderManageDetailLayout({ orderNumber }: Props) {
                     address={order?.address}
                     status={order?.status}
                     distance={order?.distance}
+                    role={employee?.role ?? ""}
                 />
                 </div>
         }

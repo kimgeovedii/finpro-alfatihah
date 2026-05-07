@@ -52,7 +52,7 @@ export const OrderDetailBranchCard: React.FC<Props> = ({ branch, orderInfo }) =>
     }
 
     return (
-        <div className="bg-white rounded-3xl">
+        <div className="bg-white rounded-3xl border border-slate-200">
             <div className="p-5 pb-0">
                 <CopyFieldButton label="Order number" value={orderInfo.orderNumber} customClass="text-lg font-semibold"/>
                 <DividerLine/>

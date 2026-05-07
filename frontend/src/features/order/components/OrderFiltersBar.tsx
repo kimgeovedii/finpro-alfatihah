@@ -15,9 +15,10 @@ type Props = {
     onStatusChange: (status: OrderStatus | "ALL") => void
     onBranchChange: (id: string) => void
     onSearchChange: (val: string) => void
+    isFilterBranchDisabled: boolean
 }
 
-export const OrderFiltersBar: React.FC<Props> = ({ branchId, branches, isBranchLoading, activeStatus, search, onSearchChange, onStatusChange, onBranchChange }) => {
+export const OrderFiltersBar: React.FC<Props> = ({ branchId, branches, isBranchLoading, activeStatus, search, onSearchChange, onStatusChange, onBranchChange, isFilterBranchDisabled }) => {
     return (
         <div className="flex flex-wrap items-center gap-3 mb-5 bg-white p-4 rounded-xl justify-between">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 my-3 w-full lg:w-auto">
@@ -32,6 +33,7 @@ export const OrderFiltersBar: React.FC<Props> = ({ branchId, branches, isBranchL
                         value={branchId}
                         onValueChange={onBranchChange}
                         isLoading={isBranchLoading}
+                        disabled={isFilterBranchDisabled}
                     />
                 </div>
             </div>

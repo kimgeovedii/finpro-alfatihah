@@ -1,9 +1,9 @@
 import React from "react"
-import { AddressSelectionModal } from "./AddressSelectionModal"
 import { AddressAdditionalInfoSection } from "./AddressAdditionalInfoSection"
 import { HeadingText } from "@/components/layout/HeadingText"
 import { BranchInfoCard } from "@/components/layout/BranchInfoCard"
 import { AddressData, BranchData } from "@/types/address.type"
+import { AddressSelectionDialog } from "./AddressSelectionDialog"
 
 type Props = {
     branch: BranchData
@@ -22,12 +22,12 @@ export const AddressSelectionCard: React.FC<Props> = ({ branch, addressList, sel
     })()
 
     return (
-        <div className="bg-white rounded-3xl">
+        <div className="bg-white rounded-3xl border border-slate-200">
             <BranchInfoCard branch={branch} roundedClass="rounded-t-3xl"/>
             <div className="p-4">
                 <div className="flex justify-between items-center mb-2">
                     <HeadingText children="Delivery Address" level={2}/>
-                    <AddressSelectionModal
+                    <AddressSelectionDialog
                         address={addressList}
                         appliedAddress={selectedAddressId}
                         onSelect={onSelect}

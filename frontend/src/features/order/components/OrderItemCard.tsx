@@ -64,7 +64,7 @@ export const OrderItemCard: React.FC<Props> = ({ orderId, orderNumber, status, t
                 { 
                     status === 'WAITING_PAYMENT' && paymentEvidence === null && paymentMethod === "MANUAL" && 
                         <div className="mt-2">
-                            <PaymentEvidenceUploadButton orderId={orderId} paymentDeadline={paymentDeadline} onSuccess={onSuccess}/> 
+                            <PaymentEvidenceUploadButton orderId={orderId} paymentDeadline={paymentDeadline} onSuccess={onSuccess} isShowDestinationAccount={false}/> 
                         </div>
                 }
                 {
