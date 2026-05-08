@@ -1,3 +1,5 @@
+import { ReactNode } from "react"
+
 // For navigation
 export type PaginationMeta = {
     page: number
@@ -10,7 +12,7 @@ export type StatusInfo = {
     key: string 
     label: string 
     sub: string 
-    icon: any
+    icon: ReactNode
     isLast?: boolean
 }
 

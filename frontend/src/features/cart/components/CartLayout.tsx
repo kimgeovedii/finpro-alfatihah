@@ -33,7 +33,10 @@ export function CartLayout() {
                     <HeadingText children="My Cart" level={1}/>
                     {
                         // Render loading element
-                        isLoading ? <SkeletonBox extraClass={'min-h-[30px]'}/> : <CartSummary totalItems={summary?.totalItems ?? 0} totalQty={summary?.totalQty ?? 0}/>
+                        isLoading ? 
+                            <SkeletonBox extraClass={'min-h-[30px]'}/> 
+                        : 
+                            <CartSummary totalItems={summary?.totalItems ?? 0} totalQty={summary?.totalQty ?? 0}/>
                     }
                     <DividerLine/>
                     <div>
@@ -76,9 +79,10 @@ export function CartLayout() {
                                                     {
                                                         ct.items.map(dt => (
                                                             <CartItemCard key={dt.id}
-                                                                slugName={dt.product.product.slugName} storeName={ct.branch.storeName} productName={dt.product.product.productName} basePrice={dt.product.product.basePrice} 
+                                                                {...dt.product.product}
+                                                                storeName={ct.branch.storeName}
                                                                 mainImage={dt.product.product.productImages[0].imageUrl} qty={localQty[dt.id] ?? dt.quantity} currentStock={dt.product.currentStock} 
-                                                                onDecrease={() => handleDecrease(dt.id, dt.quantity,dt.product.product.productName)}
+                                                                onDecrease={() => handleDecrease(dt.id, dt.quantity, dt.product.product.productName)}
                                                                 onIncrease={() => handleIncrease(dt.id, dt.quantity, dt.product.currentStock)}                        
                                                                 onRemove={() => handleRemoveCartItem(dt.id, `(${dt.quantity}) ${dt.product.product.productName}`)}
                                                             />

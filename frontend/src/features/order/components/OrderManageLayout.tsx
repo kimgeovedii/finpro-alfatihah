@@ -12,18 +12,18 @@ import { useManageOrderActions } from "@/features/order/hooks/useManageOrderActi
 import { useEffect } from "react"
 
 export function OrderManageLayout() {
-    // Call hook (fetch)
+    // Handle hook (fetch)
     const employee = useAuthStore((state) => state.user?.employee)
     const { branchs, isBranchLoading } = useAllBranchData()
 
-    // Call hook (action)
+    // Handle hook (action)
     const { page, fetchOrders, branchId, setBranchId, search, setSearch, tableOrders, meta, isLoading, status, handlePageChange, handleStatusChange, handleValidatePaymentEvidence} = useManageOrderActions(employee?.role, employee?.branchId ?? "ALL")
 
     useEffect(() => {
         fetchOrders(page, status, branchId, search)
-    }, [page, status, branchId, search])
+    }, [page, status, branchId])
     
-    // Call hook (fetch)
+    // Handle hook (fetch)
     const { summaryByBranchId, isLoadingSummaryByBranchId } = useOrderSummaryByBranchId(employee?.role === "SUPER_ADMIN" ? branchId : employee?.branchId ?? branchId)
 
     return (
@@ -80,7 +80,6 @@ export function OrderManageLayout() {
                                 meta={meta}
                                 role={employee?.role ?? ""}
                                 isLoading={isLoading}
-                                activeStatus={status}
                                 onPageChange={handlePageChange}
                                 onValidatePaymentEvidence={handleValidatePaymentEvidence}
                             />

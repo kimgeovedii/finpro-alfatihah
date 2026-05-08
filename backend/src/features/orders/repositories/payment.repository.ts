@@ -15,4 +15,11 @@ export class PaymentRepository {
             data: { status }
         })
     }
+
+    async updatePaymentByOrderId(orderId: string, status: PaymentStatus) {
+        return await prisma.payments.updateMany({
+            where: { orderId },
+            data: { status }
+        })
+    }
 }

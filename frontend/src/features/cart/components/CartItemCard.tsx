@@ -39,7 +39,7 @@ export const CartItemCard: React.FC<Props> = ({ slugName, storeName, productName
                     <TrashIcon className="w-5 h-5"/>
                 </Button>
                 <div className="flex items-center justify-end bg-slate-100/70 rounded-full p-1 shadow-inner">
-                    <Button onClick={onDecrease} className="bg-transparent w-7 h-7 flex items-center justify-center rounded-full text-slate-600 hover:bg-white transition">-</Button>
+                    <Button onClick={onDecrease} className="bg-transparent w-7 h-7 flex items-center justify-center rounded-full text-slate-600 hover:bg-red-500 hover:text-white transition">-</Button>
                     <span className="w-10 text-center font-semibold text-slate-800">{qty}</span>
                     <Button onClick={onIncrease} className="w-7 h-7 flex items-center justify-center rounded-full bg-emerald-600 text-white shadow hover:bg-emerald-700 transition">+</Button>
                 </div>

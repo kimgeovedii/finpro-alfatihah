@@ -8,7 +8,7 @@ export const useOrderActions = (
     fetchAllOrders: (page: number, filters?: { orderNumber?: string, dateStart?: string, dateEnd?: string }) => void,
     onSuccess?: () => void
 ) => {
-    // Call hook
+    // Handle hook
     const { downloadTransactionHistory } = useDownloadTransactionHistory()
     const { cancelOrder, isCancellingOrder } = useCancelOrderStatusById()
     const { confirmOrder, isConfirmingOrder } = useConfirmOrderStatusById()

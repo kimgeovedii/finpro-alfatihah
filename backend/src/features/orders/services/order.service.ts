@@ -144,7 +144,7 @@ export class OrderService {
         }
 
         // Repo : create order
-        const order = await this.orderRepo.createOrder(userId, cart.branchId, addressId, totalBasePrice, finalPrice, shippingCost, cart.items)
+        const order = await this.orderRepo.createOrder(userId, cart.branchId, addressId, totalBasePrice, finalPrice, finalShippingCost, cart.items)
         if (voucher && voucherId) {
             // Repo : reduce quota of the voucher
             await this.voucherRepo.decrementQuota(voucherId)
@@ -305,6 +305,9 @@ export class OrderService {
         // Repo : update order status
         const orderNew = await this.orderRepo.updateOrderStatusById(orderNumber, 'CANCELLED')
         if (!orderNew) throw { code: 404, message: 'Order not found' }
+
+        // Repo : update order status
+        await this.paymentRepo.updatePaymentByOrderId(orderNew.id, 'REJECTED')
         
         if (role === "EMPLOYEE") {
             // Mailer : inform user that an order has been shipped

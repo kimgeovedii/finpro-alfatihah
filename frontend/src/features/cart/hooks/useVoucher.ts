@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { PaginationMeta } from "@/types/global.type"
 import { voucherRepository } from "../repositories/voucher.repository"
 import { VoucherData } from "../repositories/voucher.type"
+import { closeLoading, showLoading } from "@/utils/message.util"
 
 export const useAllVoucherData = () => {
     const [vouchers, setVouchers] = useState<VoucherData[]>([])
@@ -14,7 +15,10 @@ export const useAllVoucherData = () => {
         setError(null)
 
         try {
+            // Repo : Get all voucher
+            showLoading("Loading...")
             const res = await voucherRepository.getAllVouchers(page, search)
+            closeLoading()
 
             setVouchers((prev) => page === 1 ? res.data : [...prev, ...res.data])
             setMeta(res.meta)
