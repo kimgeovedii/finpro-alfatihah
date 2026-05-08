@@ -155,11 +155,7 @@ export class CartRepository {
                 select: {
                   id: true, currentStock: true, product: {                 
                     select: {
-                      productName: true, slugName: true, basePrice: true, description: true, category: {
-                        select: {
-                          name: true, slugName: true,
-                        }
-                      },
+                      productName: true, slugName: true, basePrice: true,
                       productImages: {
                         select: { imageUrl: true },
                         where: { isPrimary: true },

@@ -17,6 +17,8 @@ interface Props {
 
 export const VouchersSelectionCard: React.FC<Props> = ({ appliedVoucher, totalBasePrice, onApply, onRemove }) => {
     const [search, setSearch] = useState("")
+
+    // Ref Infinite scroll observer
     const observerRef = useRef<IntersectionObserver | null>(null)
 
     // Handle hook (fetch)
@@ -27,6 +29,7 @@ export const VouchersSelectionCard: React.FC<Props> = ({ appliedVoucher, totalBa
     const handleSearch = (value: string) => {
         setSearch(value)
 
+        // Clear previous timer if user keeps typing
         if (debounceRef.current) clearTimeout(debounceRef.current)
 
         debounceRef.current = setTimeout(() => {
@@ -34,10 +37,12 @@ export const VouchersSelectionCard: React.FC<Props> = ({ appliedVoucher, totalBa
         }, debouncerTimeLimit)
     }
 
+    // Infinite scroll trigger when last element visible
     const handleLoadMore = useCallback((node: HTMLDivElement | null) => {
         if (isLoadingVoucher) return
         if (observerRef.current) observerRef.current.disconnect()
 
+        // Disconnect previous observer
         observerRef.current = new IntersectionObserver(entries => {
             if (entries[0].isIntersecting && meta && meta.page < meta.totalPages) fetchAllVouchers(meta.page + 1, search)
         })

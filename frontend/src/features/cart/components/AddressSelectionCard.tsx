@@ -14,6 +14,7 @@ type Props = {
 }
 
 export const AddressSelectionCard: React.FC<Props> = ({ branch, addressList, selectedAddressId, maxDeliveryDistance, onSelect }) => {
+    // Return address selected based on primary status and within range
     const selectedAddress = (() => {
         const primary = addressList.find(dt => dt.isPrimary && dt.isWithinRange)
         if (primary) return primary

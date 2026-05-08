@@ -197,7 +197,7 @@ export class OrderRepository {
               quantity: 'desc'
             },
             select: {
-              id: true, quantity: true, product: {
+              id: true, quantity: true, price: true, product: {
                 select: {
                   currentStock: true, product: {
                     select: {

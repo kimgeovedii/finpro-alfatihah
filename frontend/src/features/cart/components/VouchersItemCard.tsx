@@ -12,12 +12,17 @@ interface Props {
 }
 
 export const VouchersItemCard: React.FC<Props> = ({ item, isApplied, totalBasePrice, onApply, onRemove }) => {
+    // Define voucher label based on its type
     const discountLabel = item.discountValueType === "PERCENTAGE" ? `${item.discountValue}% off` : `Rp ${item.discountValue.toLocaleString(currencyFormat)} off`
+    // Check min purchase amount 
     const isMinPurchaseValid = item.minPurchaseAmount == null || totalBasePrice >= item.minPurchaseAmount
+    // Check voucher expired date
     const isExpired = item.expiredDate ? new Date() > new Date(item.expiredDate) : false
     const isQuotaEmpty = item.quota <= 0
+    // Combine all validation
     const isDisabled = !isMinPurchaseValid || isExpired || isQuotaEmpty
 
+    // Set voucher tags
     let errorMessage = ""
     if (isExpired) errorMessage = "Voucher expired"
     else if (isQuotaEmpty) errorMessage = "Voucher quota exceeded"

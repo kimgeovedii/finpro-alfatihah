@@ -1,42 +1,30 @@
 'use client'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import { currencyFormat, OrderStatus, statusColorMap } from "@/constants/business.const"
+import { currencyFormat, statusColorMap } from "@/constants/business.const"
 import { Badge } from "@/components/ui/badge"
 import { formatDate } from "@/utils/converter.util"
 import { ArrowRightIcon, CheckIcon, ChevronLeftIcon, ChevronRightIcon, EnvelopeIcon } from "@heroicons/react/24/outline"
 import { CopyFieldButton } from "@/components/button/CopyFieldButton"
-import { PaymentData } from "@/types/payment.type"
 import Link from "next/link"
 import { PaginationMeta } from "@/types/global.type"
 import { MessageBox } from "@/components/layout/MessageBox"
 import { MiniTagBox } from "@/components/layout/MiniTagBox"
 import { UserIcon } from "@heroicons/react/20/solid"
 import { PaymentConfirmationDialog } from "./PaymentConfirmationDialog"
-
-export type OrderTableItem = {
-    id: string
-    storeName: string
-    orderNumber: string
-    customerName: string
-    customerEmail: string
-    createdAt: string
-    finalPrice: number
-    status: OrderStatus
-    payments: PaymentData[]
-}
+import { InfoBoxFinalPriceEmployeeToolTip } from "@/components/layout/InfoBoxFinalPriceEmployeeToolTip"
+import { OrderTableItem } from "../repositories/order.type"
 
 type Props = {
     orders: OrderTableItem[]
     meta: PaginationMeta | null
-    activeStatus: string
     isLoading: boolean
     role: string
     onPageChange: (page: number) => void
     onValidatePaymentEvidence: (paymentId: string, isConfirm: boolean) => void
 }
 
-export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading, activeStatus, onPageChange, onValidatePaymentEvidence, role }) => {
+export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading, onPageChange, onValidatePaymentEvidence, role }) => {
     // Pagination 
     const currentPage = meta?.page ?? 1
     const totalPages = meta?.totalPages ?? 1
@@ -55,7 +43,10 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
                             <TableHead className="font-semibold text-white">Order Detail</TableHead>
                             <TableHead className="font-semibold text-white">Customer</TableHead>
                             <TableHead className="font-semibold text-white">Date</TableHead>
-                            <TableHead className="font-semibold text-white">Total Price</TableHead>
+                            <TableHead className="font-semibold text-white relative group items-center gap-2 flex">
+                                Total Price
+                                <InfoBoxFinalPriceEmployeeToolTip/>
+                            </TableHead>
                             <TableHead className="font-semibold text-white">Status</TableHead>
                             { role === "SUPER_ADMIN" && <TableHead className="font-semibold text-white">Payment</TableHead> }
                             <TableHead className="font-semibold text-white">Actions</TableHead>
@@ -72,7 +63,7 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
                                 // Render failed fetching condition
                                 <TableRow>
                                     <TableCell colSpan={7} className="text-slate-400 py-10">
-                                        <MessageBox context={'No orders found'} image={"/assets/empty.png"} description={`No <b>${activeStatus}</b> order / transaction found`}/>
+                                        <MessageBox context={'No orders found'} image={"/assets/empty.png"}/>
                                     </TableCell>
                                 </TableRow>
                             ) : (
@@ -87,7 +78,7 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
                                                 <Link href={`/${dt.storeName}`} className="cursor-pointer">
                                                     <MiniTagBox val={dt.storeName}/>
                                                 </Link>
-                                                <CopyFieldButton label="Order number" value={dt.orderNumber} customClass="text-sm font-semibold"/>
+                                                <CopyFieldButton label="Order Number" value={dt.orderNumber} customClass="text-sm font-semibold"/>
                                             </TableCell>
                                             <TableCell>
                                                 <p className="font-medium text-slate-800 flex items-center gap-1">

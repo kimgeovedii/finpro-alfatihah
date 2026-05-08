@@ -9,8 +9,8 @@ type Props = {
     cartId: string
     storeName: string
     city: string
-    onRemove: () => void
     accordionButton: React.ReactNode
+    onRemove: () => void
 }
 
 export const BranchHeader: React.FC<Props> = ({ storeName, cartId, city, onRemove, accordionButton }) => {

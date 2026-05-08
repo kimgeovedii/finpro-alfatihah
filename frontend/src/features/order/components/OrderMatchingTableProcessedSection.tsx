@@ -15,14 +15,13 @@ type Props = {
     status?: string
     isLoading: boolean
     onShipping: (orderNumber: string) => void
-    onSearch?: (query: string) => void
     onCancel: (orderNumber: string) => void
     orderNumber: string
     branchName: string
     role: string
 }
   
-export const OrderMatchingProcessedSection: React.FC<Props> = ({ branchName, items, status, isLoading, onShipping, onSearch, onCancel, orderNumber, role }) => {
+export const OrderMatchingProcessedSection: React.FC<Props> = ({ branchName, items, status, isLoading, onShipping, onCancel, orderNumber, role }) => {
     const [search, setSearch] = useState("")
     const filteredItems = items.filter(dt => search === "" || dt.product.productName.toLowerCase().includes(search.toLowerCase()))
 
@@ -51,11 +50,13 @@ export const OrderMatchingProcessedSection: React.FC<Props> = ({ branchName, ite
                     </TableHeader>
                     <TableBody>
                         {
+                            // Render loading element
                             isLoading ? (
                                 <TableRow>
                                     <TableCell colSpan={7} className="text-center py-10">Loading...</TableCell>
                                 </TableRow>
                         ) : filteredItems.length === 0 ? (
+                            // Render not found info element
                             <TableRow>
                                 <TableCell colSpan={7} className="text-center py-10">No items found</TableCell>
                             </TableRow>

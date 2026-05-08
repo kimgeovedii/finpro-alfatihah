@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { BuildingLibraryIcon, DevicePhoneMobileIcon, QrCodeIcon, CreditCardIcon, QuestionMarkCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { HeadingText } from "./HeadingText";
 import { BankInformationCard } from "./BankInformationCard";
+import { closePopUp } from "@/utils/message.util";
 
 export const PaymentHelpDialog: React.FC = () => {
     return (
@@ -17,7 +18,7 @@ export const PaymentHelpDialog: React.FC = () => {
             </DialogTrigger>
             <DialogContent className="[&>button:last-child]:hidden sm:max-w-2xl rounded-3xl border-slate-200 p-0 overflow-hidden">
                 <Button className="absolute right-5 top-5 z-50 rounded-full p-2 text-white backdrop-blur transition-colors bg-red-500 shadow hover:shadow-xl hover:scale-125 transition-all duration-300"
-                    onClick={() => document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))}>
+                    onClick={closePopUp}>
                     <XMarkIcon className="w-5 h-5" />
                 </Button>
                 <div className="bg-linear-to-r from-emerald-800 to-emerald-600 p-6 text-white">

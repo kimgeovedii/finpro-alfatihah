@@ -21,4 +21,6 @@ export const showLoading = (title: string = "Loading...", text: string = "Please
     })
 }
 
+export const closePopUp = () => document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))
+
 export const closeLoading = () => Swal.close()
