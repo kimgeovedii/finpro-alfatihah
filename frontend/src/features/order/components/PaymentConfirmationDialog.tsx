@@ -20,7 +20,7 @@ export const PaymentConfirmationDialog: React.FC<Props> = ({ imageUrl, finalPric
                     <BanknotesIcon className="w-5 h-5"/>
                 </Button>
             </DialogTrigger>
-            <DialogContent className="[&>button:last-child]:hidden sm:max-w-2xl rounded-3xl border-slate-200 p-0 overflow-hidden">
+            <DialogContent className="[&>button:last-child]:hidden sm:max-w-2xl rounded-3xl border-slate-200 p-0 overflow-hidden mt-4">
                 <Button className="absolute right-5 top-5 z-50 rounded-full p-2 text-white backdrop-blur transition-colors bg-red-500 shadow hover:shadow-xl hover:scale-125 transition-all duration-300"
                     onClick={() => document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))}>
                     <XMarkIcon className="w-5 h-5" />
@@ -31,7 +31,7 @@ export const PaymentConfirmationDialog: React.FC<Props> = ({ imageUrl, finalPric
                         <DialogDescription className="text-emerald-50 mt-2">If you reject the customer's payment, they must to reupload the evidence again.</DialogDescription>
                     </DialogHeader>
                 </div>
-                <div className="p-6 pt-0 space-y-8 max-h-[70vh] overflow-y-auto text-center">
+                <div className="p-6 pt-0 space-y-8 min-h-auto max-h-[70vh] overflow-y-auto text-center">
                     <Image src={imageUrl} className="w-full max-w-[200px] max-h-[200px] mx-auto h-full mb-2 rounded-lg" alt={imageUrl} width={100} height={100}/>
                     <p className="mb-0">Transaction Amount</p>
                     <p className="font-bold mb-4">Rp {finalPrice.toLocaleString(currencyFormat)}</p>

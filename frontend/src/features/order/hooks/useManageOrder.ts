@@ -3,11 +3,13 @@ import { orderRepository } from "../repositories/order.repository"
 import { useOrderService } from "../services/order.service"
 import { OrderStatus } from "@/constants/business.const"
 import { ManagementOrderItem, ManagementOrderResponse } from "../repositories/order.type"
+import { closeLoading, showLoading } from "@/utils/message.util"
 
 export const useOrderSummaryByBranchId = (branchId: string) => {
     const { summaryByBranchId, fetchOrderSummaryByBranchId, isLoadingSummaryByBranchId, error } = useOrderService()
 
     useEffect(() => {
+        // State : Fetch summary from global state by branch id
         fetchOrderSummaryByBranchId(branchId)
     }, [branchId])
 
@@ -25,9 +27,12 @@ export const useOrderManagement = (defaultBranchId: string = "ALL") => {    cons
     const fetchOrders = async (nextPage: number, nextStatus: OrderStatus | "ALL", nextBranchId: string, nextSearch: string) => {
         setIsLoading(true)
         try {
+            showLoading()
+            // Repo : get all order by branch
             const res = await orderRepository.getAllOrdersByBranchId(nextPage, nextBranchId, nextStatus, nextSearch)
             setOrders(res.data)
             setMeta(res.meta)
+            closeLoading()
         } catch (err) {
             console.error("Failed to fetch management orders", err)
         } finally {

@@ -7,7 +7,7 @@ import { currencyFormat } from "@/constants/business.const"
 import { ShippingSummaryCard } from "@/components/layout/ShippingSummaryCard"
 import { DividerLine } from "@/components/layout/DividerLine"
 import { HeadingText } from "@/components/layout/HeadingText"
-import { DocumentIcon, QuestionMarkCircleIcon } from "@heroicons/react/24/outline"
+import { DocumentIcon } from "@heroicons/react/24/outline"
 import { PaymentHelpDialog } from "@/components/layout/PaymentHelpDialog"
 import { InfoBoxSavingToolTip } from "@/components/layout/InfoBoxSavingToolTip"
 

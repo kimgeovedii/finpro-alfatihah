@@ -13,6 +13,8 @@ import { MessageBox } from "@/components/layout/MessageBox"
 import { MiniTagBox } from "@/components/layout/MiniTagBox"
 import { UserIcon } from "@heroicons/react/20/solid"
 import { PaymentConfirmationDialog } from "./PaymentConfirmationDialog"
+import { InfoBoxSavingToolTip } from "@/components/layout/InfoBoxSavingToolTip"
+import { InfoBoxFinalPriceEmployeeToolTip } from "@/components/layout/InfoBoxFinalPriceEmployeeToolTip"
 
 export type OrderTableItem = {
     id: string
@@ -55,7 +57,10 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
                             <TableHead className="font-semibold text-white">Order Detail</TableHead>
                             <TableHead className="font-semibold text-white">Customer</TableHead>
                             <TableHead className="font-semibold text-white">Date</TableHead>
-                            <TableHead className="font-semibold text-white">Total Price</TableHead>
+                            <TableHead className="font-semibold text-white relative group items-center gap-2 flex">
+                                Total Price
+                                <InfoBoxFinalPriceEmployeeToolTip/>
+                            </TableHead>
                             <TableHead className="font-semibold text-white">Status</TableHead>
                             { role === "SUPER_ADMIN" && <TableHead className="font-semibold text-white">Payment</TableHead> }
                             <TableHead className="font-semibold text-white">Actions</TableHead>
@@ -72,7 +77,7 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
                                 // Render failed fetching condition
                                 <TableRow>
                                     <TableCell colSpan={7} className="text-slate-400 py-10">
-                                        <MessageBox context={'No orders found'} image={"/assets/empty.png"} description={`No <b>${activeStatus}</b> order / transaction found`}/>
+                                        <MessageBox context={'No orders found'} image={"/assets/empty.png"}/>
                                     </TableCell>
                                 </TableRow>
                             ) : (

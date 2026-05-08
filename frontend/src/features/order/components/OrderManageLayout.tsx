@@ -21,7 +21,7 @@ export function OrderManageLayout() {
 
     useEffect(() => {
         fetchOrders(page, status, branchId, search)
-    }, [page, status, branchId, search])
+    }, [page, status, branchId])
     
     // Call hook (fetch)
     const { summaryByBranchId, isLoadingSummaryByBranchId } = useOrderSummaryByBranchId(employee?.role === "SUPER_ADMIN" ? branchId : employee?.branchId ?? branchId)
