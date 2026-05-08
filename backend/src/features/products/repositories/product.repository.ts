@@ -31,6 +31,20 @@ export class ProductRepository {
               imageUrl: true,
             },
           },
+          productDiscounts: {
+            where: {
+              discount: {
+                discountType: "PRODUCT_DISCOUNT",
+                startDate: { lte: new Date() },
+                endDate: { gte: new Date() },
+                branchId: branchId ? branchId : undefined,
+                deletedAt: null,
+              },
+            },
+            include: {
+              discount: true,
+            },
+          },
           branchInventories: {
             where: branchId ? { branchId } : undefined, // Filter by specific branch if provided
             select: {

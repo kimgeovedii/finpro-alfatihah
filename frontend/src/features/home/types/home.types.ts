@@ -1,3 +1,5 @@
+import { ProductDiscount } from "@/features/products/types/product.type";
+
 export interface BranchData {
   id: string;
   storeName: string;
@@ -28,6 +30,7 @@ export interface ProductCard {
   branchId: string;
   branchSlug?: string;
   branchCity?: string;
+  productDiscounts?: ProductDiscount[];
 }
 
 export interface PaginationMeta {

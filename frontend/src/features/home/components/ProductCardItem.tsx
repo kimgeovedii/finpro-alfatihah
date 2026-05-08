@@ -12,6 +12,7 @@ import { useAuthStore } from "@/features/auth/store/useAuthStore";
 import { actionMessages } from "@/constants/message.const";
 import { showPopUp } from "@/utils/message.util";
 import { currencyFormat } from "@/constants/business.const";
+import { calculateDiscountedPrice } from "@/utils/discount.util";
 
 interface ProductCardItemProps {
   product: ProductCard;
@@ -71,6 +72,9 @@ export const ProductCardItem = ({
     router.push(`/${storeIdentifier}/${product.slugName}`);
   };
 
+  const { discountedPrice, originalPrice, discountPercentage, hasDiscount } =
+    calculateDiscountedPrice(product.basePrice, product.productDiscounts);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -101,6 +105,11 @@ export const ProductCardItem = ({
                 Low Stock
               </div>
             )}
+            {hasDiscount && (
+              <div className="bg-red-500/90 backdrop-blur-md text-white text-[9px] uppercase font-black px-3 py-1.5 rounded-full shadow-lg border border-white/20">
+                Promo
+              </div>
+            )}
           </div>
 
           {/* Sold Out Overlay */}
@@ -128,7 +137,7 @@ export const ProductCardItem = ({
             <span className="text-[9px] font-black uppercase tracking-widest text-primary/60 mb-1 block">
               {product.category.name}
             </span>
-            <h3 className="font-bold text-sm md:text-base text-slate-800 dark:text-slate-200 group-hover/card:text-primary transition-colors line-clamp-2 leading-snug h-10">
+            <h3 className="font-bold text-sm md:text-base text-slate-800 dark:text-slate-200 group-hover/card:text-primary transition-colors line-clamp-2 leading-snug h-11">
               {product.productName}
             </h3>
           </div>
@@ -136,16 +145,18 @@ export const ProductCardItem = ({
           <div className="mt-auto pt-3 flex flex-col gap-3">
             <div className="flex flex-col">
               <span className="text-lg md:text-xl font-black text-slate-900 dark:text-white tracking-tight">
-                Rp {product.basePrice.toLocaleString(currencyFormat)}
+                Rp {discountedPrice.toLocaleString(currencyFormat)}
               </span>
-              <div className="flex items-center gap-2 mt-0.5">
-                <span className="text-[10px] text-slate-400 line-through">
-                  Rp {(product.basePrice * 1.2).toLocaleString(currencyFormat)}
-                </span>
-                <span className="text-[10px] font-black text-orange-500">
-                  20%
-                </span>
-              </div>
+              {hasDiscount && (
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="text-[10px] text-slate-400 line-through">
+                    Rp {originalPrice.toLocaleString(currencyFormat)}
+                  </span>
+                  <span className="text-[10px] font-black text-orange-500">
+                    {discountPercentage}%
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Branch Info - Glassy Footer */}
