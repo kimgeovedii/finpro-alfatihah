@@ -1,14 +1,8 @@
-import React, { ReactNode } from "react"
+import React from "react"
 import { OrderConfirmButton } from "./OrderConfirmButton"
 import { HeadingText } from "@/components/layout/HeadingText"
 import { DividerLine } from "@/components/layout/DividerLine"
-
-export type StatusInfo = {
-    key: string 
-    label: string 
-    sub: string 
-    icon: ReactNode
-}
+import { StatusInfo } from "@/types/global.type"
 
 type Props = {
     statusSteps: StatusInfo[]
@@ -19,9 +13,10 @@ type Props = {
 }
 
 export const OrderStatusStepsCard: React.FC<Props> = ({ statusSteps, currentStatus, onConfirm, orderNumber, status }) => {
+    // Get current order status (simplified status) for define the color
     const getStepState = (stepKey: string, currentStatus: string): "done" | "active" | "upcoming" => {
-        const currentIdx = statusSteps.findIndex(s => s.key === currentStatus)
-        const stepIdx = statusSteps.findIndex(s => s.key === stepKey)
+        const currentIdx = statusSteps.findIndex(dt => dt.key === currentStatus)
+        const stepIdx = statusSteps.findIndex(dt => dt.key === stepKey)
     
         if (stepIdx < currentIdx) return "done"
         if (stepIdx === currentIdx) return "active"
@@ -30,7 +25,7 @@ export const OrderStatusStepsCard: React.FC<Props> = ({ statusSteps, currentStat
     }
 
     return (
-        <div className="bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+        <div className="bg-white/60 backdrop-blur-xl border border-slate-200 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
             <HeadingText children="Order Progress" level={2}/>
             <DividerLine/>
             <div className="flex flex-col gap-0">

@@ -171,7 +171,21 @@ export class BranchRepository {
               },
               productImages: {
                 select: { id: true, imageUrl: true }
-              }
+              },
+              productDiscounts: {
+                where: {
+                  discount: {
+                    discountType: "PRODUCT_DISCOUNT",
+                    startDate: { lte: new Date() },
+                    endDate: { gte: new Date() },
+                    branchId: branchId ? branchId : undefined,
+                    deletedAt: null,
+                  },
+                },
+                include: {
+                  discount: true,
+                },
+              },
             }
           }
         },

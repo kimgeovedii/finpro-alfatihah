@@ -24,7 +24,7 @@ export function CartLayout() {
         fetchAllCarts(1)
     }
 
-    const { handleRemoveCart, handleRemoveCartItem, handleIncrease, handleDecrease } = useCartActions(onSuccess)
+    const { handleRemoveCart, handleRemoveCartItem, handleIncrease, handleDecrease, localQty } = useCartActions(onSuccess)
     
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full mx-auto">
@@ -33,7 +33,10 @@ export function CartLayout() {
                     <HeadingText children="My Cart" level={1}/>
                     {
                         // Render loading element
-                        isLoading ? <SkeletonBox extraClass={'min-h-[30px]'}/> : <CartSummary totalItems={summary?.totalItems ?? 0} totalQty={summary?.totalQty ?? 0}/>
+                        isLoading ? 
+                            <SkeletonBox extraClass={'min-h-[30px]'}/> 
+                        : 
+                            <CartSummary totalItems={summary?.totalItems ?? 0} totalQty={summary?.totalQty ?? 0}/>
                     }
                     <DividerLine/>
                     <div>
@@ -47,7 +50,7 @@ export function CartLayout() {
                             </div>
                         : carts.length === 0 ? 
                             // Render failed fetching condition
-                            <MessageBox context={'No items in carts'} image={"/assets/empty.png"} urlButton={'/dashboard/products'} titleButton='Browse Now!' description="Don't miss out! Browse our products today and discover many exciting offers before they run out"/>
+                            <MessageBox context={'No items in carts'} image={"/assets/empty.png"} urlButton={'/'} titleButton='Browse Now!' description="Don't miss out! Browse our products today and discover many exciting offers before they run out"/>
                         : 
                             <Accordion type="single" collapsible defaultValue={carts[0]?.id}>
                                 {
@@ -76,9 +79,10 @@ export function CartLayout() {
                                                     {
                                                         ct.items.map(dt => (
                                                             <CartItemCard key={dt.id}
-                                                                slugName={dt.product.product.slugName} storeName={ct.branch.storeName} productName={dt.product.product.productName} basePrice={dt.product.product.basePrice} 
-                                                                mainImage={dt.product.product.productImages[0].imageUrl} qty={dt.quantity} currentStock={dt.product.currentStock} 
-                                                                onDecrease={() => handleDecrease(dt.id, dt.quantity,dt.product.product.productName)}
+                                                                {...dt.product.product}
+                                                                storeName={ct.branch.storeName}
+                                                                mainImage={dt.product.product.productImages[0].imageUrl} qty={localQty[dt.id] ?? dt.quantity} currentStock={dt.product.currentStock} 
+                                                                onDecrease={() => handleDecrease(dt.id, dt.quantity, dt.product.product.productName)}
                                                                 onIncrease={() => handleIncrease(dt.id, dt.quantity, dt.product.currentStock)}                        
                                                                 onRemove={() => handleRemoveCartItem(dt.id, `(${dt.quantity}) ${dt.product.product.productName}`)}
                                                             />

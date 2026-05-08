@@ -1,7 +1,11 @@
 "use client";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation"
-import { PlusIcon, MinusIcon, ShoppingBagIcon } from "@heroicons/react/24/outline";
+import { useRouter } from "next/navigation";
+import {
+  PlusIcon,
+  MinusIcon,
+  ShoppingBagIcon,
+} from "@heroicons/react/24/outline";
 import { ProductDetailCartActionProps } from "@/features/products/types/product.type";
 import { ProductAddedInfoCard } from "./ProductAddedInfoCard";
 import { ProductRemoveButton } from "./ProductRemoveButton";
@@ -14,17 +18,30 @@ const formatMoney = (value: number) =>
     maximumFractionDigits: 0,
   }).format(value);
 
-export const ProductDetailCartAction = ({ qty, setQty, price, totalPrice, variant, onAddToCart, onRemoveFromCart, isCreating, currentCartQty, disabled, role }: ProductDetailCartActionProps) => {
-  const router = useRouter()
+export const ProductDetailCartAction = ({
+  qty,
+  setQty,
+  price,
+  discountedPrice,
+  totalPrice,
+  variant,
+  onAddToCart,
+  onRemoveFromCart,
+  isCreating,
+  currentCartQty,
+  disabled,
+  role,
+}: ProductDetailCartActionProps) => {
+  const router = useRouter();
 
   const handleCartAction = () => {
     if (role === "GUEST") {
-      router.push("/login")
-      return
+      router.push("/login");
+      return;
     }
 
-    onAddToCart()
-  }
+    onAddToCart();
+  };
 
   if (variant === "mobile") {
     // Mobile layout
@@ -46,7 +63,9 @@ export const ProductDetailCartAction = ({ qty, setQty, price, totalPrice, varian
             >
               <MinusIcon className="w-5 h-5 stroke-2" />
             </button>
-            <span className={`font-extrabold text-xl w-6 text-center ${role === "CUSTOMER" ? 'text-slate-900' : 'text-gray-400'}`}>
+            <span
+              className={`font-extrabold text-xl w-6 text-center ${role === "CUSTOMER" ? "text-slate-900" : "text-gray-400"}`}
+            >
               {qty}
             </span>
             <button
@@ -57,15 +76,14 @@ export const ProductDetailCartAction = ({ qty, setQty, price, totalPrice, varian
               <PlusIcon className="w-5 h-5 stroke-2" />
             </button>
           </div>
-          {
-            role === "CUSTOMER" &&
-              <div className="flex-1 text-right whitespace-nowrap">
-                <span className="text-slate-500 text-sm font-medium">Total:</span>
-                <span className="text-slate-900 font-extrabold text-xl ml-2 tracking-tighter">
-                  {formatMoney(totalPrice)}
-                </span>
-              </div>
-          }
+          {role === "CUSTOMER" && (
+            <div className="flex-1 text-right whitespace-nowrap">
+              <span className="text-slate-500 text-sm font-medium">Total:</span>
+              <span className="text-slate-900 font-extrabold text-xl ml-2 tracking-tighter">
+                {formatMoney(totalPrice)}
+              </span>
+            </div>
+          )}
         </div>
 
         <div>
@@ -84,9 +102,13 @@ export const ProductDetailCartAction = ({ qty, setQty, price, totalPrice, varian
                 ) : (
                   <ShoppingBagIcon className="w-6 h-6" />
                 )}
-                {
-                  isCreating ? "Adding..." : disabled ? "Not Available" : currentCartQty ? "Add More?" : "Add to Cart"
-                }
+                {isCreating
+                  ? "Adding..."
+                  : disabled
+                    ? "Not Available"
+                    : currentCartQty
+                      ? "Add More?"
+                      : "Add to Cart"}
               </motion.button>
               {currentCartQty ? (
                 <ProductRemoveButton
@@ -117,10 +139,29 @@ export const ProductDetailCartAction = ({ qty, setQty, price, totalPrice, varian
         <></>
       )}
       <div className={role === "CUSTOMER" ? "mb-8" : ""}>
-        <span className="text-4xl font-extrabold text-slate-900 tracking-tight">
-          {formatMoney(price)}
-        </span>
-        <span className="text-slate-500 text-sm ml-1">/ item</span>
+        {discountedPrice ? (
+          <div className="flex flex-col gap-1">
+            <div className="flex items-baseline gap-2">
+              <span className="text-4xl font-extrabold text-slate-900 tracking-tight">
+                {formatMoney(discountedPrice)}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-slate-400 text-lg font-bold line-through">
+                {formatMoney(price)}
+              </span>
+              <span className="bg-red-50 text-red-600 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider border border-red-100">
+                {Math.round(((price - discountedPrice) / price) * 100)}% OFF
+              </span>
+            </div>
+          </div>
+        ) : (
+          <>
+            <span className="text-4xl font-extrabold text-slate-900 tracking-tight">
+              {formatMoney(price)}
+            </span>
+          </>
+        )}
       </div>
       <div className="space-y-8">
         <div className={disabled ? "opacity-50 pointer-events-none" : ""}>
@@ -135,7 +176,11 @@ export const ProductDetailCartAction = ({ qty, setQty, price, totalPrice, varian
             >
               <MinusIcon className="w-5 h-5 stroke-2" />
             </button>
-            <span className={`font-extrabold text-lg ${role === "CUSTOMER" ? 'text-slate-900' : 'text-gray-400'}`}>{qty}</span>
+            <span
+              className={`font-extrabold text-lg ${role === "CUSTOMER" ? "text-slate-900" : "text-gray-400"}`}
+            >
+              {qty}
+            </span>
             <button
               onClick={() => setQty(qty + 1)}
               disabled={role === "CUSTOMER" ? disabled : true}
@@ -146,15 +191,14 @@ export const ProductDetailCartAction = ({ qty, setQty, price, totalPrice, varian
           </div>
         </div>
         <div className="pt-2">
-          {
-            role === "CUSTOMER" &&
-              <div className="flex justify-between items-center mb-6 px-1">
-                <span className="text-slate-500 font-medium">Total</span>
-                <span className="text-slate-900 font-extrabold text-xl tracking-tighter">
-                  {formatMoney(totalPrice)}
-                </span>
-              </div>
-          }
+          {role === "CUSTOMER" && (
+            <div className="flex justify-between items-center mb-6 px-1">
+              <span className="text-slate-500 font-medium">Total</span>
+              <span className="text-slate-900 font-extrabold text-xl tracking-tighter">
+                {formatMoney(totalPrice)}
+              </span>
+            </div>
+          )}
           <div className="flex flex-col space-y-4">
             <motion.button
               onClick={handleCartAction}

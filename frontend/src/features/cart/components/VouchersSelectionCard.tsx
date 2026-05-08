@@ -17,6 +17,8 @@ interface Props {
 
 export const VouchersSelectionCard: React.FC<Props> = ({ appliedVoucher, totalBasePrice, onApply, onRemove }) => {
     const [search, setSearch] = useState("")
+
+    // Ref Infinite scroll observer
     const observerRef = useRef<IntersectionObserver | null>(null)
 
     // Handle hook (fetch)
@@ -27,6 +29,7 @@ export const VouchersSelectionCard: React.FC<Props> = ({ appliedVoucher, totalBa
     const handleSearch = (value: string) => {
         setSearch(value)
 
+        // Clear previous timer if user keeps typing
         if (debounceRef.current) clearTimeout(debounceRef.current)
 
         debounceRef.current = setTimeout(() => {
@@ -34,10 +37,12 @@ export const VouchersSelectionCard: React.FC<Props> = ({ appliedVoucher, totalBa
         }, debouncerTimeLimit)
     }
 
+    // Infinite scroll trigger when last element visible
     const handleLoadMore = useCallback((node: HTMLDivElement | null) => {
         if (isLoadingVoucher) return
         if (observerRef.current) observerRef.current.disconnect()
 
+        // Disconnect previous observer
         observerRef.current = new IntersectionObserver(entries => {
             if (entries[0].isIntersecting && meta && meta.page < meta.totalPages) fetchAllVouchers(meta.page + 1, search)
         })
@@ -46,7 +51,7 @@ export const VouchersSelectionCard: React.FC<Props> = ({ appliedVoucher, totalBa
     }, [isLoadingVoucher, meta, fetchAllVouchers, search])
 
     return (
-        <div className="bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 mb-4">
+        <div className="bg-white/60 backdrop-blur-xl border border-slate-200 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 mb-4">
             <HeadingText children="My Vouchers" level={2}/>
             <DividerLine/>
             <Input placeholder="Search voucher..." value={search} onChange={(e) => handleSearch(e.target.value)} className="mb-4 rounded-xl"/>

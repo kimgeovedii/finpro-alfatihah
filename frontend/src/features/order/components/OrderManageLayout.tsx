@@ -9,17 +9,22 @@ import { OrderSummaryByBranchCard } from "@/features/order/components/OrderSumma
 import { useAllBranchData } from "@/features/order/hooks/useBranch"
 import { useOrderSummaryByBranchId } from "@/features/order/hooks/useManageOrder"
 import { useManageOrderActions } from "@/features/order/hooks/useManageOrderAction"
+import { useEffect } from "react"
 
 export function OrderManageLayout() {
-    // Call hook (fetch)
-    const role = useAuthStore((state) => state.user?.role)
+    // Handle hook (fetch)
+    const employee = useAuthStore((state) => state.user?.employee)
     const { branchs, isBranchLoading } = useAllBranchData()
 
-    // Call hook (action)
-    const { branchId, setBranchId, search, setSearch, tableOrders, meta, isLoading, status, handlePageChange, handleStatusChange, handleValidatePaymentEvidence } = useManageOrderActions()
+    // Handle hook (action)
+    const { page, fetchOrders, branchId, setBranchId, search, setSearch, tableOrders, meta, isLoading, status, handlePageChange, handleStatusChange, handleValidatePaymentEvidence} = useManageOrderActions(employee?.role, employee?.branchId ?? "ALL")
 
-    // Call hook (fetch)
-    const { summaryByBranchId, isLoadingSummaryByBranchId } = useOrderSummaryByBranchId(branchId)
+    useEffect(() => {
+        fetchOrders(page, status, branchId, search)
+    }, [page, status, branchId])
+    
+    // Handle hook (fetch)
+    const { summaryByBranchId, isLoadingSummaryByBranchId } = useOrderSummaryByBranchId(employee?.role === "SUPER_ADMIN" ? branchId : employee?.branchId ?? branchId)
 
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full mx-auto">
@@ -56,7 +61,7 @@ export function OrderManageLayout() {
                     </div>
                     <DividerLine/>
                     <OrderFiltersBar
-                        branchId={branchId}
+                        branchId={employee?.role === "SUPER_ADMIN" ? branchId : employee?.branchId ?? branchId}
                         onBranchChange={setBranchId}
                         branches={branchs}
                         isBranchLoading={isBranchLoading}
@@ -64,6 +69,7 @@ export function OrderManageLayout() {
                         onStatusChange={handleStatusChange}
                         search={search}
                         onSearchChange={setSearch}
+                        isFilterBranchDisabled={employee?.role === "SUPER_ADMIN" ? false : true }
                     />
                     {
                         isLoading ? 
@@ -72,8 +78,8 @@ export function OrderManageLayout() {
                             <OrderManagementTable
                                 orders={tableOrders}
                                 meta={meta}
+                                role={employee?.role ?? ""}
                                 isLoading={isLoading}
-                                activeStatus={status}
                                 onPageChange={handlePageChange}
                                 onValidatePaymentEvidence={handleValidatePaymentEvidence}
                             />

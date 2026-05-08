@@ -3,6 +3,7 @@ import { BranchInfoCard } from "@/components/layout/BranchInfoCard"
 import { DividerLine } from "@/components/layout/DividerLine"
 import { BranchData } from "@/types/address.type"
 import { formatDate } from "@/utils/converter.util"
+import { getOrderStatusStyle, getPaymentStatusStyle } from "@/utils/generator.util"
 import { CalendarDaysIcon, ClockIcon } from "@heroicons/react/24/outline"
 import React from "react"
 
@@ -21,40 +22,10 @@ type Props = {
 }
 
 export const OrderDetailBranchCard: React.FC<Props> = ({ branch, orderInfo }) => {
-    const getOrderStatusStyle = (status: string) => {
-        switch (status) {
-            case "WAITING_PAYMENT":
-            case "WAITING_PAYMENT_CONFIRMATION":
-                return "text-orange-600 bg-orange-100"
-            case "PROCESSING":
-            case "SHIPPED":
-                return "text-blue-600 bg-blue-100"
-            case "CONFIRMED":
-                return "text-emerald-600 bg-emerald-100"
-            case "CANCELLED":
-                return "text-red-600 bg-red-100"
-            default:
-                return "text-slate-600 bg-slate-100"
-        }
-    }
-    
-    const getPaymentStatusStyle = (status: string) => {
-        switch (status) {
-            case "PENDING":
-                return "text-orange-600 bg-orange-100"
-            case "SUCCESS":
-                return "text-emerald-600 bg-emerald-100"
-            case "REJECTED":
-                return "text-red-600 bg-red-100"
-            default:
-                return "text-slate-600 bg-slate-100"
-        }
-    }
-
     return (
-        <div className="bg-white rounded-3xl">
+        <div className="bg-white rounded-3xl border border-slate-200">
             <div className="p-5 pb-0">
-                <CopyFieldButton label="Order number" value={orderInfo.orderNumber} customClass="text-lg font-semibold"/>
+                <CopyFieldButton label="Order Number" value={orderInfo.orderNumber} customClass="text-lg font-semibold"/>
                 <DividerLine/>
                 <div className="flex flex-col space-y-2">
                     <div className="flex justify-between items-center">

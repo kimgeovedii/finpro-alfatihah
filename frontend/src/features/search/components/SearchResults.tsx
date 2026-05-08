@@ -9,6 +9,7 @@ import {
 import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
 import { ProductCardItem } from "@/features/home/components/ProductCardItem";
 import { useSearchStore } from "../service/search.service";
+import { useHomeStore } from "@/features/home/service/home.service";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 
@@ -55,6 +56,7 @@ export const SearchResults = () => {
     meta,
     error,
   } = useSearchStore();
+  const { nearestBranch } = useHomeStore();
 
   const { observerTarget } = useInfiniteScroll({
     loadMore,

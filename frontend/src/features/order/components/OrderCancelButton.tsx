@@ -10,7 +10,7 @@ type Props = {
 
 export const OrderCancelButton: React.FC<Props> = ({ orderNumber, onCancel }) => {
     return (
-        <Button className="w-full bg-red-100 text-red-500 border-1 border-red-500 hover:bg-red-500 hover:text-white cursor-pointer" onClick={(e) => onCancel(orderNumber)}>
+        <Button className="w-full bg-red-400 hover:bg-red-500 cursor-pointer" onClick={(e) => onCancel(orderNumber)}>
             <XMarkIcon className="w-4 h-4"/> Cancel Order
         </Button>
     )

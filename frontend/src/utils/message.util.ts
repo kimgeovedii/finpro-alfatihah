@@ -10,3 +10,17 @@ export const showPopUp = async (title: string, text: string, icon: "success" | "
     return result
 }
   
+export const showLoading = (title: string = "Loading...", text: string = "Please wait a moment") => {
+    Swal.fire({
+        title,
+        text,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+        didOpen: () => Swal.showLoading()
+    })
+}
+
+export const closePopUp = () => document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))
+
+export const closeLoading = () => Swal.close()

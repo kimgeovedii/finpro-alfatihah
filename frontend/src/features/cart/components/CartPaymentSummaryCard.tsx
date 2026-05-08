@@ -19,7 +19,7 @@ type Props = {
 
 export const CartPaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, totalPrice, totalDiscountProduct, totalDiscountVoucher, finalPrice, shippingWeight, onCheckout }) => {
     return (
-        <div className="bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 mb-4">
+        <div className="bg-white/60 backdrop-blur-xl border border-slate-200 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 mb-4">
             <HeadingText children="Payment Summary" level={2}/>
             <DividerLine/>
             <div className="flex justify-between">

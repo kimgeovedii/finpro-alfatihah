@@ -6,15 +6,8 @@ import { OrderMatchingProcessedSection } from "./OrderMatchingTableProcessedSect
 import { OrderManagementTableOrderDeliveredSection } from "./OrderMatchingTableOrderDelivered"
 import { CopyFieldButton } from "@/components/button/CopyFieldButton"
 import { HeadingText } from "@/components/layout/HeadingText"
-import { ProductCategory } from "@/types/product.type"
+import { ProductOrderCartItem } from "@/types/product.type"
 import { ArchiveBoxIcon, CheckIcon, HomeIcon, TruckIcon, XMarkIcon } from "@heroicons/react/24/outline"
-
-type OrderMatchingProduct = {
-    productName: string
-    category: ProductCategory
-    slugName: string
-    imageUrl: string
-}
 
 export type OrderMatchingItem = {
     id: string
@@ -22,7 +15,7 @@ export type OrderMatchingItem = {
     price: number
     stockBefore: number
     stockAfter: number
-    product: OrderMatchingProduct
+    product: ProductOrderCartItem
 }
 
 type Props = {
@@ -38,16 +31,16 @@ type Props = {
     shippingCost: number 
     finalPrice: number
     distance?: number
-    onSearch?: (query: string) => void
+    role: string
     onCancel: (orderNumber: string) => void
     onShipping: (orderNumber: string) => void
 }
 
-export const OrderMatchingTable: React.FC<Props> = ({ orderNumber, items, isLoading, payments, onSearch, shippingCost, finalPrice, onShipping, onCancel, status, branch, address, distance, confirmedAt, shippedAt }) => {    
+export const OrderMatchingTable: React.FC<Props> = ({ orderNumber, items, isLoading, payments, shippingCost, finalPrice, onShipping, onCancel, status, branch, address, distance, confirmedAt, shippedAt, role }) => {    
     return (
         <div className="bg-white border border-slate-200 rounded-2xl p-6 w-full">
             <div className="flex items-center justify-between mb-5">
-                <CopyFieldButton label="Order number" value={orderNumber}/>
+                <CopyFieldButton label="Order Number" value={orderNumber}/>
             </div>
             <div className="flex flex-col">
                 <div className="flex gap-3">
@@ -73,7 +66,7 @@ export const OrderMatchingTable: React.FC<Props> = ({ orderNumber, items, isLoad
                         <HeadingText level={2} children="Processed" className={`${
                             status && ["PROCESSING","SHIPPED","CONFIRMED","CANCELLED"].includes(status) ? "text-emerald-600" : "text-gray-400"} mb-2`}
                         />
-                        <OrderMatchingProcessedSection branchName={branch?.storeName??'-'} items={items} status={status} isLoading={isLoading} onShipping={onShipping} onCancel={onCancel} onSearch={onSearch} orderNumber={orderNumber}/>
+                        <OrderMatchingProcessedSection branchName={branch?.storeName??'-'} items={items} status={status} isLoading={isLoading} onShipping={onShipping} onCancel={onCancel} orderNumber={orderNumber} role={role}/>
                     </div>
                 </div>
                 {

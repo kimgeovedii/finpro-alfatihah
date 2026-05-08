@@ -6,7 +6,7 @@ import { SearchHeader } from "./SearchHeader";
 import { SearchResults } from "./SearchResults";
 
 export const SearchPageView = () => {
-  useSearchFilters();
+  useSearchFilters(true);
 
   return (
     <div className="flex flex-col gap-10 py-8 md:py-12">

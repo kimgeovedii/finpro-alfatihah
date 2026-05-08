@@ -16,10 +16,24 @@ export class ProductService {
     const skip = (page - 1) * limit;
     const take = limit;
 
-    const { sortBy = "createdAt", sortOrder = "desc", ...restFilters } = filters;
-    const orderDir = (sortOrder === "asc" || sortOrder === "desc") ? sortOrder : "desc";
+    const {
+      sortBy = "createdAt",
+      sortOrder = "desc",
+      ...restFilters
+    } = filters;
+    const orderDir =
+      sortOrder === "asc" || sortOrder === "desc" ? sortOrder : "desc";
 
     const where: any = { ...restFilters, deletedAt: null };
+    const originalBranchId = where.branchId;
+
+    if (where.branchId) {
+      where.branchInventories = {
+        some: { branchId: where.branchId },
+      };
+      delete where.branchId;
+    }
+
     if (where.search) {
       where.productName = { contains: where.search, mode: "insensitive" };
       delete where.search;
@@ -43,6 +57,7 @@ export class ProductService {
       take,
       sortBy,
       orderDir,
+      originalBranchId,
     );
 
     return {
@@ -60,8 +75,16 @@ export class ProductService {
     return await this.productRepository.getProductById(id);
   };
 
-  public getProductBySlug = async (slugName: string, userId: string | null, branchName: string) => {
-    return await this.productRepository.getProductBySlug(slugName, userId, branchName);
+  public getProductBySlug = async (
+    slugName: string,
+    userId: string | null,
+    branchName: string,
+  ) => {
+    return await this.productRepository.getProductBySlug(
+      slugName,
+      userId,
+      branchName,
+    );
   };
 
   public createProduct = async (data: any, files?: Express.Multer.File[]) => {
@@ -89,7 +112,9 @@ export class ProductService {
     files?: Express.Multer.File[],
   ) => {
     const payload = { ...data };
-    const existingImageIds = this.parseExistingImageIds(payload.existingImageIds);
+    const existingImageIds = this.parseExistingImageIds(
+      payload.existingImageIds,
+    );
     delete payload.existingImageIds;
 
     if (files && Array.isArray(files) && files.length > 0) {
@@ -115,7 +140,11 @@ export class ProductService {
   private parseExistingImageIds = (data: any): string[] => {
     if (!data) return [];
     if (Array.isArray(data)) return data.filter((id) => typeof id === "string");
-    if (typeof data === "string") return data.split(",").map((id) => id.trim()).filter(Boolean);
+    if (typeof data === "string")
+      return data
+        .split(",")
+        .map((id) => id.trim())
+        .filter(Boolean);
     return [];
   };
   public deleteProduct = async (id: string) => {

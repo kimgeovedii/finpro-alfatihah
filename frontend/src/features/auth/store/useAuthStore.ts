@@ -1,3 +1,4 @@
+import { Employee } from "@/features/manageStock";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -9,6 +10,7 @@ interface User {
   avatar?: string;
   emailVerifiedAt?: string;
   newEmail?: string;
+  employee?: Employee
 }
 
 interface AuthState {

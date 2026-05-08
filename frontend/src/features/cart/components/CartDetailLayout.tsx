@@ -26,7 +26,7 @@ export function CartDetailLayout({ cartId }: Props) {
     // Handle hook (action)
     const onSuccess = () => fetchCartDetail(cartId)
     const {
-        selectedVoucher, selectedAddressId, setSelectedAddressId, paymentMethod, setPaymentMethod,
+        selectedVoucher, selectedAddressId, setSelectedAddressId, paymentMethod, setPaymentMethod, localQty,
         handleApply, handleRemove, handleRemoveCartItem, handleIncrease, handleDecrease, handleCheckout,
     } = useCartActions(onSuccess, cartId)
 
@@ -46,9 +46,11 @@ export function CartDetailLayout({ cartId }: Props) {
         }
 
         if (cart?.user?.addresses?.length) {
+            // Return address selected based on primary status and within range
             const selectedAddress = (() => {
                 const primary = cart?.user?.addresses?.find(dt => dt.isPrimary && dt.isWithinRange)
                 if (primary) return primary
+
                 return cart?.user?.addresses?.find(dt => dt.isWithinRange) ?? cart.user.addresses[0]
             })()
 
@@ -77,40 +79,46 @@ export function CartDetailLayout({ cartId }: Props) {
 
     // Calculate price
     const shippingCost = cart.shipping?.shippingCost ?? 0
-    const finalTotalPrice = cart.finalTotalPrice
+    const productFinalPrice = cart.finalTotalPrice
     
     const voucherDiscount = (() => {
         if (!selectedVoucher) return 0
     
-        // min purchase validation
-        if (
-        selectedVoucher.minPurchaseAmount &&
-        finalTotalPrice < selectedVoucher.minPurchaseAmount
-        ) {
-        return 0
-        }
+        // Min purchase validation
+        if (selectedVoucher.minPurchaseAmount && productFinalPrice < selectedVoucher.minPurchaseAmount) return 0
+
+        const voucherTargetPrice = selectedVoucher.type === "SHIPPING_COST" ? shippingCost : productFinalPrice
     
+        // Percentage calculation
         let discount = 0
         if (selectedVoucher.discountValueType === "PERCENTAGE") {
-        const percentage = Math.min(Math.max(selectedVoucher.discountValue, 0), 100)
-        discount = (finalTotalPrice * percentage) / 100
+            // Prevent discount more than 100%
+            const percentage = Math.min(Math.max(selectedVoucher.discountValue, 0), 100)
+
+            discount = (voucherTargetPrice * percentage) / 100
         } else {
-        discount = Math.max(selectedVoucher.discountValue, 0)
+            // Prevent negative discount
+            discount = Math.max(selectedVoucher.discountValue, 0)
         }
     
-        // max discount cap
+        // Make sure discount use based on max amount
         if (selectedVoucher.maxDiscountAmount) discount = Math.min(discount, selectedVoucher.maxDiscountAmount)
+    
+        // Prevent over-discount
+        discount = Math.min(discount, voucherTargetPrice)
     
         return Math.ceil(discount)
     })()
 
-    let finalProductPrice = finalTotalPrice
+    // Final calculation
+    let finalProductPrice = productFinalPrice
     let finalShipping = shippingCost
+
+    // Implement discount based on type
     if (selectedVoucher) {
-        if (selectedVoucher.type === "ORDER") finalProductPrice = finalTotalPrice - voucherDiscount
+        if (selectedVoucher.type === "ORDER") finalProductPrice = Math.max(0, productFinalPrice - voucherDiscount)
         if (selectedVoucher.type === "SHIPPING_COST") finalShipping = Math.max(0, shippingCost - voucherDiscount)
     }
-
     const finalPrice = Math.round(finalProductPrice + finalShipping)
     
     return (
@@ -132,7 +140,7 @@ export function CartDetailLayout({ cartId }: Props) {
                     appliedVoucher={selectedVoucher?.voucherCode}
                     onApply={handleApply}
                     onRemove={handleRemove}
-                    totalBasePrice={finalTotalPrice}
+                    totalBasePrice={productFinalPrice}
                 />
                 </div>
                 <div className='w-full lg:flex-1 flex flex-col space-y-5'>
@@ -141,21 +149,13 @@ export function CartDetailLayout({ cartId }: Props) {
                         branchName={cart.branch.storeName}
                         items={
                             cart.items.map(dt => ({
-                            id: dt.id,
-                            cartId: cartId,
-                            slugName: dt.product.product.slugName,
-                            productName: dt.product.product.productName,
-                            productDiscounts: dt.product.product.productDiscounts,
-                            category: dt.product.product.category,
-                            productImages: dt.product.product.productImages,
-                            quantity: dt.quantity,
-                            currentStock: dt.product.currentStock,
-                            weight: dt.product.product.weight * dt.quantity,
-                            basePrice: dt.product.product.basePrice,
-                            totalPrice: dt.product.product.basePrice * dt.quantity,
-                            discountAmount: dt.product.product.discountAmount,
-                            finalTotalPrice: dt.product.product.finalTotalPrice,
-                            finalPricePerItem: dt.product.product.finalPricePerItem
+                                id: dt.id,
+                                cartId,
+                                ...dt.product.product,
+                                quantity: localQty[dt.id] ?? dt.quantity,
+                                currentStock: dt.product.currentStock,
+                                weight: dt.product.product.weight * (localQty[dt.id] ?? dt.quantity),
+                                totalPrice: dt.product.product.basePrice * (localQty[dt.id] ?? dt.quantity),
                             }))
                         }
                         onIncrease={handleIncrease}

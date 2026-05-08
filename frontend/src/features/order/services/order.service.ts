@@ -1,6 +1,7 @@
 import { create } from "zustand"
 import { orderRepository } from "../repositories/order.repository"
 import { OrderSummaryByBranchIdData, OrderSummaryData } from "../repositories/order.type"
+import { closeLoading, showLoading } from "@/utils/message.util"
 
 type OrderState = {
     summary: OrderSummaryData | null
@@ -28,7 +29,10 @@ export const useOrderService = create<OrderState>((set) => ({
         set({ isLoadingSummaryByBranchId: true, errorByBranchId: null })
 
         try {
+            // Repo : Get order summary by branch id
+            showLoading("Loading...")
             const data = await orderRepository.getOrderSummaryByBranchId(branchId)
+            closeLoading()
 
             set({ summaryByBranchId: data, isLoadingSummaryByBranchId: false })
         } catch (err: any) {
@@ -43,7 +47,10 @@ export const useOrderService = create<OrderState>((set) => ({
         set({ isLoadingSummary: true, error: null })
 
         try {
+            // Repo : get order summary
+            showLoading("Loading...")
             const data = await orderRepository.getOrderSummary()
+            closeLoading()
 
             set({ summary: data, isLoadingSummary: false })
         } catch (err: any) {

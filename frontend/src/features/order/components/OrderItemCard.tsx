@@ -55,7 +55,7 @@ export const OrderItemCard: React.FC<Props> = ({ orderId, orderNumber, status, t
         <div className="flex items-center justify-between bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 mb-4">
             <div className="w-full">
                 <div className="flex justify-between items-center">
-                    <CopyFieldButton label="Order number" value={orderNumber} />
+                    <CopyFieldButton label="Order Number" value={orderNumber} />
                     <Badge className={`capitalize font-semibold ${statusClass}`}>{finalStatus}</Badge>
                 </div>
                 <DividerLine/>
@@ -64,7 +64,7 @@ export const OrderItemCard: React.FC<Props> = ({ orderId, orderNumber, status, t
                 { 
                     status === 'WAITING_PAYMENT' && paymentEvidence === null && paymentMethod === "MANUAL" && 
                         <div className="mt-2">
-                            <PaymentEvidenceUploadButton orderId={orderId} paymentDeadline={paymentDeadline} onSuccess={onSuccess}/> 
+                            <PaymentEvidenceUploadButton orderId={orderId} paymentDeadline={paymentDeadline} onSuccess={onSuccess} isShowDestinationAccount={false}/> 
                         </div>
                 }
                 {

@@ -11,6 +11,7 @@ export type ProductImage = {
 export type ProductCategory = {
   id: string;
   name: string;
+  slugName: string;
 };
 
 export type BranchSchedule = {
@@ -21,6 +22,7 @@ export type BranchSchedule = {
 
 export type BranchDetail = {
   storeName: string;
+  slug: string;
   address: string;
   openStatus: string;
   schedules: BranchSchedule[];
@@ -41,6 +43,30 @@ export type BranchInventory = {
   cartItems: CartItem[];
 };
 
+export type Discount = {
+  id: string;
+  name: string;
+  discountType:
+    | "PRODUCT_DISCOUNT"
+    | "BUY_ONE_GET_ONE_FREE"
+    | "MINIMUM_PURCHASE";
+  discountValueType: "PERCENTAGE" | "NOMINAL";
+  discountValue: number;
+  minPurchaseAmount?: number;
+  maxDiscountAmount?: number;
+  startDate: string;
+  endDate: string;
+  branchId?: string;
+  deletedAt?: string | null;
+};
+
+export type ProductDiscount = {
+  id: string;
+  productId: string;
+  discountId: string;
+  discount: Discount;
+};
+
 export type ProductDetailData = {
   id: string;
   slugName: string;
@@ -55,9 +81,9 @@ export type ProductDetailData = {
   category: ProductCategory;
   productImages: ProductImage[];
   branchInventories: BranchInventory[];
+  productDiscounts?: ProductDiscount[];
 };
 
-// Component Props
 export type ProductDetailImageGalleryProps = {
   productImages: ProductImage[];
   productName: string;
@@ -68,6 +94,7 @@ export type ProductDetailInfoContentProps = {
   categoryName: string;
   description: string;
   price: number;
+  discountedPrice?: number;
 };
 
 export type ProductDetailCartActionProps = {
@@ -75,6 +102,7 @@ export type ProductDetailCartActionProps = {
   qty: number;
   setQty: (qty: number) => void;
   price: number;
+  discountedPrice?: number;
   totalPrice: number;
   variant: "mobile" | "desktop";
   isCreating: boolean;

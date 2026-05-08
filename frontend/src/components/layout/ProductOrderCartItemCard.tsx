@@ -10,7 +10,6 @@ type ProductOrderCartCardProps = {
     item: ProductOrderCartItem
     variant?: "order" | "cart"
     branchName: string
-    
     onIncrease?: () => void
     onDecrease?: () => void
     onRemove?: () => void
@@ -30,9 +29,7 @@ export const ProductOrderCartItemCard: React.FC<ProductOrderCartCardProps> = ({ 
                     }
                 </div>
                 <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-semibold text-emerald-600 uppercase tracking-wider">
-                        {item.category.name}
-                    </p>
+                    <p className="text-[10px] font-semibold text-emerald-600 uppercase tracking-wider">{item.category.name}</p>
                     <Link href={`/${branchName}/${item.slugName}`}>
                         <p className={`text-sm font-semibold text-slate-800 cursor-pointer hover:underline ${variant === "order" ? "line-clamp-3" : ""}`}>
                             {item.productName}
@@ -113,7 +110,7 @@ export const ProductOrderCartItemCard: React.FC<ProductOrderCartCardProps> = ({ 
                             <div className="flex items-center gap-2 justify-end mt-3">
                                 <Button onClick={onRemove} className="bg-transparent text-slate-400 hover:text-red-500 transition cursor-pointer"><TrashIcon className="w-5 h-5"/></Button>
                                 <div className="flex items-center bg-slate-100/70 rounded-full p-1 shadow-inner gap-1">
-                                    <Button onClick={onDecrease} className="bg-transparent w-5 h-5 flex items-center justify-center rounded-full text-slate-600 hover:bg-white transition">-</Button>
+                                    <Button onClick={onDecrease} className="bg-transparent w-5 h-5 flex items-center justify-center rounded-full text-slate-600 hover:bg-red-500 hover:text-white transition">-</Button>
                                     <span className="w-5 text-center font-semibold text-slate-800 text-sm">{item.quantity}</span>
                                     <Button onClick={onIncrease} className="w-5 h-5 flex items-center justify-center rounded-full bg-emerald-600 text-white shadow hover:bg-emerald-700 transition">+</Button>
                                 </div>
