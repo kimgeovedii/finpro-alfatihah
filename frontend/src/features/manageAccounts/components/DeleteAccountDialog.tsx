@@ -1,4 +1,8 @@
+"use client";
+
 import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import {
   Dialog,
   DialogContent,
@@ -7,8 +11,6 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { DeleteAccountDialogProps } from "../types/manageAccount.type";
 
 export const DeleteAccountDialog: React.FC<DeleteAccountDialogProps> = ({
@@ -18,56 +20,67 @@ export const DeleteAccountDialog: React.FC<DeleteAccountDialogProps> = ({
   onConfirm,
   isDeleting,
 }) => {
-  if (!account) return null;
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[440px] rounded-2xl border-none shadow-2xl p-0 overflow-hidden">
-        <div className="p-8">
-          <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center mb-6">
-            <ExclamationTriangleIcon className="w-6 h-6 text-red-600" />
-          </div>
+      <AnimatePresence>
+        {open && (
+          <DialogContent className="sm:max-w-sm" showCloseButton>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+            >
+              <DialogHeader>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-[#b31b25] shrink-0">
+                    <ExclamationTriangleIcon className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <DialogTitle className="text-base font-bold text-[#2c2f30]">
+                      Delete Account
+                    </DialogTitle>
+                    <DialogDescription className="mt-0.5">
+                      This action cannot be undone.
+                    </DialogDescription>
+                  </div>
+                </div>
+              </DialogHeader>
 
-          <DialogHeader className="text-left">
-            <DialogTitle className="text-xl font-bold text-slate-900">
-              Delete Account?
-            </DialogTitle>
-            <DialogDescription className="text-slate-500 pt-2 leading-relaxed">
-              Are you sure you want to delete the account for{" "}
-              <span className="font-semibold text-slate-900">
-                {account.employee?.fullName || account.email}
-              </span>
-              ? This action cannot be undone and will remove all associated
-              administrative data.
-            </DialogDescription>
-          </DialogHeader>
-        </div>
-
-        <DialogFooter className="bg-slate-50 p-6 flex flex-row gap-3">
-          <Button
-            variant="ghost"
-            onClick={() => onOpenChange(false)}
-            className="flex-1 h-11 rounded-xl text-slate-600 hover:bg-slate-200/50"
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={onConfirm}
-            disabled={isDeleting}
-            className="flex-1 h-11 rounded-xl bg-red-600 hover:bg-red-700 shadow-lg shadow-red-200"
-          >
-            {isDeleting ? (
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                <span>Deleting...</span>
+              <div className="mt-4 p-3 rounded-lg bg-red-50/50 border border-red-100">
+                <p className="text-sm text-[#2c2f30]">
+                  Are you sure you want to delete{" "}
+                  <span className="font-semibold">
+                    &ldquo;{account?.username || account?.email}&rdquo;
+                  </span>
+                  ? This user will lose all access to the platform.
+                </p>
               </div>
-            ) : (
-              "Yes, Delete Account"
-            )}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
+
+              <DialogFooter className="mt-4">
+                <motion.button
+                  type="button"
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => onOpenChange(false)}
+                  className="px-4 py-2 rounded-lg text-sm font-medium text-[#595c5d] hover:bg-[#eff1f2] transition-colors"
+                >
+                  Cancel
+                </motion.button>
+                <motion.button
+                  type="button"
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={onConfirm}
+                  disabled={isDeleting}
+                  className="px-5 py-2 rounded-lg bg-[#b31b25] text-white text-sm font-medium shadow-sm hover:bg-[#9f0519] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isDeleting ? "Deleting..." : "Delete"}
+                </motion.button>
+              </DialogFooter>
+            </motion.div>
+          </DialogContent>
+        )}
+      </AnimatePresence>
     </Dialog>
   );
 };

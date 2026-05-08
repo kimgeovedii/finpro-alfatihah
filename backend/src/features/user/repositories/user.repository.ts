@@ -7,17 +7,18 @@ export class UserRepository {
     page: number;
     limit: number;
     search?: string;
-    role?: EmployeeRole;
+    role?: string;
+    employeeOnly?: boolean;
   }) {
-    const { page, limit, search, role } = params;
+    const { page, limit, search, role, employeeOnly } = params;
     const skip = (page - 1) * limit;
 
-    const where: Prisma.UserWhereInput = {
-      // Only returning users that are employees for the Manage Accounts page
-      employee: {
-        isNot: null,
-      },
-    };
+    const where: Prisma.UserWhereInput = {};
+
+    // Backward compatibility: when employeeOnly is true, only return users with employee records
+    if (employeeOnly) {
+      where.employee = { isNot: null };
+    }
 
     if (search) {
       where.OR = [
@@ -27,10 +28,15 @@ export class UserRepository {
       ];
     }
 
-    if (role) {
-      where.employee = {
-        role: role,
-      };
+    // Role filtering: supports top-level UserRole and nested EmployeeRole
+    if (role && role !== "ALL") {
+      if (role === "CUSTOMER") {
+        where.role = UserRole.CUSTOMER;
+      } else if (role === "EMPLOYEE") {
+        where.role = UserRole.EMPLOYEE;
+      } else if (role === "STORE_ADMIN" || role === "SUPER_ADMIN") {
+        where.employee = { role: role as EmployeeRole };
+      }
     }
 
     const [total, data] = await Promise.all([

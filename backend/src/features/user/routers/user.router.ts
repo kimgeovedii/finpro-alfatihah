@@ -37,7 +37,7 @@ export class UserRouter {
     const adminRoutes = Router();
     adminRoutes.use(roleMiddleware([EmployeeRole.SUPER_ADMIN]));
     
-    adminRoutes.get("/", this.employeeController.getAllEmployees);
+    adminRoutes.get("/", this.userController.getAllAccounts);
     adminRoutes.post("/", this.employeeController.createEmployee);
     adminRoutes.put("/:id", this.employeeController.updateEmployee);
     adminRoutes.delete("/:id", this.employeeController.deleteEmployee);
