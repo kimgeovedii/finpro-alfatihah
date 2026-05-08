@@ -46,7 +46,6 @@ export class EmployeeController {
 
       return sendSuccess(res, { data: formattedData, meta: result.meta }, "Berhasil mengambil data employee");
     } catch (error: any) {
-      console.error("Get Employees Error:", error);
       return sendError(res, error.message || "Gagal mengambil data employee", 500);
     }
   };
@@ -64,7 +63,6 @@ export class EmployeeController {
       if (error.message.includes("sudah terdaftar")) {
         return sendError(res, error.message, 409);
       }
-      console.error("Create Employee Error:", error);
       return sendError(res, "Gagal membuat akun employee", 500);
     }
   };
@@ -86,7 +84,6 @@ export class EmployeeController {
       if (error.message.includes("sudah digunakan")) {
         return sendError(res, error.message, 409);
       }
-      console.error("Update Employee Error:", error);
       return sendError(res, "Gagal mengupdate akun employee", 500);
     }
   };
@@ -103,7 +100,6 @@ export class EmployeeController {
       if (error.message.includes("Tidak dapat menghapus")) {
         return sendError(res, error.message, 403);
       }
-      console.error("Delete Employee Error:", error);
       return sendError(res, "Gagal menghapus akun employee", 500);
     }
   };

@@ -8,7 +8,6 @@ export class OrderExportService {
     private orderRepo = new OrderRepository()
 
     async generateInvoicePdf(role: UserRole, userId: string, orderNumber: string) {
-        console.log(role)
         // Repo : get detail order invoice by order number
         const order = await this.orderRepo.findOrderDetailByOrderNumber(role, userId, orderNumber)
         if (!order) throw { code: 404, message: "Order not found" }

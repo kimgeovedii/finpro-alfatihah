@@ -75,7 +75,6 @@ export const useSearchStore = create<SearchState>((set, get) => ({
       const response = await repository.getCategories();
       set({ categories: response.data, isCategoriesLoading: false });
     } catch (error) {
-      console.error("Failed to fetch categories:", error);
       set({ isCategoriesLoading: false });
     }
   },

@@ -9,12 +9,9 @@ export class OrderCron {
         // Every day at 7 AM and 8 PM
         cron.schedule("0 7,20 * * *", async () => {
         // cron.schedule("* * * * *", async () => {
-            console.log("Running order reminder cron...")
-
             try {
                 // Service : get order that the status still waiting for confirmation or processing
                 await this.orderCronService.getUnprocessedOrdersToRemind()
-                console.log("Order reminder finished")
             } catch (error) {
                 console.error("Cron error:", error)
             }
@@ -25,14 +22,10 @@ export class OrderCron {
         // cron.schedule("* * * * *", async () => {
             try {
                 // Service : check order's payment deadline
-                console.log("Running order reminder cron...")
                 await this.orderCronService.getExpiredOrder()
-                console.log("Order expired has been updated")
 
                 // Service : auto confirm for order that has been shipped for more than 7 days
-                console.log("Running order auto confirm cron...")
                 await this.orderCronService.getOldShippedOrder()
-                console.log("Order status has been updated")
             } catch (error) {
                 console.error("Cron error:", error)
             }
