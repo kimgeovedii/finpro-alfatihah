@@ -216,14 +216,6 @@
  *                                         basePrice:
  *                                           type: number
  *                                           example: 48660
- *                                         description:
- *                                           type: string
- *                                           example: Sweet and naturally ripened Cavendish bananas from the Sunpride farms...
- *                                         category:
- *                                           type: object
- *                                           properties:
- *                                             name: { type: string, example: Fruits }
- *                                             slugName: { type: string, example: fruits }
  *                                         productImages:
  *                                           type: array
  *                                           items:
@@ -461,50 +453,67 @@
  *                     branch:
  *                       type: object
  *                       properties:
- *                         storeName: { type: string, example: Main Branch }
- *                         latitude: { type: number, example: -6.913071095629721 }
- *                         longitude: { type: number, example: 107.61796357086735 }
- *                         address: { type: string, example: Jakarta }
- *                         maxDeliveryDistance: { type: number, example: 10 }
+ *                         storeName: { type: string, example: Pasar Segar Monas }
+ *                         latitude: { type: number, example: -6.1944 }
+ *                         longitude: { type: number, example: 106.8229 }
+ *                         address: { type: string, example: Jl. Medan Merdeka Barat No. 5, Gambir }
+ *                         maxDeliveryDistance: { type: number, example: 15 }
+ *                         openStatus: { type: string, example: Open }
  *                         schedules:
  *                           type: array
  *                           items:
  *                             type: object
  *                             properties:
- *                               startTime: { type: string, example: "08:30" }
- *                               endTime: { type: string, example: "21:30" }
- *                               dayName: { type: string, example: THU }
+ *                               startTime: { type: string, example: "07:00" }
+ *                               endTime: { type: string, example: "23:00" }
+ *                               dayName: { type: string, example: FRI }
  *                     items:
  *                       type: array
  *                       items:
  *                         type: object
  *                         properties:
- *                           id: { type: string, format: uuid }
- *                           quantity: { type: integer, example: 20 }
+ *                           id: { type: string, format: uuid, example: 80ff660a-ed22-4d5f-94d0-b117f691452d }
+ *                           quantity: { type: integer, example: 1 }
  *                           product:
  *                             type: object
  *                             properties:
+ *                               currentStock: { type: integer, example: 386 }
  *                               product:
  *                                 type: object
  *                                 properties:
- *                                   productName: { type: string, example: Canned Peas }
- *                                   description: { type: string, example: Green peas, healthy and convenient }
- *                                   category:
- *                                     type: object
- *                                     properties:
- *                                       name: { type: string, example: Canned Goods }
- *                                       slugName: { type: string, example: canned-goods }
- *                                   basePrice: { type: number, example: 16023 }
- *                                   discountAmount: { type: number, example: 88439 }
- *                                   finalTotalPrice: { type: number, example: 861393 }
- *                                   finalPricePerItem: { type: number, example: 66261 }
- *                                   weight: { type: number, example: 1200 }
+ *                                   productName: { type: string, example: Alpukat Mentega Avocado 500g }
+ *                                   slugName: { type: string, example: alpukat-mentega-avocado-500g }
+ *                                   basePrice: { type: number, example: 15239 }
+ *                                   weight: { type: number, example: 500 }
+ *                                   discountAmount: { type: number, example: 0 }
+ *                                   finalTotalPrice: { type: number, example: 15239 }
+ *                                   finalPricePerItem: { type: number, example: 15239 }
+ *                                   productDiscounts:
+ *                                     type: array
+ *                                     items:
+ *                                       type: object
+ *                                       properties:
+ *                                         discount:
+ *                                           type: object
+ *                                           properties:
+ *                                             discountType: { type: string, example: MINIMUM_PURCHASE }
+ *                                             discountValue: { type: number, example: 45000 }
+ *                                             discountValueType: { type: string, example: NOMINAL }
+ *                                             maxDiscountAmount: { type: number, example: 375000 }
+ *                                             minPurchaseAmount: { type: number, example: 75000 }
+ *                                             startDate: { type: string, format: date-time, example: 2026-05-04T00:11:06.259Z }
+ *                                             endDate: { type: string, format: date-time, example: 2026-06-03T00:11:06.259Z }
  *                                   productImages:
  *                                     type: array
  *                                     items:
  *                                       type: object
  *                                       properties:
- *                                         imageUrl: { type: string, example: https://picsum.photos/seed/O7zmL/800/600 }
+ *                                         imageUrl: { type: string, example: https://loremflickr.com/800/600/500g?lock=5858 }
+ *                                   category:
+ *                                     type: object
+ *                                     properties:
+ *                                       slugName: { type: string, example: fruits }
+ *                                       name: { type: string, example: Fruits }
  *                     user:
  *                       type: object
  *                       properties:
@@ -513,22 +522,27 @@
  *                           items:
  *                             type: object
  *                             properties:
- *                               id: { type: string, format: uuid }
- *                               address: { type: string, example: Jl. Merdeka No. 10, Bandung }
- *                               lat: { type: number, example: -6.9175 }
- *                               long: { type: number, example: 107.6191 }
- *                               label: { type: string, example: Rumah }
- *                               receiptName: { type: string, example: Akim Mustofa }
- *                               phone: { type: string, example: "081234567890" }
- *                               isPrimary: { type: boolean, example: true }
- *                     totalBasePrice: { type: number, example: 24241893 }
- *                     totalQty: { type: number, example: 641 }
- *                     totalWeight: { type: number, example: 1200 }
+ *                               id: { type: string, format: uuid, example: ab93fb62-1e41-4df2-9eaf-65a4642057ac }
+ *                               address: { type: string, example: Universitas Indonesia, Depok }
+ *                               lat: { type: number, example: -6.271348 }
+ *                               long: { type: number, example: 106.764486 }
+ *                               type: { type: string, example: Rumah }
+ *                               label: { type: string, example: Kampus }
+ *                               receiptName: { type: string, example: Flazen Edu }
+ *                               phone: { type: string, example: "081200000011" }
+ *                               isPrimary: { type: boolean, example: false }
+ *                               distance: { type: number, example: 10.719195944945607 }
+ *                               isWithinRange: { type: boolean, example: true }
+ *                     totalBasePrice: { type: number, example: 15239 }
+ *                     totalQty: { type: integer, example: 1 }
+ *                     totalWeight: { type: number, example: 500 }
+ *                     totalDiscountProduct: { type: number, example: 0 }
+ *                     finalTotalPrice: { type: number, example: 15239 }
  *                     shipping:
  *                       type: object
  *                       properties:
- *                         shippingCost: { type: number, example: 8000 }
- *                         distance: { type: number, example: 0.5081978361819555 }
+ *                         shippingCost: { type: number, example: 18000 }
+ *                         distance: { type: number, example: 10.719195944945607 }
  *                         courier: { type: string, example: jne }
  *
  *       401:

@@ -27,9 +27,11 @@ export const useOrderManagement = (defaultBranchId: string = "ALL") => {    cons
     const fetchOrders = async (nextPage: number, nextStatus: OrderStatus | "ALL", nextBranchId: string, nextSearch: string) => {
         setIsLoading(true)
         try {
-            showLoading()
             // Repo : get all order by branch
+            showLoading("Loading...")
             const res = await orderRepository.getAllOrdersByBranchId(nextPage, nextBranchId, nextStatus, nextSearch)
+            closeLoading()
+
             setOrders(res.data)
             setMeta(res.meta)
             closeLoading()

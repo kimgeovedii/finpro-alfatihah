@@ -3,6 +3,7 @@ import { orderRepository } from "../repositories/order.repository"
 import { useOrderService } from "../services/order.service"
 import { CommandResult, PaginationMeta } from "@/types/global.type"
 import { OrderData } from "../repositories/order.type"
+import { closeLoading, showLoading } from "@/utils/message.util"
 
 export const useOrderSummary = () => {
     const { summary, fetchOrderSummary, isLoadingSummary, error } = useOrderService()
@@ -32,7 +33,10 @@ export const useAllOrderData = () => {
             const appliedFilters = newFilters ?? filters
             if (newFilters) setFilters(newFilters)
     
+            // Repo : Get all order
+            showLoading("Loading...")
             const res = await orderRepository.getAllOrders(page, appliedFilters)
+            closeLoading()
     
             setOrders((prev) => page === 1 ? res.data : [...prev, ...res.data])
             setMeta(res.meta)
@@ -58,7 +62,10 @@ export const useOrderDetailData = (orderNumber: string) => {
         setIsLoading(true)
 
         try {
+            // Repo : Get order detail
+            showLoading("Loading...")
             const res = await orderRepository.getOrderDetailByOrderNumber(orderNumber)
+            closeLoading()
 
             setOrder(res)
         } catch (err) {
@@ -84,7 +91,10 @@ export const useUpdateOrderStatusById = () => {
         setError(null)
     
         try {
+            // Repo : Update order by order number
+            showLoading("Updating order...")
             const res = await orderRepository.postUpdateOrderStatusById(orderNumber)
+            closeLoading()
     
             return { success: true, message: res?.message || "Order updated successfully" }
         } catch (err: any) {
@@ -109,7 +119,10 @@ export const useCancelOrderStatusById = () => {
         setError(null)
     
         try {
+            // Repo : Update cancel order by order number
+            showLoading("Cancelling order...")
             const res = await orderRepository.postCancelOrderStatusById(orderNumber)
+            closeLoading()
     
             return { success: true, message: res?.message || "Order cancel successfully" }
         } catch (err: any) {
@@ -134,7 +147,10 @@ export const useConfirmOrderStatusById = () => {
         setError(null)
     
         try {
+            // Repo : Update confirm order by order number
+            showLoading("Confirming order...")
             const res = await orderRepository.postConfirmOrderStatusById(orderNumber)
+            closeLoading()
     
             return { success: true, message: res?.message || "Order confirm successfully" }
         } catch (err: any) {

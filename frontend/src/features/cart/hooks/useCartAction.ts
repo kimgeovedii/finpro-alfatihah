@@ -43,7 +43,11 @@ export const useCartActions = (onSuccess: () => void, cartId?: string) => {
         })
         if (!confirm.isConfirmed) return
 
+        // Repo : Delete cart by id
+        showLoading("Removing cart...")
         const success = await deleteCart(cartId)
+        closeLoading()
+        
         if (success) await showPopUp(actionMessages.cartDeletedSuccessTitle, actionMessages.cartDeletedSuccessDesc, "success", "#10b981", onSuccess)
     }
 
@@ -59,7 +63,11 @@ export const useCartActions = (onSuccess: () => void, cartId?: string) => {
         })
         if (!confirm.isConfirmed) return
 
+        // Repo : Delete cart item by id
+        showLoading("Removing product...")
         const success = await deleteCartItem(cartItemId)
+        closeLoading()
+
         if (success) await showPopUp(actionMessages.productRemoveSuccessTitle, `<b>${productName}</b> ${actionMessages.productRemoveSuccessDesc}`, "success", null, onSuccess)
     }
 
@@ -185,6 +193,7 @@ export const useCartActions = (onSuccess: () => void, cartId?: string) => {
         showLoading("Preparing your order...")
         const { success, redirectUrl } = await checkoutCartItem(cartId, selectedAddressId, paymentMethod, selectedVoucher?.id)
         closeLoading()
+        
         if (!success) {
             Swal.fire({
                 icon: "error",
