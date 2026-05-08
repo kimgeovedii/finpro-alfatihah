@@ -128,91 +128,24 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
             </div>
             <div className="p-4 bg-emerald-700">
             {
-                meta && 
-                    <div className="flex items-center justify-between">
-                        <p className="text-sm text-white">Showing {startItem} to {endItem} of {totalOrders.toLocaleString(currencyFormat)} orders</p>
-                        <div className="flex items-center gap-1">
-                            <Button variant="outline" size="sm" onClick={() => onPageChange(currentPage - 1)} disabled={currentPage <= 1} className="h-8 w-8 p-0 border-0 bg-transparent text-white hover:bg-green-600 hover:text-white"><ChevronLeftIcon/></Button>
-                            { 
-                                pageNumbers.map((p) => 
-                                    <Button key={p} variant={p === currentPage ? "default" : "outline"} size="sm" onClick={() => onPageChange(p)} className={`h-8 w-8 p-0 border-0 bg-transparent text-white hover:bg-green-600 hover:text-white ${p === currentPage ? "bg-green-600 text-white" : ""}`}>
-                                        {p}
-                                    </Button>
-                                ) 
-                            }
-                          />
-                        ) : dt.status === "CANCELLED" ||
-                          dt.status === "WAITING_PAYMENT" ? (
-                          <>-</>
-                        ) : (
-                          <div className="bg-green-100 text-green-600 rounded-lg w-8 h-8 p-[5px] mx-auto">
-                            <CheckIcon className="w-5 h-5" />
-                          </div>
-                        )}
-                      </TableCell>
-                    )}
-                    <TableCell>
-                      {dt.status !== "WAITING_PAYMENT" &&
-                      dt.status !== "WAITING_PAYMENT_CONFIRMATION" ? (
-                        <Link
-                          href={`/dashboard/manage-order/${dt.orderNumber}`}
-                        >
-                          <Button className="bg-teal-700 text-white font-semibold text-xs px-3">
-                            <ArrowRightIcon className="w-3 h-3" /> Manage
-                          </Button>
-                        </Link>
-                      ) : (
-                        <>-</>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                );
-              })
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      <div className="p-4 bg-emerald-700">
-        {meta && (
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-white">
-              Showing {startItem} to {endItem} of{" "}
-              {totalOrders.toLocaleString(currencyFormat)} orders
-            </p>
-            <div className="flex items-center gap-1">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onPageChange(currentPage - 1)}
-                disabled={currentPage <= 1}
-                className="h-8 w-8 p-0 border-0 bg-transparent text-white hover:bg-green-600 hover:text-white"
-              >
-                <ChevronLeftIcon />
-              </Button>
-              {pageNumbers.map((p) => (
-                <Button
-                  key={p}
-                  variant={p === currentPage ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => onPageChange(p)}
-                  className={`h-8 w-8 p-0 border-0 bg-transparent text-white hover:bg-green-600 hover:text-white ${p === currentPage ? "bg-green-600 text-white" : ""}`}
-                >
-                  {p}
-                </Button>
-              ))}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onPageChange(currentPage + 1)}
-                disabled={currentPage >= totalPages}
-                className="h-8 w-8 p-0 border-0 bg-transparent text-white hover:bg-green-600 hover:text-white"
-              >
-                <ChevronRightIcon />
-              </Button>
+              meta && 
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-white">Showing {startItem} to {endItem} of {totalOrders.toLocaleString(currencyFormat)} orders</p>
+                  <div className="flex items-center gap-1">
+                    <Button variant="outline" size="sm" onClick={() => onPageChange(currentPage - 1)} disabled={currentPage <= 1} className="h-8 w-8 p-0 border-0 bg-transparent text-white hover:bg-green-600 hover:text-white"><ChevronLeftIcon/></Button>
+                    { 
+                      pageNumbers.map((p) => 
+                        <Button key={p} variant={p === currentPage ? "default" : "outline"} size="sm" onClick={() => onPageChange(p)} className={`h-8 w-8 p-0 border-0 bg-transparent text-white hover:bg-green-600 hover:text-white ${p === currentPage ? "bg-green-600 text-white" : ""}`}>
+                          {p}
+                        </Button>
+                      ) 
+                    }
+                    <Button variant="outline" size="sm" onClick={() => onPageChange(currentPage + 1)} disabled={currentPage >= totalPages} className="h-8 w-8 p-0 border-0 bg-transparent text-white hover:bg-green-600 hover:text-white"><ChevronRightIcon/></Button>
+                  </div>
+                </div>
+            }
             </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
+        </div>
+    )
+}
+
