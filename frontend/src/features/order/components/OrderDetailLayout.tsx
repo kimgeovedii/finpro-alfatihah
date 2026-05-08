@@ -51,139 +51,125 @@ export function OrderDetailLayout({ orderNumber }: Props) {
         }
     ]
 
-    return (
-        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full mx-auto w-full">
-        <div className='flex gap-5 items-center'>
-            <BackButton url="transaction"/>
-            <HeadingText children="Transaction Detail" level={1}/>
-        </div>
-        {
-            !isLoading && (!order || order?.payments.length === 0 ) ?
-                // Render failed fetching condition
-                <MessageBox context={'No order found'} image={"/assets/empty.png"} urlButton={'/transaction'} titleButton='Back to Order' description={`We're sorry, we cannot find <b>${orderNumber}</b> order. Double check your order number or contact our call center for more information`}/>
-            :
+    if (isLoading) {
+        return (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full mx-auto w-full">
+                <div className='flex gap-5 items-center'>
+                    <BackButton url="transaction"/>
+                    <HeadingText children="Transaction Detail" level={1}/>
+                </div>
+
                 <div className='flex flex-col lg:flex-row w-full gap-5'>
                     <div className='w-full lg:flex-1 flex flex-col space-y-5'>
-                    {
-                        isLoading ?
-                        // Render loading element
-                        <>
-                            <SkeletonBox extraClass={'min-h-[260px]'}/>
-                            <SkeletonBox extraClass={'min-h-[400px]'}/>
-                        </>
-                        :
-                        <>
-                            {
-                                // Payment summary comes first if waiting for payment / confirmation
-                                (order?.status === "WAITING_PAYMENT" || order?.status === "WAITING_PAYMENT_CONFIRMATION") &&
-                                    <PaymentSummaryCard
-                                        orderNumber={orderNumber}
-                                        totalItem={order?.items?.reduce((acc, item) => acc + item.quantity, 0) ?? 0}
-                                        shippingWeight={order?.totalWeight ?? 0}
-                                        shippingCost={order?.shippingCost ?? 0}
-                                        totalPrice={order?.totalPrice ?? 0}
-                                        totalSaving={(order?.totalPrice ?? 0) - (order?.finalPrice ?? 0)}
-                                        finalPrice={order?.finalPrice ?? 0} 
-                                        orderId={order?.id ?? '-'} 
-                                        status={order?.status ?? '-'} 
-                                        paymentDeadline={order?.paymentDeadline ?? '-'} 
-                                        paymentEvidence={order?.payments[0].evidence}
-                                        paymentMethod={order?.payments[0].method}
-                                        onCancel={handleCancelOrder} 
-                                        onSuccess={onSuccess}        
-                                    />
-                            }
-                            {
-                                // Order status comes first if payment has done
-                                order?.status !== "WAITING_PAYMENT" && order?.status !== "WAITING_PAYMENT_CONFIRMATION" &&
-                                    <OrderStatusStepsCard 
-                                        statusSteps={statusSteps} 
-                                        currentStatus={order?.status && order?.status === "WAITING_PAYMENT_CONFIRMATION" ? "WAITING_PAYMENT" : order?.status ?? ""}
-                                        orderNumber={orderNumber}
-                                        onConfirm={handleConfirmOrder}
-                                        status={order?.status}
-                                    />
-                            }
-                            <OrderDetailBranchCard
-                                branch={{
-                                    storeName: order?.branch?.storeName ?? "-",
-                                    address: order?.branch?.address ?? "-",
-                                    schedules: order?.branch?.schedules ?? [],
-                                    city: order?.branch?.city ?? "-",
-                                    openStatus: order?.branch.openStatus
-                                }}
-                                orderInfo={{
-                                    orderNumber,
-                                    orderStatus: order?.status ?? "-",
-                                    paymentStatus: order?.payments[0].status ?? '-',
-                                    paymentMethod: order?.payments[0].method ?? '-',
-                                    createdAt: order?.createdAt,
-                                    paymentDeadline: order?.paymentDeadline,
-                                }}
-                            />
-                        </>
-                    }
+                        <SkeletonBox extraClass={'min-h-[260px]'}/>
+                        <SkeletonBox extraClass={'min-h-[400px]'}/>
                     </div>
                     <div className='w-full lg:flex-1 flex flex-col space-y-5'>
-                    {
-                        isLoading ?
-                            // Render loading element
-                            <>
-                                <SkeletonBox extraClass={'min-h-[260px]'}/>
-                                <SkeletonBox extraClass={'min-h-[260px]'}/>
-                            </>
-                        :
-                            <>
-                                {
-                                    // Order status comes second if waiting for payment / confirmation
-                                    (order?.status === "WAITING_PAYMENT" || order?.status === "WAITING_PAYMENT_CONFIRMATION") &&
-                                        <OrderStatusStepsCard 
-                                            statusSteps={statusSteps} 
-                                            currentStatus={order?.status && order?.status === "WAITING_PAYMENT_CONFIRMATION" ? "WAITING_PAYMENT" : order?.status ?? ""}
-                                            orderNumber={orderNumber}
-                                            onConfirm={handleConfirmOrder}
-                                            status={order?.status}
-                                        />
-                                }
-                                <OrderDetailItemListCard
-                                    branchName={order?.branch.storeName ?? '-'}
-                                    items={
-                                        order?.items?.map(dt => ({
-                                            branchInventoriesId: dt.id,
-                                            ...dt.product.product,
-                                            id: dt.id,
-                                            quantity: dt.quantity,
-                                            basePrice: dt.price,
-                                            weight: dt.product.product.weight * dt.quantity,
-                                            totalPrice: dt.product.product.basePrice * dt.quantity,
-                                        })) ?? []
-                                    }
-                                />
-                                {
-                                    // Payment summary comes last if payment has done
-                                    order?.status !== "WAITING_PAYMENT" && order?.status !== "WAITING_PAYMENT_CONFIRMATION" &&
-                                        <PaymentSummaryCard
-                                            orderNumber={orderNumber}
-                                            totalItem={order?.items?.reduce((acc, item) => acc + item.quantity, 0) ?? 0}
-                                            shippingWeight={order?.totalWeight ?? 0}
-                                            shippingCost={order?.shippingCost ?? 0}
-                                            totalPrice={order?.totalPrice ?? 0}
-                                            totalSaving={(order?.totalPrice ?? 0) - (order?.finalPrice ?? 0)}
-                                            finalPrice={order?.finalPrice ?? 0} 
-                                            orderId={order?.id ?? '-'} 
-                                            status={order?.status ?? '-'} 
-                                            paymentDeadline={order?.paymentDeadline ?? '-'} 
-                                            paymentEvidence={order?.payments[0].evidence}
-                                            paymentMethod={order?.payments[0].method}
-                                            onCancel={handleCancelOrder} 
-                                            onSuccess={onSuccess}        
-                                        />
-                                }
-                            </>
-                        }
+                        <SkeletonBox extraClass={'min-h-[260px]'}/>
+                        <SkeletonBox extraClass={'min-h-[260px]'}/>
                     </div>
                 </div>
+            </div>
+        )
+    }
+
+    if (!order || order.payments.length === 0) {
+        return (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full mx-auto w-full">
+                <div className='flex gap-5 items-center'>
+                    <BackButton url="transaction"/>
+                    <HeadingText children="Transaction Detail" level={1}/>
+                </div>
+                <MessageBox context={'No order found'} image={"/assets/empty.png"} urlButton={'/transaction'} titleButton='Back to Order' description={`We're sorry, we cannot find <b>${orderNumber}</b> order. Double check your order number or contact our call center for more information`}/>
+            </div>
+        )
+    }
+
+    const payment = order.payments[0]
+
+    const paymentSummaryProps = {
+        ...order,
+        orderNumber,
+        totalItem: order.items.reduce((acc, item) => acc + item.quantity, 0),
+        shippingWeight: order.totalWeight,
+        totalSaving: order.totalPrice - order.finalPrice,
+        orderId: order.id,
+        paymentEvidence: payment.evidence,
+        paymentMethod: payment.method,
+        onCancel: handleCancelOrder,
+        onSuccess,
+    }
+
+    const orderStatusProps = {
+        statusSteps,
+        currentStatus: order.status === "WAITING_PAYMENT_CONFIRMATION" ? "WAITING_PAYMENT" : order.status,
+        orderNumber,
+        onConfirm: handleConfirmOrder,
+        status: order.status,
+    }
+
+    const branchCardProps = {
+        branch: { ...order.branch },
+        orderInfo: {
+            ...order,
+            orderNumber,
+            orderStatus: order.status,
+            paymentStatus: payment.status,
+            paymentMethod: payment.method,
         }
+    }
+
+    return (
+        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full mx-auto w-full">
+            <div className='flex gap-5 items-center'>
+                <BackButton url="transaction"/>
+                <HeadingText children="Transaction Detail" level={1}/>
+            </div>
+            <div className='flex flex-col lg:flex-row w-full gap-5'>
+                <div className='w-full lg:flex-1 flex flex-col space-y-5'>
+                    {
+                        // Payment summary comes first if waiting for payment / confirmation
+                        (order?.status === "WAITING_PAYMENT" || order?.status === "WAITING_PAYMENT_CONFIRMATION") &&
+                            <PaymentSummaryCard {...paymentSummaryProps} />
+                    }
+                    {
+                        // Order status comes first if payment has done
+                        order?.status !== "WAITING_PAYMENT" && order?.status !== "WAITING_PAYMENT_CONFIRMATION" &&
+                            <OrderStatusStepsCard {...orderStatusProps} />
+                    }
+                    <OrderDetailBranchCard {...branchCardProps} />
+                </div>
+                <div className='w-full lg:flex-1 flex flex-col space-y-5'>
+                    {
+                        // Order status comes second if waiting for payment / confirmation
+                        (order?.status === "WAITING_PAYMENT" || order?.status === "WAITING_PAYMENT_CONFIRMATION") &&
+                            <OrderStatusStepsCard 
+                                statusSteps={statusSteps} 
+                                currentStatus={order?.status && order?.status === "WAITING_PAYMENT_CONFIRMATION" ? "WAITING_PAYMENT" : order?.status ?? ""}
+                                orderNumber={orderNumber}
+                                onConfirm={handleConfirmOrder}
+                                status={order?.status}
+                            />
+                    }
+                    <OrderDetailItemListCard
+                        branchName={order.branch.storeName}
+                        items={order.items.map(dt => ({
+                            branchInventoriesId: dt.id,
+                            ...dt.product.product,
+                            id: dt.id,
+                            quantity: dt.quantity,
+                            basePrice: dt.price,
+                            weight: dt.product.product.weight * dt.quantity,
+                            totalPrice: dt.product.product.basePrice * dt.quantity,
+                        }))}
+                    />
+                    {
+                        // Payment summary comes last if payment has done
+                        order?.status !== "WAITING_PAYMENT" && order?.status !== "WAITING_PAYMENT_CONFIRMATION" &&
+                            <PaymentSummaryCard {...paymentSummaryProps}/>
+                    }
+                </div>
+            </div>
         </div>
     )
 }
