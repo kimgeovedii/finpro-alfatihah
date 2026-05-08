@@ -2,6 +2,7 @@ import { OrderStatus } from "./business.const";
 
 // For handling navigation
 export const debouncerTimeLimit: number = 1000
+export const debouncerSearchTimeLimit: number = 1500
 
 export const statusFilter: { label: string; value: OrderStatus | "ALL" }[] = [
     { label: "All Orders", value: "ALL" },

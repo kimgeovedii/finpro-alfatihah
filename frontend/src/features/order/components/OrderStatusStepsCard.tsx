@@ -1,14 +1,8 @@
-import React, { ReactNode } from "react"
+import React from "react"
 import { OrderConfirmButton } from "./OrderConfirmButton"
 import { HeadingText } from "@/components/layout/HeadingText"
 import { DividerLine } from "@/components/layout/DividerLine"
-
-export type StatusInfo = {
-    key: string 
-    label: string 
-    sub: string 
-    icon: ReactNode
-}
+import { StatusInfo } from "@/types/global.type"
 
 type Props = {
     statusSteps: StatusInfo[]
@@ -19,9 +13,10 @@ type Props = {
 }
 
 export const OrderStatusStepsCard: React.FC<Props> = ({ statusSteps, currentStatus, onConfirm, orderNumber, status }) => {
+    // Get current order status (simplified status) for define the color
     const getStepState = (stepKey: string, currentStatus: string): "done" | "active" | "upcoming" => {
-        const currentIdx = statusSteps.findIndex(s => s.key === currentStatus)
-        const stepIdx = statusSteps.findIndex(s => s.key === stepKey)
+        const currentIdx = statusSteps.findIndex(dt => dt.key === currentStatus)
+        const stepIdx = statusSteps.findIndex(dt => dt.key === stepKey)
     
         if (stepIdx < currentIdx) return "done"
         if (stepIdx === currentIdx) return "active"

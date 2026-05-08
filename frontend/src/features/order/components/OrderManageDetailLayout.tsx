@@ -19,7 +19,7 @@ export function OrderManageDetailLayout({ orderNumber }: Props) {
     
     // Handle hook (action)
     const onSuccess = () => fetchOrderDetail(orderNumber)
-    const { handleShippingOrder, handleCancelOrder } = useManageOrderActions(onSuccess)
+    const { handleShippingOrder, handleCancelOrder } = useManageOrderActions(employee?.role, employee?.branchId ?? "ALL", onSuccess)
 
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full mx-auto">
@@ -29,8 +29,8 @@ export function OrderManageDetailLayout({ orderNumber }: Props) {
         </div>
         {
             isLoading ? 
-            // Render loading element
-            <SkeletonBox extraClass={'min-h-[400px]'}/>
+                // Render loading element
+                <SkeletonBox extraClass={'min-h-[400px]'}/>
             :
             !order ? 
                 // Render failed fetching condition
@@ -40,19 +40,14 @@ export function OrderManageDetailLayout({ orderNumber }: Props) {
                 <OrderMatchingTable
                     orderNumber={orderNumber}
                     items={
-                    order?.items?.map(dt => ({
-                        id: dt.id,
-                        quantity: dt.quantity,
-                        price: dt.product.product.basePrice,
-                        stockBefore: dt.product.currentStock,
-                        stockAfter: dt.product.currentStock - dt.quantity,
-                        product: { 
-                            productName: dt.product.product.productName, 
-                            slugName: dt.product.product.slugName,
-                            category: dt.product.product.category,
-                            imageUrl: dt.product.product.productImages[0].imageUrl 
-                        },
-                    })) ?? []
+                        order?.items?.map(dt => ({
+                            id: dt.id,
+                            quantity: dt.quantity,
+                            price: dt.product.product.basePrice,
+                            stockBefore: dt.product.currentStock,
+                            stockAfter: dt.product.currentStock - dt.quantity,
+                            product: { ...dt.product.product, imageUrl: dt.product.product.productImages[0].imageUrl },
+                        })) ?? []
                     }
                     shippingCost={order?.shippingCost ?? 0}
                     confirmedAt={order?.confirmedAt}

@@ -4,6 +4,7 @@ import React from "react"
 import { AddressAdditionalInfoSection } from "./AddressAdditionalInfoSection"
 import { PencilSquareIcon, XMarkIcon } from "@heroicons/react/24/outline"
 import { AddressData } from "@/types/address.type"
+import { closePopUp } from "@/utils/message.util"
 
 interface Props {
     address: AddressData[]
@@ -20,8 +21,8 @@ export const AddressSelectionDialog: React.FC<Props> = ({ address, appliedAddres
             </DialogTrigger>
             <DialogContent className="[&>button:last-child]:hidden sm:max-w-2xl rounded-3xl border-slate-200 p-0 overflow-hidden mt-0 md:mt-10 lg:mt-0">
                 <Button className="absolute right-5 top-5 z-50 rounded-full p-2 text-white backdrop-blur transition-colors bg-red-500 shadow hover:shadow-xl hover:scale-125 transition-all duration-300"
-                    onClick={() => document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))}>
-                    <XMarkIcon className="w-5 h-5" />
+                    onClick={closePopUp}>
+                    <XMarkIcon className="w-5 h-5"/>
                 </Button>
                 <div className="bg-linear-to-r from-emerald-800 to-emerald-600 p-6 text-white">
                     <DialogHeader>
@@ -32,9 +33,8 @@ export const AddressSelectionDialog: React.FC<Props> = ({ address, appliedAddres
                 <div className="p-6 pt-0 space-y-4 max-h-[70vh] overflow-y-auto">
                     {
                         address.map(dt => 
-                            <AddressAdditionalInfoSection key={dt.id}
+                            <AddressAdditionalInfoSection key={dt.id} {...dt}
                                 action={() => onSelect(dt.id)}
-                                {...dt}
                                 isSelected={appliedAddress === dt.id}
                                 maxDeliveryDistance={maxDeliveryDistance}                  
                             />

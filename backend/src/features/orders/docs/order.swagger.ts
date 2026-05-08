@@ -438,155 +438,81 @@
  *                 data:
  *                   type: object
  *                   properties:
- *                     orderNumber:
- *                       type: string
- *                       example: ORD-1776295220552-150
- *                     status:
- *                       type: string
- *                       enum: [WAITING_PAYMENT, WAITING_PAYMENT_CONFIRMATION, PROCESSING, SHIPPED, CONFIRMED, CANCELLED]
- *                       example: WAITING_PAYMENT_CONFIRMATION
- *                     totalPrice:
- *                       type: number
- *                       example: 224322
- *                     totalWeight:
- *                       type: number
- *                       example: 1400
- *                     finalPrice:
- *                       type: number
- *                       example: 248580
- *                     shippingCost:
- *                       type: number
- *                       example: 24258
- *                     paymentDeadline:
- *                       type: string
- *                       format: date-time
- *                       example: 2026-04-16T10:18:42.420Z
- *                     shippedAt:
- *                       type: string
- *                       format: date-time
- *                       nullable: true
- *                       example: null
- *                     confirmedAt:
- *                       type: string
- *                       format: date-time
- *                       nullable: true
- *                       example: null
- *                     rejectedAt:
- *                       type: string
- *                       format: date-time
- *                       nullable: true
- *                       example: null
- *                     createdAt:
- *                       type: string
- *                       format: date-time
- *                       example: 2025-07-25T15:29:08.364Z
+ *                     id: { type: string, format: uuid, example: a38d4283-b008-4113-aa3e-36f861cade93 }
+ *                     orderNumber: { type: string, example: ORD-1776295220552-150 }
+ *                     status: { type: string, enum: [WAITING_PAYMENT, WAITING_PAYMENT_CONFIRMATION, PROCESSING, SHIPPED, CONFIRMED, CANCELLED], example: WAITING_PAYMENT_CONFIRMATION }
+ *                     totalPrice: { type: number, example: 224322 }
+ *                     totalWeight: { type: number, example: 1400 }
+ *                     finalPrice: { type: number, example: 248580 }
+ *                     shippingCost: { type: number, example: 24258 }
+ *                     paymentDeadline: { type: string, format: date-time, example: 2026-04-16T10:18:42.420Z }
+ *                     shippedAt: { type: string, format: date-time, nullable: true, example: null }
+ *                     confirmedAt: { type: string, format: date-time, nullable: true, example: null }
+ *                     rejectedAt: { type: string, format: date-time, nullable: true, example: null }
+ *                     createdAt: { type: string, format: date-time, example: 2025-07-25T15:29:08.364Z }
  *                     branch:
  *                       type: object
  *                       properties:
- *                         id:
- *                           type: string
- *                           format: uuid
- *                           example: 61904921-d090-4196-87b5-27aac626154c
- *                         storeName:
- *                           type: string
- *                           example: Toko Cabang Surabaya
- *                         address:
- *                           type: string
- *                           example: Jl. Tunjungan No. 88, Genteng
- *                         city:
- *                           type: string
- *                           example: Surabaya
+ *                         id: { type: string, format: uuid, example: 61904921-d090-4196-87b5-27aac626154c }
+ *                         storeName: { type: string, example: Toko Cabang Surabaya }
+ *                         address: { type: string, example: Jl. Tunjungan No. 88, Genteng }
+ *                         city: { type: string, example: Surabaya }
+ *                         openStatus: { type: string, example: Open }
  *                         schedules:
  *                           type: array
  *                           items:
  *                             type: object
  *                             properties:
- *                               startTime:
- *                                 type: string
- *                                 example: "08:30"
- *                               endTime:
- *                                 type: string
- *                                 example: "21:30"
- *                               dayName:
- *                                 type: string
- *                                 example: MON
+ *                               startTime: { type: string, example: "08:30" }
+ *                               endTime: { type: string, example: "21:30" }
+ *                               dayName: { type: string, example: MON }
  *                     address:
  *                       type: object
  *                       properties:
- *                         label:
- *                           type: string
- *                           example: Rumah
- *                         type:
- *                           type: string
- *                           example: Rumah
- *                         receiptName:
- *                           type: string
- *                           example: Akim Mustofa
- *                         notes:
- *                           type: string
- *                           example: Pagar warna hitam
- *                         phone:
- *                           type: string
- *                           example: 081234567890
- *                         address:
- *                           type: string
- *                           example: Jl. Merdeka No. 10, Bandung
+ *                         label: { type: string, example: Rumah }
+ *                         type: { type: string, example: Rumah }
+ *                         receiptName: { type: string, example: Akim Mustofa }
+ *                         notes: { type: string, nullable: true, example: Pagar warna hitam }
+ *                         phone: { type: string, example: 081234567890 }
+ *                         address: { type: string, example: Jl. Merdeka No. 10, Bandung }
  *                     items:
  *                       type: array
  *                       items:
  *                         type: object
  *                         properties:
- *                           id:
- *                             type: string
- *                             format: uuid
- *                             example: 2f7002fc-216b-4cee-9efc-8c252bb8b5fb
- *                           quantity:
- *                             type: integer
- *                             example: 243
+ *                           id: { type: string, format: uuid, example: 2f7002fc-216b-4cee-9efc-8c252bb8b5fb }
+ *                           quantity: { type: integer, example: 243 }
+ *                           price: { type: number, example: 1086050 }
  *                           product:
  *                             type: object
  *                             properties:
+ *                               currentStock: { type: integer, example: 135 }
  *                               product:
  *                                 type: object
  *                                 properties:
- *                                   productName:
- *                                     type: string
- *                                     example: Carrots
- *                                   basePrice:
- *                                     type: number
- *                                     example: 14328
- *                                   weight:
- *                                     type: number
- *                                     example: 120
- *                                   slugName:
- *                                     type: string
- *                                     example: coca-cola
+ *                                   productName: { type: string, example: Carrots }
+ *                                   weight: { type: number, example: 120 }
+ *                                   slugName: { type: string, example: coca-cola }
+ *                                   category:
+ *                                     type: object
+ *                                     properties:
+ *                                       name: { type: string, example: Vegetables }
  *                                   productImages:
  *                                     type: array
  *                                     items:
  *                                       type: object
  *                                       properties:
- *                                         imageUrl:
- *                                           type: string
- *                                           format: uri
- *                                           example: https://picsum.photos/seed/UYwqDr3/800/600
+ *                                         imageUrl: { type: string, format: uri, example: https://picsum.photos/seed/UYwqDr3/800/600 }
  *                     payments:
  *                       type: array
  *                       items:
  *                         type: object
  *                         properties:
- *                           evidence:
- *                             type: string
- *                             format: uri
- *                             example: https://res.cloudinary.com/dcpasygag/image/upload/v1776123123/123123123.png
- *                           method:
- *                             type: string
- *                             enum: [MANUAL, AUTOMATIC]
- *                             example: MANUAL
- *                           status:
- *                             type: string
- *                             enum: [PENDING, CONFIRMED, REJECTED]
- *                             example: PENDING
+ *                           evidence: { type: string, format: uri, nullable: true, example: null }
+ *                           method: { type: string, enum: [MANUAL, GATEWAY], example: MANUAL }
+ *                           status: { type: string, enum: [SUCCESS, PENDING, REJECTED], example: PENDING }
+ *                           approvedAt: { type: string, format: date-time, nullable: true, example: 2025-09-14T22:11:43.486Z }
+ *                           rejectedAt: { type: string, format: date-time, nullable: true, example: null }
  *
  *       400:
  *         description: Validation error

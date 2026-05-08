@@ -74,6 +74,18 @@ export type ManagementOrderItem = {
     user: ManagementOrderUser
 }
 
+export type OrderTableItem = {
+    id: string
+    storeName: string
+    orderNumber: string
+    customerName: string
+    customerEmail: string
+    createdAt: string
+    finalPrice: number
+    status: OrderStatus
+    payments: PaymentData[]
+}
+
 export type ManagementOrderResponse = {
     data: ManagementOrderItem[]
     meta: PaginationMeta

@@ -10,12 +10,12 @@ import Link from "next/link";
 import React from "react";
 
 type Props = {
-  cartId: string;
-  storeName: string;
-  city: string;
-  onRemove: () => void;
-  accordionButton: React.ReactNode;
-};
+    cartId: string
+    storeName: string
+    city: string
+    accordionButton: React.ReactNode
+    onRemove: () => void
+}
 
 export const BranchHeader: React.FC<Props> = ({
   storeName,

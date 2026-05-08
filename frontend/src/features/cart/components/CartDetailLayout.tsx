@@ -46,9 +46,11 @@ export function CartDetailLayout({ cartId }: Props) {
         }
 
         if (cart?.user?.addresses?.length) {
+            // Return address selected based on primary status and within range
             const selectedAddress = (() => {
                 const primary = cart?.user?.addresses?.find(dt => dt.isPrimary && dt.isWithinRange)
                 if (primary) return primary
+
                 return cart?.user?.addresses?.find(dt => dt.isWithinRange) ?? cart.user.addresses[0]
             })()
 
@@ -82,23 +84,24 @@ export function CartDetailLayout({ cartId }: Props) {
     const voucherDiscount = (() => {
         if (!selectedVoucher) return 0
     
-        // min purchase validation
-        if (selectedVoucher.minPurchaseAmount && productFinalPrice < selectedVoucher.minPurchaseAmount) {
-            return 0
-        }
+        // Min purchase validation
+        if (selectedVoucher.minPurchaseAmount && productFinalPrice < selectedVoucher.minPurchaseAmount) return 0
 
         const voucherTargetPrice = selectedVoucher.type === "SHIPPING_COST" ? shippingCost : productFinalPrice
     
-        let discount = 0
         // Percentage calculation
+        let discount = 0
         if (selectedVoucher.discountValueType === "PERCENTAGE") {
+            // Prevent discount more than 100%
             const percentage = Math.min(Math.max(selectedVoucher.discountValue, 0), 100)
 
             discount = (voucherTargetPrice * percentage) / 100
         } else {
+            // Prevent negative discount
             discount = Math.max(selectedVoucher.discountValue, 0)
         }
     
+        // Make sure discount use based on max amount
         if (selectedVoucher.maxDiscountAmount) discount = Math.min(discount, selectedVoucher.maxDiscountAmount)
     
         // Prevent over-discount
@@ -111,11 +114,11 @@ export function CartDetailLayout({ cartId }: Props) {
     let finalProductPrice = productFinalPrice
     let finalShipping = shippingCost
 
+    // Implement discount based on type
     if (selectedVoucher) {
         if (selectedVoucher.type === "ORDER") finalProductPrice = Math.max(0, productFinalPrice - voucherDiscount)
         if (selectedVoucher.type === "SHIPPING_COST") finalShipping = Math.max(0, shippingCost - voucherDiscount)
     }
-
     const finalPrice = Math.round(finalProductPrice + finalShipping)
     
     return (
@@ -147,20 +150,12 @@ export function CartDetailLayout({ cartId }: Props) {
                         items={
                             cart.items.map(dt => ({
                                 id: dt.id,
-                                cartId: cartId,
-                                slugName: dt.product.product.slugName,
-                                productName: dt.product.product.productName,
-                                productDiscounts: dt.product.product.productDiscounts,
-                                category: dt.product.product.category,
-                                productImages: dt.product.product.productImages,
+                                cartId,
+                                ...dt.product.product,
                                 quantity: localQty[dt.id] ?? dt.quantity,
                                 currentStock: dt.product.currentStock,
                                 weight: dt.product.product.weight * (localQty[dt.id] ?? dt.quantity),
-                                basePrice: dt.product.product.basePrice,
                                 totalPrice: dt.product.product.basePrice * (localQty[dt.id] ?? dt.quantity),
-                                discountAmount: dt.product.product.discountAmount,
-                                finalTotalPrice: dt.product.product.finalTotalPrice,
-                                finalPricePerItem: dt.product.product.finalPricePerItem
                             }))
                         }
                         onIncrease={handleIncrease}

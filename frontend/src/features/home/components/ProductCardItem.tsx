@@ -55,8 +55,8 @@ export const ProductCardItem = ({
       return;
     }
 
-    // Call hook
-    const success = await createCart(branchId, productId);
+    // Handle hook
+    const success = await createCart(branchId, productId)
 
     if (success)
       await showPopUp(

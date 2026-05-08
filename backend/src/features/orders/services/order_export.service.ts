@@ -8,6 +8,7 @@ export class OrderExportService {
     private orderRepo = new OrderRepository()
 
     async generateInvoicePdf(role: UserRole, userId: string, orderNumber: string) {
+        console.log(role)
         // Repo : get detail order invoice by order number
         const order = await this.orderRepo.findOrderDetailByOrderNumber(role, userId, orderNumber)
         if (!order) throw { code: 404, message: "Order not found" }
@@ -101,13 +102,13 @@ export class OrderExportService {
             // Order item
             doc.font("Helvetica")
 
-            order.items.forEach((item, index) => {
-                const product = item.product.product
-                const total = item.quantity * product.basePrice
+            order.items.forEach(dt => {
+                const product = dt.product.product
+                const total = dt.quantity * dt.price
 
                 doc.text(product.productName, col.name, y, { width: 250 })
-                doc.text(`${item.quantity}`, col.qty, y)
-                doc.text(`Rp ${product.basePrice.toLocaleString(currencyFormat)}`, col.price, y)
+                doc.text(`${dt.quantity}`, col.qty, y)
+                doc.text(`Rp ${dt.price.toLocaleString(currencyFormat)}`, col.price, y)
                 doc.text(`Rp ${total.toLocaleString(currencyFormat)}`, col.total, y)
 
                 y += 20
@@ -147,7 +148,6 @@ export class OrderExportService {
             doc.end()
         })
     }
-
 
     async generateTransactionHistoryExcel(userId: string): Promise<Buffer> {
         // Repo : get all transaction by user id
