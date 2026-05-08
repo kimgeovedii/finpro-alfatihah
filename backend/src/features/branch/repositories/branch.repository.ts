@@ -54,6 +54,18 @@ export class BranchRepository {
     });
   }
 
+  async findBySlug(slug: string) {
+    return prisma.branch.findUnique({
+      where: { slug },
+      include: {
+        schedules: true,
+        employees: {
+          include: { user: true },
+        },
+      },
+    });
+  }
+
   async create(data: any) {
     return prisma.branch.create({
       data,
@@ -93,12 +105,14 @@ export class BranchRepository {
       select: {
         id: true,
         storeName: true,
+        slug: true,
         address: true,
         city: true,
         province: true,
         latitude: true,
         longitude: true,
         maxDeliveryDistance: true,
+        isDefault: true,
       },
       orderBy: { createdAt: "asc" },
     });
@@ -114,12 +128,14 @@ export class BranchRepository {
         select: {
           id: true,
           storeName: true,
+          slug: true,
           address: true,
           city: true,
           province: true,
           latitude: true,
           longitude: true,
           maxDeliveryDistance: true,
+          isDefault: true,
         },
         orderBy: { createdAt: "asc" },
       }),
@@ -141,7 +157,7 @@ export class BranchRepository {
           id: true,
           currentStock: true,
           branch: {
-            select: { id: true, storeName: true, city: true }
+            select: { id: true, storeName: true, slug: true, city: true }
           },
           product: {
             select: {
@@ -155,7 +171,21 @@ export class BranchRepository {
               },
               productImages: {
                 select: { id: true, imageUrl: true }
-              }
+              },
+              productDiscounts: {
+                where: {
+                  discount: {
+                    discountType: "PRODUCT_DISCOUNT",
+                    startDate: { lte: new Date() },
+                    endDate: { gte: new Date() },
+                    branchId: branchId ? branchId : undefined,
+                    deletedAt: null,
+                  },
+                },
+                include: {
+                  discount: true,
+                },
+              },
             }
           }
         },
@@ -177,6 +207,7 @@ export class BranchRepository {
           currentStock: inv.currentStock,
           branchName: inv.branch?.storeName,
           branchId: inv.branch?.id,
+          branchSlug: inv.branch?.slug,
           branchCity: inv.branch?.city,
         };
       }).filter(p => p !== null);
@@ -186,5 +217,25 @@ export class BranchRepository {
       console.error("Error mapping products in BranchRepository:", err);
       throw err;
     }
+  }
+
+  async resetAllDefaults() {
+    return prisma.branch.updateMany({
+      where: { isDefault: true },
+      data: { isDefault: false },
+    });
+  }
+
+  async setDefault(id: string) {
+    return prisma.branch.update({
+      where: { id },
+      data: { isDefault: true },
+      include: {
+        schedules: true,
+        employees: {
+          include: { user: true },
+        },
+      },
+    });
   }
 }

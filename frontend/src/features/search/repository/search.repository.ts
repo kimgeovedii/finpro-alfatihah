@@ -11,6 +11,7 @@ export class SearchRepository {
     if (filters.maxPrice) params.set("maxPrice", String(filters.maxPrice));
     if (filters.sortBy) params.set("sortBy", filters.sortBy);
     if (filters.sortOrder) params.set("sortOrder", filters.sortOrder);
+    if (filters.branchId) params.set("branchId", filters.branchId);
     if (filters.page) params.set("page", String(filters.page));
     if (filters.limit) params.set("limit", String(filters.limit));
 

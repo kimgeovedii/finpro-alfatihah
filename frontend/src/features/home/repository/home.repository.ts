@@ -22,7 +22,7 @@ export class HomeRepository {
     query.set("limit", String(params.limit ?? 50)); // Map can handle more
     return apiFetch<{ data: BranchData[]; meta: PaginationMeta }>(`/branches?${query.toString()}`);
   }
-  async getBranchDetail(id: string, page: number = 1, limit: number = 12) {
-    return apiFetch<NearestBranchResponse>(`/branches/${id}?page=${page}&limit=${limit}`);
+  async getBranchDetail(slug: string, page: number = 1, limit: number = 12) {
+    return apiFetch<NearestBranchResponse>(`/branches/${slug}?page=${page}&limit=${limit}`);
   }
 }

@@ -8,6 +8,7 @@ export class ProductRepository {
     take?: number,
     orderBy: string = "createdAt",
     orderDir: "asc" | "desc" = "desc",
+    branchId?: string, // Add branchId parameter
   ) => {
     const [data, total] = await prisma.$transaction([
       prisma.products.findMany({
@@ -30,6 +31,36 @@ export class ProductRepository {
               imageUrl: true,
             },
           },
+          productDiscounts: {
+            where: {
+              discount: {
+                discountType: "PRODUCT_DISCOUNT",
+                startDate: { lte: new Date() },
+                endDate: { gte: new Date() },
+                branchId: branchId ? branchId : undefined,
+                deletedAt: null,
+              },
+            },
+            include: {
+              discount: true,
+            },
+          },
+          branchInventories: {
+            where: branchId ? { branchId } : undefined, // Filter by specific branch if provided
+            select: {
+              id: true,
+              currentStock: true,
+              branch: {
+                select: {
+                  id: true,
+                  storeName: true,
+                  slug: true,
+                  city: true,
+                },
+              },
+            },
+            take: 1,
+          },
         },
       }),
       prisma.products.count({
@@ -37,7 +68,19 @@ export class ProductRepository {
       }),
     ]);
 
-    return { data, total };
+    const mappedData = data.map((product) => {
+      const inventory = product.branchInventories?.[0];
+      return {
+        ...product,
+        currentStock: inventory?.currentStock ?? 0,
+        branchId: inventory?.branch?.id,
+        branchName: inventory?.branch?.storeName,
+        branchSlug: inventory?.branch?.slug,
+        branchCity: inventory?.branch?.city,
+      };
+    });
+
+    return { data: mappedData, total };
   };
 
   public getProductById = async (id: string) => {
@@ -48,6 +91,7 @@ export class ProductRepository {
           select: {
             id: true,
             name: true,
+            slugName: true,
           },
         },
         productImages: {
@@ -57,6 +101,19 @@ export class ProductRepository {
             isPrimary: true,
           },
         },
+        productDiscounts: {
+          where: {
+            discount: {
+              discountType: "PRODUCT_DISCOUNT",
+              startDate: { lte: new Date() },
+              endDate: { gte: new Date() },
+              deletedAt: null,
+            },
+          },
+          include: {
+            discount: true,
+          },
+        },
       },
     });
   };
@@ -64,13 +121,14 @@ export class ProductRepository {
   public getProductBySlug = async (
     slugName: string,
     userId: string | null,
-    branchName: string
+    branchName: string,
   ) => {
     const include: any = {
       category: {
         select: {
           id: true,
           name: true,
+          slugName: true,
         },
       },
       productImages: {
@@ -83,7 +141,7 @@ export class ProductRepository {
       branchInventories: {
         where: {
           branch: {
-            storeName: branchName,
+            slug: branchName,
             schedules: {
               some: {},
             },
@@ -95,6 +153,7 @@ export class ProductRepository {
           branch: {
             select: {
               storeName: true,
+              slug: true,
               address: true,
               schedules: {
                 select: {
@@ -107,20 +166,37 @@ export class ProductRepository {
           },
         },
       },
+      productDiscounts: {
+        where: {
+          discount: {
+            discountType: "PRODUCT_DISCOUNT",
+            startDate: { lte: new Date() },
+            endDate: { gte: new Date() },
+            branch: {
+              slug: branchName,
+            },
+            deletedAt: null,
+          },
+        },
+        include: {
+          discount: true,
+        },
+      },
     };
-  
+
     if (userId) {
       include.branchInventories.select.cartItems = {
         where: {
           cart: {
             userId,
             branch: {
-              storeName: branchName,
+              slug: branchName,
             },
           },
         },
         select: {
-          id: true, quantity: true,
+          id: true,
+          quantity: true,
           cart: {
             select: {
               branchId: true,
@@ -129,25 +205,27 @@ export class ProductRepository {
         },
       };
     }
-  
+
     const product = await prisma.products.findFirst({
       where: { slugName, deletedAt: null },
       include,
-    })
-  
-    if (!product) return null
-  
+    });
+
+    if (!product) return null;
+
     product.branchInventories = product.branchInventories.map((inv: any) => {
-      const schedules = inv.branch?.schedules ?? []
-    
+      const schedules = inv.branch?.schedules ?? [];
+
       return {
-        ...inv, branch: {
-          ...inv.branch, openStatus: getStoreOpenStatus(schedules),
+        ...inv,
+        branch: {
+          ...inv.branch,
+          openStatus: getStoreOpenStatus(schedules),
         },
-      }
-    })
-  
-    return product
+      };
+    });
+
+    return product;
   };
 
   public createProduct = async (data: any) => {
@@ -168,26 +246,32 @@ export class ProductRepository {
     });
   };
 
-
   public updateProduct = async (
     id: string,
     data: any,
     existingImageIds: string[] = [],
   ) => {
     const { imageUrls, ...updateData } = data;
-    const shouldDeleteOldImages = existingImageIds.length > 0 || (imageUrls && Array.isArray(imageUrls) && imageUrls.length > 0);
+    const shouldDeleteOldImages =
+      existingImageIds.length > 0 ||
+      (imageUrls && Array.isArray(imageUrls) && imageUrls.length > 0);
 
     if (shouldDeleteOldImages) {
       const productImageUpdate: any = {
-        deleteMany: existingImageIds.length > 0 ? { id: { notIn: existingImageIds } } : {},
+        deleteMany:
+          existingImageIds.length > 0
+            ? { id: { notIn: existingImageIds } }
+            : {},
       };
 
       if (imageUrls && Array.isArray(imageUrls) && imageUrls.length > 0) {
         const startPrimaryIndex = existingImageIds.length === 0 ? 0 : 1;
-        productImageUpdate.create = imageUrls.map((imageUrl: string, index: number) => ({
-          imageUrl,
-          isPrimary: existingImageIds.length === 0 && index === 0,
-        }));
+        productImageUpdate.create = imageUrls.map(
+          (imageUrl: string, index: number) => ({
+            imageUrl,
+            isPrimary: existingImageIds.length === 0 && index === 0,
+          }),
+        );
       }
 
       return prisma.products.update({
@@ -236,7 +320,7 @@ export class ProductRepository {
   public deleteProduct = async (id: string) => {
     return prisma.products.update({
       where: { id },
-      data: { deletedAt: new Date() }
+      data: { deletedAt: new Date() },
     });
   };
 

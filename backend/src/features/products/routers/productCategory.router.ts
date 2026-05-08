@@ -19,8 +19,6 @@ export class ProductCategoryRouter {
   private routes() {
     this.router.get(
       "/", 
-      authMiddleware,
-      roleMiddleware([EmployeeRole.SUPER_ADMIN, EmployeeRole.STORE_ADMIN]),
       this.productCategoriesController.findAllCategories
     );
     this.router.post(

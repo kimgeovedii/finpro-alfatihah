@@ -55,16 +55,13 @@ const NAV_ITEMS = [
     href: "/dashboard/manage-order",
     icon: ClipboardDocumentCheckIcon,
   },
-  {
-    title: "Report & Analysis",
-    href: "/dashboard/report",
-    icon: DocumentChartBarIcon,
-  },
 ];
 
 export const Sidebar = () => {
   const user = useAuthStore((state) => state.user);
-  const isSuperAdmin = (user as any)?.employee?.role === "SUPER_ADMIN" || user?.role === "SUPER_ADMIN";
+  const isSuperAdmin =
+    (user as any)?.employee?.role === "SUPER_ADMIN" ||
+    user?.role === "SUPER_ADMIN";
 
   const filteredNavItems = NAV_ITEMS.filter((item) => {
     if (item.title === "Branches") {

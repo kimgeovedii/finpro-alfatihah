@@ -42,15 +42,15 @@ export class BranchController {
     }
   };
 
-  public getBranchById = async (
+  public getBranchBySlug = async (
     req: Request,
     res: Response,
     next: NextFunction
   ) => {
     try {
-      const { id } = req.params;
+      const { slug } = req.params;
       const { page = 1, limit = 12 } = req.query as any;
-      const data = await this.branchService.getBranchWithProducts(id as string, Number(page), Number(limit));
+      const data = await this.branchService.getBranchWithProducts(slug as string, Number(page), Number(limit));
       return sendSuccess(res, data, "Get branch detail successfully");
     } catch (error) {
       next(error);

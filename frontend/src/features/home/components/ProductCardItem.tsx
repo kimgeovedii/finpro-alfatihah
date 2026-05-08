@@ -12,44 +12,71 @@ import { useAuthStore } from "@/features/auth/store/useAuthStore";
 import { actionMessages } from "@/constants/message.const";
 import { showPopUp } from "@/utils/message.util";
 import { currencyFormat } from "@/constants/business.const";
+import { calculateDiscountedPrice } from "@/utils/discount.util";
 
 interface ProductCardItemProps {
   product: ProductCard;
   index: number;
   branchName?: string;
   branchId: string;
+  branchSlug?: string;
   branchCity?: string;
 }
 
-export const ProductCardItem = ({ product, index, branchName, branchId, branchCity }: ProductCardItemProps) => {
+export const ProductCardItem = ({
+  product,
+  index,
+  branchName,
+  branchId,
+  branchSlug,
+  branchCity,
+}: ProductCardItemProps) => {
   const router = useRouter();
 
   // Handle hook
-  const { createCart, isCreating } = useCreateCart()
-  const role = useAuthStore((state) => state.user?.role)
+  const { createCart, isCreating } = useCreateCart();
+  const role = useAuthStore((state) => state.user?.role);
 
-  const handleAddToCart = async (e: React.MouseEvent, branchId: string, productId: string) => {
-    e.preventDefault()
-    e.stopPropagation()
-    
+  const handleAddToCart = async (
+    e: React.MouseEvent,
+    branchId: string,
+    productId: string,
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+
     // Customer guard
-    if (!role) {      
-      await showPopUp(actionMessages.productAddFailed, actionMessages.productSignInRequired, "error")
-      return
+    if (!role) {
+      await showPopUp(
+        actionMessages.productAddFailed,
+        actionMessages.productSignInRequired,
+        "error",
+      );
+      return;
     }
 
     // Handle hook
     const success = await createCart(branchId, productId)
 
-    if (success) await showPopUp(actionMessages.productAddSuccessTitle, actionMessages.productCartSuccessDesc, "success")
-  }
+    if (success)
+      await showPopUp(
+        actionMessages.productAddSuccessTitle,
+        actionMessages.productCartSuccessDesc,
+        "success",
+      );
+  };
 
   const handleCardClick = () => {
-    router.push(`/products/${product.slugName}`)
-  }
+    // If we're clicking the actual card, redirect to product details
+    const storeIdentifier = branchSlug || branchId || "default-store";
+    router.push(`/${storeIdentifier}/${product.slugName}`);
+  };
+
+  const { discountedPrice, originalPrice, discountPercentage, hasDiscount } =
+    calculateDiscountedPrice(product.basePrice, product.productDiscounts);
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: (index % 8) * 0.05 }}
@@ -57,23 +84,30 @@ export const ProductCardItem = ({ product, index, branchName, branchId, branchCi
       onClick={handleCardClick}
     >
       <div className="relative h-full glass-panel bg-white/70 dark:bg-slate-900/40 backdrop-blur-xl rounded-[2rem] p-3 border border-white/40 dark:border-slate-800/50 shadow-sm hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 flex flex-col group/card">
-        
         {/* Image Container */}
         <div className="relative aspect-square rounded-[1.5rem] overflow-hidden bg-slate-100/50 dark:bg-slate-800/50 mb-4">
-          <img 
-            src={product.productImages[0]?.imageUrl || "https://placehold.co/400x400?text=No+Image"} 
+          <img
+            src={
+              product.productImages[0]?.imageUrl ||
+              "https://placehold.co/400x400?text=No+Image"
+            }
             alt={product.productName}
             className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110"
           />
-          
+
           {/* Overlay Gradients */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-500" />
-          
+
           {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
             {product.currentStock <= 5 && product.currentStock > 0 && (
               <div className="bg-orange-500/90 backdrop-blur-md text-white text-[9px] uppercase font-black px-3 py-1.5 rounded-full shadow-lg border border-white/20">
                 Low Stock
+              </div>
+            )}
+            {hasDiscount && (
+              <div className="bg-red-500/90 backdrop-blur-md text-white text-[9px] uppercase font-black px-3 py-1.5 rounded-full shadow-lg border border-white/20">
+                Promo
               </div>
             )}
           </div>
@@ -88,12 +122,12 @@ export const ProductCardItem = ({ product, index, branchName, branchId, branchCi
           )}
 
           {/* Hover Action Button */}
-          <Button 
+          <Button
             onClick={(e) => handleAddToCart(e, branchId, product.id)}
             disabled={product.currentStock === 0}
             className="absolute bottom-3 right-3 bg-primary text-white w-12 h-12 rounded-2xl shadow-2xl opacity-0 translate-y-4 transition-all duration-300 group-hover/card:opacity-100 group-hover/card:translate-y-0 hover:bg-emerald-600 active:scale-90 z-20"
           >
-            <ShoppingCart className="w-5 h-5"/>
+            <ShoppingCart className="w-5 h-5" />
           </Button>
         </div>
 
@@ -103,7 +137,7 @@ export const ProductCardItem = ({ product, index, branchName, branchId, branchCi
             <span className="text-[9px] font-black uppercase tracking-widest text-primary/60 mb-1 block">
               {product.category.name}
             </span>
-            <h3 className="font-bold text-sm md:text-base text-slate-800 dark:text-slate-200 group-hover/card:text-primary transition-colors line-clamp-2 leading-snug h-10">
+            <h3 className="font-bold text-sm md:text-base text-slate-800 dark:text-slate-200 group-hover/card:text-primary transition-colors line-clamp-2 leading-snug h-11">
               {product.productName}
             </h3>
           </div>
@@ -111,18 +145,30 @@ export const ProductCardItem = ({ product, index, branchName, branchId, branchCi
           <div className="mt-auto pt-3 flex flex-col gap-3">
             <div className="flex flex-col">
               <span className="text-lg md:text-xl font-black text-slate-900 dark:text-white tracking-tight">
-                Rp {product.basePrice.toLocaleString(currencyFormat)}
+                Rp {discountedPrice.toLocaleString(currencyFormat)}
               </span>
-              <div className="flex items-center gap-2 mt-0.5">
-                <span className="text-[10px] text-slate-400 line-through">Rp {(product.basePrice * 1.2).toLocaleString(currencyFormat)}</span>
-                <span className="text-[10px] font-black text-orange-500">20%</span>
-              </div>
+              {hasDiscount && (
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="text-[10px] text-slate-400 line-through">
+                    Rp {originalPrice.toLocaleString(currencyFormat)}
+                  </span>
+                  <span className="text-[10px] font-black text-orange-500">
+                    {discountPercentage}%
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Branch Info - Glassy Footer */}
             {branchName && (
-              <Link 
-                href={branchId ? `/branches/${branchId}` : "#"} 
+              <Link
+                href={
+                  branchSlug
+                    ? `/${branchSlug}`
+                    : branchId
+                      ? `/${branchId}`
+                      : "#"
+                }
                 onClick={(e) => e.stopPropagation()}
                 className="flex items-center gap-2 py-2 px-3 bg-slate-100/50 dark:bg-slate-800/30 rounded-xl border border-slate-200/50 dark:border-slate-700/30 hover:bg-primary/10 transition-colors group/branch"
               >

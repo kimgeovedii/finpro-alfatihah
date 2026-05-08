@@ -11,6 +11,7 @@ interface BranchTableProps {
   onManageSchedules: (branch: Branch) => void;
   onAssignAdmin: (branch: Branch) => void;
   onViewAdmins: (branch: Branch) => void;
+  onSetDefault: (branch: Branch) => void;
 }
 
 export const BranchTable: React.FC<BranchTableProps> = ({
@@ -21,6 +22,7 @@ export const BranchTable: React.FC<BranchTableProps> = ({
   onManageSchedules,
   onAssignAdmin,
   onViewAdmins,
+  onSetDefault,
 }) => {
   if (isLoading) {
     return (
@@ -66,6 +68,7 @@ export const BranchTable: React.FC<BranchTableProps> = ({
                 onManageSchedules={onManageSchedules}
                 onAssignAdmin={onAssignAdmin}
                 onViewAdmins={onViewAdmins}
+                onSetDefault={onSetDefault}
               />
             ))}
           </tbody>
@@ -74,3 +77,4 @@ export const BranchTable: React.FC<BranchTableProps> = ({
     </div>
   );
 };
+

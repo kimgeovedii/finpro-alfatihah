@@ -17,23 +17,37 @@ export const ProductDetailInfoContent = ({
   categoryName,
   description,
   price,
+  discountedPrice,
 }: ProductDetailInfoContentProps) => {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 mb-4">
       {/* Mobile Header */}
       <div className="lg:hidden flex justify-between items-start gap-4">
         <div className="flex-1 min-w-0">
-          <HeadingText level={1} children={productName}/>
+          <HeadingText level={1} children={productName} />
           <p className="text-slate-500 font-medium mt-1 text-sm">
             Sold by weight • ~100g each
           </p>
         </div>
         <div className="shrink-0 text-right">
-          <div className="text-emerald-700 font-extrabold text-xl">
-            {formatMoney(price)}
-          </div>
-          <div className="text-slate-500 text-xs font-medium uppercase">
-            Per Piece
+          <div className="flex flex-col items-end">
+            {discountedPrice ? (
+              <>
+                <div className="text-emerald-700 font-extrabold text-xl">
+                  {formatMoney(discountedPrice)}
+                </div>
+                <div className="text-slate-400 text-xs font-bold line-through">
+                  {formatMoney(price)}
+                </div>
+              </>
+            ) : (
+              <div className="text-emerald-700 font-extrabold text-xl">
+                {formatMoney(price)}
+              </div>
+            )}
+            <div className="text-slate-500 text-[10px] font-black uppercase tracking-wider mt-1">
+              Per Piece
+            </div>
           </div>
         </div>
       </div>
@@ -55,7 +69,6 @@ export const ProductDetailInfoContent = ({
         transition={{ duration: 0.5, delay: 0.1 }}
         className="flex items-center gap-3"
       >
-        <div className="h-[2px] w-6 bg-emerald-700"></div>
         <span className="text-xs font-black uppercase tracking-[0.2em] text-emerald-700">
           {categoryName}
         </span>

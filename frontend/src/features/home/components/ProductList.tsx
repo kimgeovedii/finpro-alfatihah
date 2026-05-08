@@ -137,7 +137,7 @@ export const ProductList = ({ products, isLoading }: ProductListProps) => {
           </p>
         </div>
         <Link
-          href="/products"
+          href="/search"
           className="group flex items-center gap-2 text-primary font-bold hover:text-primary-hover transition-all self-start sm:self-auto bg-primary/5 px-6 py-3 rounded-full hover:bg-primary/10"
         >
           See All
@@ -148,11 +148,12 @@ export const ProductList = ({ products, isLoading }: ProductListProps) => {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 md:gap-8">
         {products.map((product, index) => (
           <ProductCardItem
-            key={product.id}
+            key={`${product.id}-${index}`}
             product={product}
             index={index}
             branchName={product.branchName}
             branchId={product.branchId}
+            branchSlug={product.branchSlug}
             branchCity={product.branchCity}
           />
         ))}

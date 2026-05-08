@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useFormik } from "formik";
@@ -29,6 +29,19 @@ export const LoginForm = ({ isEmployee = false }: { isEmployee?: boolean }) => {
   
   const { login, employeeLogin, googleLogin, isLoading, user } = useAuthService();
   const [showPassword, setShowPassword] = useState(false);
+  const [googleBtnWidth, setGoogleBtnWidth] = useState(400);
+  const googleBtnContainerRef = useRef<HTMLDivElement>(null);
+
+  // Dynamically measure container width for responsive Google button
+  useEffect(() => {
+    const el = googleBtnContainerRef.current;
+    if (!el) return;
+    const update = () => setGoogleBtnWidth(el.offsetWidth);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -216,11 +229,11 @@ export const LoginForm = ({ isEmployee = false }: { isEmployee?: boolean }) => {
                   <span className="w-full border-t border-gray-100"></span>
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-white px-4 text-gray-400 font-bold tracking-widest">Atau masuk dengan</span>
+                  <span className="px-4 text-gray-400 font-bold tracking-widest">Atau masuk dengan</span>
                 </div>
               </div>
 
-              <div className="flex justify-center w-full">
+              <div ref={googleBtnContainerRef} className="w-full">
                 <GoogleLogin
                   onSuccess={handleGoogleSuccess}
                   onError={() => toast.error("Google login failed")}
@@ -228,7 +241,7 @@ export const LoginForm = ({ isEmployee = false }: { isEmployee?: boolean }) => {
                   theme="outline"
                   size="large"
                   shape="pill"
-                  width="384px"
+                  width={googleBtnWidth}
                 />
               </div>
             </>

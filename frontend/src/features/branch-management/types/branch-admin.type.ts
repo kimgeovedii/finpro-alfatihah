@@ -30,11 +30,13 @@ export interface Employee {
 export interface Branch {
   id: string;
   storeName: string;
+  slug: string;
   address: string;
   latitude: number;
   longitude: number;
   maxDeliveryDistance: number;
   isActive: boolean;
+  isDefault: boolean;
   city: string;
   province: string;
   district?: string;

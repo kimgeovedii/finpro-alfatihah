@@ -43,16 +43,10 @@ export const ReportHeader: React.FC<ReportHeaderProps> = ({
 }) => {
   return (
     <div className="flex flex-col gap-1 mb-8">
-      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div className="space-y-3">
-          <div className="flex items-center gap-2 w-fit px-2.5 py-1.5 bg-[#006666]/10 rounded-lg border border-[#006666]/10">
-            <DocumentChartBarIcon className="w-4 h-4 text-[#006666]" />
-            <span className="text-[11px] font-bold text-[#006666] uppercase tracking-widest">
-              Analytics Dashboard
-            </span>
-          </div>
-          <h1 className="text-3xl font-extrabold text-[#2c2f30] tracking-tight">
-            Reports & Analysis
+          <h1 className="text-4xl font-extrabold text-[#2c2f30] tracking-tight">
+            Dashboard
           </h1>
           <p className="text-[#595c5d] max-w-xl leading-relaxed text-sm md:text-base font-medium opacity-80">
             Track your grocery store&apos;s performance with comprehensive sales
