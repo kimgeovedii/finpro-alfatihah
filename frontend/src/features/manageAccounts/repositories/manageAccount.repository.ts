@@ -44,6 +44,10 @@ export class ManageAccountRepository {
   };
 
   public getAllBranches = async (): Promise<Branch[]> => {
-    return await apiFetch<Branch[]>("/branches", "get");
+    const response = await apiFetch<{ data: Branch[]; meta: unknown }>(
+      "/branches",
+      "get",
+    );
+    return response?.data ?? [];
   };
 }

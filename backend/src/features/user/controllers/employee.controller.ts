@@ -23,6 +23,7 @@ export class EmployeeController {
         limit,
         search,
         role,
+        employeeOnly: true,
       });
 
       const formattedData = result.data.map((user) => ({

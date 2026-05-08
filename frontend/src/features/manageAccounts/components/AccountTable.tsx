@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AccountTableProps } from "../types/manageAccount.type";
@@ -11,18 +13,19 @@ export const AccountTable: React.FC<AccountTableProps> = ({
 }) => {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.1 }}
-      className="bg-white rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden"
+      className="w-full overflow-x-auto"
     >
-      <div className="overflow-x-auto">
+      <div className="min-w-[700px]">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-[#eff1f2] text-[#595c5d] text-xs uppercase tracking-wider">
               <th className="py-4 px-6 font-medium">User</th>
               <th className="py-4 px-6 font-medium">Role</th>
               <th className="py-4 px-6 font-medium">Assigned Branch</th>
+              <th className="py-4 px-6 font-medium">Joined</th>
               <th className="py-4 px-6 font-medium text-right">Actions</th>
             </tr>
           </thead>
@@ -30,14 +33,14 @@ export const AccountTable: React.FC<AccountTableProps> = ({
             {isLoading ? (
               Array.from({ length: 5 }).map((_, i) => (
                 <tr key={i} className="animate-pulse">
-                  <td colSpan={4} className="py-8 px-6 text-center">
-                    <div className="h-12 bg-slate-50 rounded-lg w-full" />
+                  <td colSpan={5} className="py-5 px-6">
+                    <div className="h-10 bg-[#eff1f2] rounded-lg w-full" />
                   </td>
                 </tr>
               ))
             ) : accounts.length === 0 ? (
               <tr>
-                <td colSpan={4} className="py-20 text-center text-slate-400">
+                <td colSpan={5} className="py-20 text-center text-[#595c5d]">
                   No accounts found.
                 </td>
               </tr>

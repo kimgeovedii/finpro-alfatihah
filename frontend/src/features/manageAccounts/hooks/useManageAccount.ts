@@ -5,6 +5,7 @@ import {
   CreateAccountPayload,
   UpdateAccountPayload,
   Branch,
+  RoleFilter,
 } from "@/features/manageAccounts/types/manageAccount.type";
 import { ManageAccountRepository } from "@/features/manageAccounts/repositories/manageAccount.repository";
 import toast from "react-hot-toast";
@@ -22,7 +23,7 @@ export const useManageAccount = () => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [roleFilter, setRoleFilter] = useState("STORE_ADMIN");
+  const [roleFilter, setRoleFilter] = useState<RoleFilter>("ALL");
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -68,7 +69,7 @@ export const useManageAccount = () => {
         setIsLoading(false);
       }
     },
-    [meta.limit, debouncedSearch],
+    [meta.limit, debouncedSearch, roleFilter],
   );
 
   const fetchBranches = useCallback(async () => {
