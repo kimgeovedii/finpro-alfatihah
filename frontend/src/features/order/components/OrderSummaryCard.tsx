@@ -13,15 +13,18 @@ type Props = {
 }
 
 export const OrderSummaryCard: React.FC<Props> = ({ totalPrice, totalFinalPrice, totalConfirmedOrder, totalProcessingOrder, totalCancelledOrder, totalWaitingOrder}) => {
+    // Calculate saving
     const totalSaving: number = totalPrice - totalFinalPrice
     const savingPercentage: number = ((totalPrice - totalFinalPrice) / totalFinalPrice) * 100
 
+    // Build stats wording (element) based on order status
     const summaryParts: React.ReactNode[] = []
     if (totalConfirmedOrder > 0) summaryParts.push(<><b>{totalConfirmedOrder}</b> confirmed order{totalConfirmedOrder > 1 ? "s" : ""}</>)
     if (totalProcessingOrder > 0) summaryParts.push(<><b>{totalProcessingOrder}</b> order{totalProcessingOrder > 1 ? "s" : ""} in progress</>)
     if (totalWaitingOrder > 0) summaryParts.push(<><b>{totalWaitingOrder}</b> awaiting payment</>)
     if (totalCancelledOrder > 0) summaryParts.push(<><b>{totalCancelledOrder}</b> cancelled</>)
 
+    // Tidy up the sentence using ", " and ", and " and group into single element
     const summaryText = summaryParts.length === 0 ? <>So far you have no orders yet.</> : <>So far you have {
         summaryParts.map((dt, idx) => 
             <React.Fragment key={idx}>

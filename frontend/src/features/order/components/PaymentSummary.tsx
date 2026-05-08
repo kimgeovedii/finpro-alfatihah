@@ -29,6 +29,7 @@ type Props = {
 }
 
 export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, totalPrice, totalSaving, finalPrice, orderId, status, paymentDeadline, paymentEvidence, orderNumber, onCancel, paymentMethod, shippingWeight, onSuccess }) => {
+    // Handle hooks (action)
     const { downloadInvoiceOrder } = useDownloadInvoice()
     
     return (

@@ -12,10 +12,10 @@ type Props = {
     isBranchLoading: boolean
     activeStatus: OrderStatus | "ALL"
     search: string
+    isFilterBranchDisabled: boolean
     onStatusChange: (status: OrderStatus | "ALL") => void
     onBranchChange: (id: string) => void
     onSearchChange: (val: string) => void
-    isFilterBranchDisabled: boolean
 }
 
 export const OrderFiltersBar: React.FC<Props> = ({ branchId, branches, isBranchLoading, activeStatus, search, onSearchChange, onStatusChange, onBranchChange, isFilterBranchDisabled }) => {

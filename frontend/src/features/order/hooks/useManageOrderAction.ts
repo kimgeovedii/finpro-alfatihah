@@ -3,14 +3,14 @@ import { OrderStatus } from "@/constants/business.const"
 import { useUpdatePaymentStatusById } from "@/features/order/hooks/usePayment"
 import { useOrderManagement } from "@/features/order/hooks/useManageOrder"
 import { showPopUp } from "@/utils/message.util"
-import { OrderTableItem } from "@/features/order/components/OrderManagementTable"
 import Swal from "sweetalert2"
 import { useCancelOrderStatusById, useUpdateOrderStatusById } from "./useOrder"
 import { closeAllDialogs } from "@/utils/dialog"
 import { debouncerSearchTimeLimit } from "@/constants/feature.const"
+import { OrderTableItem } from "../repositories/order.type"
 
 export const useManageOrderActions = (employeeRole?: string, employeeBranchId?: string, onSuccess?: () => void) => {
-    // Call hook
+    // Handle hook
     const { orders, meta, isLoading, status, setStatus, page, setPage, branchId, setBranchId, search, setSearch, fetchOrders } = useOrderManagement(
         employeeRole === "SUPER_ADMIN" ? "ALL" : employeeBranchId ?? "ALL"
     )

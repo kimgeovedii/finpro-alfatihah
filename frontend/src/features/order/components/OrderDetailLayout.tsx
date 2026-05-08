@@ -147,18 +147,17 @@ export function OrderDetailLayout({ orderNumber }: Props) {
                                 }
                                 <OrderDetailItemListCard
                                     branchName={order?.branch.storeName ?? '-'}
-                                    items={order?.items?.map(dt => ({
-                                        branchInventoriesId: dt.id,
-                                        id: dt.id,
-                                        slugName: dt.product.product.slugName,
-                                        weight: dt.product.product.weight * dt.quantity,
-                                        productName: dt.product.product.productName,
-                                        category: dt.product.product.category,
-                                        quantity: dt.quantity,
-                                        basePrice: dt.price,
-                                        totalPrice: dt.product.product.basePrice * dt.quantity,
-                                        productImages: dt.product.product.productImages
-                                    })) ?? []}
+                                    items={
+                                        order?.items?.map(dt => ({
+                                            branchInventoriesId: dt.id,
+                                            ...dt.product.product,
+                                            id: dt.id,
+                                            quantity: dt.quantity,
+                                            basePrice: dt.price,
+                                            weight: dt.product.product.weight * dt.quantity,
+                                            totalPrice: dt.product.product.basePrice * dt.quantity,
+                                        })) ?? []
+                                    }
                                 />
                                 {
                                     // Payment summary comes last if payment has done
