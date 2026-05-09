@@ -165,7 +165,7 @@ export const ProductDetailCartAction = ({
       </div>
       <div className="space-y-8">
         <div className={disabled ? "opacity-50 pointer-events-none" : ""}>
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-4 block">
+          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-4 mt-4 block">
             Select Quantity
           </label>
           <div className="flex items-center justify-between bg-white rounded-full border border-slate-200/60 px-4 py-1">

@@ -41,6 +41,11 @@ const NAV_ITEMS = [
     icon: GlobeAmericasIcon,
   },
   {
+    title: "Accounts",
+    href: "/dashboard/accounts",
+    icon: UsersIcon,
+  },
+  {
     title: "Discounts",
     href: "/dashboard/discounts",
     icon: PercentBadgeIcon,
@@ -64,7 +69,7 @@ export const Sidebar = () => {
     user?.role === "SUPER_ADMIN";
 
   const filteredNavItems = NAV_ITEMS.filter((item) => {
-    if (item.title === "Branches") {
+    if (item.title === "Branches" || item.title === "Accounts") {
       return isSuperAdmin;
     }
     return true;
