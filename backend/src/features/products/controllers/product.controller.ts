@@ -98,13 +98,17 @@ export class ProductController {
   };
 
   public deleteProduct = async (
-    req: Request,
+    req: AuthRequest,
     res: Response,
     next: NextFunction,
   ) => {
     try {
+      const authReq = req as AuthRequest;
+      if (!authReq.user) throw new Error("User unauthorized");
+
       const data = await this.productService.deleteProduct(
         req.params.id as string,
+        authReq.user,
       );
       sendSuccess(res, data, "Delete product successfully");
     } catch (error) {
