@@ -5,7 +5,7 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useSearchStore } from "../service/search.service";
 import { useHomeStore } from "@/features/home/service/home.service";
 
-export const useSearchFilters = (autoSync: boolean = false) => {
+export const useCategoryFilters = (autoSync: boolean = false) => {
   const {
     setFilters,
     fetchProducts,
@@ -22,7 +22,6 @@ export const useSearchFilters = (autoSync: boolean = false) => {
   const { nearestBranch } = useHomeStore();
   const searchParams = useSearchParams();
   const router = useRouter();
-
   const pathname = usePathname();
 
   useEffect(() => {
@@ -37,14 +36,14 @@ export const useSearchFilters = (autoSync: boolean = false) => {
     const q = searchParams.get("q") || "";
     let catId = "";
 
-    if (searchParams.get("category")) {
-      const slug = searchParams.get("category");
+    const slug = pathname.split("/").pop();
+    if (slug === "all") {
+      catId = "";
+    } else {
       const cat = useSearchStore.getState().categories.find((c) => c.slugName === slug);
       if (cat) {
         catId = cat.id;
       }
-    } else {
-      catId = searchParams.get("categoryId") || "";
     }
 
     const minP = searchParams.get("minPrice")
@@ -80,7 +79,7 @@ export const useSearchFilters = (autoSync: boolean = false) => {
     } else if (!meta && !isLoading) {
       fetchProducts();
     }
-  }, [autoSync, searchParams, setFilters, fetchProducts, query, categoryId, minPrice, maxPrice, sortBy, sortOrder, branchId, nearestBranch?.id, meta, isLoading]);
+  }, [autoSync, searchParams, pathname, setFilters, fetchProducts, query, categoryId, minPrice, maxPrice, sortBy, sortOrder, branchId, nearestBranch?.id, meta, isLoading]);
 
   const updateFilters = (newFilters: {
     query?: string;
@@ -103,21 +102,24 @@ export const useSearchFilters = (autoSync: boolean = false) => {
 
     params.delete("page");
 
+    let targetPathname = pathname;
+    
     if (newFilters.categoryId !== undefined) {
-      params.delete("categoryId"); // Always remove UUID from browser URL
-      params.delete("category"); // Clear previous slug param
-
-      if (newFilters.categoryId !== "") {
+      params.delete("categoryId");
+      
+      if (newFilters.categoryId === "") {
+        targetPathname = "/categories/all";
+      } else {
         const cat = useSearchStore.getState().categories.find(c => c.id === newFilters.categoryId);
         if (cat) {
-          params.set("category", cat.slugName);
+          targetPathname = `/categories/${cat.slugName}`;
         } else {
-          params.set("categoryId", newFilters.categoryId);
+          targetPathname = "/categories/all";
         }
       }
     }
 
-    router.push(`/search?${params.toString()}`, { scroll: false });
+    router.push(`${targetPathname}?${params.toString()}`, { scroll: false });
   };
 
   return { updateFilters };

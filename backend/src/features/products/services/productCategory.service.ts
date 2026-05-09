@@ -1,4 +1,5 @@
 import { productCategoryRepository } from "../repositories/productCategory.repository";
+import { prisma } from "../../../config/prisma";
 
 export class ProductCategoryService {
   private productCategoryRepository: productCategoryRepository;
@@ -78,6 +79,56 @@ export class ProductCategoryService {
   };
 
   public deleteCategory = async (id: string) => {
-    return await this.productCategoryRepository.deleteCategory(id);
+    return await prisma.$transaction(async (tx) => {
+      let otherCategory = await tx.product_categories.findFirst({
+        where: {
+          OR: [
+            { name: { equals: "Other", mode: "insensitive" } },
+            { slugName: { equals: "other", mode: "insensitive" } },
+          ],
+          deletedAt: null,
+        },
+      });
+
+      if (!otherCategory) {
+        otherCategory = await tx.product_categories.findFirst({
+          where: {
+            OR: [
+              { name: { equals: "Other", mode: "insensitive" } },
+              { slugName: { equals: "other", mode: "insensitive" } },
+            ],
+            deletedAt: { not: null },
+          },
+        });
+
+        if (otherCategory) {
+          otherCategory = await tx.product_categories.update({
+            where: { id: otherCategory.id },
+            data: { deletedAt: null },
+          });
+        } else {
+          otherCategory = await tx.product_categories.create({
+            data: {
+              name: "Other",
+              slugName: "other",
+              description: "General category for products without a specific category",
+            },
+          });
+        }
+      }
+
+      if (id === otherCategory.id) {
+        throw new Error("Cannot delete the General/Other category");
+      }
+      await tx.products.updateMany({
+        where: { categoryId: id },
+        data: { categoryId: otherCategory.id },
+      });
+
+      return await tx.product_categories.update({
+        where: { id },
+        data: { deletedAt: new Date() },
+      });
+    });
   };
 }
