@@ -16,7 +16,6 @@ export class SessionController {
       const result = await this.sessionService.getActiveSessions(userId, currentSessionId, page, limit);
       return sendSuccess(res, result, "Active sessions retrieved successfully");
     } catch (error: any) {
-      console.error(error);
       return sendError(res, "Internal server error");
     }
   };
@@ -36,7 +35,6 @@ export class SessionController {
       if (error.message === "Session not found or unauthorized") {
         return sendError(res, error.message, 404);
       }
-      console.error(error);
       return sendError(res, "Internal server error");
     }
   };

@@ -228,6 +228,7 @@
  *                               id: { type: string, format: uuid, example: 3212d7e9-0dd0-4558-8ae8-813fd063970a }
  *                               storeName: { type: string, example: Pasar Segar Monas }
  *                               city: { type: string, example: Jakarta Pusat }
+ *                               slug: { type: string, example: pasar-segar-monas }
  *                     meta:
  *                       type: object
  *                       properties:
