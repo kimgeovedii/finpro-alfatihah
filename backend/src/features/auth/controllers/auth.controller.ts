@@ -26,7 +26,6 @@ export class AuthController {
       if (error.message === "Email already in use") {
         return sendError(res, error.message, 400);
       }
-      console.error(error);
       return sendError(res, "Internal server error");
     }
   }
@@ -90,7 +89,6 @@ export class AuthController {
       if (error.message === "Please verify your email before logging in") {
         return sendError(res, error.message, 403);
       }
-      console.error(error);
       return sendError(res, "Internal server error");
     }
   }
@@ -114,7 +112,6 @@ export class AuthController {
       if (error.message.includes("Akses ditolak")) {
         return sendError(res, error.message, 403);
       }
-      console.error(error);
       return sendError(res, "Internal server error");
     }
   }
@@ -132,7 +129,6 @@ export class AuthController {
       const data = await this.authService.googleLogin(result.data, device, ip);
       return sendSuccess(res, data, "Login successful");
     } catch (error: any) {
-      console.error("Google Login Error:", error);
       return sendError(res, error.message || "Social login failed", 401);
     }
   }
@@ -206,7 +202,6 @@ export class AuthController {
       const result = await this.authService.revokeAllSessions(req.user.userId);
       return sendSuccess(res, null, result.message);
     } catch (error) {
-      console.error(error);
       return sendError(res, "Internal server error");
     }
   }

@@ -1,36 +1,27 @@
 import { HeadingText } from "@/components/layout/HeadingText";
 import { MiniTagBox } from "@/components/layout/MiniTagBox";
 import { Button } from "@/components/ui/button";
-import {
-  BuildingOfficeIcon,
-  ShoppingCartIcon,
-  TrashIcon,
-} from "@heroicons/react/24/outline";
+import { BuildingOfficeIcon, ShoppingCartIcon, TrashIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import React from "react";
 
 type Props = {
-    cartId: string
-    storeName: string
-    city: string
-    accordionButton: React.ReactNode
-    onRemove: () => void
+  cartId: string
+  storeName: string
+  slug: string
+  city: string
+  accordionButton: React.ReactNode
+  onRemove: () => void
 }
 
-export const BranchHeader: React.FC<Props> = ({
-  storeName,
-  cartId,
-  city,
-  onRemove,
-  accordionButton,
-}) => {
+export const BranchHeader: React.FC<Props> = ({ storeName, cartId, city, onRemove, accordionButton, slug }) => {
   return (
     <div className="flex flex-col md:flex-row md:items-center gap-3 w-full">
       <div className="flex items-center gap-3 flex-1 min-w-0">
         <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 shrink-0">
           <BuildingOfficeIcon className="w-5 h-5" />
         </div>
-        <Link href={`/${storeName}`}>
+        <Link href={`/${slug}`}>
           <HeadingText children={storeName} level={2} />
           <MiniTagBox val={city} />
         </Link>

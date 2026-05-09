@@ -59,6 +59,7 @@ export function CartLayout() {
                                             <div className="mb-5 bg-white p-5 rounded-xl shadow">
                                                 <BranchHeader 
                                                     storeName={ct.branch.storeName} 
+                                                    slug={ct.branch.slug ?? ct.branch.storeName}
                                                     city={ct.branch.city ?? "-"}
                                                     onRemove={() => handleRemoveCart(ct.id)} 
                                                     cartId={ct.id}

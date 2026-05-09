@@ -75,7 +75,7 @@ export const OrderManagementTable: React.FC<Props> = ({ orders, meta, isLoading,
                                     return (
                                         <TableRow key={dt.id} className="hover:bg-slate-50">
                                             <TableCell className="font-semibold text-slate-800 items-start flex flex-col">
-                                                <Link href={`/${dt.storeName}`} className="cursor-pointer">
+                                                <Link href={`/${dt.slug}`} className="cursor-pointer">
                                                     <MiniTagBox val={dt.storeName}/>
                                                 </Link>
                                                 <CopyFieldButton label="Order Number" value={dt.orderNumber} customClass="text-sm font-semibold"/>

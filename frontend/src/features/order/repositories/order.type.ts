@@ -77,6 +77,7 @@ export type ManagementOrderItem = {
 export type OrderTableItem = {
     id: string
     storeName: string
+    slug: string
     orderNumber: string
     customerName: string
     customerEmail: string

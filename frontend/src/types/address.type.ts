@@ -20,6 +20,7 @@ export type BranchData = {
     storeName: string
     address: string
     city?: string
+    slug?: string
     schedules: Schedule[]
     openStatus?: string
 }

@@ -403,7 +403,7 @@ export class OrderRepository {
             }
           },
           branch: {
-            select: { storeName: true }
+            select: { storeName: true, slug: true }
           }
         }
       }),

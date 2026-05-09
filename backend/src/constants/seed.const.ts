@@ -88,6 +88,16 @@ export const userSeedData = [
             branchCity: 'Jakarta Selatan',
         },
     },
+    {
+        email: 'leonardho81@gmail.com',
+        username: 'leonardho.rante',
+        role: 'EMPLOYEE' as const,
+        employee: {
+            fullName: 'Leonardho Admin',
+            role: EmployeeRole.SUPER_ADMIN,
+            branchCity: 'Jakarta Selatan',
+        },
+    },
     // Customers
     {
         email: 'flazen.edu@gmail.com',
