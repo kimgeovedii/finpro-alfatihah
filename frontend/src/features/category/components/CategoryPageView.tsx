@@ -3,7 +3,7 @@
 import { useEffect, useMemo } from "react";
 import { useParams } from "next/navigation";
 import { useSearchStore } from "@/features/search/service/search.service";
-import { useSearchFilters } from "@/features/search/hooks/useSearchFilters";
+import { useCategoryFilters } from "@/features/search/hooks/useCategoryFilters";
 import { SearchSidebar } from "@/features/search/components/SearchSidebar";
 import { SearchHeader } from "@/features/search/components/SearchHeader";
 import { SearchResults } from "@/features/search/components/SearchResults";
@@ -19,7 +19,7 @@ export const CategoryPageView = () => {
     fetchCategories,
   } = useSearchStore();
 
-  useSearchFilters(true);
+  useCategoryFilters(true);
 
   useEffect(() => {
     if (categories.length === 0) {
@@ -27,9 +27,12 @@ export const CategoryPageView = () => {
     }
   }, [fetchCategories, categories.length]);
 
+  const isAll = slug === "all";
+
   const currentCategory = useMemo(() => {
+    if (isAll) return { name: "All Products", slugName: "all", id: "" };
     return categories.find((c) => c.slugName === slug);
-  }, [categories, slug]);
+  }, [categories, slug, isAll]);
 
   if (categories.length > 0 && !currentCategory) {
     return (
