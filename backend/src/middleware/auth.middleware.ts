@@ -18,12 +18,13 @@ export const authMiddleware = async (req: AuthRequest, res: Response, next: Next
   const token = authHeader.split(" ")[1];
 
   try {
-    // Check if the token has been blacklisted (logout/revoked)
-    if (await isTokenBlacklisted(token)) {
+    const decoded: any = jwt.verify(token, JWT_SECRET);
+    
+    // Check if the token or sessionId has been blacklisted (logout/revoked)
+    if (await isTokenBlacklisted(token) || (decoded.sessionId && await isTokenBlacklisted(decoded.sessionId))) {
       return res.status(401).json({ success: false, message: "Token has been revoked" });
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded;
     next();
   } catch (error) {
@@ -31,3 +32,25 @@ export const authMiddleware = async (req: AuthRequest, res: Response, next: Next
   }
 };
 
+export const optionalAuthMiddleware = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  const authHeader = req.headers.authorization;
+  // No token just continue
+  if (!authHeader) return next()
+
+  const token = authHeader.split(" ")[1]
+  // No token after split just continue
+  if (!token) return next()
+
+  try {
+    // Check blacklist 
+    if (await isTokenBlacklisted(token)) return next()
+
+    const decoded = jwt.verify(token, JWT_SECRET)
+    req.user = decoded
+
+    return next()
+  } catch (error) {
+    // Ignore invalid / expired token
+    return next()
+  }
+};

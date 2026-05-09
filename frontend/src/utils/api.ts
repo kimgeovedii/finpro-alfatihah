@@ -6,9 +6,6 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
 // create axios instance with defaults
 const api: AxiosInstance = axios.create({
   baseURL: API_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
 });
 
 // helper to update tokens in cookies
@@ -19,11 +16,11 @@ function setTokens(accessToken: string, refreshToken: string) {
     ...(process.env.NODE_ENV === "production" ? { secure: true } : {}),
   };
   Cookies.set("accessToken", accessToken, { path: "/", ...cookieOptions });
-  Cookies.set(
-    "refreshToken",
-    refreshToken,
-    { path: "/", ...cookieOptions, expires: 7 },
-  );
+  Cookies.set("refreshToken", refreshToken, {
+    path: "/",
+    ...cookieOptions,
+    expires: 7,
+  });
 }
 
 // request interceptor to attach access token
@@ -40,7 +37,9 @@ api.interceptors.request.use((cfg) => {
 api.interceptors.response.use(
   (resp) => resp,
   async (error: AxiosError) => {
-    const originalRequest = error.config as (typeof error.config & { _retry?: boolean }) | undefined;
+    const originalRequest = error.config as
+      | (typeof error.config & { _retry?: boolean })
+      | undefined;
     if (
       originalRequest &&
       error.response?.status === 401 &&
@@ -51,7 +50,9 @@ api.interceptors.response.use(
       const refreshToken = Cookies.get("refreshToken");
       if (refreshToken) {
         try {
-          const r = await axios.post(`${API_URL}/auth/refresh`, { token: refreshToken });
+          const r = await axios.post(`${API_URL}/auth/refresh`, {
+            token: refreshToken,
+          });
           const tokens = r.data.data || r.data;
           setTokens(tokens.accessToken, tokens.refreshToken);
           // update header and retry original request
@@ -66,7 +67,8 @@ api.interceptors.response.use(
         }
       }
     }
-    const errorMessage = (error.response?.data as any)?.message || error.message;
+    const errorMessage =
+      (error.response?.data as any)?.message || error.message;
     return Promise.reject(new Error(errorMessage));
   },
 );
@@ -77,15 +79,27 @@ export async function apiFetch<T>(
   method: "get" | "post" | "put" | "patch" | "delete" = "get",
   body?: any,
 ): Promise<T> {
-  const response = await api.request({ url: endpoint, method, data: body });
+  const isFormData = body instanceof FormData;
+  const response = await api.request({
+    url: endpoint,
+    method,
+    data: body,
+    ...(isFormData
+      ? {}
+      : {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }),
+  });
   const data = response.data;
-  // unwrap if wrapped
+
   if (data && data.hasOwnProperty("data")) {
-    if (data.success === false) {
+    if (data.success === false)
       throw new Error(data.message || "Request failed");
-    }
+
     return data.data as T;
   }
+
   return data as T;
 }
-

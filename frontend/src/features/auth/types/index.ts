@@ -1,37 +1,43 @@
+export interface User {
+  id: string;
+  email: string;
+  username: string;
+  role: string;
+  avatar?: string;
+  emailVerifiedAt?: string;
+  newEmail?: string;
+}
+
 export interface LoginPayload {
   email: string;
   password: string;
   rememberMe?: boolean;
+  deviceId?: string;
 }
 
-export interface User {
-  id: string;
+export interface RegisterPayload {
   email: string;
-  name: string;
-  role: { id: string; name: string } | null;
+  referralCode?: string;
 }
 
-export interface LoginResponse {
+export interface VerifyPayload {
+  token: string;
+  password?: string;
+  confirmPassword?: string;
+}
+
+export interface AuthResponse {
+  user: User;
   accessToken: string;
   refreshToken: string;
-  user: User;
 }
 
-export interface AuthState {
-  user: User | null;
-  accessToken: string | null;
-  isLoading: boolean;
-  error: string | null;
-  login: (payload: LoginPayload) => Promise<void>;
-  logout: () => Promise<void>;
-  fetchUser: () => Promise<void>;
-  resendVerification: (email: string) => Promise<{ message: string }>;
-  verifyEmailToken: (token: string) => Promise<{ message: string }>;
-  clearError: () => void;
+export interface MessageResponse {
+  message: string;
 }
 
-
-export interface ApiError {
-  message?: string;
-  errors?: Record<string, string[]>;
+export interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data: T;
 }

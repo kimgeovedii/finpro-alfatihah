@@ -4,18 +4,55 @@ export class AuthRepository {
   async findByEmail(email: string) {
     return prisma.user.findUnique({
       where: { email },
-      include: { role: true },
     });
   }
 
-  async createRefreshToken(userId: string, token: string, expiresAt: Date, device?: string, ip?: string) {
+  async findByEmailWithEmployee(email: string) {
+    return prisma.user.findUnique({
+      where: { email },
+      include: {
+        employee: true,
+      }
+    });
+  }
+
+  async findById(id: string) {
+    return prisma.user.findUnique({
+      where: { id },
+      include: {
+        employee: true,
+      }
+    });
+  }
+
+  async findByProviderId(provider: string, providerId: string) {
+    return prisma.user.findFirst({
+      where: {
+        provider,
+        providerId,
+      },
+    });
+  }
+
+  async createRefreshToken(userId: string, token: string, expiresAt: Date, device?: string, ip?: string, sessionId?: string, deviceId?: string) {
     return prisma.token.create({
       data: {
+        id: sessionId,
         userId,
         token,
-        expiresAt,
+        expiredAt: expiresAt,
         device,
         ip,
+        deviceId,
+      },
+    });
+  }
+
+  async deleteExistingSessionByDevice(userId: string, deviceId: string) {
+    return prisma.token.deleteMany({
+      where: {
+        userId,
+        deviceId,
       },
     });
   }
@@ -27,9 +64,43 @@ export class AuthRepository {
     });
   }
 
-  async createUser(data: any) {
+  async createUserEmailOnly(email: string, verificationToken: string, expires: Date, referredById?: string) {
+    const myReferralCode = Math.random().toString(36).substring(2, 10).toUpperCase();
+    
     return prisma.user.create({
-      data,
+      data: {
+        email,
+        verificationToken,
+        verificationExpires: expires,
+        provider: "credentials",
+        referalCode: myReferralCode,
+        referredById: referredById,
+      },
+    });
+  }
+
+  async createGoogleUser(data: { email: string; providerId: string; username?: string; avatar?: string }) {
+    const myReferralCode = Math.random().toString(36).substring(2, 10).toUpperCase();
+    
+    return prisma.user.create({
+      data: {
+        ...data,
+        provider: "google",
+        emailVerifiedAt: new Date(), // Google emails are pre-verified
+        referalCode: myReferralCode,
+      },
+    });
+  }
+
+  async linkGoogleAccount(userId: string, providerId: string, avatar?: string) {
+    return prisma.user.update({
+      where: { id: userId },
+      data: {
+        provider: "google",
+        providerId,
+        ...(avatar && { avatar }),
+        emailVerifiedAt: new Date(),
+      },
     });
   }
 
@@ -39,6 +110,18 @@ export class AuthRepository {
       data: {
         verificationToken: token,
         verificationExpires: expires,
+      },
+    });
+  }
+
+  async setPasswordAndVerify(userId: string, passwordHash: string) {
+    return prisma.user.update({
+      where: { id: userId },
+      data: {
+        password: passwordHash,
+        emailVerifiedAt: new Date(),
+        verificationToken: null,
+        verificationExpires: null,
       },
     });
   }
@@ -54,11 +137,31 @@ export class AuthRepository {
     });
   }
 
+  async verifyEmailChange(userId: string, newEmail: string) {
+    return prisma.user.update({
+      where: { id: userId },
+      data: {
+        email: newEmail,
+        newEmail: null,
+        emailVerifiedAt: new Date(),
+        verificationToken: null,
+        verificationExpires: null,
+      },
+    });
+  }
+
   async findByVerificationToken(token: string) {
     return prisma.user.findFirst({
       where: { verificationToken: token },
     });
   }
+
+  async findByReferralCode(code: string) {
+    return prisma.user.findUnique({
+      where: { referalCode: code },
+    });
+  }
+
 
   async findRefreshToken(token: string) {
     return prisma.token.findUnique({
@@ -76,6 +179,34 @@ export class AuthRepository {
   async deleteAllRefreshTokensByUserId(userId: string) {
     return prisma.token.deleteMany({
       where: { userId },
+    });
+  }
+
+  // Reset Password methods
+  async updateResetPasswordToken(userId: string, token: string, expires: Date) {
+    return prisma.user.update({
+      where: { id: userId },
+      data: {
+        resetPasswordToken: token,
+        resetPasswordExpires: expires,
+      },
+    });
+  }
+
+  async findUserByResetToken(token: string) {
+    return prisma.user.findFirst({
+      where: { resetPasswordToken: token },
+    });
+  }
+
+  async resetPassword(userId: string, passwordHash: string) {
+    return prisma.user.update({
+      where: { id: userId },
+      data: {
+        password: passwordHash,
+        resetPasswordToken: null,
+        resetPasswordExpires: null,
+      },
     });
   }
 }
