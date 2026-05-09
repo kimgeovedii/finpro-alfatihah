@@ -20,7 +20,6 @@ export const useNearestStore = () => {
 
   const requestLocation = useCallback(async () => {
     if (!navigator.geolocation) {
-      console.log("Geolocation not supported");
       setLocationStatus("denied");
       fetchNearestBranch();
       return;
@@ -41,13 +40,10 @@ export const useNearestStore = () => {
       }
     }
 
-    console.log("Requesting location...");
     setLocationStatus("requesting");
     
-    console.log("Calling navigator.geolocation.getCurrentPosition...");
     navigator.geolocation.getCurrentPosition(
       async (position) => {
-        console.log("Position received:", position.coords.latitude, position.coords.longitude);
         const coords = {
           lat: position.coords.latitude,
           lng: position.coords.longitude,
@@ -59,13 +55,11 @@ export const useNearestStore = () => {
           setLocationStatus("granted");
           fetchNearestBranch(coords.lat, coords.lng);
         } catch (err) {
-          console.error("Coords validation failed:", err);
           setLocationStatus("denied");
           fetchNearestBranch();
         }
       },
       (error) => {
-        console.error("Geolocation error:", error.message, `(Code: ${error.code})`);
         setLocationStatus("denied");
         fetchNearestBranch(); 
       },

@@ -36,8 +36,6 @@ export const PaymentEvidenceUploadButton: React.FC<Props> = ({ orderId, paymentD
             showPopUp("Upload failed", "File size must not exceed 10 MB.", "error")
             return
         }
-
-        Swal.fire({ title: "Uploading...", allowOutsideClick: false, didOpen: () => Swal.showLoading() })
         
         // Handle hook (action)
         const result = await uploadEvidence(orderId, file)

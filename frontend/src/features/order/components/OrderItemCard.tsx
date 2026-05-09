@@ -104,13 +104,13 @@ export const OrderItemCard: React.FC<Props> = ({ orderId, orderNumber, status, t
                             status !== 'CANCELLED' && 
                                 <>
                                     <p className="text-gray-500 font-semibold text-sm mb-0">Total Spend</p>
-                                    <p className="text-emerald-800 font-bold text-xl">Rp {(finalPrice + shippingCost).toLocaleString(currencyFormat)}</p>
+                                    <p className="text-emerald-800 font-bold text-xl">Rp {Math.round(finalPrice + shippingCost).toLocaleString(currencyFormat)}</p>
                                 </>
                         }
                         {
                             totalPrice !== finalPrice && status !== 'CANCELLED' &&
                                 <div className="bg-green-100 p-1 text-center rounded-md mt-1 px-2">
-                                    <p className="text-gray-500 font-semibold text-sm mb-0">You saved <b className="text-green-600">Rp. {(totalPrice - finalPrice).toLocaleString(currencyFormat)}</b></p>
+                                    <p className="text-gray-500 font-semibold text-sm mb-0">You saved <b className="text-green-600">Rp. {Math.round(totalPrice - finalPrice).toLocaleString(currencyFormat)}</b></p>
                                 </div>
                         }
                     </div>

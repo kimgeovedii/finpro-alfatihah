@@ -91,7 +91,6 @@ export const useNearestStoreMap = (isExpanded: boolean, userCoords: { lat: numbe
         toast.error("Lokasi tidak ditemukan pada peta");
       }
     } catch (error) {
-      console.error("Search error:", error);
       toast.error("Gagal mencari lokasi");
     } finally {
       setIsSearchingLocation(false);

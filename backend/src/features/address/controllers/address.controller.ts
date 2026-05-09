@@ -124,7 +124,6 @@ export class AddressController {
       });
       return res.json(response.data);
     } catch (error: any) {
-      console.error("Geocoding proxy error:", error.message);
       return sendError(res, "Gagal mencari alamat", 502);
     }
   };
@@ -146,7 +145,6 @@ export class AddressController {
       });
       return res.json(response.data);
     } catch (error: any) {
-      console.error("Reverse geocoding proxy error:", error.message);
       return sendError(res, "Gagal mendapatkan alamat dari koordinat", 502);
     }
   };

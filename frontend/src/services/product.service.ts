@@ -39,7 +39,6 @@ export const useProductStore = create<ProductState>((set) => ({
         searchMeta: response.meta,
         isSearching: false,
       });
-      console.log("Search Results (Global Store):", response.data);
     } catch (error: any) {
       set({
         searchError: error.message || "Failed to search products",
