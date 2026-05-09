@@ -8,9 +8,13 @@ class BranchFactory {
 
         for (const branchData of branchSeedData) {
             // Create branch
+            const storeName = branchData.storeName
+            const slug = storeName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+
             const branch = await prisma.branch.create({
                 data: {
-                    storeName: branchData.storeName,
+                    storeName,
+                    slug, 
                     address: branchData.address,
                     latitude: branchData.latitude,
                     longitude: branchData.longitude,
