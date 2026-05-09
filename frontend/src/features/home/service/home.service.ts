@@ -173,13 +173,11 @@ export const useHomeStore = create<HomeState>((set, get) => ({
             get().fetchNearestBranch(coords.lat, coords.lng);
           }
         } catch (err) {
-          console.error("Coords validation failed:", err);
           set({ locationStatus: "denied" });
           get().fetchNearestBranch();
         }
       },
       (error) => {
-        console.error("Geolocation error:", error);
         set({ locationStatus: "denied" });
         get().fetchNearestBranch(); 
       },

@@ -127,6 +127,7 @@ export const useManageOrderActions = (employeeRole?: string, employeeBranchId?: 
         id: dt.id,
         orderNumber: dt.orderNumber,
         storeName: dt.branch.storeName,
+        slug: dt.branch.slug ?? dt.branch.storeName,
         customerName: dt.user.username,
         customerEmail: dt.user.email,
         createdAt: dt.createdAt,

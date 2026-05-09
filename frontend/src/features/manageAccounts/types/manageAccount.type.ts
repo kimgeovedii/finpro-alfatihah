@@ -1,5 +1,6 @@
 export type UserRole = "CUSTOMER" | "EMPLOYEE";
 export type EmployeeRole = "STORE_ADMIN" | "SUPER_ADMIN";
+export type RoleFilter = "ALL" | "CUSTOMER" | "EMPLOYEE" | "STORE_ADMIN" | "SUPER_ADMIN";
 
 export type Branch = {
   id: string;
@@ -54,8 +55,8 @@ export type UpdateAccountPayload = Partial<CreateAccountPayload>;
 export type AccountHeaderProps = {
   searchQuery: string;
   onSearchChange: (value: string) => void;
-  roleFilter: string;
-  onRoleFilterChange: (value: string) => void;
+  roleFilter: RoleFilter;
+  onRoleFilterChange: (value: RoleFilter) => void;
   onAddClick: () => void;
 };
 

@@ -36,7 +36,12 @@ export const ManageAccountPage = () => {
   } = useManageAccount();
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="space-y-6"
+    >
       <AccountHeader
         searchQuery={searchQuery}
         onSearchChange={handleSearchChange}
@@ -45,27 +50,41 @@ export const ManageAccountPage = () => {
         onAddClick={handleAddClick}
       />
 
-      {/* Desktop Layout */}
-      <AccountTable
-        accounts={accounts}
-        isLoading={isLoading}
-        onEdit={handleEditClick}
-        onDelete={handleDeleteClick}
-      />
+      {/* Desktop Table */}
+      <div className="hidden md:block shadow-[0_4px_30px_rgba(0,0,0,0.02)] rounded-3xl bg-white overflow-hidden">
+        <AccountTable
+          accounts={accounts}
+          isLoading={isLoading}
+          onEdit={handleEditClick}
+          onDelete={handleDeleteClick}
+        />
+      </div>
 
       {/* Mobile Layout */}
-      <div className="md:hidden grid grid-cols-1 gap-4">
+      <div className="md:hidden space-y-4">
         {isLoading ? (
-          Array.from({ length: 3 }).map((_, i) => (
+          [...Array(4)].map((_, i) => (
             <div
               key={i}
-              className="h-48 bg-slate-100 rounded-2xl animate-pulse"
-            />
+              className="bg-white rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.04)] p-4 flex gap-4 animate-pulse"
+            >
+              <div className="w-12 h-12 rounded-lg bg-slate-200 shrink-0" />
+              <div className="flex-1 space-y-2 py-1">
+                <div className="w-3/4 h-4 bg-slate-200 rounded" />
+                <div className="w-1/2 h-3 bg-slate-100 rounded" />
+                <div className="w-1/3 h-3 bg-slate-100 rounded" />
+              </div>
+            </div>
           ))
         ) : accounts.length === 0 ? (
-          <div className="py-20 text-center text-slate-400">
-            No accounts found.
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.04)] p-8 text-center"
+          >
+            <p className="font-medium text-[#2c2f30]">No accounts found</p>
+            <p className="text-sm text-[#595c5d] mt-1">Try adjusting your search or filter.</p>
+          </motion.div>
         ) : (
           accounts.map((account, index) => (
             <AccountCard
@@ -145,6 +164,6 @@ export const ManageAccountPage = () => {
         onConfirm={handleDeleteConfirm}
         isDeleting={isDeleting}
       />
-    </div>
+    </motion.div>
   );
 };

@@ -48,7 +48,7 @@ export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, t
                     <div className="flex justify-between">
                         <p>Total Saving</p>
                         <div className="flex gap-2 items-center relative group">
-                            <p className="font-bold">Rp. {totalSaving.toLocaleString(currencyFormat)}</p>
+                            <p className="font-bold">Rp. {Math.round(totalSaving).toLocaleString(currencyFormat)}</p>
                             <InfoBoxSavingToolTip/>
                         </div>
                     </div>
@@ -58,7 +58,7 @@ export const PaymentSummaryCard: React.FC<Props> = ({ totalItem, shippingCost, t
             <DividerLine/>
             <div className="flex justify-between">
                 <HeadingText children="Final Price" level={3}/>
-                <p className="font-bold text-xl">Rp. {Math.ceil(finalPrice + shippingCost).toLocaleString(currencyFormat)}</p>
+                <p className="font-bold text-xl">Rp. {Math.round(finalPrice + shippingCost).toLocaleString(currencyFormat)}</p>
             </div>
             { !['WAITING_PAYMENT_CONFIRMATION', 'PROCESSING', 'CANCELLED'].includes(status) && <DividerLine/> }
             <div className="flex flex-col gap-3">

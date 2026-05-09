@@ -20,7 +20,7 @@ export class UserController {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
       const search = (req.query.search as string) || "";
-      const role = req.query.role as EmployeeRole | undefined;
+      const role = req.query.role as string | undefined;
 
       const result = await this.userService.getAllAccounts({
         page,
@@ -50,7 +50,6 @@ export class UserController {
 
       return sendSuccess(res, { data: formattedData, meta: result.meta }, "Berhasil mengambil data akun");
     } catch (error: any) {
-      console.error("Get Accounts Error:", error);
       return sendError(res, error.message || "Gagal mengambil data akun", 500);
     }
   };
@@ -68,7 +67,6 @@ export class UserController {
       if (error.message.includes("sudah terdaftar")) {
         return sendError(res, error.message, 409);
       }
-      console.error("Create Account Error:", error);
       return sendError(res, "Gagal membuat akun", 500);
     }
   };
@@ -90,7 +88,6 @@ export class UserController {
       if (error.message.includes("sudah digunakan")) {
         return sendError(res, error.message, 409);
       }
-      console.error("Update Account Error:", error);
       return sendError(res, "Gagal mengupdate akun", 500);
     }
   };
@@ -107,7 +104,6 @@ export class UserController {
       if (error.message.includes("Tidak dapat menghapus")) {
         return sendError(res, error.message, 403);
       }
-      console.error("Delete Account Error:", error);
       return sendError(res, "Gagal menghapus akun", 500);
     }
   };

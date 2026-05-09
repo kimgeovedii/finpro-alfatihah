@@ -19,7 +19,8 @@ export class UserService {
     page: number;
     limit: number;
     search?: string;
-    role?: EmployeeRole;
+    role?: string;
+    employeeOnly?: boolean;
   }) {
     return this.userRepository.findAllAccounts(params);
   }

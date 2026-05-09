@@ -169,7 +169,7 @@ export class CartRepository {
           },
           branch: {
             select: {
-              id: true, storeName: true, city: true
+              id: true, storeName: true, city: true, slug: true
             }
           }
         }

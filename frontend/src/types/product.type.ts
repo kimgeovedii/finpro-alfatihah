@@ -41,6 +41,7 @@ export type ProductOrderCartItem = {
     discountAmount?: number
     finalTotalPrice?: number
     finalPricePerItem?: number
+    imageUrl?: string
 }
 
 export type ProductCategory = {
