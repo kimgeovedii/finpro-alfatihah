@@ -1,16 +1,16 @@
 "use client";
 
 import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
   DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { DeleteCategoryDialogProps } from "@/features/manageCategories/types/manageCategory.type";
 
 export const DeleteCategoryDialog: React.FC<DeleteCategoryDialogProps> = ({
@@ -22,60 +22,65 @@ export const DeleteCategoryDialog: React.FC<DeleteCategoryDialogProps> = ({
 }) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[420px] bg-white rounded-2xl border-none shadow-2xl p-0 overflow-hidden">
-        <div className="p-6">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center shrink-0">
-              <ExclamationTriangleIcon className="w-6 h-6 text-red-600" />
-            </div>
-            <div>
-              <DialogTitle className="text-xl font-bold text-[#2c2f30]">
-                Delete Category
-              </DialogTitle>
-              <DialogDescription className="text-[#595c5d] text-sm">
-                This action is permanent and cannot be undone.
-              </DialogDescription>
-            </div>
-          </div>
-
-          <div className="bg-[#fef2f2] rounded-xl p-4 border border-red-100 mb-6">
-            <p className="text-sm text-red-800 font-medium">
-              Are you sure you want to delete{" "}
-              <span className="font-bold underline">"{category?.name}"</span>?
-            </p>
-            <p className="text-xs text-red-600/80 mt-1">
-              All products associated with this category may lose their
-              classification.
-            </p>
-          </div>
-
-          <DialogFooter className="gap-2 sm:gap-0 mt-2">
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => onOpenChange(false)}
-              className="flex-1 rounded-xl hover:bg-[#f0f1f2] text-[#595c5d] font-medium"
+      <AnimatePresence>
+        {open && (
+          <DialogContent className="sm:max-w-sm" showCloseButton>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
             >
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              disabled={isDeleting}
-              onClick={onConfirm}
-              className="flex-1 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold shadow-md shadow-red-200"
-            >
-              {isDeleting ? (
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Deleting...
+              <DialogHeader>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-[#b31b25] shrink-0">
+                    <ExclamationTriangleIcon className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <DialogTitle className="text-base font-bold text-[#2c2f30]">
+                      Delete Category
+                    </DialogTitle>
+                    <DialogDescription className="mt-0.5">
+                      This action cannot be undone.
+                    </DialogDescription>
+                  </div>
                 </div>
-              ) : (
-                "Yes, Delete"
-              )}
-            </Button>
-          </DialogFooter>
-        </div>
-      </DialogContent>
+              </DialogHeader>
+
+              <div className="mt-4 p-3 rounded-lg bg-red-50/50 border border-red-100">
+                <p className="text-sm text-[#2c2f30]">
+                  Are you sure you want to delete{" "}
+                  <span className="font-semibold">
+                    &ldquo;{category?.name}&rdquo;
+                  </span>
+                  ? Products in this category will be moved to "Other".
+                </p>
+              </div>
+
+              <DialogFooter className="mt-4">
+                <motion.button
+                  type="button"
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => onOpenChange(false)}
+                  className="px-4 py-2 rounded-lg text-sm font-medium text-[#595c5d] hover:bg-[#eff1f2] transition-colors"
+                >
+                  Cancel
+                </motion.button>
+                <motion.button
+                  type="button"
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={onConfirm}
+                  disabled={isDeleting}
+                  className="px-5 py-2 rounded-lg bg-[#b31b25] text-white text-sm font-medium shadow-sm hover:bg-[#9f0519] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isDeleting ? "Deleting..." : "Delete"}
+                </motion.button>
+              </DialogFooter>
+            </motion.div>
+          </DialogContent>
+        )}
+      </AnimatePresence>
     </Dialog>
   );
 };

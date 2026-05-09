@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useSearchFilters } from "../hooks/useSearchFilters";
+import { useCatalogFilters } from "../hooks/useCatalogFilters";
 import { usePriceFilter } from "../hooks/usePriceFilter";
 import {
   Popover,
@@ -37,7 +37,7 @@ export const SearchHeader = () => {
     minPrice,
     maxPrice,
   } = useSearchStore();
-  const { updateFilters } = useSearchFilters();
+  const { updateFilters } = useCatalogFilters();
   const { localMin, localMax, handlePriceChange } = usePriceFilter();
   const pathname = usePathname();
   const isCategoryPage = pathname.startsWith("/categories/");
@@ -69,18 +69,16 @@ export const SearchHeader = () => {
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent className="rounded-xl border-slate-100 dark:border-slate-800">
-                {!isCategoryPage && (
-                  <SelectItem
-                    value="all"
-                    className={cn(
-                      "text-xs font-bold py-3 transition-colors hover:bg-[#f8fafc] focus:bg-[#f8fafc] cursor-pointer",
-                      !categoryId &&
-                        "text-[#006666] bg-[#f0fdfa] focus:bg-[#f0fdfa] focus:text-[#006666]",
-                    )}
-                  >
-                    All Categories
-                  </SelectItem>
-                )}
+                <SelectItem
+                  value="all"
+                  className={cn(
+                    "text-xs font-bold py-3 transition-colors hover:bg-[#f8fafc] focus:bg-[#f8fafc] cursor-pointer",
+                    !categoryId &&
+                      "text-[#006666] bg-[#f0fdfa] focus:bg-[#f0fdfa] focus:text-[#006666]",
+                  )}
+                >
+                  All Categories
+                </SelectItem>
                 {categories.map((cat) => (
                   <SelectItem
                     key={cat.id}

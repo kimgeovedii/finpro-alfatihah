@@ -31,9 +31,9 @@ class ProductImagesFactory {
         
         if (!targetProduct) throw new Error('Cannot create product image without product or valid productId')
 
-        // Generate realistic image URL using faker, related to the product name
-        const keyword = encodeURIComponent(targetProduct.productName.split(' ').pop() || 'grocery');
-        const imageUrl = `https://loremflickr.com/800/600/${keyword}?lock=${faker.number.int({ min: 1000, max: 9999 })}`;
+        // Generate placeholder image URL
+        const keyword = encodeURIComponent(targetProduct.productName);
+        const imageUrl = `https://placehold.co/800x600?text=${keyword}`;
 
         // For simplicity, set first image as primary, others as secondary
         // In a real scenario, you'd check existing images for the product
@@ -72,8 +72,8 @@ class ProductImagesFactory {
 
             if (isPrimary) hasPrimary = true
 
-            const keyword = encodeURIComponent(targetProduct.productName.split(' ').pop() || 'grocery');
-            const imageUrl = `https://loremflickr.com/800/600/${keyword}?lock=${faker.number.int({ min: 1000, max: 9999 })}`;
+            const keyword = encodeURIComponent(targetProduct.productName);
+            const imageUrl = `https://placehold.co/800x600?text=${keyword}`;
 
             const image = await this.productImageService.createImage({
                 id: faker.string.uuid(),
@@ -108,6 +108,25 @@ class ProductImagesFactory {
             allImages.push(...productImages)
         }
         return allImages
+    }
+    // Create images using specific URLs
+    public createWithCustomUrls = async (productId: string, urls: string[]) => {
+        const createdImages = []
+        
+        for (let i = 0; i < urls.length; i++) {
+            // First image in the array is usually primary
+            const isPrimary = i === 0
+
+            const image = await this.productImageService.createImage({
+                id: faker.string.uuid(),
+                productId,
+                imageUrl: urls[i],
+                isPrimary,
+                createdAt: faker.date.past({ years: 1 }),
+            })
+            createdImages.push(image)
+        }
+        return createdImages
     }
 }
 
