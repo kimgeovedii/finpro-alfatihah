@@ -13,7 +13,7 @@ import { sendError } from "./utils/apiResponse";
 import { Prisma } from "@prisma/client";
 import { CartCron } from "./features/carts/crons/cart.cron";
 import { OrderCron } from "./features/orders/crons/order.cron";
-import { auditError } from "./utils/audit";
+// import { auditError } from "./utils/audit";
 
 class App {
   public app: Application;
@@ -92,7 +92,7 @@ class App {
       
       // Audit server error
       if (statusCode === 500) {
-        auditError(err, req)
+        // auditError(err, req)
         
         return sendError(res, "Something went wrong", 500)
       }
