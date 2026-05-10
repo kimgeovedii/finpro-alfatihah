@@ -8,14 +8,57 @@ import { courierShippingDefault } from "../../../constants/business.const";
 import { isWithinDeliveryRange } from "../../../utils/location";
 import { getCityIdFromCoords, getShippingCost } from "../../../utils/shipping";
 import { getStoreOpenStatus } from "../../../utils/business";
+import { GlobalAddressRepository } from "../../globals/address.repository";
 
 export class CartService {
+    // Global Repo
+    private globalAddressRepo = new GlobalAddressRepository()
+    // Feature Repo
     private cartRepo = new CartRepository()
     private cartItemRepo = new CartItemRepository()
     private branchInventoryRepo = new BranchInventoryRepository()
 
-    async getAllCarts(page: number, limit: number, userId: string, branchId: string | null) {
-        return await this.cartRepo.findAllCarts(page, limit, userId, branchId)
+    async getAllCarts(userId: string, addressId: string | null, coordinate: string | null) {
+        // Repo : get all cart
+        const carts = await this.cartRepo.findAllCarts(userId)
+        if (!carts.length) return null
+        if (!addressId && !coordinate) return carts
+
+        let targetLat = 0
+        let targetLong = 0
+        // Priority using address
+        if (addressId) {
+            // Repo : get all address
+            const addresses = await this.globalAddressRepo.findManyByUserId(userId)
+
+            // Filter address by address id
+            const selectedAddress = addresses.find((dt) => dt.id === addressId)
+
+            // If address not found
+            if (!selectedAddress) throw { code: 404, message: 'Address not found' }
+
+            targetLat = selectedAddress.lat
+            targetLong = selectedAddress.long
+        } else {
+            const [lat, long] = coordinate!.split(',')
+            targetLat = Number(lat)
+            targetLong = Number(long)
+        }
+
+        // Filter valid carts by delivery range
+        const filteredCarts = carts.map((cart) => {
+                const { isInsideRange, distance } = isWithinDeliveryRange(targetLat, targetLong, cart.branch.latitude, cart.branch.longitude, cart.branch.maxDeliveryDistance)
+
+                return { ...cart, distance: Number(distance.toFixed(2)), isInsideRange }
+            })
+            .filter((cart) => cart.isInsideRange)
+            .sort((a, b) => a.distance - b.distance)
+
+        // If no nearest cart
+        if (!filteredCarts.length) return null
+
+        // Return nearest cart only
+        return filteredCarts[0]
     }
 
     async getCartDetailById(userId: string, cartId: string, addressId: string | null) {

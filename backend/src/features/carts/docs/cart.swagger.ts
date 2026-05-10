@@ -134,28 +134,24 @@
  * /api/carts:
  *   get:
  *     summary: Get all carts
- *     description: Retrieve all carts for the authenticated user with pagination. Optionally filter by branchId to return a single cart object instead of an array.
+ *     description: Retrieve all carts for the authenticated user. Can optionally filter nearest valid cart using addressId or coordinate.
  *     tags: [Cart]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           example: 1
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           example: 14
- *       - in: query
- *         name: branchId
+ *         name: addressId
  *         required: false
  *         schema:
  *           type: string
  *           format: uuid
  *           example: 3212d7e9-0dd0-4558-8ae8-813fd063970a
+ *       - in: query
+ *         name: coordinate
+ *         required: false
+ *         schema:
+ *           type: string
+ *           example: "-6.230495761995336,106.81826499782397"
  *     responses:
  *       200:
  *         description: Cart fetched successfully
@@ -167,55 +163,33 @@
  *                 success: { type: boolean, example: true }
  *                 message: { type: string, example: Cart fetched }
  *                 data:
- *                   type: object
- *                   properties:
- *                     data:
- *                       type: array
+ *                   oneOf:
+ *                     - type: array
  *                       items:
  *                         type: object
  *                         properties:
- *                           id:
- *                             type: string
- *                             format: uuid
- *                             example: 96c69d82-a91e-4ded-bc3a-7088236918ae
- *                           branchId:
- *                             type: string
- *                             format: uuid
- *                             example: 3212d7e9-0dd0-4558-8ae8-813fd063970a
+ *                           id: { type: string, format: uuid, example: 96c69d82-a91e-4ded-bc3a-7088236918ae }
+ *                           branchId: { type: string, format: uuid, example: 3212d7e9-0dd0-4558-8ae8-813fd063970a }
+ *                           distance: { type: number, example: 4.17 }
+ *                           isInsideRange: { type: boolean, example: true }
  *                           items:
  *                             type: array
  *                             items:
  *                               type: object
  *                               properties:
- *                                 id:
- *                                   type: string
- *                                   format: uuid
- *                                   example: 54295d89-c211-455f-928d-d9b7631be94a
- *                                 quantity:
- *                                   type: integer
- *                                   example: 3
+ *                                 id: { type: string, format: uuid, example: 54295d89-c211-455f-928d-d9b7631be94a }
+ *                                 quantity: { type: integer, example: 3 }
  *                                 product:
  *                                   type: object
  *                                   properties:
- *                                     id:
- *                                       type: string
- *                                       format: uuid
- *                                       example: 38401a75-286e-4cdb-8624-30a5ff12aad9
- *                                     currentStock:
- *                                       type: integer
- *                                       example: 249
+ *                                     id: { type: string, format: uuid, example: 38401a75-286e-4cdb-8624-30a5ff12aad9 }
+ *                                     currentStock: { type: integer, example: 249 }
  *                                     product:
  *                                       type: object
  *                                       properties:
- *                                         productName:
- *                                           type: string
- *                                           example: Sunpride Cavendish Banana 1kg
- *                                         slugName:
- *                                           type: string
- *                                           example: sunpride-cavendish-banana-1kg-5a2lp
- *                                         basePrice:
- *                                           type: number
- *                                           example: 48660
+ *                                         productName: { type: string, example: Sunpride Cavendish Banana 1kg }
+ *                                         slugName: { type: string, example: sunpride-cavendish-banana-1kg-5a2lp }
+ *                                         basePrice: { type: number, example: 48660 }
  *                                         productImages:
  *                                           type: array
  *                                           items:
@@ -229,13 +203,32 @@
  *                               storeName: { type: string, example: Pasar Segar Monas }
  *                               city: { type: string, example: Jakarta Pusat }
  *                               slug: { type: string, example: pasar-segar-monas }
- *                     meta:
- *                       type: object
+ *                               latitude: { type: number, example: -6.175392 }
+ *                               longitude: { type: number, example: 106.827153 }
+ *                               maxDeliveryDistance: { type: number, example: 10 }
+ *                     - type: object
  *                       properties:
- *                         page: { type: integer, example: 1 }
- *                         limit: { type: integer, example: 14 }
- *                         total: { type: integer, example: 2 }
- *                         totalPages: { type: integer, example: 1 }
+ *                         id: { type: string, format: uuid, example: 96c69d82-a91e-4ded-bc3a-7088236918ae }
+ *                         branchId: { type: string, format: uuid, example: 3212d7e9-0dd0-4558-8ae8-813fd063970a }
+ *                         distance: { type: number, example: 4.25 }
+ *                         isInsideRange: { type: boolean, example: true }
+ *                         items:
+ *                           type: array
+ *                           items:
+ *                             type: object
+ *                             properties:
+ *                               id: { type: string, format: uuid, example: 54295d89-c211-455f-928d-d9b7631be94a }
+ *                               quantity: { type: integer, example: 3 }
+ *                         branch:
+ *                           type: object
+ *                           properties:
+ *                             id: { type: string, format: uuid, example: 3212d7e9-0dd0-4558-8ae8-813fd063970a }
+ *                             storeName: { type: string, example: Pasar Segar Monas }
+ *                             city: { type: string, example: Jakarta Pusat }
+ *                             slug: { type: string, example: pasar-segar-monas }
+ *                             latitude: { type: number, example: -6.175392 }
+ *                             longitude: { type: number, example: 106.827153 }
+ *                             maxDeliveryDistance: { type: number, example: 10 }
  *
  *       400:
  *         description: Validation error
@@ -245,7 +238,7 @@
  *               type: object
  *               properties:
  *                 success: { type: boolean, example: false }
- *                 message: { type: string, example: branchId is not valid UUID }
+ *                 message: { type: string, example: coordinate format must be lat,long }
  *
  *       401:
  *         description: Unauthorized - No token provided
@@ -256,6 +249,16 @@
  *               properties:
  *                 success: { type: boolean, example: false }
  *                 message: { type: string, example: No token provided }
+ *
+ *       404:
+ *         description: Address not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: false }
+ *                 message: { type: string, example: Address not found }
  *
  *       500:
  *         description: Internal server error

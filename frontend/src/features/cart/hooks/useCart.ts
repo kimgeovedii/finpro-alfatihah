@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react"
 import { useCartService } from "../services/cart.service"
 import { cartRepository } from "../repositories/cart.repository"
-import { CartBranch, CartData } from "../repositories/cart.type"
-import { PaginationMeta } from "@/types/global.type"
+import { CartBasedAddress, CartData } from "../repositories/cart.type"
 import { closeLoading, showLoading } from "@/utils/message.util"
 
 export const useCartSummary = () => {
@@ -15,25 +14,22 @@ export const useCartSummary = () => {
     return { summary, isLoading, fetchCartSummary }
 }
 
-export const useAllCartData = () => {
-    const [carts, setCarts] = useState<CartBranch[]>([])
-    const [meta, setMeta] = useState<PaginationMeta | null>(null)
+export const useAllCartData = (addressId: string | null, coordinate: string | null) => {
+    const [cart, setCart] = useState<CartBasedAddress>()
     const [isLoadingAllCart, setIsLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
-    const fetchAllCarts = async (page = 1) => {
+    const fetchAllCarts = async (addressId: string | null, coordinate: string | null) => {
         setIsLoading(true)
         setError(null)
 
         try {
             // Repo : Get all cart
             showLoading("Loading...")
-            const res = await cartRepository.getAllCarts(page)
+            const res = await cartRepository.getAllCarts(addressId, coordinate)
             closeLoading()
 
-            setCarts((prev) => page === 1 ? res.data : [...prev, ...res.data])
-
-            setMeta(res.meta)
+            setCart(res)
         } catch (err: any) {
             setError(err.message || "Failed to fetch carts")
         } finally {
@@ -41,11 +37,7 @@ export const useAllCartData = () => {
         }
     }
 
-    useEffect(() => {
-        fetchAllCarts(1)
-    }, [])
-
-    return { carts, meta, isLoadingAllCart, error, fetchAllCarts }
+    return { cart, isLoadingAllCart, error, fetchAllCarts }
 }
 
 export const useDeleteCart = () => {
