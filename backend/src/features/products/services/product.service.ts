@@ -1,5 +1,7 @@
 import { ProductRepository } from "../repositories/product.repository";
 import { cloudinaryUpload } from "../../../config/cloudinary";
+import { prisma } from "../../../config/prisma";
+import { TransactionType, ReferenceType } from "@prisma/client";
 
 export class ProductService {
   private productRepository: ProductRepository;
@@ -147,7 +149,46 @@ export class ProductService {
         .filter(Boolean);
     return [];
   };
-  public deleteProduct = async (id: string) => {
-    return await this.productRepository.deleteProduct(id);
+  public deleteProduct = async (id: string, user: any) => {
+    const product = await this.productRepository.getProductById(id);
+    if (!product) throw new Error("Product not found");
+
+    const inventories = await prisma.branch_inventories.findMany({
+      where: { productId: id },
+    });
+
+    return await prisma.$transaction(async (tx) => {
+      for (const inventory of inventories) {
+        if (inventory.currentStock > 0) {
+          const stockBefore = inventory.currentStock;
+          const stockAfter = 0;
+          const quantityChange = stockBefore;
+
+          await tx.stock_journals.create({
+            data: {
+              branchInventoryId: inventory.id,
+              productId: id,
+              transactionType: TransactionType.OUT,
+              quantityChange,
+              stockBefore,
+              stockAfter,
+              referenceType: ReferenceType.MANUAL,
+              notes: "Stock zeroed due to product deletion",
+              createdBy: user?.employee?.id,
+            },
+          });
+
+          await tx.branch_inventories.update({
+            where: { id: inventory.id },
+            data: { currentStock: 0 },
+          });
+        }
+      }
+
+      return await tx.products.update({
+        where: { id },
+        data: { deletedAt: new Date() },
+      });
+    });
   };
 }
