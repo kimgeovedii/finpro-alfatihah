@@ -1,12 +1,13 @@
 import { apiFetch } from "@/utils/api"
-import { CartData, CartResponse, CartSummaryData } from "./cart.type"
+import { CartBasedAddress, CartData, CartSummaryData } from "./cart.type"
 
 export const cartRepository = {
     async getCartSummary(): Promise<CartSummaryData> {
         return await apiFetch<CartSummaryData>("/carts/summary","get")
     },
-    async getAllCarts(page: number = 1): Promise<CartResponse> {
-        return await apiFetch<CartResponse>(`/carts?page=${page}`, "get")
+    async getAllCarts(addressId: string | null, coordinate: string | null): Promise<CartBasedAddress> {
+        const query = new URLSearchParams({ ...(addressId && { addressId }), ...(coordinate && { coordinate })}).toString()
+        return await apiFetch<CartBasedAddress>(`/carts${query ? `?${query}` : ""}`, "get")
     },
     async deleteCart(cartId: string): Promise<{ cartId: string }> {
         return await apiFetch<{ cartId: string }>(`/carts/delete/${cartId}`, "delete")

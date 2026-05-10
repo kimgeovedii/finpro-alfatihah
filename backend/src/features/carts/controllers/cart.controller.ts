@@ -32,22 +32,22 @@ export class CartController {
             const userId = req.user?.userId 
 
             // Query param
-            const page = Number(req.query.page) || 1
-            const limit = Number(req.query.limit) || paginationDefault
-            const branchId = typeof req.query.branchId === 'string' ? req.query.branchId.trim() : null
+            const addressId = typeof req.query.addressId === 'string' ? req.query.addressId.trim() : null
+            const coordinate = typeof req.query.coordinate === 'string' ? req.query.coordinate.trim() : null
 
             // Validate the UUID format
-            if (branchId && !uuidRegex.test(branchId)) throw { code: 400, message: 'branchId is not valid UUID' }
+            if (addressId && !uuidRegex.test(addressId)) throw { code: 400, message: 'addressId is not valid UUID' }
+
+            // Validate the coordinate
+            if (coordinate) {
+                const splitted = coordinate.split(',')
+                if (splitted.length !== 2 || isNaN(Number(splitted[0])) || isNaN(Number(splitted[1]))) throw { code: 400, message: 'coordinate format must be lat,long' }
+            }
             
             // Service
-            const result = await this.cartService.getAllCarts(page, limit, userId, branchId)
+            const data = await this.cartService.getAllCarts(userId, addressId, coordinate)
 
-            return sendSuccess(res, {
-                data: result.data,
-                meta: {
-                    page, limit, total: result.total, totalPages: Math.ceil(result.total / limit),
-                },
-            }, "Cart fetched")
+            return sendSuccess(res, data, "Cart fetched")
         } catch (error: any) {
             next(error)
         }

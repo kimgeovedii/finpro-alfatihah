@@ -1,4 +1,3 @@
-import { baseShippingCost, shippingRatePerKM } from "../constants/business.const"
 import { earthRadiusKM } from "../constants/formula.const"
 
 // Returns distance in KM between two coordinates (Haversine formula)
