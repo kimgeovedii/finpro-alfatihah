@@ -155,7 +155,7 @@ export class CartService {
         return await this.cartRepo.getCartSummary(userId, branchId)
     }
 
-    async addToCart(userId: string, payload: { productId: string, branchId: string, qty: number | null }) {
+    async addToCart(userId: string, payload: { productId: string, branchId: string, qty?: number | null }) {
         let { productId, branchId, qty } = payload
         const finalQty = qty ?? 1
 
