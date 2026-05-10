@@ -109,6 +109,9 @@ class App {
 }
 
 const server = new App();
-server.start();
 
-export default server;
+if (!process.env.VERCEL) {
+  server.start();
+}
+
+export default server.app;
