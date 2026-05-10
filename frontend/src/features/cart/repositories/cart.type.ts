@@ -18,16 +18,12 @@ export type CartItem = {
     }
 }
 
-export type CartBranch = {
+export type CartBasedAddress = {
     id: string
     branchId: string
     branch: BranchData
     items: CartItem[]
-}
-
-export type CartResponse = {
-    data: CartBranch[]
-    meta: PaginationMeta
+    distance?: number
 }
 
 // Cart Detail
