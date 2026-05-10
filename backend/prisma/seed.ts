@@ -5,7 +5,6 @@ import CartFactory from './factories/carts.factory';
 import OrderFactory from './factories/orders.factory';
 import ProductCategoriesFactory from './factories/product_categories.factory';
 import ProductsFactory from './factories/products.factory';
-import ProductImagesFactory from './factories/product_images.factory';
 import BranchInventoriesFactory from './factories/branch_inventories.factory';
 import DiscountsFactory from './factories/discounts.factory';
 import ProductDiscountsFactory from './factories/product_discounts.factory';
@@ -60,9 +59,6 @@ async function main() {
   const totalProducts = 50;
   const productsFactory = new ProductsFactory();
   await productsFactory.createMany(totalProducts);
-
-  const productImagesFactory = new ProductImagesFactory();
-  await productImagesFactory.createForAllProducts();
 
   const branchInventoriesFactory = new BranchInventoriesFactory();
   await branchInventoriesFactory.createForAllBranchProducts();
