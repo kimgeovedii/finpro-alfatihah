@@ -56,7 +56,7 @@ export const useNavbar = () => {
 
   const handleCartClick = useCallback(() => {
     if (!handleProtectedAction("mengakses keranjang")) return;
-    window.location.href = "/cart";
+    router.push('/cart')
   }, [handleProtectedAction]);
 
   const handleLogout = useCallback(async () => {

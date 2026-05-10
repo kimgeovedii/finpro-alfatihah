@@ -129,57 +129,41 @@ export class CartRepository {
     return { ...cart, items, totalBasePrice, totalQty, totalWeight, totalDiscountProduct, finalTotalPrice }
   }
 
-  async findAllCarts(page: number, limit: number, userId: string, branchId: string | null) {
-    const skip = (page - 1) * limit
-
-    const where: Prisma.cartsWhereInput = {
-      userId,
-      ...(branchId && { branchId })
-    }
-
-    const [rawData, total] = await Promise.all([
-      prisma.carts.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: { createdAt: 'desc' },
-        select: {
-          id: true, branchId: true, 
-          items: {
-            orderBy: {
-              quantity: 'desc'
-            },
-            select: {
-              id: true, quantity: true, 
-              product: {                         
-                select: {
-                  id: true, currentStock: true, product: {                 
-                    select: {
-                      productName: true, slugName: true, basePrice: true,
-                      productImages: {
-                        select: { imageUrl: true },
-                        where: { isPrimary: true },
-                        take: 1
-                      },
-                    }
-                  },
-                }
+  async findAllCarts(userId: string) {
+    return await prisma.carts.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true, branchId: true, 
+        items: {
+          orderBy: {
+            quantity: 'desc'
+          },
+          select: {
+            id: true, quantity: true, 
+            product: {                         
+              select: {
+                id: true, currentStock: true, product: {                 
+                  select: {
+                    productName: true, slugName: true, basePrice: true,
+                    productImages: {
+                      select: { imageUrl: true },
+                      where: { isPrimary: true },
+                      take: 1
+                    },
+                  }
+                },
               }
             }
-          },
-          branch: {
-            select: {
-              id: true, storeName: true, city: true, slug: true
-            }
+          }
+        },
+        branch: {
+          select: {
+            id: true, storeName: true, city: true, slug: true, latitude: true, longitude: true, maxDeliveryDistance: true
           }
         }
-      }),
-      prisma.carts.count({ where })
-    ])
-
-    const data = branchId ? (rawData[0] ?? null) : rawData
-
-    return { data, total }
+      }
+    })
   }
 
   async findAllCartsCron(maxDays: number) {
