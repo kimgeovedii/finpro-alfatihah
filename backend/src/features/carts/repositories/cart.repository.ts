@@ -14,8 +14,13 @@ export class CartRepository {
           select: {
             quantity: true
           }
+        },
+        branch: {
+          select: {
+            id: true, storeName: true, city: true, slug: true, latitude: true, longitude: true, maxDeliveryDistance: true
+          }
         }
-      }
+      }, 
     })
 
     // Sum qty from all cart items

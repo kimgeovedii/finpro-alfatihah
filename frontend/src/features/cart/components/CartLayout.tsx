@@ -17,18 +17,18 @@ export function CartLayout() {
 
     // Handle hook (fetch)
     const { summary, isLoading, fetchCartSummary } = useCartSummary()
-    const { cart, isLoadingAllCart, fetchAllCarts } = useAllCartData(selectedAddressId, coordinate)
+    const { cart, isLoadingAllCart, fetchAllCarts } = useAllCartData()
 
     useEffect(() => {
         if (!selectedAddressId && !coordinate) return
     
-        fetchCartSummary()
+        fetchCartSummary(selectedAddressId, coordinate)
         fetchAllCarts(selectedAddressId, coordinate)
     }, [selectedAddressId, coordinate])
 
     // Handle hook (action)
     const onSuccess = () => {
-        fetchCartSummary()
+        fetchCartSummary(selectedAddressId, coordinate)
         fetchAllCarts(selectedAddressId, coordinate)
     }
 
