@@ -36,7 +36,7 @@ export const ProductCardItem = ({
 
   // Handle hook
   const { createCart, isCreating } = useCreateCart();
-  const { fetchCartSummary } = useCartService();
+  const fetchCartSummary = useCartService((state) => state.fetchCartSummary);
   const role = useAuthStore((state) => state.user?.role);
 
   const handleAddToCart = async (
