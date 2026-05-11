@@ -7,14 +7,10 @@ import { closeLoading, showLoading } from "@/utils/message.util"
 export const useCartSummary = () => {
     const { summary, fetchCartSummary, isLoading, error } = useCartService()
 
-    useEffect(() => {
-        fetchCartSummary()
-    }, [])
-
     return { summary, isLoading, fetchCartSummary }
 }
 
-export const useAllCartData = (addressId: string | null, coordinate: string | null) => {
+export const useAllCartData = () => {
     const [cart, setCart] = useState<CartBasedAddress>()
     const [isLoadingAllCart, setIsLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
