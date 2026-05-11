@@ -7,7 +7,7 @@ type CartState = {
     isLoading: boolean
     error: string | null
 
-    fetchCartSummary: () => Promise<void>
+    fetchCartSummary: (addressId: string | null, coordinate: string | null) => Promise<void>
 }
 
 export const useCartService = create<CartState>((set) => ({
@@ -15,11 +15,11 @@ export const useCartService = create<CartState>((set) => ({
     isLoading: false,
     error: null,
 
-    fetchCartSummary: async () => {
+    fetchCartSummary: async (addressId: string | null, coordinate: string | null) => {
         set({ isLoading: true, error: null })
 
         try {
-            const data = await cartRepository.getCartSummary()
+            const data = await cartRepository.getCartSummary(addressId, coordinate)
 
             set({ summary: data, isLoading: false })
         } catch (err: any) {

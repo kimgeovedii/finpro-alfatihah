@@ -2,8 +2,9 @@ import { apiFetch } from "@/utils/api"
 import { CartBasedAddress, CartData, CartSummaryData } from "./cart.type"
 
 export const cartRepository = {
-    async getCartSummary(): Promise<CartSummaryData> {
-        return await apiFetch<CartSummaryData>("/carts/summary","get")
+    async getCartSummary(addressId: string | null, coordinate: string | null): Promise<CartSummaryData> {
+        const query = new URLSearchParams({ ...(addressId && { addressId }), ...(coordinate && { coordinate })}).toString()
+        return await apiFetch<CartSummaryData>(`/carts/summary${query ? `?${query}` : ""}`,"get")
     },
     async getAllCarts(addressId: string | null, coordinate: string | null): Promise<CartBasedAddress> {
         const query = new URLSearchParams({ ...(addressId && { addressId }), ...(coordinate && { coordinate })}).toString()

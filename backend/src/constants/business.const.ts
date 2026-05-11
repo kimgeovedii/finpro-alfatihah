@@ -9,7 +9,7 @@ export const orderCode: string = 'ORD'
 // Raja Ongkir : Shipment
 export const weightGramsShippingDefault: number = 1000 // 1 kg
 export const courierShippingDefault: string = 'jne' 
-export const isShipmentTesting: boolean = true
+export const isShipmentTesting: boolean = false
 export const mockShipmentCity: string = "Jakarta"
 export const mockShipmentPricePerKG: number = 18000
 // Multer & Cloudinary : File handling

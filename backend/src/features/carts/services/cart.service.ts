@@ -151,8 +151,74 @@ export class CartService {
         }
     }
 
-    async getCartSummary(userId: string, branchId: string | null) {
-        return await this.cartRepo.getCartSummary(userId, branchId)
+    async getCartSummary(userId: string, branchId: string | null, addressId: string | null, coordinate: string | null) {
+        // Repo : get cart summary directly by branchId
+        if (branchId) return await this.cartRepo.getCartSummary(userId, branchId)
+    
+        // Repo : get all carts
+        const carts = await this.cartRepo.findAllCarts(userId)
+    
+        // If no cart
+        if (!carts.length) return { totalItems: 0, totalQty: 0 }
+    
+        // Return all summary if no address / coordinate
+        if (!addressId && !coordinate) {
+            const allItems = carts.flatMap((cart) => cart.items)
+    
+            return {
+                totalItems: allItems.length,
+                totalQty: allItems.reduce((sum, item) => sum + item.quantity, 0)
+            }
+        }
+    
+        let targetLat = 0
+        let targetLong = 0
+        // Priority using address
+        if (addressId) {
+            // Repo : get all address
+            const addresses = await this.globalAddressRepo.findManyByUserId(userId)
+    
+            // Filter address by address id
+            const selectedAddress = addresses.find((dt) => dt.id === addressId)
+    
+            // If address not found
+            if (!selectedAddress) throw { code: 404, message: 'Address not found' }
+    
+            targetLat = selectedAddress.lat
+            targetLong = selectedAddress.long
+        } else {
+            const [lat, long] = coordinate!.split(',')
+    
+            targetLat = Number(lat)
+            targetLong = Number(long)
+        }
+    
+        // Filter valid carts by delivery range
+        const filteredCarts = carts.map((cart) => {
+                const { isInsideRange, distance } = isWithinDeliveryRange(
+                    targetLat,
+                    targetLong,
+                    cart.branch.latitude,
+                    cart.branch.longitude,
+                    cart.branch.maxDeliveryDistance
+                )
+    
+                return { ...cart, distance: Number(distance.toFixed(2)), isInsideRange }
+            })
+            .filter((cart) => cart.isInsideRange)
+            .sort((a, b) => a.distance - b.distance)
+    
+        // If no nearest cart
+        if (!filteredCarts.length) return { totalItems: 0, totalQty: 0 }
+    
+        // Get nearest cart only
+        const nearestCart = filteredCarts[0]
+    
+        // Sum qty from nearest cart items
+        const totalItems = nearestCart.items.length
+        const totalQty = nearestCart.items.reduce((sum, item) => sum + item.quantity, 0)
+    
+        return { totalItems, totalQty }
     }
 
     async addToCart(userId: string, payload: { productId: string, branchId: string, qty?: number | null }) {
