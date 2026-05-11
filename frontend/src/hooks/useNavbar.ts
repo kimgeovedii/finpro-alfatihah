@@ -15,6 +15,8 @@ export const useNavbar = () => {
   const [mounted, setMounted] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const fetchRef = useRef(false);
+  const { selectedAddressId, userCoords } = useHomeStore()
+  const coordinate = userCoords?.lat && userCoords?.lng ? `${userCoords.lat},${userCoords.lng}` : null
 
   useEffect(() => {
     setMounted(true);
@@ -26,7 +28,7 @@ export const useNavbar = () => {
 
   useEffect(() => {
     if (isAuthenticated() && isVerified()) {
-      fetchCartSummary();
+      fetchCartSummary(selectedAddressId, coordinate);
     }
   }, [isAuthenticated, isVerified, fetchCartSummary]);
 
