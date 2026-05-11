@@ -11,8 +11,23 @@ import { OrderSummaryCard } from "@/features/order/components/OrderSummaryCard";
 import { useAllOrderData, useOrderSummary } from "@/features/order/hooks/useOrder";
 import { useOrderActions } from "@/features/order/hooks/useOrderAction";
 import { CloudArrowDownIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export function OrderLayout() {
+    const router = useRouter()
+    const searchParams = useSearchParams()
+
+    // Clean midtrans redirect url after payment gateway
+    useEffect(() => {
+        const orderNumber = searchParams.get("order_id")
+        const statusCode = searchParams.get("status_code")
+        const transactionStatus = searchParams.get("transaction_status")
+        const hasMidtransParams = orderNumber || statusCode || transactionStatus
+    
+        if (hasMidtransParams && orderNumber) router.replace(`/transaction/${orderNumber}`)
+    }, [searchParams, router])
+
     // Handle hook (fetch)
     const { summary, isLoadingSummary } = useOrderSummary()
     const { orders, meta, isLoading, fetchAllOrders } = useAllOrderData()

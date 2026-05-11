@@ -8,7 +8,7 @@ export class OrderWebhookService {
 
     // Webhook
     async handleMidtransWebhook(notification: any) {
-        const { orderNumber, transaction_status, fraud_status } = notification
+        const { order_id, transaction_status, fraud_status } = notification
     
         let paymentStatus: PaymentStatus
     
@@ -22,11 +22,11 @@ export class OrderWebhookService {
             paymentStatus = 'PENDING'
         }
     
-        await this.paymentRepo.updatePaymentStatusByGatewayRef(orderNumber, paymentStatus)
+        await this.paymentRepo.updatePaymentStatusByGatewayRef(order_id, paymentStatus)
     
         if (paymentStatus === 'SUCCESS') {
-            const order = await this.orderRepo.findOrderById(orderNumber, "orderNumber")
-            if (order) await this.orderRepo.updateOrderStatusById(order.id, 'PROCESSING')
+            const order = await this.orderRepo.findOrderById(order_id, "orderNumber")
+            if (order) await this.orderRepo.updateOrderStatusById(order_id, 'PROCESSING')
         }
     }
 }
