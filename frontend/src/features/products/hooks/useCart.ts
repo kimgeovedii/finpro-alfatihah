@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { cartRepository } from "../repositories/cart.repository"
+import { useCartService } from "@/features/cart/services/cart.service"
 
 export const useCreateCart = () => {
     const [isCreating, setIsCreating] = useState(false)
@@ -11,6 +12,8 @@ export const useCreateCart = () => {
 
         try {
             await cartRepository.createCart(branchId, productId, qty)
+            // Auto-refresh cart summary so navbar badge updates
+            useCartService.getState().fetchCartSummary()
             return true
         } catch (err: any) {
             setError(err.message || "Failed to create cart")

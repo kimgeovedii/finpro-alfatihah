@@ -13,7 +13,6 @@ import { actionMessages } from "@/constants/message.const";
 import { showPopUp } from "@/utils/message.util";
 import { currencyFormat } from "@/constants/business.const";
 import { calculateDiscountedPrice } from "@/utils/discount.util";
-import { useCartService } from "@/features/cart/services/cart.service";
 
 interface ProductCardItemProps {
   product: ProductCard;
@@ -36,7 +35,6 @@ export const ProductCardItem = ({
 
   // Handle hook
   const { createCart, isCreating } = useCreateCart();
-  const fetchCartSummary = useCartService((state) => state.fetchCartSummary);
   const role = useAuthStore((state) => state.user?.role);
 
   const handleAddToCart = async (
@@ -60,14 +58,12 @@ export const ProductCardItem = ({
     // Handle hook
     const success = await createCart(branchId, productId)
 
-    if (success) {
-      await fetchCartSummary();
+    if (success)
       await showPopUp(
         actionMessages.productAddSuccessTitle,
         actionMessages.productCartSuccessDesc,
         "success",
       );
-    }
   };
 
   const handleCardClick = () => {
